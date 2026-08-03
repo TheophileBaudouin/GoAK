@@ -17,6 +17,13 @@ adding unsupported volume or ambiguity.
 - **Tooling installed locally:** golangci-lint v2, gosec, govulncheck (under
   `$(go env GOPATH)/bin`). PATH must include it for validation runs.
 
+## Repository
+
+- **Remote (origin):** <https://github.com/TheophileBaudouin/GoAK.git> — public repo, branch `main`.
+- **Initial commit:** `690aa35` (2026-08-03), 295 files, 17 334 insertions.
+- **Auth:** `gh auth setup-git` (account TheophileBaudouin). The macOS keychain previously held a stale `theocode29` credential — check `gh auth status` before pushing.
+- **Consequence:** `docs/evidence/` is now VCS-versioned and `.github/workflows/ci.yml` can run; PR-based evaluation gates become possible.
+
 ## Architecture
 
 Four analytical architecture shapes are now validated for agentic CLI tooling: L = local binary; CS = client/server with a separated backend; D = distributed harness with registries/transports/brokers; H = hybrid local-first / remote workbench. KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject.
@@ -106,4 +113,4 @@ the reason.
 
 ## Verification status
 
-The KitV2 gate and probes pass through the 2026-08-03 evidence records. The root harness validator is `.agent/validators/validate-instructions.py`; KitV2 uses `KitV2/tools/validators/validate-kitv2.py`. Remaining PARTIAL: no Git repository exists to prove evidence VCS-versioning; no real non-probe consumer-project maturity evidence; Pi discovery, Wails, and TUI remain separate/uncovered runtime checks. Bootstrap CLI/runtime architecture is documented only: no CLI, installer, repository, or release pipeline exists yet. The sequential audit of all 34 Niveau S/A registry resources is complete: official Go sources received dedicated `KitV2/knowledge` Source artifacts where absent; existing rules/recipes/catalogs were verified; specialized third-party resources were added only as conditional reference pointers without dependencies or unvalidated recipes. Product validator, tests, formatting, and probes pass.
+The KitV2 gate and probes pass through the 2026-08-03 evidence records. The root harness validator is `.agent/validators/validate-instructions.py`; KitV2 uses `KitV2/tools/validators/validate-kitv2.py`. The sequential audit of all 34 Niveau S/A registry resources is complete and dedicated Source artifacts ship in KitV2 knowledge. **VCS is now unblocked**: the metaproject is a Git repository pushed to <https://github.com/TheophileBaudouin/GoAK> (branch `main`, commit `690aa35`), so evidence versioning is provable and CI workflows can run. Remaining PARTIAL: no real non-probe consumer-project maturity evidence; Pi discovery, Wails, and TUI remain separate/uncovered runtime checks; bootstrap CLI/runtime architecture remains documented-only (no CLI, installer, or release pipeline yet).
