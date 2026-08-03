@@ -26,8 +26,9 @@ bootstrap_targets:
   - "go run <future-published-module>/cmd/gak@latest init"
 constraints:
   - >-
-    No repository, published module, installer, or release process currently
-    exists.
+    A public repository exists (TheophileBaudouin/GoAK, v2.1.0) and a tree-based
+    bootstrap installer (install.sh) ships as the interim distribution path; no
+    published Go module, gak CLI, or formal release pipeline exists yet.
   - "Deployment is not manual file copying."
   - >-
     @latest is a convenience selector; reproducibility requires resolved
@@ -48,4 +49,8 @@ relationships:
 notes: >-
   This is an architecture definition only. The future CLI must resolve a
   versioned release, select modules and one adapter, materialize a staged
-  runtime, validate it, and commit atomically with ownership metadata.
+  runtime, validate it, and commit atomically with ownership metadata. Until
+  then, the root install.sh bootstrap installer materializes the standalone
+  KitV2 product into a consumer directory and verifies it; it is the interim
+  path for the first benchmarkable version and never installs metaproject
+  material (.agent/, memory, decisions, evaluations).

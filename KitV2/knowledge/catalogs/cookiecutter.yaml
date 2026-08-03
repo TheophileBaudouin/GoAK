@@ -1,0 +1,27 @@
+---
+id: source:scaffolding:cookiecutter
+title: Cookiecutter project template generator reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [scaffolding, templates, python, generator, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://cookiecutter.readthedocs.io/
+selection: >-
+  Consider only when a consumer's workflow is already cookiecutter-based or
+  needs multi-language project templating. For Go projects, the kit's native
+  templates and the go-blueprint reference remain the Go-specific defaults.
+limits:
+  - >-
+    Cookiecutter is a Python tool and not a Go runtime capability; this pointer
+    has no runnable recipe and no product dependency.
+  - >-
+    Generated scaffolding must pass the consumer project's own validation and
+    architecture review before use; cookiecutter templates are not maintained
+    by this kit.
+relationships:
+  references:
+    - https://cookiecutter.readthedocs.io/

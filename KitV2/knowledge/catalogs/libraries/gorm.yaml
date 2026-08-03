@@ -1,0 +1,29 @@
+---
+id: source:go:gorm
+title: GORM ORM reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, database, orm, gorm, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/go-gorm/gorm
+selection: >-
+  Consider only when a consumer explicitly requests an ORM with schema
+  auto-migration, associations, and hooks over the kit's explicit-SQL default
+  (sqlc for static queries, database/sql plus a query builder for dynamic
+  ones). GORM remains an alternative paradigm, not a kit recommendation.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    validate the current release, driver, and Go version before adoption.
+  - >-
+    GORM hides SQL behind a reflection-based abstraction, which the sqlc
+    catalog rejects for a kit favouring explicit, auditable SQL; verify N+1
+    behaviour, eager-loading semantics, and migration side effects in the
+    consumer project.
+relationships:
+  references:
+    - https://github.com/go-gorm/gorm

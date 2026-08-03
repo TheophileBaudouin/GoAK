@@ -1,0 +1,23 @@
+---
+id: source:go:github-code-search
+title: GitHub Code Search reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, discovery, code-search, github, tool]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/search
+selection: >-
+  Use to find production implementations and real-world usage patterns.
+  Discovered code is a lead, not authority: verify semantics against the
+  primary source and the kit's validation gate before admission.
+limits:
+  - >-
+    Search results are unvetted community code; never copy a pattern without
+    understanding its license, dependencies, and tests.
+relationships:
+  references:
+    - https://github.com/search

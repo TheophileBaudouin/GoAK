@@ -1,0 +1,27 @@
+---
+id: source:go:uber-go-mock
+title: uber-go/mock (GoMock) reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, mocking, gomock, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/uber-go/mock
+selection: >-
+  Consider when interface-contract mocking is explicitly required; the kit's
+  testing rules remain stdlib-first with testify for assertions, and mocks are
+  only justified for verified interface boundaries.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    prefer hand-written fakes over generated mocks unless the interface surface
+    is genuinely large and stable.
+  - >-
+    Generated mock code must be regenerated and reviewed whenever the mocked
+    interface changes; validate the current release before adoption.
+relationships:
+  references:
+    - https://github.com/uber-go/mock

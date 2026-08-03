@@ -1,0 +1,25 @@
+---
+id: source:go:google-uuid
+title: Google UUID reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, uuid, identifiers, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/google/uuid
+selection: >-
+  Consider when RFC 4122 UUID generation is explicitly required. The kit's
+  dependency tree already carries google/uuid as an indirect dependency; the
+  standard library has no UUID type, so this small stable utility is a
+  reasonable explicit dependency when IDs are needed.
+limits:
+  - >-
+    This pointer is not a product recipe; validate the current release and use
+    the appropriate version variant (v4 random, v7 time-ordered) for the
+    consumer's indexing and ordering needs.
+relationships:
+  references:
+    - https://github.com/google/uuid

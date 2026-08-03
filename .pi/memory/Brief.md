@@ -19,11 +19,10 @@ adding unsupported volume or ambiguity.
 
 ## Repository
 
-- **Remote (origin):** <https://github.com/TheophileBaudouin/GoAK.git> — public repo, branch `main`.
-- **Initial commit:** `690aa35` (2026-08-03), 295 files, 17 334 insertions.
-- **Auth:** `gh auth setup-git` (account TheophileBaudouin). The macOS keychain previously held a stale `theocode29` credential — check `gh auth status` before pushing.
-- **Consequence:** `docs/evidence/` is now VCS-versioned and `.github/workflows/ci.yml` can run; PR-based evaluation gates become possible.
-
+- **Remote (origin):** <https://github.com/TheophileBaudouin/GoAK> — public repo, branch `main`, poussé (identité de commit locale corrigée : TheophileBaudouin — le commit initial 690aa35 était attribué à theocode29).
+- **Tag v2.1.0:** marqueur de la première version benchmarkable (aligné sur `manifest.yaml`), pas encore une politique de release formelle. `install.sh` (racine) est l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future.
+- **Auth:** `gh auth setup-git` (compte TheophileBaudouin). Le credential helper macOS a contenu un ancien identifiant theocode29 — toujours vérifier l'identité effective avant push.
+- **Conséquence:** `docs/evidence/` est VCS-versionné, `.github/workflows/ci.yml` peut tourner, PR-based evaluation gates deviennent possibles, et un consommateur peut installer le kit par `curl …/install.sh | sh`.
 ## Architecture
 
 Four analytical architecture shapes are now validated for agentic CLI tooling: L = local binary; CS = client/server with a separated backend; D = distributed harness with registries/transports/brokers; H = hybrid local-first / remote workbench. KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject.

@@ -1,0 +1,24 @@
+---
+id: source:go:mockery
+title: Mockery mock generator reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, mocking, mockery, codegen, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/vektra/mockery
+selection: >-
+  Consider when automated mock generation from interfaces is explicitly
+  required. Generated mocks must live in normal, non-dot paths so Go tooling
+  compiles and tests them, and must be regenerated on interface change.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    prefer hand-written fakes for small interfaces and validate the current
+    release before adoption.
+relationships:
+  references:
+    - https://github.com/vektra/mockery

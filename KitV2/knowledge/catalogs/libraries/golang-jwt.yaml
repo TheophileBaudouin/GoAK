@@ -1,0 +1,27 @@
+---
+id: source:go:golang-jwt
+title: golang-jwt JWT reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, security, jwt, authentication, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/golang-jwt/jwt
+selection: >-
+  Consider when JWT signing and verification are explicitly required for an API
+  authentication boundary. Validate token algorithms, key handling, expiry, and
+  audience claims in the consumer project.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release, algorithm defaults, and security guidance
+    before adoption.
+  - >-
+    JWT is one authentication mechanism among several; the consumer must choose
+    tokens, sessions, or mTLS deliberately at the trust boundary.
+relationships:
+  references:
+    - https://github.com/golang-jwt/jwt

@@ -1,0 +1,24 @@
+---
+id: source:go:prometheus-client
+title: Prometheus client_golang reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, observability, metrics, prometheus, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/prometheus/client_golang
+selection: >-
+  Consider for exposing a /metrics endpoint in Prometheus text format when the
+  consumer's monitoring stack is Prometheus-based. The kit's observability
+  standard is OpenTelemetry; Prometheus exposition is a complementary,
+  deployment-specific concern.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release and exposition format before adoption.
+relationships:
+  references:
+    - https://github.com/prometheus/client_golang

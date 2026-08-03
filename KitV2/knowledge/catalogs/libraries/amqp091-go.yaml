@@ -1,0 +1,28 @@
+---
+id: source:go:amqp091-go
+title: RabbitMQ AMQP 0-9-1 client reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, messaging, rabbitmq, amqp, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/rabbitmq/amqp091-go
+selection: >-
+  Consider for an explicitly requested RabbitMQ integration. The official
+  amqp091-go client exposes the AMQP 0-9-1 protocol directly (channels, queues,
+  exchanges, consumers) and is maintained by the RabbitMQ team.
+limits:
+  - >-
+    RabbitMQ requires broker infrastructure and is a project-scoped decision,
+    not a kit default; this pointer has no runnable recipe and no product
+    dependency.
+  - >-
+    The API is protocol-oriented; connection, channel, and consumer lifecycle
+    (reconnect, ack/nack, prefetch) must be designed and validated in the
+    consumer project.
+relationships:
+  references:
+    - https://github.com/rabbitmq/amqp091-go

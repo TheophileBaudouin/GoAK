@@ -1,0 +1,28 @@
+---
+id: source:go:fiber
+title: Fiber HTTP framework reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, http, web, fasthttp, fiber, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/gofiber/fiber
+selection: >-
+  Consider only when measured performance requirements justify fasthttp over
+  the kit's net/http plus chi default. Fiber's handler API is Express-like and
+  fasthttp-based, not net/http-compatible, so the standard Go middleware
+  ecosystem does not apply directly.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release, HTTP/2 support, and middleware compatibility
+    before adoption.
+  - >-
+    Handlers and request/response types diverge from net/http; porting stdlib
+    or chi-based code requires explicit adaptation and its own tests.
+relationships:
+  references:
+    - https://github.com/gofiber/fiber

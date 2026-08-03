@@ -1,0 +1,7 @@
+{
+  "ignore": [
+    ".pi-subagents/**",
+    ".ruff_cache/**",
+    "KitV2/tools/validators/__pycache__/**"
+  ]
+}

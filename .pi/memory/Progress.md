@@ -48,7 +48,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [ ] Codex output adapter.
 - [ ] Gemini CLI output adapter.
 
-## Future deployment foundation (blocked until a public repository exists)
+## Future deployment foundation (repository public ; module, CLI et pipeline de release toujours à venir)
 
 - [ ] Publish the canonical repository and public Go module.
 - [ ] Define release, versioning, checksums, and provenance policy.
@@ -131,6 +131,8 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed (this session)
 
+- [ ] Terminer l'audit d'intégration des 6 ressources Niveau B (GORM, Fiber, Kafka, RabbitMQ, Resty, Cookiecutter) + audit global du registre : 21 entrées Source conditionnelles ajoutées (6 Niveau B + 15 entrées non classées du corps), matrice de couverture 59/59, gate complète PASS, evidence docs/evidence/2026-08-03/b-resource-integration-audit.md, registre non modifié.
+
 ## KitV2 knowledge catalogs
 
 - [x] `chi` — go-chi/chi v5
@@ -161,4 +163,8 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] Metaproject memory: root `.pi/memory/` Brief / Progress / Gotchas / Agent / Decisions.
 - [x] Root CI and Dependabot point to KitV2; root and product ignore rules are present.
 - [x] External former-product archive and restore drill passed before deletion.
-- [ ] Publier le dépôt Git public du metaprojet — remote https://github.com/TheophileBaudouin/GoAK, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
+- [x] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
+emory/` Brief / Progress / Gotchas / Agent / Decisions.
+- [x] Root CI and Dependabot point to KitV2; root and product ignore rules are present.
+- [x] External former-product archive and restore drill passed before deletion.
+- [ ] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.

@@ -1,0 +1,27 @@
+---
+id: source:go:gin
+title: Gin HTTP framework reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, http, web, gin, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/gin-gonic/gin
+selection: >-
+  Consider when a consumer explicitly requires Gin's handler API and middleware
+  ecosystem. Gin is net/http-compatible at the adapter level (its engine
+  implements http.Handler) but its handler API is framework-specific; the kit's
+  default remains net/http plus chi.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release and handler-signature stability before adoption.
+  - >-
+    Porting stdlib or chi-based handlers requires explicit adaptation to the
+    Gin context API and its own tests.
+relationships:
+  references:
+    - https://github.com/gin-gonic/gin

@@ -1,0 +1,27 @@
+---
+id: source:go:sqlx
+title: sqlx database/sql extension reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, database, sql, sqlx, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/jmoiron/sqlx
+selection: >-
+  Consider as a thin extension of database/sql when scanning into structs,
+  named parameters, or in-clause helpers are needed without adopting an ORM.
+  The sqlc catalog already points to database/sql plus a query builder as the
+  fallback for dynamic queries; sqlx fits that same explicit-SQL posture.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release and driver compatibility before adoption.
+  - >-
+    sqlx still wraps database/sql, so pool, transaction, and context semantics
+    are governed by the underlying driver and stdlib behavior.
+relationships:
+  references:
+    - https://github.com/jmoiron/sqlx

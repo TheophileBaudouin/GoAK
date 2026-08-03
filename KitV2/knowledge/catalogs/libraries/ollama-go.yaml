@@ -1,0 +1,24 @@
+---
+id: source:go:ollama-go
+title: Ollama local model API reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, llm, ai, ollama, local, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/ollama/ollama
+selection: >-
+  Consider for an explicitly requested local-model integration. Ollama exposes
+  an HTTP API for running models locally, suitable for offline or private
+  agents, after model, resource, and data-handling requirements are specified.
+limits:
+  - >-
+    Local model serving is not a core Go runtime capability and is not
+    integrated as a KitV2 dependency or recipe; verify the current API and
+    security requirements first.
+relationships:
+  references:
+    - https://github.com/ollama/ollama

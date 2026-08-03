@@ -1,0 +1,23 @@
+---
+id: source:go:sourcegraph
+title: Sourcegraph code search reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, discovery, code-search, sourcegraph, tool]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://sourcegraph.com/
+selection: >-
+  Use for cross-repository code search and codebase analysis. Findings are
+  leads, not authority: verify semantics against the primary source and the
+  kit's validation gate before admission.
+limits:
+  - >-
+    Search results are unvetted community code; never copy a pattern without
+    understanding its license, dependencies, and tests.
+relationships:
+  references:
+    - https://sourcegraph.com/

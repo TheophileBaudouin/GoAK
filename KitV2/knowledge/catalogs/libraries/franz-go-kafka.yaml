@@ -1,0 +1,28 @@
+---
+id: source:go:franz-go
+title: franz-go Kafka client reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, messaging, kafka, franz-go, event-driven, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/twmb/franz-go
+selection: >-
+  Consider for an explicitly requested Kafka-based event-driven architecture.
+  franz-go is the actively maintained community client covering the modern
+  Kafka protocol (consumer groups, transactions, admin, stream processing).
+limits:
+  - >-
+    Kafka requires broker infrastructure and is a project-scoped decision, not
+    a kit default; this pointer has no runnable recipe and no product
+    dependency.
+  - >-
+    Verify the current release, broker version compatibility, consumer-group
+    semantics, and partitioning strategy in the consumer project before
+    adoption.
+relationships:
+  references:
+    - https://github.com/twmb/franz-go

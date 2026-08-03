@@ -1,0 +1,30 @@
+---
+id: source:go:resty
+title: Resty HTTP client reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, http, client, resty, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/go-resty/resty
+selection: >-
+  Consider a high-level HTTP client only when built-in retries, middleware,
+  backoff, and multipart features are explicitly required; the kit's canonical
+  client remains stdlib net/http. Resty is instance-oriented, so build and
+  reuse an explicit *resty.Client rather than relying on package-global
+  configuration.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release and net/http compatibility before adoption.
+  - >-
+    The kit's extract-only catalog for high-level HTTP client patterns is
+    imroc/req; evaluate Resty against it and against net/http before choosing,
+    and keep client configuration explicit and shared.
+relationships:
+  references:
+    - https://github.com/go-resty/resty
+    - https://github.com/imroc/req

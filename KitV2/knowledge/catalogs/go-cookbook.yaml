@@ -1,0 +1,23 @@
+---
+id: source:go:cookbook
+title: Go Cookbook reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, cookbook, recipes, discovery, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go-cookbook.com/
+selection: >-
+  Use as a discovery source for recipe-style patterns. Verify every pattern
+  against a primary source (official docs or maintained code) before admission;
+  the kit's own recipes remain the canonical, validated procedures.
+limits:
+  - >-
+    Community recipe content is not normative; always validate code samples
+    against the primary source and the kit's validation gate before use.
+relationships:
+  references:
+    - https://go-cookbook.com/

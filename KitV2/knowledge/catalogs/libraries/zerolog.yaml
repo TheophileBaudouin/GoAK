@@ -1,0 +1,22 @@
+---
+id: source:go:zerolog
+title: zerolog structured logging reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, logging, structured, zerolog, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/rs/zerolog
+selection: >-
+  Consider only when measured logging allocation or latency requirements
+  justify a third-party logger over the kit's slog default.
+limits:
+  - >-
+    This source pointer is not a product recommendation and has no runnable
+    recipe; validate the current release before adoption.
+relationships:
+  references:
+    - https://github.com/rs/zerolog

@@ -1,0 +1,24 @@
+---
+id: source:go:echo
+title: Echo HTTP framework reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, http, web, echo, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/labstack/echo
+selection: >-
+  Consider when a consumer explicitly requires Echo's full-featured handler API,
+  middleware, and binding helpers. Echo is net/http-compatible at the adapter
+  level but its handler API is framework-specific; the kit's default remains
+  net/http plus chi.
+limits:
+  - >-
+    This pointer is not a product recommendation and has no runnable recipe;
+    verify the current release and handler-signature stability before adoption.
+relationships:
+  references:
+    - https://github.com/labstack/echo

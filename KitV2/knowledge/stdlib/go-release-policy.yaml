@@ -1,0 +1,24 @@
+---
+id: source:go:release-policy
+title: Go Release Policy reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, toolchain, release, lifecycle, official]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/devel/release
+selection: >-
+  Consult before defining supported Go versions, update windows, and security
+  patching policy for a module or CI. The official cadence is two releases per
+  year with a rolling support window, so compatibility decisions must not be
+  based on an obsolete release.
+limits:
+  - >-
+    This is a documentation reference, not an executable artifact; check the
+    current release policy page when making a concrete version decision.
+relationships:
+  references:
+    - https://go.dev/doc/devel/release
