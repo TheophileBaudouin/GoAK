@@ -21,9 +21,12 @@ jobs:
       # can be repointed). SHAs resolved from the release tags below.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Explicit go-version, not go-version-file: gosec v2.28.0 requires
+      # go >= 1.25.8 while go.mod declares 1.25.6. '1.26' matches the local
+      # maintainer toolchain (go1.26.5) used by the validation gate.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version-file: KitV2/go.mod
+          go-version: '1.26'
           cache: true
 
       # gosec/govulncheck are not provided by setup-go; pinned to audited
