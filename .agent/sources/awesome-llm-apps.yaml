@@ -1,0 +1,20 @@
+id: source-awesome-llm-apps
+title: Awesome LLM Apps
+kind: source
+version: 1
+status: recorded
+owner: go-agent-kit
+url: https://github.com/Shubhamsaboo/awesome-llm-apps
+scope:
+  - prompts
+  - agent-skills
+  - agent-applications
+  - workflow-examples
+observed_paths:
+  - agent_skills/
+  - .github/workflows/skill-evals.yml
+  - README.md
+usage: >-
+  Research source for prompt, skill, and agent workflow discovery; do not copy
+  content without a separate evidence review.
+last_verified: 2026-08-03

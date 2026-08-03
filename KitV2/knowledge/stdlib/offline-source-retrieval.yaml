@@ -1,0 +1,22 @@
+---
+id: evaluation:go:offline-source-retrieval
+title: Offline official Go source retrieval probe
+kind: Evaluation
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, offline, retrieval, determinism, probe]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+scope: >-
+  Verify that the standalone resolver retrieves bundled Effective Go content,
+  local pkg-doc and toolchain units, enforces bounded results, and reports
+  unavailable content without fabrication.
+relationships:
+  uses:
+    - capability:go:offline-package-lookup
+  references:
+    - source:go:pkg-doc
+    - source:go:effective-go
+    - source:go:toolchain

@@ -1,0 +1,22 @@
+---
+id: source:go:language-specification
+title: Go language specification
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, language, specification]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/ref/spec
+selection: >-
+  Load the normative language reference when generated or reviewed code depends
+  on syntax, types, interfaces, generics, declarations, or language semantics.
+limits:
+  - >-
+    The specification defines the language; it does not replace package
+    documentation or project-specific rules.
+relationships:
+  references:
+    - https://go.dev/ref/spec

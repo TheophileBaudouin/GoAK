@@ -1,0 +1,4 @@
+name: go-template-cloud-service
+status: partial
+purpose: Minimal runnable scaffold for the cloud-service project shape.
+validation: go test ./...

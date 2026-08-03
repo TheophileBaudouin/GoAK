@@ -1,0 +1,22 @@
+---
+id: source:go:go-blueprint
+title: go-blueprint project generator reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, templates, scaffolding, generator, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/Melkeydev/go-blueprint
+selection: >-
+  Consider only as a project-generation reference when a consumer explicitly
+  wants generated scaffolding and has reviewed the resulting architecture.
+limits:
+  - >-
+    It is not integrated as a KitV2 runtime or template; generated scaffolding
+    must pass the consumer project's own validation and architecture review.
+relationships:
+  references:
+    - https://github.com/Melkeydev/go-blueprint

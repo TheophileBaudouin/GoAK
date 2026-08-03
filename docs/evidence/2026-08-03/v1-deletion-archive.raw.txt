@@ -1,0 +1,13 @@
+$ archive=/Users/theophilebaudouin/Documents/devellopement/go-engineering-kit-v1-archive-2026-08-03/kit-v1.tar.gz
+$ checksum=/Users/theophilebaudouin/Documents/devellopement/go-engineering-kit-v1-archive-2026-08-03/SHA256SUMS
+$ shasum -a 256 -c SHA256SUMS
+kit-v1.tar.gz: OK
+$ tar -tzf kit-v1.tar.gz
+entries=164
+$ tar -xzf kit-v1.tar.gz -C restore
+$ python3 restore/kit/scripts/validate-instructions.py
+instruction-artifacts: PASS
+
+Result: external archive, checksum, listing, extraction, and v1 validator
+restore drill all passed. KitV2 deletion checkpoint may proceed to self-contained
+validator/harness work; kit/ remains intact until all later stop conditions pass.

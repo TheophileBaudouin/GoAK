@@ -1,0 +1,22 @@
+---
+id: source:go:race-detector
+title: Go race detector
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, concurrency, testing, race]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/articles/race_detector
+selection: >-
+  Load when validating shared state, goroutine lifetimes, worker pools, HTTP
+  servers, or tests that execute concurrent operations.
+limits:
+  - >-
+    A race-clean run covers detected executions only; it does not prove absence
+    of races in unexecuted paths.
+relationships:
+  references:
+    - https://go.dev/doc/articles/race_detector

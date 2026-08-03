@@ -1,0 +1,11 @@
+# sqlc.yaml — tells sqlc how to generate Go for this SQLite schema.
+# Docs: https://docs.sqlc.dev/en/latest/tutorials/getting-started-sqlite.html
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "query.sql"
+    schema: "schema.sql"
+    gen:
+      go:
+        package: "db"
+        out: "db"

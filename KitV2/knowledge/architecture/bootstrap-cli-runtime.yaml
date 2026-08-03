@@ -1,0 +1,51 @@
+id: pattern:distribution:bootstrap-cli-runtime
+title: Bootstrap CLI and canonical agent runtime
+kind: Pattern
+version: 1
+status: proposed
+owner: go-agent-kit
+tags:
+  - distribution
+  - cli
+  - runtime
+  - adapters
+  - modules
+  - deterministic-installation
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+scope: future-deployment
+canonical_runtime: .pi/
+official_entrypoint: gak
+commands: [init, update, doctor, validate, remove, info]
+adapters: [pi, claude-code, codex, cursor, gemini-cli]
+module_artifacts: [Rule, Recipe, Pattern, Snippet, Template, Evaluation]
+module_examples: [postgres, grpc, auth, kafka, docker, kubernetes, otel]
+bootstrap_targets:
+  - "go install <future-published-module>/cmd/gak@latest"
+  - "go run <future-published-module>/cmd/gak@latest init"
+constraints:
+  - >-
+    No repository, published module, installer, or release process currently
+    exists.
+  - "Deployment is not manual file copying."
+  - >-
+    @latest is a convenience selector; reproducibility requires resolved
+    versions and checksums in a project manifest.
+  - >-
+    Root .agent/ remains metaproject governance and is never installed as a
+    competing consumer runtime.
+  - "Only the selected agent adapter is installed."
+  - >-
+    Canonical artifact bodies are composed through graph relationships, not
+    duplicated by adapters or modules.
+relationships:
+  references:
+    - https://go.dev/ref/mod
+    - https://agentskills.io/specification
+  uses: []
+  validated_by: []
+notes: >-
+  This is an architecture definition only. The future CLI must resolve a
+  versioned release, select modules and one adapter, materialize a staged
+  runtime, validate it, and commit atomically with ownership metadata.

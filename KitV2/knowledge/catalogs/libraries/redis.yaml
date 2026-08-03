@@ -1,0 +1,22 @@
+---
+id: source:go:redis
+title: go-redis client reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, redis, cache, sessions, queues, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/redis/go-redis
+selection: >-
+  Consider for Redis-backed cache, session, queue, or data-store integration
+  after the operational Redis contract is defined.
+limits:
+  - >-
+    This pointer is not a runnable Redis recipe; verify server compatibility,
+    timeouts, failure behavior, and connection lifecycle before adoption.
+relationships:
+  references:
+    - https://github.com/redis/go-redis

@@ -1,0 +1,70 @@
+---
+schema: go-agent-kit-technology-source-units/1
+scope: metaproject-only
+registry: .agent/cognitive/technology-documentation.yaml
+storage: context-mode-cache
+retrieval: metadata-first; query source label and bounded section only
+units:
+  - id: source-cache:official:chi-v5.3.1
+    technology: chi
+    source: official:chi-v5.3.1
+    url: https://pkg.go.dev/github.com/go-chi/chi/v5@v5.3.1
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:bubbletea-v2.0.8
+    technology: bubbletea
+    source: official:bubbletea-v2.0.8
+    url: https://pkg.go.dev/charm.land/bubbletea/v2@v2.0.8
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:x-sync-v0.22.0
+    technology: x-sync
+    source: official:x-sync-v0.22.0
+    url: https://pkg.go.dev/golang.org/x/sync@v0.22.0
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:modernc-sqlite-v1.55.0
+    technology: modernc-sqlite
+    source: official:modernc-sqlite-v1.55.0
+    url: https://pkg.go.dev/modernc.org/sqlite@v1.55.0
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:google-uuid-v1.6.0
+    technology: google-uuid
+    source: official:google-uuid-v1.6.0
+    url: https://pkg.go.dev/github.com/google/uuid@v1.6.0
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:log-slog-go1.26
+    technology: slog
+    source: official:log-slog-go1.26
+    url: https://pkg.go.dev/log/slog
+    retrieved_at: 2026-08-03
+    content_type: official-api
+    context_policy: package-symbol-units-only
+  - id: source-cache:official:viper-v1.21.0
+    technology: viper
+    source: official:viper-v1.21.0
+    url: https://pkg.go.dev/github.com/spf13/viper
+    retrieved_at: 2026-08-03
+    content_type: official-api-and-migration
+    context_policy: section-and-symbol-units-only
+  - id: source-cache:official:koanf-v2.3.5
+    technology: koanf
+    source: official:koanf-v2.3.5
+    url: https://pkg.go.dev/github.com/knadh/koanf/v2
+    retrieved_at: 2026-08-03
+    content_type: official-api-and-migration
+    context_policy: section-and-symbol-units-only
+  - id: source-cache:official:cobra-v1.10.2
+    technology: cobra
+    source: official:cobra-v1.10.2
+    url: https://cobra.dev/docs/
+    retrieved_at: 2026-08-03
+    content_type: official-api-and-cli-guides
+    context_policy: section-and-symbol-units-only

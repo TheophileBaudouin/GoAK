@@ -1,0 +1,24 @@
+---
+# .golangci.yml — golangci-lint v2, opt-in (default: none).
+# The kit's lint gate. Add a linter only when you can justify it. See
+# core/validation/golangci-lint for rationale and false-positive triage.
+version: "2"
+
+linters:
+  default: none # opt-in, not opt-out — keeps the gate intentional
+  enable:
+    - errcheck # unchecked error returns (catches real bugs)
+    - govet # go vet correctness checks
+    - staticcheck # SA* checks
+    - unused # unused code
+    - ineffassign # ineffectual assignments
+    - revive # only the exported rule below — doc comments on API surface
+  settings:
+    revive:
+      rules:
+        - name: exported # every exported identifier needs a doc comment
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

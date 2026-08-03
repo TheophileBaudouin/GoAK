@@ -1,0 +1,23 @@
+---
+id: source:go:openai-go
+title: OpenAI Go SDK reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, openai, llm, sdk, ai, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/openai/openai-go
+selection: >-
+  Consider for an explicitly requested OpenAI API integration after API version,
+  authentication, data handling, retries, and cost controls are specified.
+limits:
+  - >-
+    The SDK is not a core Go runtime capability and is not integrated as a KitV2
+    dependency or recipe; verify the current API and security
+    requirements first.
+relationships:
+  references:
+    - https://github.com/openai/openai-go

@@ -1,0 +1,4 @@
+name: go-template-cli
+status: partial
+purpose: Minimal runnable scaffold for the cli project shape.
+validation: go test ./...

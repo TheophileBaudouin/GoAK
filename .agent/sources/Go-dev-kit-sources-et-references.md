@@ -1,0 +1,839 @@
+# Go Dev Kit — Sources et Références
+
+> Base de connaissances pour un kit de développement Go moderne.
+>
+> Objectif : couvrir API, CLI, microservices, workers, tooling, IA et projets production.
+
+---
+
+# 1. Cœur du langage Go
+
+## Standard Library
+
+### pkg.go.dev
+
+- **Lien :** <https://pkg.go.dev/>
+- **Description :** Documentation officielle de tous les packages Go.
+- **Utilité potentielle :**
+  - Référence primaire pour un agent IA.
+  - Validation des APIs disponibles.
+  - Génération de code conforme à la stdlib.
+- **Priorité :** Critique
+- **Catégorie :** Documentation / Référence
+
+## Effective Go
+
+- **Lien :** <https://go.dev/doc/effective_go>
+- **Description :** Guide officiel des bonnes pratiques Go.
+- **Utilité potentielle :**
+  - Règles de style.
+  - Patterns idiomatiques.
+  - Amélioration du code généré.
+- **Priorité :** Critique
+- **Catégorie :** Best Practices
+
+## Go Language Specification
+
+- **Lien :** <https://go.dev/ref/spec>
+- **Description :** Spécification normative du langage Go : syntaxe, types,
+  interfaces, generics, déclarations et sémantique.
+- **Utilité potentielle :**
+  - Référence d'autorité pour la génération et la revue de code.
+  - Vérification des comportements qui ne doivent pas être déduits d'exemples.
+- **Priorité :** Critique
+- **Catégorie :** Langage / Référence normative
+
+## Go Modules
+
+- **Lien :** <https://go.dev/doc/modules/managing-dependencies>
+- **Description :** Documentation officielle de la gestion des modules,
+  dépendances, sommes de contrôle, remplacements et workspaces Go.
+- **Utilité potentielle :**
+  - Initialisation et maintenance déterministes de `go.mod` et `go.sum`.
+  - Résolution, mise à jour et vérification des dépendances.
+- **Priorité :** Critique
+- **Catégorie :** Dépendances / Tooling officiel
+
+## Go Toolchains
+
+- **Lien :** <https://go.dev/doc/toolchain>
+- **Description :** Gestion officielle des versions du compilateur et du
+  changement automatique de toolchain via `go`, `toolchain` et `GOTOOLCHAIN`.
+- **Utilité potentielle :**
+  - Reproductibilité locale et CI.
+  - Choix explicite de la version Go supportée par un module.
+- **Priorité :** Critique
+- **Catégorie :** Tooling officiel / Reproductibilité
+
+## Go Release Policy
+
+- **Lien :** <https://go.dev/doc/devel/release>
+- **Description :** Politique et historique officiels des versions Go,
+  correctifs, cadence de publication et versions supportées.
+- **Utilité potentielle :**
+  - Définir les versions supportées et les fenêtres de mise à jour.
+  - Éviter les décisions de compatibilité fondées sur une version obsolète.
+- **Priorité :** Critique
+- **Catégorie :** Cycle de vie / Toolchain
+
+---
+
+# 2. Outils officiels Go
+
+## Go Toolchain
+
+- **Lien :** <https://go.dev/>
+- **Description :** Outils officiels du langage Go.
+- **Inclut :**
+  - gofmt
+  - go test
+  - go vet
+  - benchmark
+  - fuzzing
+  - race detector
+  - pprof
+  - trace
+
+- **Utilité potentielle :**
+  - Automatisation qualité.
+  - Validation automatique par agent.
+  - Analyse performance.
+- **Priorité :** Critique
+- **Catégorie :** Tooling
+
+## go command
+
+- **Lien :** <https://pkg.go.dev/cmd/go>
+- **Description :** Référence complète de la commande `go`, de ses sous-
+  commandes, variables d'environnement, flags et contraintes de build.
+- **Utilité potentielle :**
+  - Automatisation fiable des opérations de build, test, module et release.
+  - Référence pour `GOOS`, `GOARCH`, `CGO_ENABLED` et `//go:build`.
+- **Priorité :** Critique
+- **Catégorie :** Tooling officiel / Build
+
+## Go Testing
+
+- **Lien :** <https://pkg.go.dev/testing>
+- **Description :** Guide officiel du package `testing`, des tests unitaires,
+  sous-tests, tests parallèles et benchmarks.
+- **Utilité potentielle :**
+  - Base commune pour les tests du kit et des projets consommateurs.
+  - Référence avant l'emploi d'un framework d'assertions ou de mocks.
+- **Priorité :** Critique
+- **Catégorie :** Tests / Tooling officiel
+
+## Go Fuzzing
+
+- **Lien :** <https://go.dev/doc/tutorial/fuzz>
+- **Description :** Fuzzing natif de Go avec `testing.F`, corpus de graines et
+  réutilisation des cas trouvés.
+- **Utilité potentielle :**
+  - Détection reproductible de cas limites dans parseurs et frontières de confiance.
+  - Renforcement des recettes de sécurité et de validation.
+- **Priorité :** Critique
+- **Catégorie :** Tests / Sécurité
+
+## Go Race Detector
+
+- **Lien :** <https://go.dev/doc/articles/race_detector>
+- **Description :** Documentation officielle de l'analyse dynamique des accès
+  concurrents avec `go test -race`.
+- **Utilité potentielle :**
+  - Validation des workers, serveurs et états partagés.
+  - Référence pour intégrer le détecteur dans CI.
+- **Priorité :** Critique
+- **Catégorie :** Concurrence / Validation
+
+## Go Profiling
+
+- **Lien :** <https://go.dev/blog/pprof>
+- **Description :** Référence officielle du profiling avec `pprof` pour
+  diagnostiquer CPU, mémoire et latence; la commande `go tool trace` complète
+  l'analyse des exécutions concurrentes.
+- **Utilité potentielle :**
+  - Mesurer avant d'optimiser.
+  - Relier une hypothèse de performance à une observation reproductible.
+- **Priorité :** Critique
+- **Catégorie :** Performance / Validation
+
+## govulncheck
+
+- **Lien :** <https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck>
+- **Description :** Outil officiel d'analyse des vulnérabilités connues dans le
+  code et les dépendances d'un module Go.
+- **Utilité potentielle :**
+  - Vérifier les appels vulnérables réellement atteignables.
+  - Compléter les tests, le lint et le scan de dépendances dans la gate.
+- **Priorité :** Critique
+- **Catégorie :** Sécurité / Validation officielle
+
+## Go Security Best Practices
+
+- **Lien :** <https://go.dev/security/best-practices>
+- **Description :** Recommandations officielles pour sécuriser les programmes
+  Go, maintenir les dépendances et utiliser les outils de validation.
+- **Utilité potentielle :**
+  - Référence de sécurité transversale pour le code généré.
+  - Base des contrôles `govulncheck`, fuzzing, race detector et `go vet`.
+- **Priorité :** Critique
+- **Catégorie :** Sécurité / Validation officielle
+
+## gosec
+
+- **Lien :** <https://github.com/securego/gosec>
+- **Description :** Analyseur statique de sécurité Go utilisé par la gate du
+  kit pour détecter des constructions à risque.
+- **Utilité potentielle :**
+  - Ajouter un contrôle SAST complémentaire à `govulncheck`.
+  - Exiger une justification explicite pour toute suppression ciblée.
+- **Priorité :** Critique
+- **Catégorie :** Sécurité / Validation tierce
+
+## golangci-lint
+
+- **Lien :** <https://golangci-lint.run/docs/configuration/>
+- **Description :** Agrégateur de linters Go utilisé par la gate du kit pour
+  centraliser les contrôles de qualité et de correction.
+- **Utilité potentielle :**
+  - Exécuter une configuration déterministe de linters.
+  - Maintenir une configuration compatible avec la version majeure installée.
+- **Priorité :** Critique
+- **Catégorie :** Qualité / Validation tierce
+
+## Go Vulnerability Database
+
+- **Lien :** <https://pkg.go.dev/vuln/>
+- **Description :** Base de vulnérabilités Go maintenue par l'écosystème Go et
+  consultable par module et symbole affecté.
+- **Utilité potentielle :**
+  - Comprendre la portée d'un avis et la version corrigée.
+  - Compléter l'analyse automatisée par une source de vulnérabilités tracée.
+- **Priorité :** Critique
+- **Catégorie :** Sécurité / Référence
+
+## context
+
+- **Lien :** <https://pkg.go.dev/context>
+- **Description :** Package standard pour annulation, délais, échéances et
+  valeurs liées à une opération.
+- **Utilité potentielle :**
+  - Contrôler la durée de vie des requêtes et goroutines.
+  - Éviter les appels bloquants sans chemin d'annulation.
+- **Priorité :** Critique
+- **Catégorie :** Standard Library / Concurrence
+
+## errors
+
+- **Lien :** <https://pkg.go.dev/errors>
+- **Description :** Package standard pour composer, envelopper et inspecter
+  les erreurs avec `Is`, `As` et `Join`.
+- **Utilité potentielle :**
+  - Préserver la cause tout en exposant un contrat d'erreur stable.
+  - Référencer les décisions sentinel, typed ou opaque.
+- **Priorité :** Critique
+- **Catégorie :** Standard Library / Erreurs
+
+## sync et sync/atomic
+
+- **Lien :** <https://pkg.go.dev/sync>
+- **Description :** Primitives standard de synchronisation et d'opérations
+  atomiques pour l'état partagé concurrent.
+- **Utilité potentielle :**
+  - Choisir mutex, wait group, once ou atomics sans réinventer une primitive.
+  - Vérifier les invariants de durée de vie et de concurrence.
+- **Priorité :** Critique
+- **Catégorie :** Standard Library / Concurrence
+
+## net/http
+
+- **Lien :** <https://pkg.go.dev/net/http>
+- **Description :** Package standard pour clients, serveurs, handlers, TLS et
+  transport HTTP.
+- **Utilité potentielle :**
+  - Référence primaire avant un framework HTTP.
+  - Construire des serveurs testables avec les interfaces standard.
+- **Priorité :** Critique
+- **Catégorie :** Standard Library / HTTP
+
+## database/sql
+
+- **Lien :** <https://pkg.go.dev/database/sql>
+- **Description :** Abstraction standard Go pour pools de connexions,
+  transactions, requêtes et annulation via contexte.
+- **Utilité potentielle :**
+  - Évaluer un driver ou générateur SQL sans confondre abstraction et moteur.
+  - Référence des comportements de pool et de transaction.
+- **Priorité :** Critique
+- **Catégorie :** Standard Library / Base de données
+
+---
+
+# 3. Configuration
+
+## Viper
+
+- **Lien :** <https://github.com/spf13/viper>
+- **Description :** Gestionnaire de configuration Go populaire.
+- **Supporte :**
+  - YAML
+  - JSON
+  - TOML
+  - ENV
+  - Flags
+
+- **Utilité potentielle :**
+  - Templates de projets.
+  - Applications configurables.
+- **Priorité :** Haute
+- **Catégorie :** Configuration
+
+## Koanf
+
+- **Lien :** <https://github.com/knadh/koanf>
+- **Description :** Alternative moderne et légère à Viper.
+- **Utilité potentielle :**
+  - Configuration modulaire.
+  - Services modernes.
+- **Priorité :** Haute
+- **Catégorie :** Configuration
+
+---
+
+# 4. CLI
+
+## Cobra
+
+- **Lien :** <https://github.com/spf13/cobra>
+- **Description :** Framework CLI utilisé par Kubernetes, Docker et Hugo.
+- **Utilité potentielle :**
+  - Création de CLI professionnelles.
+  - Agents de développement.
+  - Outils internes.
+- **Priorité :** Critique
+- **Catégorie :** CLI
+
+---
+
+# 5. Logging
+
+## slog
+
+- **Lien :** <https://pkg.go.dev/log/slog>
+- **Description :** Logger structuré officiel depuis Go 1.21.
+- **Utilité potentielle :**
+  - Standard recommandé.
+  - Compatible production.
+- **Priorité :** Critique
+- **Catégorie :** Observabilité
+
+## Zap
+
+- **Lien :** <https://github.com/uber-go/zap>
+- **Description :** Logger haute performance Uber.
+- **Utilité potentielle :**
+  - Services nécessitant beaucoup de logs.
+- **Priorité :** Haute
+- **Catégorie :** Logging
+
+## Zerolog
+
+- **Lien :** <https://github.com/rs/zerolog>
+- **Description :** Logger JSON très rapide.
+- **Utilité potentielle :**
+  - Microservices.
+  - Applications performantes.
+- **Priorité :** Haute
+- **Catégorie :** Logging
+
+---
+
+# 6. Validation et Identifiants
+
+## Validator
+
+- **Lien :**
+<https://github.com/go-playground/validator>
+
+- **Description :**
+Validation de structures Go.
+
+- **Utilité potentielle :**
+  - API REST.
+  - Validation automatique.
+- **Priorité :** Haute
+
+## Google UUID
+
+- **Lien :**
+<https://github.com/google/uuid>
+
+- **Description :**
+Génération UUID standard.
+
+- **Utilité potentielle :**
+  - IDs distribués.
+  - Microservices.
+- **Priorité :** Haute
+
+---
+
+# 7. HTTP
+
+## Resty
+
+- **Lien :**
+<https://github.com/go-resty/resty>
+
+- **Description :**
+Client HTTP riche.
+
+- **Utilité potentielle :**
+  - APIs externes.
+  - Intégrations SaaS.
+- **Priorité :** Moyenne
+
+---
+
+# 8. Frameworks HTTP
+
+## Chi
+
+- **Lien :**
+<https://github.com/go-chi/chi>
+
+- **Description :**
+Router HTTP léger basé sur stdlib.
+
+- **Utilité potentielle :**
+  - APIs REST modernes.
+  - Architecture propre.
+- **Priorité :** Critique
+
+## Gin
+
+- **Lien :**
+<https://github.com/gin-gonic/gin>
+
+- **Description :**
+Framework HTTP populaire.
+
+- **Utilité potentielle :**
+  - APIs rapides.
+  - Projets existants.
+- **Priorité :** Haute
+
+## Fiber
+
+- **Lien :**
+<https://github.com/gofiber/fiber>
+
+- **Description :**
+Framework haute performance basé sur fasthttp.
+
+- **Utilité potentielle :**
+  - APIs nécessitant performance.
+- **Priorité :** Haute
+
+## Echo
+
+- **Lien :**
+<https://github.com/labstack/echo>
+
+- **Description :**
+Framework HTTP complet.
+
+- **Utilité potentielle :**
+  - APIs classiques.
+- **Priorité :** Moyenne
+
+---
+
+# 9. Base de données
+
+## sqlc
+
+- **Lien :**
+<https://sqlc.dev/>
+
+- **Description :**
+Génère du code Go depuis SQL.
+
+- **Utilité potentielle :**
+  - Alternative moderne aux ORM.
+  - Code type-safe.
+- **Priorité :** Critique
+
+## sqlx
+
+- **Lien :**
+<https://github.com/jmoiron/sqlx>
+
+- **Description :**
+Extension de database/sql.
+
+- **Utilité potentielle :**
+  - SQL manuel simplifié.
+- **Priorité :** Haute
+
+## GORM
+
+- **Lien :**
+<https://gorm.io/>
+
+- **Description :**
+ORM Go populaire.
+
+- **Utilité potentielle :**
+  - CRUD rapide.
+  - Prototypes.
+- **Priorité :** Moyenne
+
+---
+
+# 10. Migration SQL
+
+## golang-migrate
+
+- **Lien :**
+<https://github.com/golang-migrate/migrate>
+
+- **Description :**
+Gestionnaire de migrations SQL.
+
+- **Utilité potentielle :**
+  - Déploiement production.
+- **Priorité :** Haute
+
+---
+
+# 11. Tests
+
+## Testify
+
+- **Lien :**
+<https://github.com/stretchr/testify>
+
+- **Description :**
+Assertions et mocks pour tests Go.
+
+- **Utilité potentielle :**
+  - Tests lisibles.
+- **Priorité :** Haute
+
+## GoMock
+
+- **Lien :**
+<https://github.com/uber-go/mock>
+
+- **Description :**
+Framework officiel de mocks Uber.
+
+- **Utilité potentielle :**
+  - Tests unitaires complexes.
+- **Priorité :** Haute
+
+---
+
+# 12. Cache
+
+## go-redis
+
+- **Lien :**
+<https://github.com/redis/go-redis>
+
+- **Description :**
+Client Redis officiel Go.
+
+- **Utilité potentielle :**
+  - Cache.
+  - Sessions.
+  - Queues.
+- **Priorité :** Haute
+
+---
+
+# 13. Messaging
+
+## Franz-go Kafka
+
+- **Lien :**
+<https://github.com/twmb/franz-go>
+
+- **Description :**
+Client Kafka moderne.
+
+- **Utilité potentielle :**
+  - Event-driven architecture.
+- **Priorité :** Haute
+
+## RabbitMQ AMQP
+
+- **Lien :**
+<https://github.com/rabbitmq/amqp091-go>
+
+- **Description :**
+Client RabbitMQ officiel.
+
+- **Priorité :** Haute
+
+## NATS
+
+- **Lien :**
+<https://github.com/nats-io/nats.go>
+
+- **Description :**
+Messaging léger haute performance.
+
+- **Priorité :** Haute
+
+---
+
+# 14. Observabilité
+
+## OpenTelemetry Go
+
+- **Lien :**
+<https://opentelemetry.io/docs/languages/go/>
+
+- **Description :**
+Standard traces, métriques et logs.
+
+- **Utilité potentielle :**
+  - Monitoring microservices.
+  - Debug automatique.
+- **Priorité :** Critique
+
+## Prometheus Client Go
+
+- **Lien :**
+<https://github.com/prometheus/client_golang>
+
+- **Description :**
+Client officiel Prometheus.
+
+- **Priorité :** Haute
+
+---
+
+# 15. Docker / Développement local
+
+## Air
+
+- **Lien :**
+<https://github.com/air-verse/air>
+
+- **Description :**
+Hot reload Go.
+
+- **Utilité potentielle :**
+  - Développement rapide.
+- **Priorité :** Haute
+
+---
+
+# 16. Génération de code
+
+## Mockery
+
+- **Lien :**
+<https://github.com/vektra/mockery>
+
+- **Description :**
+Générateur de mocks Go.
+
+- **Priorité :** Haute
+
+---
+
+# 17. Sécurité
+
+## JWT Go
+
+- **Lien :**
+<https://github.com/golang-jwt/jwt>
+
+- **Description :**
+Implémentation JWT.
+
+- **Utilité potentielle :**
+  - Authentification API.
+- **Priorité :** Haute
+
+---
+
+# 18. IA / LLM
+
+## OpenAI Go SDK
+
+- **Lien :**
+<https://github.com/openai/openai-go>
+
+- **Description :**
+SDK officiel Go pour API OpenAI.
+
+- **Utilité potentielle :**
+  - Agents IA.
+  - Automatisation.
+  - Copilotes.
+- **Priorité :** Haute
+
+## Ollama API Go
+
+- **Lien :**
+<https://github.com/ollama/ollama>
+
+- **Description :**
+API Go pour modèles locaux.
+
+- **Utilité potentielle :**
+  - IA locale.
+  - Agents offline.
+- **Priorité :** Haute
+
+---
+
+# 19. Templates projets
+
+## go-blueprint
+
+- **Lien :**
+<https://github.com/Melkeydev/go-blueprint>
+
+- **Description :**
+Générateur de projets Go.
+
+- **Utilité potentielle :**
+  - Bootstrap rapide.
+  - Templates agent.
+- **Priorité :** Haute
+
+## Cookiecutter
+
+- **Lien :**
+<https://cookiecutter.readthedocs.io/>
+
+- **Description :**
+Générateur de templates multi-langages.
+
+- **Priorité :** Moyenne
+
+---
+
+# 20. Bases de connaissances / Snippets
+
+## Awesome Go
+
+- **Lien :**
+<https://awesome-go.com/>
+
+- **Description :**
+Collection communautaire de bibliothèques Go destinée à la découverte.
+
+- **Utilité potentielle :**
+  - Source d'index RAG.
+  - Découverte initiale avant vérification dans une source primaire.
+- **Priorité :** Haute
+
+## Go by Example
+
+- **Lien :**
+<https://gobyexample.com/>
+
+- **Description :**
+Exemples Go exécutables orientés apprentissage et découverte.
+
+- **Utilité potentielle :**
+  - Point de départ pour des snippets.
+  - Vérification obligatoire dans la documentation primaire avant admission.
+- **Priorité :** Haute
+
+## Go Cookbook
+
+- **Lien :**
+<https://go-cookbook.com/>
+
+- **Description :**
+Recettes pratiques Go.
+
+- **Utilité potentielle :**
+  - Base de patterns.
+- **Priorité :** Haute
+
+## GitHub Code Search
+
+- **Lien :**
+<https://github.com/search>
+
+- **Description :**
+Recherche d'implémentations réelles.
+
+- **Utilité potentielle :**
+  - Trouver des patterns production.
+- **Priorité :** Haute
+
+## Sourcegraph
+
+- **Lien :**
+<https://sourcegraph.com/>
+
+- **Description :**
+Recherche intelligente dans des dépôts.
+
+- **Utilité potentielle :**
+  - Analyse codebase.
+  - Recherche RAG.
+- **Priorité :** Haute
+
+---
+
+# Priorités pour un Agent Coding Go
+
+## Niveau S (indispensable)
+
+- Go Language Specification
+- Go Modules
+- Go Toolchains
+- go command
+- Go Testing
+- Go Security Best Practices
+- pkg.go.dev
+
+## Niveau A (très utile)
+
+- Effective Go
+- Go Toolchain
+- Go Fuzzing
+- Go Race Detector
+- Go Profiling
+- Go Vulnerability Database
+- context
+- errors
+- sync et sync/atomic
+- net/http
+- database/sql
+- slog
+- OpenTelemetry
+- sqlc
+- chi
+- Cobra
+- Koanf
+- Zap
+- Validator
+- Redis
+- NATS
+- Testify
+- Air
+- go-blueprint
+- Go by Example
+- Awesome Go
+- OpenAI Go SDK
+
+## Niveau B (selon projet)
+
+- GORM
+- Fiber
+- Kafka
+- RabbitMQ
+- Resty
+- Cookiecutter

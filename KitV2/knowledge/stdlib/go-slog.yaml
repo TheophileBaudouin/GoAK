@@ -1,0 +1,22 @@
+---
+id: source:go:slog
+title: Go structured logging with slog
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, slog, logging, observability]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/log/slog
+selection: >-
+  Load when adding structured, leveled, handler-based logging to a Go service,
+  handler, worker, or library boundary.
+limits:
+  - >-
+    The package provides logging mechanics; level policy and dependency wiring
+    remain governed by the kit logging rule.
+relationships:
+  references:
+    - https://pkg.go.dev/log/slog

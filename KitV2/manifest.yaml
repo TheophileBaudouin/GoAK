@@ -1,0 +1,37 @@
+name: go-agent-kit-v2
+version: 2.1.0
+schema_version: 1
+language:
+  name: go
+  minimum_version: "1.25"
+principles:
+  - idiomatic-go
+  - explicit-errors
+  - simplicity
+  - concurrency-safe
+  - observable-verification
+capabilities:
+  - rules
+  - knowledge-catalog
+  - recipes
+  - snippets
+  - project-templates
+  - product-verification
+  - pi-workflows
+  - go-probes
+  - source-registry
+  - offline-source-retrieval
+canonical:
+  rules: rules/
+  knowledge: knowledge/
+  recipes: recipes/
+  snippets: snippets/
+  templates: templates/
+  product_verification: probes/
+product_status: standalone
+metadata_role: product manifest, not a Pi instruction entrypoint
+avoid:
+  - duplicated-sources
+  - unnecessary-frameworks
+  - premature-abstraction
+  - unverified-completion

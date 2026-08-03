@@ -1,0 +1,22 @@
+---
+id: source:go:security-best-practices
+title: Go security best practices
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, security, validation, dependencies]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/security/best-practices
+selection: >-
+  Load when designing or reviewing production Go code, dependency maintenance,
+  vulnerability checks, fuzzing, race detection, or security validation.
+limits:
+  - >-
+    Official best practices guide validation; it does not prove application
+    intent or replace a threat model for a concrete system.
+relationships:
+  references:
+    - https://go.dev/security/best-practices

@@ -1,0 +1,22 @@
+---
+id: source:go:modules
+title: Go modules dependency management
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, modules, dependencies, reproducibility]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/modules/managing-dependencies
+selection: >-
+  Load when initializing, updating, verifying, replacing, or publishing Go
+  module dependencies and workspaces.
+limits:
+  - >-
+    Module guidance does not choose an application architecture or a preferred
+    third-party library.
+relationships:
+  references:
+    - https://go.dev/doc/modules/managing-dependencies

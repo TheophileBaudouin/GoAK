@@ -1,0 +1,22 @@
+---
+id: source:go:fuzzing
+title: Go native fuzzing
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, testing, fuzzing, security]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/tutorial/fuzz
+selection: >-
+  Load when testing parsers, encoders, protocol boundaries, or other code with
+  broad input spaces and security-sensitive edge cases.
+limits:
+  - >-
+    Fuzzing complements example tests and review; it does not prove all inputs
+    are safe or all business behavior is correct.
+relationships:
+  references:
+    - https://go.dev/doc/tutorial/fuzz

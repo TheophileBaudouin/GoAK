@@ -1,0 +1,4 @@
+name: go-template-monolith
+status: partial
+purpose: Minimal runnable scaffold for the monolith project shape.
+validation: go test ./...

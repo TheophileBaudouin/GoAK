@@ -1,0 +1,22 @@
+---
+id: source:go:context
+title: Go context package
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, context, cancellation, timeout, concurrency]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/context
+selection: >-
+  Load when propagating cancellation, deadlines, request scope, or bounded
+  operation lifetime through Go APIs.
+limits:
+  - >-
+    Context is for cancellation, deadlines, and request-scoped values; it is not
+    a replacement for explicit required dependencies or arbitrary state.
+relationships:
+  references:
+    - https://pkg.go.dev/context

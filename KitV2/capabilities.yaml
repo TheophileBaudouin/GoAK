@@ -1,0 +1,42 @@
+---
+name: go-agent-kit-v2
+version: 2.1.0
+status: standalone
+capabilities:
+  rules:
+    source: rules/
+    status: complete
+  knowledge:
+    source: knowledge/
+    status: catalog-and-sources
+  recipes:
+    source: recipes/
+    status: complete
+  snippets:
+    source: snippets/
+    status: complete-catalog
+  templates:
+    source: templates/
+    status: runnable-minimal-bases-and-explicit-partials
+  product_verification:
+    source: probes/
+    status: deterministic-probes-and-checks
+  offline-source-retrieval:
+    source: tools/offline/
+    status: self-contained-pinned-bundle-and-deterministic-resolver
+coverage:
+  product_skills: 33
+  rules: 10
+  recipes: 10
+  knowledge_catalogs: 13
+  probes: 5
+  project_templates: 7
+metadata_role: product capability catalog, not an instruction entrypoint
+known_limits:
+  - Pi discovery was smoke-tested from a trusted temporary consumer copy;
+    individual skill invocation remains separate.
+  - Wails and interactive TUI host behavior remain outside the four probes.
+  - No Git repository exists, so rollback evidence is not VCS-proven.
+  - Effective Go is pinned in the shipped bundle; pkg.go.dev and toolchain
+    units resolve from the local pinned Go toolchain.
+---

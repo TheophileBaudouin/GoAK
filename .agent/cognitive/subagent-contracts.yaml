@@ -1,0 +1,43 @@
+schema: go-agent-kit-subagent-contracts/1
+policy: "Readers and reviewers by default; one writer owns a worktree."
+contracts:
+  - role: Planner
+    responsibility: global dependency-ordered planning
+    inputs: [user-goal, charter, graph-inventory]
+    outputs: [implementation-plan, decision-boundaries, risks]
+    forbidden: [shared-worktree-editing, doctrine-without-sources]
+  - role: Scout
+    responsibility: canonical-owner and duplicate-risk discovery
+    inputs: [repository-tree, manifests, validators]
+    outputs: [owner-map, duplicate-risks, unresolved-paths]
+    forbidden: [editing, inventing-missing-architecture]
+  - role: Web-Research
+    responsibility: primary-source and freshness verification
+    inputs: [source-IDs, unresolved-claims]
+    outputs: [cited-source-matrix, pins, freshness-cautions]
+    forbidden: [promoting-unsupported-doctrine]
+  - role: Knowledge-Engineer
+    responsibility: source-to-artifact transformation
+    inputs: [source-matrix, graph-schema]
+    outputs: [candidate-artifacts, metadata, relationships, admission-status]
+    forbidden: [copying-source-bodies, duplicate-canonical-content]
+  - role: Context-Engineer
+    responsibility: retrieval hierarchy and token budget design
+    inputs: [artifact-inventory, context-limits]
+    outputs: [retrieval-tiers, query-contract, result-contract, budgets]
+    forbidden: [embedding-as-authority, unbounded-preloading]
+  - role: Go-Architect
+    responsibility: minimal implementation and compatibility design
+    inputs: [approved-plan, capabilities, target-go-version]
+    outputs: [stdlib-first-design, interfaces, commands, compatibility-notes]
+    forbidden: [unapproved-dependencies, hidden-runtime-inputs]
+  - role: Validation-Engineer
+    responsibility: executable quality gates and observable scenarios
+    inputs: [artifact-contracts, generated-output]
+    outputs: [checks, probes, evidence, pass-partial-blocked-status]
+    forbidden: [compile-only-proof, undocumented-network-assumptions]
+  - role: Documentation-Engineer
+    responsibility: concise routing documentation
+    inputs: [accepted-graph-objects, source-pointers]
+    outputs: [routing-docs, changelog-entry, migration-notes]
+    forbidden: [duplicate-canonical-bodies, raw-command-dumps]

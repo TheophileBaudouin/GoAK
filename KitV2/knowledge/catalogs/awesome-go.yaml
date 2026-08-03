@@ -1,0 +1,23 @@
+---
+id: source:go:awesome-go
+title: Awesome Go discovery index
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, libraries, discovery, catalog]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://awesome-go.com/
+selection: >-
+  Use to discover candidate Go libraries, then apply the kit admission criteria
+  and verify each candidate through primary documentation and repository
+  evidence.
+limits:
+  - >-
+    This is a community discovery index, not an authority for maintenance,
+    security, compatibility, or production readiness.
+relationships:
+  references:
+    - https://awesome-go.com/

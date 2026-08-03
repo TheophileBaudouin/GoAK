@@ -1,0 +1,13 @@
+Source: installed Pi documentation
+Files inspected:
+  ~/.nvm/versions/node/v23.11.0/lib/node_modules/@earendil-works/pi-coding-agent/docs/settings.md
+  ~/.nvm/versions/node/v23.11.0/lib/node_modules/@earendil-works/pi-coding-agent/docs/skills.md
+  ~/.nvm/versions/node/v23.11.0/lib/node_modules/@earendil-works/pi-coding-agent/docs/packages.md
+Claims verified:
+  project .pi/settings.json is a project-level resource loaded after trust
+  .pi/skills/ and .pi/prompts/ are native project resource surfaces
+  Pi packages can bundle and filter skills and prompts
+  project-local package installations use .pi/
+Existing project evidence:
+  docs/evidence/2026-08-03/kitv2-boundary/pi-discovery.raw.txt
+  docs/evidence/2026-08-03/kitv2-boundary/ownership-and-gate.raw.txt

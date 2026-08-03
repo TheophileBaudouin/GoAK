@@ -1,0 +1,17 @@
+$ temporary trusted consumer copy
+$ pi --approve --mode json -p 'Reply exactly: KITV2_PI_SMOKE_PASS'
+records=19
+contains_smoke=True
+assistant_text=KITV2_PI_SMOKE_PASS
+stderr=<empty>
+
+$ native resource paths
+test -f KitV2/AGENTS.md: PASS
+test -f KitV2/.pi/settings.json: PASS
+test -d KitV2/.pi/prompts: PASS
+test -d KitV2/.pi/skills: PASS
+test ! -e KitV2/.agent: PASS
+
+Result: Pi trusted smoke execution PASS. The JSON session returned the exact
+sentinel. This proves invocation and trust loading can execute; it does not
+claim that every individual skill/command was interactively invoked.

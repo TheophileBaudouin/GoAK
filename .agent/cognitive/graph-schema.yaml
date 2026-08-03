@@ -1,0 +1,61 @@
+schema: go-agent-kit-graph/1
+authority: KIT_CHARTER.md
+identity:
+  format: "<kind>:<namespace>:<stable-unit>"
+  examples:
+    - rule:go:explicit-errors
+    - capability:go:toolchain-test
+    - source:go:pkg-doc:net/http
+    - evaluation:go:package-gate
+required_metadata:
+  - id
+  - title
+  - kind
+  - version
+  - status
+  - owner
+  - tags
+  - go_version
+  - dependencies
+  - last_verified
+kinds:
+  - Rule
+  - Recipe
+  - Pattern
+  - Snippet
+  - Template
+  - Capability
+  - Evaluation
+  - DecisionRecord
+  - Source
+  - Memory
+statuses:
+  - proposed
+  - active
+  - deprecated
+  - rejected
+relationships:
+  - depends_on
+  - uses
+  - implements
+  - extends
+  - references
+  - requires
+  - supersedes
+  - validated_by
+  - generated_from
+composition:
+  - "Template assembles Recipe"
+  - "Recipe selects Pattern"
+  - "Pattern uses Snippet"
+  - "Rule constrains applicable artifacts"
+  - "Capability exposes a tool or retrieval ability"
+  - "Source supplies evidence"
+  - "Evaluation verifies generated behavior"
+  - "Memory records durable project knowledge"
+constraints:
+  - "One graph object has one responsibility."
+  - "The graph, not folders, is the source of truth."
+  - "A source-derived artifact cites its Source and narrows its question."
+  - "Duplicate answers are admission failures."
+  - "Source bodies are stored once; consumers use stable pointers."

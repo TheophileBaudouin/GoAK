@@ -1,0 +1,58 @@
+schema: go-agent-kit-context-policy/1
+protocol: goretrieval/1
+loop:
+  - Retrieve
+  - Reason
+  - Generate
+  - Validate
+  - Remember
+always_loaded:
+  maximum_tokens: 1500
+  contents:
+    - task_and_constraints
+    - target_go_version
+    - graph_router_metadata
+    - applicable_permanent_rules
+progressive_disclosure:
+  - level: L0
+    purpose: source pins, IDs, checksums, and graph metadata
+    maximum_bytes: 4096
+  - level: L1
+    purpose: sorted unit index
+    maximum_bytes: 16384
+  - level: L2
+    purpose: immutable content-addressed source blob
+    maximum_bytes: 524288
+  - level: L3
+    purpose: optional exploratory ranking only
+    retrieval_authority: false
+retrieval:
+  default_budget_tokens: 2000
+  maximum_excerpt_tokens: 512
+  explicit_full_budget_tokens: 8000
+  modes: [exact, prefix, contains]
+  ordering: exactness_then_lexical_unit
+  network_default: false
+  fallback:
+    - local_content_store
+    - goroot_go_doc_or_go_help
+    - gomodcache
+    - explicit_online_refresh
+    - blocked_without_fabrication
+provenance:
+  required: true
+  pin_types: [toolchain-version, module-version, git-commit]
+  verifiers: [toolchain-local, module-sum, git-commit, dl-json]
+determinism:
+  same_query_and_cache: byte-identical-result
+  forbidden_ranking_inputs:
+    - elapsed_time
+    - wall_clock
+    - model_score
+    - embeddings
+  missing_content: return-miss-or-blocked
+anti_duplication:
+  source_identity: "(source_id, unit, pin)"
+  blob_identity: sha256
+  product_knowledge: pointer-only-selection-guidance
+  duplicate_answer: admission-failure

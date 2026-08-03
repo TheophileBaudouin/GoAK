@@ -1,0 +1,13 @@
+$ shasum -a 256 -c /Users/theophilebaudouin/Documents/devellopement/go-engineering-kit-v1-archive-2026-08-03/SHA256SUMS
+kit-v1.tar.gz: OK
+$ test -d kit
+PASS
+$ test -d KitV2
+PASS
+$ rm -rf kit
+$ test ! -e kit
+PASS
+
+Result: the former v1 product directory was deleted only after the external
+archive checksum, restore drill, standalone validator, CI/dependabot rewrite,
+active-reference cleanup, and full pre-deletion KitV2 gate passed.

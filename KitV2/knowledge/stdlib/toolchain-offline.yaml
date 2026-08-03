@@ -1,0 +1,42 @@
+---
+id: source:go:toolchain
+title: Official Go toolchain offline capabilities
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, toolchain, validation, offline]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/
+resolver: "go help, go doc, and pinned GOROOT source paths"
+selection: >-
+  Load only the capability and command required by the current evaluation.
+capabilities:
+  - gofmt
+  - go-test
+  - go-vet
+  - benchmark
+  - fuzzing
+  - race
+  - pprof
+  - trace
+mapping:
+  gofmt: "GOROOT/src/cmd/gofmt/doc.go and go help fmt"
+  go-test: "go help test and go help testflag"
+  benchmark: "go help testflag and go doc testing.B"
+  fuzzing: "go help testflag and go doc testing.F"
+  race: >-
+    go help build (-race); local GOROOT race sources when present; a pinned
+    official source unit may be required
+  go-vet: "go help vet"
+  pprof: "GOROOT/src/cmd/pprof/doc.go and runtime/pprof"
+  trace: "GOROOT/src/cmd/trace/doc.go and runtime/trace"
+limits:
+  - >-
+    The shipped offline probe validates source retrieval; the full mechanical
+    gate remains rules/core/validation plus probes.
+relationships:
+  validated_by:
+    - evaluation:go:offline-source-retrieval

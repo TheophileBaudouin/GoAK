@@ -1,0 +1,12 @@
+id: http-json-response
+type: response-helper
+purpose: Encode a JSON HTTP response with an explicit status.
+tags: [http, json, net-http]
+go_version: "1.25"
+dependencies: [stdlib]
+when_to_use: When a net/http handler returns a JSON body.
+avoid_when: When the endpoint streams a different media type.
+source: ../../recipes/recipe-rest-chi/SKILL.md
+complexity: low
+files: [example.go]
+tests: [check.sh]

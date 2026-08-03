@@ -1,0 +1,22 @@
+---
+id: source:go:by-example
+title: Go by Example discovery source
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, examples, learning, discovery]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://gobyexample.com/
+selection: >-
+  Use as an executable example and discovery aid; verify language and API
+  claims against official Go documentation before promoting them into rules.
+limits:
+  - >-
+    Examples are not the kit's normative source and do not replace the
+    specification, package documentation, or project validation.
+relationships:
+  references:
+    - https://gobyexample.com/

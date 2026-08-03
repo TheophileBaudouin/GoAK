@@ -1,0 +1,22 @@
+---
+id: source:go:toolchains
+title: Go toolchains and version selection
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, toolchain, reproducibility, ci]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/toolchain
+selection: >-
+  Load when selecting, pinning, or diagnosing the Go compiler version used by a
+  module, workspace, local environment, or CI job.
+limits:
+  - >-
+    Toolchain selection does not replace module dependency verification or the
+    project validation gate.
+relationships:
+  references:
+    - https://go.dev/doc/toolchain

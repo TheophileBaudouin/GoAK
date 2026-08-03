@@ -1,0 +1,280 @@
+schema: go-agent-kit-source-catalog/1
+registry: .agent/sources/Go-dev-kit-sources-et-references.md
+authority: KIT_CHARTER.md
+sources:
+  - id: source:go:module-install
+    title: Go module-aware install and run version suffixes
+    kind: Source
+    version: local-toolchain-help
+    status: active
+    owner: go-agent-kit
+    tags: [go, modules, install, run, versioning]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    references:
+      - https://go.dev/ref/mod
+    transformations:
+      patterns:
+        - pattern:distribution:bootstrap-cli-runtime
+      capabilities: []
+      evaluations: []
+      recipes: []
+      snippets: []
+    relationships:
+      references:
+        - https://go.dev/ref/mod
+      validated_by: []
+  - id: source:go:pkg-doc
+    title: pkg.go.dev standard-library and module API documentation
+    kind: Source
+    version: pinned-toolchain-or-module-version
+    status: active
+    owner: go-agent-kit
+    tags: [go, official, api, pkg-doc, offline]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units: [package, symbol]
+    offline_resolver: >-
+      go doc -short from GOROOT; GOMODCACHE for downloaded modules
+    transformations:
+      capability: capability:go:offline-package-lookup
+      evaluation: evaluation:go:api-resolution
+      recipes: []
+      patterns: []
+      snippets: []
+    # Transformation intent is separate from materialization status.
+    target_status:
+      rule:go:errors:
+        status: proposed
+      rule:go:universal:
+        status: proposed
+      capability:go:offline-package-lookup:
+        status: active
+        materialized_by:
+          - .pi/skills/go-source-retrieval
+          - tools/offline
+      evaluation:go:api-resolution:
+        status: proposed
+      evaluation:go:offline-source-retrieval:
+        status: active
+        materialized_by:
+          - probes/offline
+    remains_source_only:
+      - "complete pkg.go.dev pages"
+      - "exhaustive generated API corpus"
+    relationships:
+      references:
+        - ".agent/sources/Go-dev-kit-sources-et-references.md#pkg-godev"
+      validated_by:
+        - evaluation:go:api-resolution
+        - evaluation:go:offline-source-retrieval
+
+  - id: source:go:effective-go
+    title: Effective Go
+    kind: Source
+    version: pinned-commit-and-checksum
+    status: active
+    owner: go-agent-kit
+    tags: [go, official, idiomatic, style, historical]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units: [document]
+    offline_resolver: "pinned local document blob, addressed by SHA-256"
+    transformations:
+      rules:
+        - rule:go:errors
+        - rule:go:universal
+      patterns: []
+      snippets: []
+      recipes: []
+      evaluations:
+        - evaluation:go:offline-source-retrieval
+    freshness: >-
+      Historical guide; label derived rules with the target Go version and
+      prefer newer official references when they supersede it.
+    target_status:
+      rule:go:errors:
+        status: proposed
+      rule:go:universal:
+        status: proposed
+      evaluation:go:offline-source-retrieval:
+        status: active
+        materialized_by:
+          - probes/offline
+    remains_source_only:
+      - "complete guide prose"
+      - "sections not admitted as a distinct operational decision"
+    relationships:
+      references:
+        - ".agent/sources/Go-dev-kit-sources-et-references.md#effective-go"
+      generated_from:
+        - .agent/sources/Go-dev-kit-sources-et-references.md#effective-go
+
+  - id: source:go:config-viper
+    title: Viper configuration library
+    kind: Source
+    version: v1.21.0
+    status: active
+    owner: go-agent-kit
+    tags: [go, config, viper, official]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units: [readme, api, upgrade, security]
+    offline_resolver: "local module cache with module-sum verification"
+    transformations:
+      recipes: [recipe:go:config-viper]
+    target_status:
+      recipe:go:config-viper:
+        status: active
+        materialized_by:
+          - recipes/recipe-config-viper
+      evaluation:go:config-viper:
+        status: proposed
+    relationships:
+      references:
+        - https://github.com/spf13/viper
+        - https://pkg.go.dev/github.com/spf13/viper
+
+  - id: source:go:config-koanf
+    title: Koanf configuration library
+    kind: Source
+    version: v2.3.5
+    status: active
+    owner: go-agent-kit
+    tags: [go, config, koanf, official]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units: [readme, api, migration, security]
+    offline_resolver: "local module cache with module-sum verification"
+    transformations:
+      recipes: [recipe:go:config-koanf]
+    target_status:
+      recipe:go:config-koanf:
+        status: active
+        materialized_by:
+          - recipes/recipe-config-koanf
+      evaluation:go:config-koanf:
+        status: proposed
+    relationships:
+      references:
+        - https://github.com/knadh/koanf
+        - https://pkg.go.dev/github.com/knadh/koanf/v2
+
+  - id: source:go:cli-cobra
+    title: Cobra CLI framework
+    kind: Source
+    version: v1.10.2
+    status: active
+    owner: go-agent-kit
+    tags: [go, cli, cobra, official]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units: [readme, api, user-guide, llm-guide, security]
+    offline_resolver: "local module cache with module-sum verification"
+    transformations:
+      recipes: [recipe:go:cli-cobra]
+    target_status:
+      recipe:go:cli-cobra:
+        status: active
+        materialized_by:
+          - recipes/recipe-cli-cobra
+      evaluation:go:cli-cobra:
+        status: proposed
+    relationships:
+      references:
+        - https://github.com/spf13/cobra
+        - https://cobra.dev/docs/
+
+  - id: source:go:toolchain
+    title: Official Go toolchain
+    kind: Source
+    version: pinned-go-version
+    status: active
+    owner: go-agent-kit
+    tags: [go, official, toolchain, validation, offline]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-03
+    retrieval_units:
+      - gofmt
+      - go-test
+      - benchmark
+      - fuzzing
+      - race
+      - go-vet
+      - pprof
+      - trace
+    offline_resolver: "go help, go doc, and pinned GOROOT source paths"
+    transformations:
+      capabilities:
+        - capability:go:toolchain-format
+        - capability:go:toolchain-test
+        - capability:go:toolchain-vet
+        - capability:go:toolchain-benchmark
+        - capability:go:toolchain-fuzz
+        - capability:go:toolchain-race
+        - capability:go:toolchain-pprof
+        - capability:go:toolchain-trace
+      evaluations:
+        - evaluation:go:format
+        - evaluation:go:static-analysis
+        - evaluation:go:tests
+        - evaluation:go:concurrency
+        - evaluation:go:performance
+    mapping:
+      gofmt: "GOROOT/src/cmd/gofmt/doc.go; go help fmt"
+      go-test: "go help test; go help testflag"
+      benchmark: >-
+        go help testflag (-bench, -benchtime, -benchmem); go doc testing.B
+      fuzzing: "go help testflag (-fuzz, -fuzztime); go doc testing.F"
+      race: >-
+        go help build (-race); local GOROOT race sources when present; a pinned
+        official race-detector source unit may be required
+      go-vet: "go help vet"
+      pprof: "GOROOT/src/cmd/pprof/doc.go; runtime/pprof"
+      trace: "GOROOT/src/cmd/trace/doc.go; runtime/trace"
+    remains_source_only:
+      - "tool implementation internals"
+      - "full command documentation when only one flag is needed"
+    target_status:
+      pattern:distribution:bootstrap-cli-runtime:
+        status: proposed
+      capability:go:toolchain-format:
+        status: proposed
+      capability:go:toolchain-test:
+        status: proposed
+      capability:go:toolchain-vet:
+        status: proposed
+      capability:go:toolchain-benchmark:
+        status: proposed
+      capability:go:toolchain-fuzz:
+        status: proposed
+      capability:go:toolchain-race:
+        status: proposed
+      capability:go:toolchain-pprof:
+        status: proposed
+      capability:go:toolchain-trace:
+        status: proposed
+      evaluation:go:format:
+        status: proposed
+      evaluation:go:static-analysis:
+        status: proposed
+      evaluation:go:tests:
+        status: proposed
+      evaluation:go:concurrency:
+        status: proposed
+      evaluation:go:performance:
+        status: proposed
+    relationships:
+      references:
+        - ".agent/sources/Go-dev-kit-sources-et-references.md#go-toolchain"
+      validated_by:
+        - evaluation:go:format
+        - evaluation:go:static-analysis
+        - evaluation:go:tests

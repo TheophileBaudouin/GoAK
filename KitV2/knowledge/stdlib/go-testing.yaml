@@ -1,0 +1,22 @@
+---
+id: source:go:testing
+title: Go testing package reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, testing, benchmarks, subtests]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/testing
+selection: >-
+  Load when designing tests, subtests, benchmarks, test helpers, or test
+  lifecycle behavior with the standard library.
+limits:
+  - >-
+    This source documents the testing API; project-specific test strategy and
+    observable scenarios remain in the kit testing rule and recipes.
+relationships:
+  references:
+    - https://pkg.go.dev/testing

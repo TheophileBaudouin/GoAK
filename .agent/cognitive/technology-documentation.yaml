@@ -1,0 +1,194 @@
+schema: go-agent-kit-technology-documentation/1
+scope: metaproject-only
+authority: .agent/sources/Go-dev-kit-sources-et-references.md
+policy:
+  official_source_priority:
+    - official-documentation
+    - official-llm-documentation
+    - official-complementary-reference
+    - official-annex-guide
+  local_content: metadata-and-bounded-source-units
+  forbidden:
+    - full-document-preload
+    - undocumented-product-doctrine
+    - copying-this-policy-into-KitV2
+  retrieval:
+    network_default: false
+    source_body: content-addressed-and-pinned
+    context: metadata-first-and-atomic
+metadata:
+  required:
+    - technology
+    - project
+    - version
+    - retrieved_at
+    - upstream_updated_at
+    - official_urls
+    - license
+technologies:
+  - technology: go-toolchain
+    project: Go
+    version: go1.26.5-local
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-08-03
+    official_urls:
+      - https://go.dev/
+      - https://pkg.go.dev/
+      - https://go.dev/doc/effective_go
+    license: BSD-3-Clause
+    local_units:
+      - source:go:pkg-doc
+      - source:go:effective-go
+      - source:go:toolchain
+    status: active
+  - technology: bubbletea
+    project: charm.land/bubbletea/v2
+    version: v2.0.8
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-08-03
+    official_urls:
+      - https://pkg.go.dev/charm.land/bubbletea/v2@v2.0.8
+      - https://github.com/charmbracelet/bubbletea/releases/tag/v2.0.8
+    license: MIT
+    local_units:
+      - recipe:recipe-cli-interactif
+      - source-cache:official:bubbletea-v2.0.8
+    status: active
+  - technology: chi
+    project: github.com/go-chi/chi/v5
+    version: v5.3.1
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-08-03
+    official_urls:
+      - https://pkg.go.dev/github.com/go-chi/chi/v5@v5.3.1
+      - https://github.com/go-chi/chi/releases/tag/v5.3.1
+    license: MIT
+    local_units:
+      - catalog:chi
+      - source-cache:official:chi-v5.3.1
+    status: active
+  - technology: x-sync
+    project: golang.org/x/sync
+    version: v0.22.0
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-07-01
+    official_urls:
+      - https://pkg.go.dev/golang.org/x/sync@v0.22.0
+      - https://go.googlesource.com/sync
+    license: BSD-3-Clause
+    local_units:
+      - recipe:recipe-worker-pool
+      - source-cache:official:x-sync-v0.22.0
+    status: active
+  - technology: modernc-sqlite
+    project: modernc.org/sqlite
+    version: v1.55.0
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-07-20
+    official_urls:
+      - https://pkg.go.dev/modernc.org/sqlite@v1.55.0
+      - https://gitlab.com/cznic/sqlite/-/releases/tag/v1.55.0
+    license: BSD-3-Clause
+    local_units:
+      - catalog:modernc-sqlite
+      - recipe:recipe-sqlite-sqlc
+      - source-cache:official:modernc-sqlite-v1.55.0
+    status: active
+  - technology: google-uuid
+    project: github.com/google/uuid
+    version: v1.6.0
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2024-03-05
+    official_urls:
+      - https://pkg.go.dev/github.com/google/uuid@v1.6.0
+      - https://github.com/google/uuid/releases/tag/v1.6.0
+    license: MIT
+    local_units:
+      - source-cache:official:google-uuid-v1.6.0
+    status: active
+  - technology: viper
+    project: github.com/spf13/viper
+    version: v1.21.0
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-01-12
+    official_urls:
+      - https://github.com/spf13/viper
+      - https://pkg.go.dev/github.com/spf13/viper
+      - https://github.com/spf13/viper/blob/master/UPGRADE.md
+    license: MIT
+    local_units: [catalog:viper, source-cache:official:viper-v1.21.0]
+    status: active
+  - technology: koanf
+    project: github.com/knadh/koanf/v2
+    version: v2.3.5
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-05-30
+    official_urls:
+      - https://github.com/knadh/koanf
+      - https://pkg.go.dev/github.com/knadh/koanf/v2
+    license: MIT
+    local_units: [catalog:koanf, source-cache:official:koanf-v2.3.5]
+    status: active
+  - technology: cobra
+    project: github.com/spf13/cobra
+    version: v1.10.2
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2025-12-04
+    official_urls:
+      - https://github.com/spf13/cobra
+      - https://pkg.go.dev/github.com/spf13/cobra
+      - https://cobra.dev/docs/
+    license: Apache-2.0
+    local_units: [catalog:cobra, source-cache:official:cobra-v1.10.2]
+    status: active
+  - technology: slog
+    project: log/slog
+    version: go1.26.5-local
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-08-03
+    official_urls: [https://pkg.go.dev/log/slog, https://go.dev/blog/slog]
+    license: BSD-3-Clause
+    local_units: [rule:registry:logging, source-cache:official:log-slog-go1.26]
+    status: active
+  - technology: golangci-lint
+    project: golangci-lint
+    version: v2.12.2-local
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-05-06
+    official_urls: [https://golangci-lint.run/docs/]
+    license: GPL-3.0
+    local_units: [rule:validation:golangci-lint]
+    status: active
+  - technology: gosec
+    project: gosec
+    version: dev-local
+    retrieved_at: 2026-08-03
+    upstream_updated_at: unknown
+    official_urls:
+      - https://github.com/securego/gosec
+      - https://securego.io/docs/rules/rule-intro
+    license: Apache-2.0
+    local_units: [rule:validation:gosec]
+    status: active
+  - technology: govulncheck
+    project: govulncheck
+    version: go1.26.5-local
+    retrieved_at: 2026-08-03
+    upstream_updated_at: 2026-08-03
+    official_urls:
+      - https://go.dev/doc/tutorial/govulncheck
+      - https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck
+    license: BSD-3-Clause
+    local_units: [rule:validation:govulncheck]
+    status: active
+  - technology: wails
+    project: Wails v3
+    version: referenced-v3
+    retrieved_at: 2026-08-03
+    upstream_updated_at: unknown
+    official_urls:
+      - https://wails.io/docs/
+      - https://v3.wails.io/quick-start/installation
+    license: MIT
+    local_units: [recipe:recipe-desktop-app]
+    status: partial

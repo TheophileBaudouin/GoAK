@@ -1,0 +1,31 @@
+$ python3 KitV2/scripts/validate-kitv2.py
+kitv2: PASS (28 skills, 3 snippets, 28 v1 modules mapped)
+
+$ ownership checks
+KitV2 product boundary: PASS
+- KitV2/.agent absent
+- KitV2/evaluations absent
+- KitV2/tools.yaml absent
+- KitV2/AGENTS.md present
+- KitV2/.pi/settings.json present
+- KitV2/.pi/prompts present
+- KitV2/.pi/skills present
+
+$ Pi smoke
+records=19
+contains_smoke=True
+assistant_text=KITV2_PI_SMOKE_PASS
+stderr=<empty>
+
+$ available KitV2 gate
+- go mod tidy / go mod verify: PASS
+- gofmt: PASS
+- go vet ./...: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- golangci-lint run ./...: PASS (0 issues)
+- gosec ./...: PASS (0 issues)
+- govulncheck ./...: PASS (No vulnerabilities found)
+- seven partial template go tests: PASS
+- three snippet checks: PASS
+- four probes: PASS

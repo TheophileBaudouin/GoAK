@@ -1,0 +1,89 @@
+=== validator cognitive ===
+cognitive: PASS (20 catalog objects)
+=== validator instructions ===
+instruction-artifacts: PASS
+=== validator product ===
+kitv2: PASS (28 product skills, 3 snippets, standalone)
+=== offline toolchain probes ===
+go version go1.26.5 darwin/arm64
+func Append(b []byte, a ...any) []byte
+func Appendf(b []byte, format string, a ...any) []byte
+func Appendln(b []byte, a ...any) []byte
+func Errorf(format string, a ...any) (err error)
+func FormatString(state State, verb rune) string
+func Fprint(w io.Writer, a ...any) (n int, err error)
+func Fprintf(w io.Writer, format string, a ...any) (n int, err error)
+func Fprintln(w io.Writer, a ...any) (n int, err error)
+func Fscan(r io.Reader, a ...any) (n int, err error)
+func Fscanf(r io.Reader, format string, a ...any) (n int, err error)
+func Fscanln(r io.Reader, a ...any) (n int, err error)
+func Print(a ...any) (n int, err error)
+func Printf(format string, a ...any) (n int, err error)
+func Println(a ...any) (n int, err error)
+func Scan(a ...any) (n int, err error)
+func Scanf(format string, a ...any) (n int, err error)
+func Scanln(a ...any) (n int, err error)
+func Sprint(a ...any) string
+func Sprintf(format string, a ...any) string
+func Sprintln(a ...any) string
+func Sscan(str string, a ...any) (n int, err error)
+func Sscanf(str string, format string, a ...any) (n int, err error)
+func Sscanln(str string, a ...any) (n int, err error)
+type Formatter interface{ ... }
+type GoStringer interface{ ... }
+type ScanState interface{ ... }
+type Scanner interface{ ... }
+type State interface{ ... }
+type Stringer interface{ ... }
+package testing // import "testing"
+
+type F struct {
+	// Has unexported fields.
+}
+    F is a type passed to fuzz tests.
+
+    Fuzz tests run generated inputs against a provided fuzz target, which can
+    find and report potential bugs in the code being tested.
+
+    A fuzz test runs the seed corpus by default, which includes entries provided
+    by F.Add and entries in the testdata/fuzz/<FuzzTestName> directory.
+    After any necessary setup and calls to F.Add, the fuzz test must then call
+    F.Fuzz to provide the fuzz target. See the testing package documentation for
+    an example, and see the F.Fuzz and F.Add method documentation for details.
+
+    *F methods can only be called before F.Fuzz. Once the test is executing
+    the fuzz target, only *T methods can be used. The only *F methods that are
+    allowed in the F.Fuzz function are F.Failed and F.Name.
+
+func (f *F) Add(args ...any)
+func (c *F) ArtifactDir() string
+func (c *F) Attr(key, value string)
+func (c *F) Chdir(dir string)
+func (c *F) Cleanup(f func())
+func (c *F) Context() context.Context
+func (c *F) Error(args ...any)
+func (c *F) Errorf(format string, args ...any)
+func (f *F) Fail()
+func (c *F) FailNow()
+func (c *F) Failed() bool
+func (c *F) Fatal(args ...any)
+func (c *F) Fatalf(format string, args ...any)
+func (f *F) Fuzz(ff any)
+func (f *F) Helper()
+func (c *F) Log(args ...any)
+func (c *F) Logf(format string, args ...any)
+func (c *F) Name() string
+func (c *F) Output() io.Writer
+func (c *F) Setenv(key, value string)
+func (c *F) Skip(args ...any)
+func (c *F) SkipNow()
+func (c *F) Skipf(format string, args ...any)
+func (f *F) Skipped() bool
+func (c *F) TempDir() string
+	-bench regexp
+	    To run all benchmarks, use '-bench .' or '-bench=.'.
+	    are run with b.N=1 to identify sub-benchmarks. For example,
+	    given -bench=X/Y, top-level benchmarks matching X are run
+	-race
+		The default is "set" unless -race is enabled,
+=== formatting ===

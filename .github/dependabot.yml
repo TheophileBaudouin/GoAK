@@ -1,0 +1,28 @@
+---
+# Dependabot — dependency update PRs for the KitV2 product.
+# Inert until this workspace is hosted on GitHub.
+# gomod targets KitV2/go.mod; github-actions targets the
+# workflows at the repo root. Dependabot intentionally does NOT propose
+# bumping the `go` directive itself — only `toolchain` and regular
+# dependencies — which is the correct default; do not override.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /KitV2
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(go)"
+    groups:
+      all-go-deps:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(actions)"
+    groups:
+      all-actions:
+        patterns: ["*"]

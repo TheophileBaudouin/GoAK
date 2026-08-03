@@ -1,0 +1,67 @@
+# templates/ci-workflow.yml — drop-in CI for new Go projects.
+# Copy this file into a new project's .github/workflows/ during setup.
+# Same gate as the KitV2 CI (.github/workflows/ci.yml at the metaproject
+# root), minus the monorepo working-directory: a new project's go.mod sits
+# at its root, so no working-directory is needed here.
+name: gate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      # v7.0.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # gosec/govulncheck are not provided by setup-go; pinned to audited
+      # releases so CI matches what the local gate uses.
+      - name: Install gate tools
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.28.0
+          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+
+      # 1. gofmt — must report no files. `gofmt -l` exits 0 even when dirty,
+      #    so test -z is required to turn output into a failure.
+      - name: gofmt
+        run: test -z "$(gofmt -l .)"
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go mod verify
+        run: go mod verify
+
+      - name: golangci-lint
+        uses: >-
+          golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a
+        with:
+          version: v2.12.2
+
+      - name: go test -race
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: coverage floor (70%)
+        run: |
+          pct=$(go tool cover -func=coverage.out | tail -1 \
+            | grep -oE '[0-9]+\.[0-9]+%$' | tr -d '%')
+          echo "aggregate coverage: ${pct}% (floor: 70%)"
+          awk -v p="$pct" 'BEGIN { exit !(p+0 >= 70) }'
+
+      - name: gosec
+        run: gosec ./...
+
+      - name: govulncheck
+        run: govulncheck ./...

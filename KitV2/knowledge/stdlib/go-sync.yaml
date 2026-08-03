@@ -1,0 +1,22 @@
+---
+id: source:go:sync
+title: Go sync and atomic primitives
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, concurrency, sync, atomic]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/sync
+selection: >-
+  Load when protecting shared state or coordinating goroutine lifetimes with
+  mutexes, wait groups, once, pools, maps, or synchronization primitives.
+limits:
+  - >-
+    Choose a primitive from the ownership and lifetime invariant;
+    synchronization alone does not make an unsafe design correct.
+relationships:
+  references:
+    - https://pkg.go.dev/sync

@@ -1,0 +1,16 @@
+# EditorConfig — Go conventions: tabs, LF, UTF-8.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.go]
+# gofmt is the authority for Go formatting; tabs only, display width
+# is the editor's choice (do not set indent_size — it confuses some tools).
+indent_style = tab
+
+[*.md]
+trim_trailing_whitespace = false

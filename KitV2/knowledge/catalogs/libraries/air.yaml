@@ -1,0 +1,22 @@
+---
+id: source:go:air
+title: Air Go live reload reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, development, hot-reload, air, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/air-verse/air
+selection: >-
+  Consider only for local development feedback loops that need process
+  rebuilding; never make hot reload a production runtime dependency.
+limits:
+  - >-
+    This pointer is not a product recipe; verify configuration, file watching,
+    generated files, and platform behavior before adoption.
+relationships:
+  references:
+    - https://github.com/air-verse/air

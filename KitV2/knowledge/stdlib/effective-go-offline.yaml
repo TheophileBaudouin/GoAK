@@ -1,0 +1,27 @@
+id: source:go:effective-go
+title: Effective Go offline source routing
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, idiomatic, historical, offline]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/doc/effective_go
+resolver: "tools/offline bundle: content-addressed document, SHA-256 verified"
+selection: >-
+  Retrieve the bounded pinned document; the current bundle indexes one
+  document unit, not individual headings.
+limits:
+  - >-
+    Effective Go is a historical guide and is not actively updated for every
+    current release.
+  - >-
+    Derived rules must name their target Go version and cite newer official
+    guidance when applicable.
+relationships:
+  references:
+    - https://go.dev/doc/effective_go
+  validated_by:
+    - evaluation:go:offline-source-retrieval

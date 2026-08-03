@@ -1,0 +1,117 @@
+{
+  "protocol": "goretrieval/1",
+  "schema": 1,
+  "sources": [
+    {
+      "id": "effective-go",
+      "go_version": "1.25+",
+      "pin": "52749b6d9f44f5c99e9b209ce5399b5da6157e3c",
+      "pin_type": "git-commit",
+      "verifier": "git-commit",
+      "index": "index/effective-go.tsv",
+      "index_sha256": "bc5a43e5edbc21a71bfd5ae87a3332d4f77b1d6d010907b1cce1650738aa130f",
+      "license": "licenses/go-website.txt",
+      "attribution": "The Go Authors; golang.org/doc/effective_go"
+    },
+    {
+      "id": "pkg-doc",
+      "go_version": "1.25+",
+      "pin": "go1.26.5",
+      "pin_type": "toolchain-version",
+      "verifier": "toolchain-local",
+      "license": "licenses/go-website.txt",
+      "attribution": "The Go Authors; pkg.go.dev"
+    },
+    {
+      "id": "toolchain",
+      "go_version": "1.25+",
+      "pin": "go1.26.5",
+      "pin_type": "toolchain-version",
+      "verifier": "toolchain-local",
+      "license": "licenses/go-website.txt",
+      "attribution": "The Go Authors; go.dev"
+    }
+  ],
+  "modules": [
+    {
+      "path": "github.com/fsnotify/fsnotify",
+      "version": "v1.9.0"
+    },
+    {
+      "path": "github.com/go-viper/mapstructure/v2",
+      "version": "v2.4.0"
+    },
+    {
+      "path": "github.com/knadh/koanf/maps",
+      "version": "v0.1.2"
+    },
+    {
+      "path": "github.com/mitchellh/copystructure",
+      "version": "v1.2.0"
+    },
+    {
+      "path": "github.com/mitchellh/reflectwalk",
+      "version": "v1.0.2"
+    },
+    {
+      "path": "github.com/pelletier/go-toml/v2",
+      "version": "v2.2.4"
+    },
+    {
+      "path": "github.com/sagikazarmark/locafero",
+      "version": "v0.11.0"
+    },
+    {
+      "path": "github.com/sourcegraph/conc",
+      "version": "v0.3.1-0.20240121214520-5f936abd7ae8"
+    },
+    {
+      "path": "github.com/spf13/afero",
+      "version": "v1.15.0"
+    },
+    {
+      "path": "github.com/spf13/cast",
+      "version": "v1.10.0"
+    },
+    {
+      "path": "github.com/spf13/pflag",
+      "version": "v1.0.10"
+    },
+    {
+      "path": "github.com/subosito/gotenv",
+      "version": "v1.6.0"
+    },
+    {
+      "path": "go.yaml.in/yaml/v3",
+      "version": "v3.0.4"
+    },
+    {
+      "path": "golang.org/x/text",
+      "version": "v0.28.0"
+    },
+    {
+      "path": "github.com/inconshreveable/mousetrap",
+      "version": "v1.1.0"
+    },
+    {
+      "path": "github.com/go-chi/chi/v5",
+      "version": "v5.3.1"
+    },
+    {
+      "path": "github.com/knadh/koanf/providers/confmap",
+      "version": "v1.0.0"
+    },
+    {
+      "path": "github.com/knadh/koanf/v2",
+      "version": "v2.3.5"
+    },
+    {
+      "path": "github.com/spf13/cobra",
+      "version": "v1.10.2"
+    },
+    {
+      "path": "github.com/spf13/viper",
+      "version": "v1.21.0"
+    }
+  ]
+}

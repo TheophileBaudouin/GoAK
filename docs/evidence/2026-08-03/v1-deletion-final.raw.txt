@@ -1,0 +1,27 @@
+$ test ! -e kit
+PASS
+$ python3 .agent/validators/validate-instructions.py
+instruction-artifacts: PASS
+$ cd KitV2 && python3 scripts/validate-kitv2.py
+kitv2: PASS (28 product skills, 3 snippets, standalone)
+$ KitV2 full gate
+- go mod verify: PASS
+- gofmt: PASS
+- go vet ./...: PASS
+- golangci-lint run ./...: PASS (0 issues)
+- go test -race ./...: PASS
+- gosec ./...: PASS (0 issues)
+- govulncheck ./...: PASS (No vulnerabilities found)
+- bash probes/run.sh: PASS (4/4)
+- templates: PASS (7/7)
+- snippets: PASS (3/3)
+$ active v1 reference scan
+PASS: no active references in AGENTS.md, .agent/, .pi/memory/, KitV2/, .github/, or .gitignore.
+
+Archive:
+/Users/theophilebaudouin/Documents/devellopement/go-engineering-kit-v1-archive-2026-08-03/kit-v1.tar.gz
+SHA-256 manifest:
+/Users/theophilebaudouin/Documents/devellopement/go-engineering-kit-v1-archive-2026-08-03/SHA256SUMS
+
+Residual risks: no Git repository; archive is the rollback referent. Historical
+records are retained only in current KitV2/deletion synthesis and evidence.

@@ -1,0 +1,22 @@
+---
+id: source:go:command
+title: Go command reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, tooling, build, test, modules]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/cmd/go
+selection: >-
+  Load when automating Go build, test, module, environment, cross-compilation,
+  or build-constraint operations.
+limits:
+  - >-
+    The command reference documents mechanics; observable application behavior
+    still requires the relevant project test or probe.
+relationships:
+  references:
+    - https://pkg.go.dev/cmd/go

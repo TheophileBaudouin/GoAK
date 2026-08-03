@@ -1,0 +1,22 @@
+---
+id: source:go:profiling
+title: Go profiling with pprof
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, profiling, pprof, performance]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://go.dev/blog/pprof
+selection: >-
+  Load when investigating CPU, memory, blocking, or allocation behavior after
+  a reproducible performance symptom.
+limits:
+  - >-
+    Profiling informs optimization; it does not justify an optimization before
+    a measured baseline and a behavior-preserving check.
+relationships:
+  references:
+    - https://go.dev/blog/pprof

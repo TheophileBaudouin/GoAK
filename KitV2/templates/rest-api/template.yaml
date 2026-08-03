@@ -1,0 +1,4 @@
+name: go-template-rest-api
+status: partial
+purpose: Minimal runnable scaffold for the rest-api project shape.
+validation: go test ./...

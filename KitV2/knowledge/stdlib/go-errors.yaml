@@ -1,0 +1,22 @@
+---
+id: source:go:errors
+title: Go errors package
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, errors, wrapping, inspection]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/errors
+selection: >-
+  Load when choosing error contracts, wrapping causes, joining failures, or
+  inspecting sentinel and typed errors.
+limits:
+  - >-
+    The package API does not decide which failures belong in a public contract;
+    that decision remains with the consuming boundary.
+relationships:
+  references:
+    - https://pkg.go.dev/errors

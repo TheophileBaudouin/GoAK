@@ -1,0 +1,22 @@
+---
+id: source:go:opentelemetry
+title: OpenTelemetry Go observability
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, observability, opentelemetry, tracing, metrics]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://opentelemetry.io/docs/languages/go/
+selection: >-
+  Load when adding vendor-neutral tracing, metrics, context propagation, or
+  instrumentation to a Go service.
+limits:
+  - >-
+    OpenTelemetry is an integration capability, not a mandatory dependency for
+    every kit recipe; exporter and SDK choices require separate verification.
+relationships:
+  references:
+    - https://opentelemetry.io/docs/languages/go/

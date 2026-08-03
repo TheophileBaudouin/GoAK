@@ -1,0 +1,23 @@
+id: source:go:pkg-doc
+title: Offline Go package and symbol lookup
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, api, offline]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/
+resolver: >-
+  go doc -short <package> or <package>.<symbol> from the pinned local
+  toolchain
+selection: "Load only the exact package or symbol required by the task."
+limits:
+  - "This is not an offline copy of pkg.go.dev HTML."
+  - >-
+    Missing local modules require an explicit online refresh or return
+    blocked.
+relationships:
+  validated_by: [evaluation:go:offline-source-retrieval]
+  implements: [capability:go:offline-package-lookup]

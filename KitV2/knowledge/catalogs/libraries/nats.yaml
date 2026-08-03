@@ -1,0 +1,22 @@
+---
+id: source:go:nats
+title: NATS Go client reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, nats, messaging, pubsub, jetstream, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/nats-io/nats.go
+selection: >-
+  Consider for request-reply, pub/sub, queue groups, or JetStream messaging
+  after delivery, durability, and failure semantics are specified.
+limits:
+  - >-
+    This pointer is not a runnable messaging recipe; verify server version,
+    acknowledgment, replay, ordering, and shutdown behavior before adoption.
+relationships:
+  references:
+    - https://github.com/nats-io/nats.go

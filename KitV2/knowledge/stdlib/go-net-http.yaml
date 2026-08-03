@@ -1,0 +1,22 @@
+---
+id: source:go:net-http
+title: Go net/http package
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, http, server, client, handlers]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/net/http
+selection: >-
+  Load when building HTTP clients, servers, handlers, transports, middleware,
+  TLS, or test servers in Go.
+limits:
+  - >-
+    The standard library is the integration boundary; routing or observability
+    libraries remain separate decisions.
+relationships:
+  references:
+    - https://pkg.go.dev/net/http

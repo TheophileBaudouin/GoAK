@@ -1,0 +1,22 @@
+---
+id: source:go:database-sql
+title: Go database/sql package
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, database, sql, transactions, context]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://pkg.go.dev/database/sql
+selection: >-
+  Load when designing SQL connections, pools, transactions, context-aware
+  queries, drivers, or generated database access.
+limits:
+  - >-
+    database/sql is an abstraction; driver behavior, schema, and query
+    generation remain separate integration decisions.
+relationships:
+  references:
+    - https://pkg.go.dev/database/sql

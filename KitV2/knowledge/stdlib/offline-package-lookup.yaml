@@ -1,0 +1,17 @@
+---
+id: capability:go:offline-package-lookup
+title: Offline Go package and symbol lookup
+kind: Capability
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, offline, pkg-doc, package, symbol]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+scope: >-
+  Resolve exact Go package and symbol documentation from the shipped resolver,
+  local GOROOT, or the local module cache without network access.
+relationships:
+  implements: [source:go:pkg-doc]
+  validated_by: [evaluation:go:offline-source-retrieval]

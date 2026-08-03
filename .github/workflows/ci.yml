@@ -1,0 +1,68 @@
+# CI — the KitV2 verification gate, machine-enforced.
+# Any non-zero exit fails the job.
+name: gate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: KitV2
+    steps:
+      # Actions pinned to full commit SHAs (supply-chain hardening: tags
+      # can be repointed). SHAs resolved from the release tags below.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: KitV2/go.mod
+          cache: true
+
+      # gosec/govulncheck are not provided by setup-go; pinned to audited
+      # releases so CI matches what the local gate uses.
+      - name: Install gate tools
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.28.0
+          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+
+      # 1. gofmt — must report no files. `gofmt -l` exits 0 even when dirty,
+      #    so test -z is required to turn output into a failure.
+      - name: gofmt
+        run: test -z "$(gofmt -l .)"
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go mod verify
+        run: go mod verify
+
+      - name: golangci-lint
+        uses: >-
+          golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a
+        with:
+          version: v2.12.2
+          working-directory: KitV2
+
+      - name: go test -race
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: coverage floor (70%)
+        run: |
+          pct=$(go tool cover -func=coverage.out | tail -1 \
+            | grep -oE '[0-9]+\.[0-9]+%$' | tr -d '%')
+          echo "aggregate coverage: ${pct}% (floor: 70%)"
+          awk -v p="$pct" 'BEGIN { exit !(p+0 >= 70) }'
+
+      - name: gosec
+        run: gosec ./...
+
+      - name: govulncheck
+        run: govulncheck ./...

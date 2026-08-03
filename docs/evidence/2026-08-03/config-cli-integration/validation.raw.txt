@@ -1,0 +1,26 @@
+$ python3 .agent/validators/validate-cognitive.py
+cognitive: PASS (32 catalog objects)
+$ python3 KitV2/tools/validators/validate-kitv2.py
+kitv2: PASS (33 product skills, 3 snippets, standalone, offline bundle)
+$ python3 .agent/validators/validate-instructions.py
+instruction-artifacts: PASS
+$ cd KitV2 && go mod verify
+a ll modules verified
+$ cd KitV2 && test -z "$(gofmt -l .)"
+PASS
+$ cd KitV2 && go vet ./...
+PASS
+$ cd KitV2 && golangci-lint run ./...
+0 issues.
+$ cd KitV2 && go test -race ./...
+PASS: all packages passed
+$ cd KitV2 && gosec ./...
+Issues: 0
+$ cd KitV2 && govulncheck ./...
+No vulnerabilities found.
+$ cd KitV2 && GOPROXY=off bash probes/run.sh
+cli-minimal: PASS
+rest-chi: PASS
+sqlite-sqlc: PASS
+worker-shutdown: PASS
+offline: PASS

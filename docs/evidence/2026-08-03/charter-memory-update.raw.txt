@@ -1,0 +1,20 @@
+$ python3 .agent/validators/validate-instructions.py
+instruction-artifacts: PASS
+$ cd KitV2 && python3 scripts/validate-kitv2.py
+kitv2: PASS (28 product skills, 3 snippets, standalone)
+$ KitV2 gate
+- go mod verify: PASS
+- gofmt: PASS
+- go vet ./...: PASS
+- golangci-lint run ./...: PASS (0 issues)
+- go test -race ./...: PASS
+- gosec ./...: PASS (0 issues)
+- govulncheck ./...: PASS (No vulnerabilities found)
+- bash probes/run.sh: PASS (4/4)
+
+Memory was reconciled against the complete current KIT_CHARTER.md: ten typed
+artifact kinds, minimum metadata, explicit relationships, composition hierarchy,
+Problem→Research→Decision→Pattern→Snippet→Recipe→Template→Evaluation
+lifecycle, ownership boundaries, and deterministic validation are now active
+rules. Former-product paths are historical only; no active command depends on
+them.

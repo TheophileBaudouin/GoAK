@@ -1,0 +1,103 @@
+$ test ! -e KitV2/.agent
+$ test -f KitV2/AGENTS.md KitV2/.pi/settings.json
+$ python3 KitV2/scripts/validate-kitv2.py
+kitv2: PASS (28 skills, 3 snippets, 28 v1 modules mapped)
+$ KitV2 available mechanical/behavior gate
+all modules verified
+ok  	go-engineering-kit/recipes/recipe-cli-interactif	(cached)
+ok  	go-engineering-kit/recipes/recipe-cli-minimal	(cached)
+ok  	go-engineering-kit/recipes/recipe-desktop-app	(cached)
+ok  	go-engineering-kit/recipes/recipe-graceful-shutdown	(cached)
+ok  	go-engineering-kit/recipes/recipe-rest-chi	(cached)
+ok  	go-engineering-kit/recipes/recipe-sqlite-sqlc	(cached)
+ok  	go-engineering-kit/recipes/recipe-worker-pool	(cached)
+?   	go-engineering-kit/snippets/bounded-worker	[no test files]
+?   	go-engineering-kit/snippets/errors-once	[no test files]
+?   	go-engineering-kit/snippets/http-json	[no test files]
+ok  	go-engineering-kit/recipes/recipe-cli-interactif	(cached)
+ok  	go-engineering-kit/recipes/recipe-cli-minimal	(cached)
+ok  	go-engineering-kit/recipes/recipe-desktop-app	(cached)
+ok  	go-engineering-kit/recipes/recipe-graceful-shutdown	(cached)
+ok  	go-engineering-kit/recipes/recipe-rest-chi	(cached)
+ok  	go-engineering-kit/recipes/recipe-sqlite-sqlc	(cached)
+ok  	go-engineering-kit/recipes/recipe-worker-pool	(cached)
+?   	go-engineering-kit/snippets/bounded-worker	[no test files]
+?   	go-engineering-kit/snippets/errors-once	[no test files]
+?   	go-engineering-kit/snippets/http-json	[no test files]
+0 issues.
+[gosec] 2026/08/03 00:52:40 Including rules: default
+[gosec] 2026/08/03 00:52:40 Excluding rules: default
+[gosec] 2026/08/03 00:52:40 Including analyzers: default
+[gosec] 2026/08/03 00:52:40 Excluding analyzers: default
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/monolith
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-interactif
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-graceful-shutdown
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/cloud-service
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-sqlite-sqlc
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-worker-pool
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-minimal
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/rest-api
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/worker
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/cli-minimal
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/rest-chi
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/worker-shutdown
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-desktop-app
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-rest-chi
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/bounded-worker
+[gosec] 2026/08/03 00:52:41 Checking package: cli
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-minimal/cli.go
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/errors-once
+[gosec] 2026/08/03 00:52:41 Checking package: pool
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-worker-pool/pool.go
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/http-json
+[gosec] 2026/08/03 00:52:41 Checking package: snippet
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/bounded-worker/example.go
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/sqlite-sqlc
+[gosec] 2026/08/03 00:52:41 Checking package: shutdown
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-graceful-shutdown/shutdown.go
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/cli
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/grpc
+[gosec] 2026/08/03 00:52:41 Checking package: desktop
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-desktop-app/app.go
+[gosec] 2026/08/03 00:52:41 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/microservice
+[gosec] 2026/08/03 00:52:41 Checking package: tui
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-interactif/tui.go
+[gosec] 2026/08/03 00:52:41 Checking package: sqlcsqlite
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-sqlite-sqlc/store.go
+[gosec] 2026/08/03 00:52:41 Checking package: snippet
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/errors-once/example.go
+[gosec] 2026/08/03 00:52:41 Checking package: restchi
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-rest-chi/server.go
+[gosec] 2026/08/03 00:52:41 Checking package: snippet
+[gosec] 2026/08/03 00:52:41 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/http-json/example.go
+Results:
+
+
+[1;36mSummary:[0m
+  Gosec  : dev
+  Files  : 10
+  Lines  : 579
+  Nosec  : 0
+  Issues : [1;32m0[0m
+
+No vulnerabilities found.
+ok  	go-agent-template-cli	(cached)
+ok  	go-agent-template-cloud-service	(cached)
+ok  	go-agent-template-grpc	(cached)
+ok  	go-agent-template-microservice	(cached)
+ok  	go-agent-template-monolith	(cached)
+ok  	go-agent-template-rest-api	(cached)
+ok  	go-agent-template-worker	(cached)
+bounded-worker-cancellation: PASS
+errors-handle-once: PASS
+http-json-response: PASS
+--- probes/cli-minimal ---
+cli-minimal: PASS
+--- probes/rest-chi ---
+2026/08/03 00:52:44 INFO item created id=1 name=probe
+2026/08/03 00:52:44 [MacBookAir.lan/YCivs1QQNA-000001] "POST http://127.0.0.1:51750/items HTTP/1.1" from 127.0.0.1:51751 - 201 24B in 1.01175ms
+rest-chi: PASS
+--- probes/sqlite-sqlc ---
+sqlite-sqlc: PASS
+--- probes/worker-shutdown ---
+worker-shutdown: PASS

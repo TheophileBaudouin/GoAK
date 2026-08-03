@@ -1,0 +1,22 @@
+---
+id: source:go:zap
+title: Uber zap structured logging reference
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, logging, structured, zap, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-03
+source: https://github.com/uber-go/zap
+selection: >-
+  Consider only when measured logging throughput or allocation requirements
+  justify a third-party logger over the kit's slog default.
+limits:
+  - >-
+    This source pointer is not a product recommendation and has no runnable
+    recipe; validate the current release before adoption.
+relationships:
+  references:
+    - https://github.com/uber-go/zap

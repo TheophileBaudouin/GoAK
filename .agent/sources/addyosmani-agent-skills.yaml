@@ -1,0 +1,23 @@
+---
+id: source-addyosmani-agent-skills
+title: Addy Osmani Agent Skills
+kind: source
+version: 1
+status: recorded
+owner: go-agent-kit
+url: https://github.com/addyosmani/agent-skills/tree/main/skills
+scope:
+  - prompts
+  - agent-skills
+  - workflow-skills
+  - progressive-disclosure
+observed_paths:
+  - skills/
+  - README.md
+  - docs/
+usage: >-
+  Research source for prompt, skill, and workflow discovery; do not copy
+  content without a separate evidence review.
+last_verified: 2026-08-03
+---
+

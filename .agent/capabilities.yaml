@@ -1,0 +1,8 @@
+name: go-agent-development-metaproject
+version: 1
+surfaces:
+  instructions: .agent/instructions.md
+  memory: .pi/memory/
+  decisions: .pi/memory/Decisions.md
+  evaluations: .agent/evaluations/
+  product: KitV2/

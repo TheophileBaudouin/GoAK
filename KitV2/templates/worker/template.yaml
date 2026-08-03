@@ -1,0 +1,4 @@
+name: go-template-worker
+status: partial
+purpose: Minimal runnable scaffold for the worker project shape.
+validation: go test ./...
