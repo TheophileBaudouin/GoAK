@@ -11,7 +11,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[2]
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -232,6 +231,17 @@ def check_knowledge_metadata() -> list[str]:
     return errors
 
 
+def check_empty_markdown() -> list[str]:
+    """Reject zero-byte .md files: Pi loads any .md under a declared skill
+    directory and requires at least a description, so empty placeholders
+    break skill discovery (rules/architecture.md regression)."""
+    errors: list[str] = []
+    for path in ROOT.rglob("*.md"):
+        if path.is_file() and path.stat().st_size == 0:
+            errors.append(f"{path}: empty markdown file breaks skill discovery")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     for required in (
@@ -270,6 +280,7 @@ def main() -> int:
         except ValueError as error:
             errors.append(str(error))
     errors.extend(check_knowledge_metadata())
+    errors.extend(check_empty_markdown())
     for name in EXPECTED_TEMPLATES:
         for required in (
             "template.yaml",
