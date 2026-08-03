@@ -9,6 +9,8 @@ Format:
 
 ---
 
+- **2026-08-03** — Le premier push vers TheophileBaudouin/GoAK a échoué en 403 « denied to theocode29 » alors que `gh auth status` montrait le bon compte TheophileBaudouin. Cause : le credential helper macOS (osxkeychain) stockait un ancien identifiant github.com du compte theocode29, et git l'utilisait par priorité. → **Avant un push GitHub, vérifier l'identité effective utilisée par git (`git push` échoue → `gh auth status`), pas seulement le user.name de git config. Corriger avec `gh auth setup-git` qui configure un credential helper prioritaire pour github.com, puis repousser. `git config user.name/email` n'a aucun rôle dans l'authentification HTTPS.**
+
 - **2026-08-03** — Le premier enrichissement du registre a utilisé trois URL Go obsolètes ou inexistantes (`go.dev/doc/tutorial/testing`, `go.dev/doc/race`, `go.dev/doc/tutorial/profiling`) et une preuve avec des compteurs périmés. → **Vérifier chaque URL ajoutée par une requête bornée avant de la considérer canonique, puis régénérer les compteurs d'évidence après toute modification du registre. Une revue sub-agent partielle ne vaut pas approbation indépendante complète.**
 
 - **2026-08-03** — Architecture work initially linked the proposed pattern to `capability:agent:pi-workflows`, but the current graph has only manifest capability names and no declared graph object with that stable ID. → **Do not create forward graph relationships to undeclared capability objects. Keep proposed architecture metadata relationship-safe, or first add the complete capability artifact and validator coverage.**

@@ -161,3 +161,4 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] Metaproject memory: root `.pi/memory/` Brief / Progress / Gotchas / Agent / Decisions.
 - [x] Root CI and Dependabot point to KitV2; root and product ignore rules are present.
 - [x] External former-product archive and restore drill passed before deletion.
+- [ ] Publier le dépôt Git public du metaprojet — remote https://github.com/TheophileBaudouin/GoAK, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
