@@ -19,7 +19,7 @@
 set -eu
 
 repo="TheophileBaudouin/GoAK"
-ref="${GAK_REF:-v2.2.0}"
+ref="${GAK_REF:-v2.2.1}"
 target="${1:-./go-agent-kit}"
 
 # --- output helpers: minimal, portable (POSIX sh), auto-disabled ---
@@ -30,11 +30,50 @@ else
 	C_RESET='' C_BOLD='' C_CYAN='' C_GREEN='' C_YELLOW='' C_RED='' C_DIM=''
 fi
 
-say()  { printf '%b\n' "$*"; }
+say() { printf '%b\n' "$*"; }
 step() { printf '%b\n' "${C_CYAN}→${C_RESET} $*"; }
-ok()   { printf '%b\n' "${C_GREEN}✓${C_RESET} $*"; }
+ok() { printf '%b\n' "${C_GREEN}✓${C_RESET} $*"; }
 warn() { printf '%b\n' "${C_YELLOW}!${C_RESET} $*" >&2; }
-die()  { printf '%b\n' "${C_RED}✗${C_RESET} $*" >&2; exit 1; }
+die() {
+	printf '%b\n' "${C_RED}✗${C_RESET} $*" >&2
+	exit 1
+}
+
+# --- animation: standard rotating-line spinner (TTY only) ---
+# Runs <cmd...> with a |/-\ spinner while it executes; returns the cmd rc.
+# When stdout is not a TTY it just runs the command (no animation).
+animate() {
+	label=$1
+	shift
+	if [ ! -t 1 ]; then
+		set +e
+		"$@"
+		rc=$?
+		set -e
+		return "$rc"
+	fi
+	"$@" &
+	pid=$!
+	i=0
+	while kill -0 "$pid" 2>/dev/null; do
+		# shellcheck disable=SC1003 # single backslash spinner frame
+		case $((i % 4)) in
+			0) ch='|' ;;
+			1) ch='/' ;;
+			2) ch='-' ;;
+			3) ch='\' ;;
+		esac
+		printf '\r  %s %s' "$ch" "$label"
+		i=$((i + 1))
+		sleep 0.1
+	done
+	set +e
+	wait "$pid"
+	rc=$?
+	set -e
+	printf '\r  \033[K'
+	return "$rc"
+}
 
 say ""
 say "${C_BOLD}${C_CYAN}Go Agent Kit — installer${C_RESET} ${C_DIM}(ref ${ref} → ${target})${C_RESET}"
@@ -53,16 +92,16 @@ if [ -e "$target" ] && [ -n "$(ls -A "$target" 2>/dev/null)" ]; then
 	die "target '$target' exists and is not empty — pick another directory or empty it"
 fi
 
-# --- download ---
-step "downloading ${repo}@${ref}"
+# --- download (animated) ---
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/gak-install.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
 url="https://codeload.github.com/$repo/tar.gz/$ref"
-if ! curl -fsSL --retry 2 --retry-delay 1 "$url" -o "$tmp/repo.tgz"; then
+if ! animate "downloading ${repo}@${ref}" \
+	curl -fsSL --retry 2 --retry-delay 1 "$url" -o "$tmp/repo.tgz"; then
 	die "cannot download $url (check the ref and network)"
 fi
-size=$(wc -c < "$tmp/repo.tgz" | tr -d ' ')
+size=$(wc -c <"$tmp/repo.tgz" | tr -d ' ')
 ok "downloaded ${size} bytes"
 
 # --- extract ---
