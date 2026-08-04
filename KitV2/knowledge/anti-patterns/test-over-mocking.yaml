@@ -1,0 +1,42 @@
+id: pattern:antipattern:test-over-mocking
+title: Mock de tout — le faux devient le système
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [testing, mocking, unit-test, integration]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Chaque dépendance est mockée (couches entières : repository, HTTP client,
+  filesystem, horloge), les tests vérifient des interactions entre mocks et
+  ne touchent plus aucune implémentation réelle.
+detect: >-
+  - Suite de tests sans aucun test d'intégration ; mocks de couches sans
+    logique (simple relais).
+  - Tests qui passent alors que le système réel casse (contrat faux entre
+    mock et implémentation).
+  - Configuration de mock aussi complexe que le code testé.
+problem: >-
+  Les mocks ne vérifient que les attentes programmées : ils figent l'API
+  interne (voir test-implementation-details), ne détectent ni les erreurs de
+  contrat réel ni les régressions d'intégration, et donnent une fausse
+  confiance. La hiérarchie de tests (pyramide) exige plus de tests de bas
+  niveau réels que de mocks.
+fix: >-
+  Mockez seulement les frontières instables (réseau, horloge, I/O) avec des
+  fakes de données simples ; testez la logique sur des implémentations réelles
+  (base de test, httptest.Server pour HTTP). Vérifiez les contrats par un test
+  d'intégration minimal (voir recipe-sqlite-sqlc, recipe-rest-chi). Le kit
+  privilégie les seams purs (fonctions testables) aux frameworks de mock.
+when_ok: >-
+  Un mock se justifie pour une dépendance externe non reproductible en test
+  (fournisseur SaaS, réseau) ; il doit refléter le vrai contrat, pas une
+  attente ad hoc.
+relationships:
+  references:
+    - http://xunitpatterns.com/MockObject.html
+    - https://testsmells.org/
+  uses: []
+  validated_by: []

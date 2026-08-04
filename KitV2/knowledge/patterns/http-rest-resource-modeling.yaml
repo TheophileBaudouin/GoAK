@@ -1,0 +1,41 @@
+id: pattern:http:rest-resource-modeling
+title: Modélisation REST — ressources, verbes et statuts
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [http, rest, api, resources, status-codes]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une API qui tunnelise tout par POST/GET générique est opaque : pas de cache,
+  pas d'idempotence, statuts inexploitables (voir
+  pattern:antipattern:rest-tunneling).
+context: >-
+  S'applique à toute API HTTP exposant des entités et leurs cycles de vie à
+  des clients (internes ou externes).
+solution: >-
+  Modéliser des ressources (noms, hiérarchies) et utiliser les verbes selon
+  leur sémantique : GET (lecture, idempotent), POST (création/action), PUT
+  (remplacement), PATCH (mise à jour partielle), DELETE ; statuts standards
+  (400/401/403/404/409/429/5xx) ; erreurs structurées (RFC 9457 Problem
+  Details) ; en-têtes de cache quand la ressource le permet.
+benefits: >-
+  Les clients standards (caches, proxies, libs) fonctionnent sans adaptation ;
+  le contrat est lisible ; l'idempotence des verbes protège les retries.
+costs: >-
+  L'action non-CRUD (annuler une commande) exige un POST d'action
+  (`/orders/{id}/cancel`) — légitime ; forcer chaque opération dans un cadre
+  de ressource « propre » produit des modèles artificiels.
+related: >-
+  Catalog : chi. Recette : recipe-rest-chi. Homologue négatif :
+  pattern:antipattern:rest-tunneling,
+  pattern:antipattern:rest-ignoring-http-semantics.
+relationships:
+  references:
+    - https://www.infoq.com/articles/rest-anti-patterns
+    - https://www.rfc-editor.org/rfc/rfc9457
+    - pattern:antipattern:rest-tunneling
+  uses: []
+  validated_by: []

@@ -1,0 +1,39 @@
+id: pattern:go:contextual-worker
+title: Worker contextuel — goroutine avec condition de sortie explicite
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, goroutine, context, cancellation]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Lancer une goroutine est trivial ; la faire s'arrêter proprement ne l'est pas.
+  Sans condition de sortie, les goroutines fuient (mémoire, pile) jusqu'au OOM.
+context: >-
+  S'applique à toute goroutine dont la durée de vie dépasse la fonction qui la
+  lance : worker, pipeline, poller, handler long.
+solution: >-
+  Donner à chaque goroutine un `context.Context` d'annulation et une sélection
+  explicite : `select { case <-ctx.Done(): return; case <-jobs: … }`. Le
+  lanceur crée `ctx, cancel := context.WithCancel(parent)`, appelle `cancel()`
+  dans son `defer`, et attend la fin (WaitGroup/errgroup) avant de retourner.
+benefits: >-
+  Les goroutines ont une durée de vie bornée et vérifiable ; l'annulation se
+  propage aux appels bloquants ; le test peut simuler l'arrêt en annulant le
+  contexte (voir pattern:go:concurrency-worker-pool pour le groupement).
+costs: >-
+  Coût d'une sélection et d'un canal de plus ; l'oubli d'un `cancel()` fuit
+  l'annulation (voir pattern:go:private-context-keys pour les valeurs).
+related: >-
+  Règles du kit : `rules/core/concurrency` (goroutine lifetimes, cancellation).
+  Recette : recipe-worker-pool, recipe-graceful-shutdown. Homologue négatif :
+  pattern:antipattern:go-goroutine-leak.
+relationships:
+  references:
+    - https://go.dev/blog/pipelines
+    - https://pkg.go.dev/context
+    - pattern:antipattern:go-goroutine-leak
+  uses: []
+  validated_by: []

@@ -1,0 +1,37 @@
+id: pattern:go:string-builder
+title: Builder de chaînes — strings.Builder pour l'assemblage en boucle
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, strings, builder, performance]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  L'immutabilité des chaînes Go rend la concaténation en boucle quadratique
+  (voir pattern:antipattern:go-string-concat-loop) : chaque `+=` copie toute
+  la chaîne.
+context: >-
+  S'applique à tout assemblage de texte en plusieurs morceaux : CSV, SQL
+  dynamique, HTML, logs multilignes, requêtes.
+solution: >-
+  `var b strings.Builder` + `b.WriteString(part)` ; préallouer avec
+  `b.Grow(n)` quand la taille est connue ; `strings.Join` pour les
+  séparateurs fixes ; `bytes.Buffer` pour le binaire. Construire puis
+  convertir une seule fois (`b.String()`).
+benefits: >-
+  Amortit la réallocation (coût linéaire au lieu de quadratique), zéro
+  allocation intermédiaire de la chaîne entière, API triviale.
+costs: >-
+  Pour 2-3 concaténations fixes (`a + b + c`), le builder est du bruit sans
+  gain mesurable — la règle vise les boucles et chemins chauds.
+related: >-
+  Homologue négatif : pattern:antipattern:go-string-concat-loop.
+relationships:
+  references:
+    - https://go.dev/blog/strings
+    - https://pkg.go.dev/strings
+    - pattern:antipattern:go-string-concat-loop
+  uses: []
+  validated_by: []

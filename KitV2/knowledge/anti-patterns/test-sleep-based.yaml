@@ -1,0 +1,39 @@
+id: pattern:antipattern:test-sleep-based
+title: Tests basés sur le temps réel (sleep)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [testing, time, flakiness, concurrency]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `time.Sleep(100 * time.Millisecond)` avant une assertion (attente d'une
+  goroutine, d'un événement, d'un timeout) et conditions de course tolérées
+  « ça marche généralement ».
+detect: >-
+  - `time.Sleep` dans les tests (grep).
+  - Tests intermittents en CI chargée (flaky par timing).
+  - Assertions sans synchronisation explicite (attendre un canal, un signal).
+problem: >-
+  Un sleep est un délai arbitraire : trop court → flaky, trop long → suite
+  lente ; il n'apporte aucune garantie de synchronisation. Les tests de
+  concurrence basés sur le temps masquent les races au lieu de les révéler —
+  `go test -race` ne suffit pas si l'assertion n'attend rien.
+fix: >-
+  Synchroniser par événement : attendre la réception sur un canal, un
+  `sync.WaitGroup`, un poll borné avec deadline (retry avec timeout court et
+  intervalle), ou tester le seam temporel (injecter l'horloge). Pour le code
+  temporel, utiliser un fake clock (passer `time.Now`/timer en dépendance) ou
+  `testing/synctest` (Go 1.25+) pour les goroutines liées au temps.
+when_ok: >-
+  Un sleep borné en attendant un système externe (base, réseau) peut rester
+  dans un test d'intégration — toujours avec une deadline globale et jamais
+  dans un test unitaire.
+relationships:
+  references:
+    - http://xunitpatterns.com/Sleepy%20Test.html
+    - https://go.dev/doc/go1.25
+  uses: []
+  validated_by: []

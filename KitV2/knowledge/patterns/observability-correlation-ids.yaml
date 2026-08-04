@@ -1,0 +1,42 @@
+id: pattern:observability:correlation-ids
+title: Identifiants de corrélation — relier les signaux d'une requête
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [observability, correlation, tracing, logs]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  En architecture distribuée, une action utilisateur traverse plusieurs
+  services : sans lien commun, les logs de chaque étape sont des îlots et
+  l'incident est impossible à reconstituer (voir
+  pattern:antipattern:obs-logging-not-observability).
+context: >-
+  S'applique dès que plus d'un service ou processus participe à une requête,
+  ou qu'un worker consomme des événements.
+solution: >-
+  Générer un identifiant unique à l'entrée (middleware), le propager par
+  en-tête (`X-Request-Id`, `traceparent`) et dans le contexte (voir
+  pattern:go:private-context-keys), et l'inclure dans chaque log, erreur et
+  métrique de la requête. En Go : middleware chi + `slog` avec l'ID dans le
+  handler, ou OpenTelemetry pour les traces complètes (source du kit).
+benefits: >-
+  Reconstituer le chemin complet d'une requête (logs + erreurs + métriques),
+  répondre « cette requête a-t-elle réussi ? » et corréler les plaintes
+  utilisateurs aux traces.
+costs: >-
+  L'injection d'ID dans chaque log demande de la discipline (handler dédié) ;
+  l'ID seul ne remplace pas les traces distribuées (voir
+  source:go:opentelemetry) quand le budget le justifie.
+related: >-
+  Knowledge : observability/otel-go.yaml (source:go:opentelemetry). Homologue
+  négatif : pattern:antipattern:obs-logging-not-observability.
+relationships:
+  references:
+    - https://microservices.io/patterns/observability/distributed-tracing.html
+    - https://microsoft.github.io/code-with-engineering-playbook/observability/correlation-id/
+    - pattern:antipattern:obs-logging-not-observability
+  uses: []
+  validated_by: []

@@ -1,0 +1,41 @@
+id: pattern:antipattern:cfg-hardcoded-values
+title: Valeurs de configuration codées en dur dans le code
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [configuration, deployment, twelve-factor, design]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  URLs de production, ports, timeouts, feature flags et paramètres
+  d'environnement littéraux dans le code source, modifiables seulement par
+  recompilation.
+detect: >-
+  - Constantes/valeurs d'environnement mélangées au code (grep des URLs,
+    ports).
+  - Déploiement vers un autre environnement nécessitant un build distinct
+    (config embarquée dans l'artefact).
+  - « Ça marche en dev, pas en prod » — la config diffère sans contrôle.
+problem: >-
+  Les valeurs codées en dur violent l'externalisation de la configuration
+  (CWE-15, Twelve-Factor) : changement = redéploiement, environnements
+  confondus, secrets exposés (voir sec-hardcoded-credentials) et risque de
+  dérive de configuration entre environnements.
+fix: >-
+  Lire la configuration depuis l'environnement ou un fichier de config
+  injecté au déploiement, avec des défauts sûrs et une validation au
+  démarrage (échec rapide). Voir recipe-config-viper et recipe-config-koanf
+  du kit pour une gestion typée. Même artefact déployé partout, valeurs au
+  runtime.
+when_ok: >-
+  Une constante de code réellement immuable (limite de protocole, valeur
+  métier fixe) peut rester en code ; la règle concerne les valeurs qui
+  varient par environnement.
+relationships:
+  references:
+    - https://cwe.mitre.org/data/definitions/15.html
+    - https://12factor.net/config
+  uses: []
+  validated_by: []

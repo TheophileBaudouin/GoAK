@@ -1,0 +1,38 @@
+id: pattern:concurrency:singleflight
+title: Singleflight — fusionner les appels concurrents identiques
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, singleflight, cache, stampede]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  N requêtes simultanées ratent un cache au même instant et toutes frappent la
+  source (voir pattern:antipattern:cache-stampede) : charge multipliée et
+  latence en pointe.
+context: >-
+  S'applique à tout calcul ou fetch coûteux partagé entre goroutines du même
+  processus : cache miss, token d'accès, configuration distante.
+solution: >-
+  `golang.org/x/sync/singleflight` : `g.Do(key, fn)` garantit qu'une seule
+  exécution de `fn` par clé est en vol, les autres goroutines partagent le
+  résultat. Combiner avec un cache (miss → singleflight → populate) pour
+  absorber les pointes.
+benefits: >-
+  La source ne reçoit qu'un seul appel par fenêtre de miss ; latence réduite
+  pour les appelants en attente ; implémentation triviale et testable.
+costs: >-
+  La fusion est par processus uniquement (pas inter-neuds — un verrou
+  distribué ou Redis serait nécessaire) ; la première requête reste payée, et
+  un échec est partagé par tous (les appelants doivent retry).
+related: >-
+  Homologue négatif : pattern:antipattern:cache-stampede.
+relationships:
+  references:
+    - https://pkg.go.dev/golang.org/x/sync/singleflight
+    - https://redis.io/blog/cache-consistency-strategies/
+    - pattern:antipattern:cache-stampede
+  uses: []
+  validated_by: []

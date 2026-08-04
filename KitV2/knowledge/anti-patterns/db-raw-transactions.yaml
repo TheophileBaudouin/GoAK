@@ -1,0 +1,38 @@
+id: pattern:antipattern:db-raw-transactions
+title: BEGIN/COMMIT SQL brut au lieu de l'API de transaction
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, transactions, correctness]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `db.Exec("BEGIN")` / `db.Exec("COMMIT")` ou `db.Exec("ROLLBACK")` enchaînés
+  manuellement, avec gestion d'erreur et d'état par l'application.
+detect: >-
+  - `Exec("BEGIN")`/`Exec("COMMIT")` dans le code (grep).
+  - Absence d'`*sql.Tx` dans les signatures ; état de transaction implicite.
+problem: >-
+  La doc officielle le dit : en programmation concurrente, un BEGIN/COMMIT
+  brut peut laisser la base dans un état imprévisible — la connexion sous
+  jacente peut être réutilisée par un autre goroutine entre deux Exec, et le
+  rollback n'est pas garanti sur erreur (connexion verrouillée, transaction
+  ouverte).
+fix: >-
+  Utiliser l'API : `tx, err := db.BeginTx(ctx, nil)`, toutes les opérations sur
+  `tx`, `defer tx.Rollback()` (sûr après commit) puis `tx.Commit()`. Commiter
+  explicitement et vérifier l'erreur de Commit ; Rollback en defer couvre les
+  chemins d'erreur.
+when_ok: >-
+  Jamais de BEGIN/COMMIT brut dans du code applicatif ; l'API database/sql
+  couvre les transactions simples. Les savepoints (transactions imbriquées)
+  ne font pas partie de l'API : ils exigent du SQL brut dépendant du driver
+  (SAVEPOINT/RELEASE), à encapsuler derrière une fonction dédiée et testée.
+relationships:
+  references:
+    - https://go.dev/doc/database/execute-transactions
+    - https://pkg.go.dev/database/sql
+  uses: []
+  validated_by: []

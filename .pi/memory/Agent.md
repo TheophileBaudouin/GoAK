@@ -23,6 +23,16 @@ summary. The standalone product is `KitV2/`.
 - `docs/` stores plans, research, and raw evidence; raw output never belongs in
   memory.
 
+## Zone contracts (obligatoire)
+
+- Avant toute édition dans `KitV2/<zone>`, lire le contrat de cette zone dans
+  `.agent/kit-governance/` (index : `README.md`) et l'appliquer.
+- Zone sans contrat → écrire ou auditer son contrat avant d'éditer ; ne jamais
+  éditer une zone sans contrat.
+- Toute règle nouvelle d'un contrat doit être vérifiable par le validateur
+  produit (C2) ou un contrôle de revue ; une règle non vérifiable est une
+  hypothèse, pas un contrat.
+
 ## Artifact contract
 
 - Artifact kinds are: Rule, Recipe, Pattern, Snippet, Template, Capability,

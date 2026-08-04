@@ -1,5 +1,8 @@
 ---
 name: go-code-review
+category: workflow
+tags: [review, code-review, diff, evidence, verification]
+last-verified: 2026-08-04
 description: Review a Go diff for correctness, regressions, maintainability, and evidence quality. Use before merging or handing off non-trivial Go changes, especially when a fresh-context reviewer should challenge the implementer's assumptions; do not use it as an automatic approval.
 ---
 

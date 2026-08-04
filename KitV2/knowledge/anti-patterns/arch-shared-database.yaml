@@ -1,0 +1,39 @@
+id: pattern:antipattern:arch-shared-database
+title: Base de données partagée entre services
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, microservices, database, coupling]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Plusieurs services écrivent/lisent les mêmes tables : schéma unique central,
+  migrations coordonnées, contrats de données implicites entre services via la
+  base.
+detect: >-
+  - Deux services (ou plus) avec des migrations sur le même schéma.
+  - Modification de colonne nécessitant un déploiement coordonné.
+  - Verrous/contention DB imputables à des accès croisés entre services.
+problem: >-
+  La base partagée réintroduit le couplage que la décomposition devait
+  éliminer : les services sont liés par le schéma, les changements se
+  coordonnent, la base devient le goulot et le point de défaillance unique —
+  c'est le principal symptôme du monolithe distribué (voir
+  arch-distributed-monolith).
+fix: >-
+  Donner à chaque service la propriété exclusive de ses données
+  (database-per-service) : les autres services accèdent via son API ou des
+  événements (projection de lecture, CQRS léger). Les vues partagées sont
+  exposées par le service propriétaire, jamais par accès direct.
+when_ok: >-
+  Pour une petite organisation, une base partagée avec des schémas séparés
+  par service (un user par schéma) est un compromis pragmatique ; la règle
+  forte s'applique quand les services évoluent indépendamment.
+relationships:
+  references:
+    - https://algomaster.io/learn/microservices/anti-patterns-reference
+    - https://dzone.com/articles/antipatterns-of-microservices
+  uses: []
+  validated_by: []

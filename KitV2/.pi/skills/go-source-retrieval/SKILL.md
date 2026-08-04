@@ -1,5 +1,8 @@
 ---
 name: go-source-retrieval
+category: workflow
+tags: [source, retrieval, offline, toolchain, resolve]
+last-verified: 2026-08-04
 description: Resolve only the Go source or toolchain unit needed for a task through the shipped offline bundle or pinned local toolchain. Use before relying on an API, idiom, or Go tool capability; return blocked instead of inventing unavailable knowledge.
 ---
 

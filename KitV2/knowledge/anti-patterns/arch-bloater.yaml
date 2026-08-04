@@ -1,0 +1,40 @@
+id: pattern:antipattern:arch-bloater
+title: Bloater — méthode/fonction trop longue, données gonflées
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, code-smell, maintainability, refactoring]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Fonctions de plusieurs centaines de lignes avec plusieurs niveaux de
+  condition, structures avec beaucoup de champs jamais utilisés ensemble, et
+  duplication de blocs entre fonctions.
+detect: >-
+  - Complexité cyclomatique élevée par fonction (outil d'analyse, lint) —
+    les seuils pi-lens/complexity le signalent.
+  - Fonctions qui nécessitent un défilement long pour être comprises.
+  - Champs de struct jamais lus (dead code) ; duplication détectable (jscpd).
+problem: >-
+  Les « bloaters » sont le terreau des bugs : une fonction longue rend les
+  chemins d'erreur difficiles à auditer, les données gonflées créent des états
+  impossibles (combinaisons de champs incohérentes), la duplication fait
+  diverger les correctifs. Le catalogue de refactoring (Fowler) traite ces
+  odeurs par extraction.
+fix: >-
+  Extraire les blocs en fonctions nommées (extraire méthode), regrouper les
+  champs liés en types dédiés, factoriser la duplication en un point unique.
+  La règle du kit : petite fonction explicite plutôt que grande fonction
+  générale — le refactoring est mécanique et testable (voir rules/testing).
+when_ok: >-
+  Une fonction longue sans branche (séquence linéaire de traitement de
+  données) peut rester lisible ; le signal principal est la complexité
+  conditionnelle, pas la longueur brute.
+relationships:
+  references:
+    - https://refactoring.guru/refactoring/smells
+    - https://refactoring.com/catalog/
+  uses: []
+  validated_by: []

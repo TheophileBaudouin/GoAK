@@ -1,0 +1,42 @@
+id: pattern:antipattern:go-init-misuse
+title: init() à effet de bord — initialisation implicite
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, init, initialization, side-effects, testing]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `init()` ouvre des connexions, charge des fichiers, configure des globals,
+  enregistre des handlers, ou fait des I/O — effets déclenchés par le simple
+  import du package.
+detect: >-
+  - Présence de `init()` hors des cas de registre inévitables (flags,
+  profiling).
+  - Import d'un package uniquement pour son `init` (import à effet de bord),
+    difficile à repérer en revue.
+  - Tests qui échouent selon l'ordre d'import des packages.
+problem: >-
+  L'exécution d'`init` est implicite, non ordonnée (ordre d'import, indéfini
+  entre fichiers d'un même package) et non testable directement : les échecs
+  d'initialisation sont impossibles à simuler, les dépendances cachées
+  compliquent les tests et l'état global (voir go-mutable-global-state) est
+  partagé.
+fix: >-
+  Déplacer l'initialisation dans des fonctions explicites appelées depuis `main`
+  ou un constructeur `New(...)` qui retourne l'erreur. L'échec d'initialisation
+  doit être une erreur retournée et gérée, pas un `panic` d'`init`. Réserver
+  `init` aux registres statiques inévitables (flags, `http.HandleFunc` de
+  package de démonstration) et les garder sans I/O.
+when_ok: >-
+  Un `init` sans effet de bord (déclaration de variables de package,
+  enregistrement
+  de registre purement en mémoire) reste acceptable.
+relationships:
+  references:
+    - https://100go.co/
+    - https://go.dev/wiki/CodeReviewComments
+  uses: []
+  validated_by: []

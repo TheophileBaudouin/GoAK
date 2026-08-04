@@ -1,0 +1,37 @@
+id: pattern:antipattern:db-n-plus-one
+title: Requête N+1 — une requête par élément
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, performance, queries]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Pour chaque ligne d'un résultat, une requête supplémentaire est exécutée
+  (chargement des enfants, des références, des décomptes) : `for rows { SELECT
+  ... WHERE parent_id = ... }`.
+detect: >-
+  - Profil SQL : n+1 requêtes identiques en séquence (log SQL,
+  pg_stat_statements).
+  - Boucles contenant un appel base de données (revue).
+  - Latence qui croît linéairement avec la taille de la liste.
+problem: >-
+  Chaque élément coûte un aller-retour réseau + plan d'exécution : une liste de
+  1000 éléments génère 1001 requêtes, secondes de latence et charge inutile sur
+  la base. C'est le problème de performance SQL le plus cité.
+fix: >-
+  Une seule requête avec `JOIN` ou `IN (…)` (chargement par lot des enfants) ;
+  en Go, construire la clause IN par lots bornés, grouper les résultats en map
+  (`parentID → []child`) et assembler en mémoire. Vérifier avec l'outil de
+  requêtes lentes que le nombre de requêtes est constant.
+when_ok: >-
+  Acceptable pour de très petits volumes connus (quelques éléments) ou quand le
+  SGBD ne peut pas JOIN (sharding) ; sinon toujours batching.
+relationships:
+  references:
+    - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/
+    - https://slicker.me/sql/antipatterns.htm
+  uses: []
+  validated_by: []

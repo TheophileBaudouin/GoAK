@@ -1,0 +1,45 @@
+id: pattern:antipattern:go-goroutine-leak
+title: Goroutine leak — goroutine lancée sans chemin de sortie garanti
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, goroutine, cancellation, memory]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `go f()` est lancé dans un chemin où rien ne garantit que f se termine :
+  blocage
+  permanent sur une réception de canal, une boucle `for` sans condition de
+  sortie,
+  un worker sans mécanisme d'arrêt.
+detect: >-
+  - `runtime.NumGoroutine()` qui croît sous charge ou en boucle de test.
+  - Profil goroutine (`go tool pprof` → `goroutine`), stack trace qui montre des
+    réceptions de canal sans émetteur.
+  - Revue : chercher `go ` suivi d'un appel sans contexte ni canal de fin, et
+  des
+    pipelines dont une étape n'est jamais fermée.
+problem: >-
+  Chaque fuite consomme une pile et ses références ; les fuites s'accumulent
+  silencieusement jusqu'au OOM. C'est un bug permissif : aucun avertissement
+  runtime, il ne se révèle qu'en production.
+fix: >-
+  Donner à chaque goroutine une condition de sortie explicite : passer un
+  `context.Context` et `select` sur `ctx.Done()`, fermer les canaux que les
+  consommateurs parcourent (`for range`), utiliser `errgroup.WithContext` et
+  `defer cancel()`. Le pipeline officiel : chaque étape ferme son canal de
+  sortie,
+  la propagation d'annulation se fait via le contexte.
+when_ok: >-
+  Une goroutine longue durée est acceptable si elle est délibérée (boucle
+  d'acceptation d'un serveur, worker daemon) et possède un mécanisme d'arrêt ;
+  la règle est « exit condition explicite », pas « aucune goroutine persistante
+  ». Règles de concurrence du kit : `rules/core/concurrency`.
+relationships:
+  references:
+    - https://go.dev/blog/pipelines
+    - https://100go.co/
+  uses: []
+  validated_by: []

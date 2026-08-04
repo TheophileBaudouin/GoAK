@@ -1,0 +1,38 @@
+id: pattern:antipattern:go-shadowing
+title: Shadowing — masquage de variable par une déclaration interne
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, correctness, scope, shadow, review]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `err :=` (ou `:=`) à l'intérieur d'un bloc réutilise un nom déjà déclaré dans
+  une portée englobante, masquant l'original : la valeur de la portée externe
+  reste inchangée alors que le code semble la mettre à jour.
+detect: >-
+  - Analyseur `shadow` (`go vet -vettool=$(which shadow)` ou
+    `golang.org/x/tools/go/analysis/passes/shadow`) ; golangci-lint
+    (`govet` avec le check shadow activé).
+  - Revue : `:=` dans des `if`/`for`/`switch` qui réutilise un nom externe.
+problem: >-
+  Le shadowing produit des bugs silencieux : une affectation qui « ne prend
+  pas », un `err` masqué qui ne propage pas l'erreur, une confusion de variable
+  qui survit aux refactors. Le compilateur n'alerte pas (légal en Go).
+fix: >-
+  Éviter de réutiliser des noms de portée externe dans des blocs imbriqués ;
+  préférer des noms distincts ou restructurer pour affecter la variable
+  externe délibérément. Activer le check shadow dans le lint pour rendre la
+  détection déterministe.
+when_ok: >-
+  Le shadowing volontaire est parfois utilisé pour restreindre une portée
+  (ex. un `err` local à un bloc) ; il doit alors être explicite et commenté,
+  jamais accidentel.
+relationships:
+  references:
+    - https://100go.co/
+    - https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/shadow
+  uses: []
+  validated_by: []

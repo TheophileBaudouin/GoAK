@@ -1,0 +1,40 @@
+id: pattern:antipattern:arch-god-object
+title: God Object — type central qui sait tout faire
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, design, cohesion, coupling]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Un type (struct) accumule des dizaines de méthodes sans rapport : validation,
+  persistance, calcul, rendu, notification — référencé par presque tout le
+  codebase.
+detect: >-
+  - Un type central avec un nombre de méthodes démesuré (> ~20) et plusieurs
+    responsabilités (noms de méthodes de domaines différents).
+  - Fan-in élevé : ce type apparaît dans la signature d'une grande part des
+    fonctions (module_report « hubs »).
+  - Tests qui doivent construire l'objet entier pour tester un comportement
+    isolé.
+problem: >-
+  Le god object viole la cohésion : chaque modification touche un type partagé,
+  les dépendances transitives se multiplient, le test unitaire devient coûteux
+  (monster builder), et la concurrence sur l'état central crée des courses.
+fix: >-
+  Découper par responsabilité en petits types (ou fonctions libres) avec un
+  état minimal : le handler HTTP ne manipule pas le store, le domaine ne
+  connaît pas le rendu. Réduire le fan-in via l'injection de dépendances des
+  composants (voir go-mutable-global-state et go-interface-everywhere).
+when_ok: >-
+  Un agrégat de domaine (DDD) avec invariants et méthodes de cohésion forte
+  n'est pas un god object ; le signal est la pluralité de responsabilités sans
+  rapport, pas la taille seule.
+relationships:
+  references:
+    - https://refactoring.guru/refactoring/smells/large-class
+    - https://en.wikipedia.org/wiki/List_of_software_anti-patterns
+  uses: []
+  validated_by: []

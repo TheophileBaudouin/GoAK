@@ -1,0 +1,41 @@
+id: pattern:antipattern:go-over-structuring
+title: Surcharge de structure — copie de golang-standards/project-layout
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, project-structure, layout, simplicity]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Arborescence `cmd/`, `internal/`, `pkg/`, `scripts/`, `configs/`, `deploy/`,
+  `docs/`… copiée d'un template générique pour un projet qui tient en quelques
+  packages, avec des packages vides ou à un seul fichier.
+detect: >-
+  - Dossiers avec un seul fichier ou des ré-exportations.
+  - `pkg/` contenant du code utilisé uniquement en interne.
+  - Import circulaires évités en créant des packages « util » fourre-tout.
+problem: >-
+  `golang-standards/project-layout` n'est pas un standard officiel (Go team) :
+  la doc officielle d'organisation d'un module recommande de rester simple et
+  de ne créer que les packages nécessaires. La sur-structuration augmente le
+  coût de navigation, encourage les packages fourre-tout et dilue les
+  responsabilités.
+fix: >-
+  Commencer minimal : tout à la racine du module ou dans un package racine, des
+  sous-packages uniquement quand une frontière d'import est réelle (utiliser
+  `internal/` pour le code privé, `cmd/` pour les binaires multiples).
+  Structurer
+  par responsabilité de code, pas par copie de template. Ajouter des dossiers
+  quand la taille le justifie, jamais par anticipation.
+when_ok: >-
+  Les templates de démarrage (monolith, api-service) du kit fournissent une
+  structure de départ raisonnable ; l'anti-pattern est d'en garder les dossiers
+  vides au-delà du besoin. Philosophie du kit : `rules/core/philosophy`.
+relationships:
+  references:
+    - https://go.dev/doc/modules/layout
+    - https://100go.co/
+  uses: []
+  validated_by: []

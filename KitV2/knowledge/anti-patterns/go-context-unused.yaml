@@ -1,0 +1,43 @@
+id: pattern:antipattern:go-context-unused
+title: Context ignoré ou cancel jamais appelé
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, context, cancellation, timeout, correctness]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Une fonction reçoit un `ctx` mais ne le transmet à aucun appel bloquant (I/O,
+  requête, boucle), ou `context.WithCancel/WithTimeout` est appelé sans
+  `defer cancel()`.
+detect: >-
+  - Paramètre `ctx context.Context` présent dans la signature mais absent de
+    tous les appels internes bloquants (linters : `contextcheck`,
+    `containedctx`).
+  - Appel de `WithTimeout`/`WithCancel` sans `defer cancel()` (golangci-lint :
+    `contextcheck` ne le couvrent pas tous — revue manuelle).
+  - Tests qui ignorent `ctx` et ne peuvent pas simuler une annulation.
+problem: >-
+  Un contexte accepté mais non utilisé est un bug de correction, pas un style :
+  l'appelant qui annule ou impose un délai est ignoré silencieusement — le code
+  continue de tourner jusqu'à la fin de l'opération. Un `cancel` jamais appelé
+  fuit une goroutine par opération (voir go-goroutine-leak).
+fix: >-
+  Transmettre `ctx` à chaque appel qui peut bloquer (net/http, database/sql,
+  requêtes réseau). Appeler `cancel` immédiatement : `ctx, cancel :=
+  context.WithTimeout(parent, d); defer cancel()`. Ne créer un contexte dérivé
+  que si on ajoute une valeur ou une contrainte ; sinon transmettre le parent
+  tel quel.
+when_ok: >-
+  Une fonction pure ou une opération garantie bornée (calcul local court) peut
+  ne pas utiliser le contexte — mais la convention veut quand même le recevoir
+  pour la composabilité des appels futurs. Règles de concurrence du kit :
+  `rules/core/concurrency`.
+relationships:
+  references:
+    - https://go.dev/blog/context
+    - https://pkg.go.dev/context
+  uses: []
+  validated_by: []

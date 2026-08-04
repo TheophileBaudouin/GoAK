@@ -1,0 +1,41 @@
+id: pattern:antipattern:arch-distributed-monolith
+title: Monolithe distribué — services couplés au runtime
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, microservices, coupling, latency]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Des services déployés séparément mais couplés au runtime : appels
+  synchrones en chaîne profonde, base de données partagée, contrats qui
+  changent ensemble, transaction distribuée.
+detect: >-
+  - Chaînes d'appels synchrones A→B→C→D pour une seule requête utilisateur.
+  - Un changement de schéma dans un service impose un changement immédiat
+    dans un autre (contrat implicite).
+  - Latence qui s'additionne le long de la chaîne ; dégradation en cascade.
+problem: >-
+  Le monolithe distribué combine les coûts d'un système distribué (latence,
+  échecs partiels, déploiements) avec les inconvénients d'un monolithe
+  (couplage, changements coordonnés) — le pire des deux mondes. C'est
+  l'échec le plus fréquent des migrations microservices.
+fix: >-
+  Renforcer les frontières : contrats explicites et versionnés, données
+  possédées par un seul service (pas de base partagée — voir
+  arch-shared-database), communication asynchrone (événements) pour les
+  flux non transactionnels, et tolérance aux pannes (timeouts, retry bornée,
+  circuit breaker — voir msg-retry-storm). Ne décomposer que des frontières
+  métier réelles.
+when_ok: >-
+  Si le système est déployé et évolue déjà de façon cohérente, un monolithe
+  modulaire (frontières de packages strictes) est souvent la meilleure
+  option ; la décomposition est une dette à rembourser avec des mesures.
+relationships:
+  references:
+    - https://softwarepatternslexicon.com/microservices-boundaries-and-service-decomposition/anti-patterns/the-distributed-monolith/
+    - https://dzone.com/articles/antipatterns-of-microservices
+  uses: []
+  validated_by: []

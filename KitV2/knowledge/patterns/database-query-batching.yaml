@@ -1,0 +1,37 @@
+id: pattern:database:query-batching
+title: Requêtes par lots — éliminer le N+1 par JOIN/IN
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, performance, batching]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une requête par élément (N+1) coûte un aller-retour par ligne et fait
+  exploser la latence et la charge (voir pattern:antipattern:db-n-plus-one).
+context: >-
+  S'applique dès qu'une liste de parents nécessite leurs enfants ou
+  références : tables liées, décomptes, statuts.
+solution: >-
+  Une requête globale : `JOIN` pour les relations proches, ou chargement par
+  lots `WHERE parent_id IN (…)` (par paquets bornés, ex. 500 ids), puis
+  assemblage en mémoire dans une map `parentID → []child`. En Go, construire
+  les placeholders par lots et trier les résultats après jointure.
+benefits: >-
+  Nombre de requêtes constant (1-2) quel que soit le volume, latence
+  linéaire-amortie, charge DB minimale.
+costs: >-
+  L'assemblage en mémoire exige du code de groupement ; les IN géants cassent
+  les plans d'exécution (borner les lots) ; les données imbriquées profondes
+  peuvent justifier deux requêtes plutôt qu'un JOIN monstrueux.
+related: >-
+  Recette : recipe-sqlite-sqlc (sqlc génère les requêtes statiques).
+  Homologue négatif : pattern:antipattern:db-n-plus-one.
+relationships:
+  references:
+    - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/
+    - pattern:antipattern:db-n-plus-one
+  uses: []
+  validated_by: []

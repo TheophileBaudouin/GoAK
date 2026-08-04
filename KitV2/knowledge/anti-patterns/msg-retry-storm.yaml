@@ -1,0 +1,42 @@
+id: pattern:antipattern:msg-retry-storm
+title: Tempête de retries — retries agressives sans limite ni breaker
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [resilience, retry, circuit-breaker, timeouts, distributed]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Chaque client retente immédiatement et sans backoff quand un service
+  dégrade ; les retries s'amplifient à travers les couches (A retente sur B,
+  B sur C, C sur D) et le service en panne reçoit un déluge.
+detect: >-
+  - Retries sans délai exponentiel ni jitter, nombre de tentatives élevé.
+  - Cascade : un ralentissement d'un service provoque une hausse de charge
+    sur ses dépendants (effet d'emballement).
+  - Absence de circuit breaker : les retries continuent vers un service
+    manifestement en échec.
+problem: >-
+  L'architecture center Microsoft documente le retry storm comme cause
+  majeure d'outages : les retries synchronisées (tous les clients retentent
+  au même moment) transforment une panne limitée en effondrement général.
+  Sans breaker, l'échec se propage au lieu de s'isoler.
+fix: >-
+  Retries avec backoff exponentiel + jitter, bornées (petit nombre de
+  tentatives) et limitées aux erreurs transitoires (timeout, 5xx, 429 avec
+  respect de Retry-After). Ajouter un circuit breaker par dépendance
+  (passer en échec rapide après un seuil d'erreurs), des timeouts stricts en
+  amont (voir http-no-timeouts) et de la redondance indépendante (bulkhead)
+  pour isoler les couches.
+when_ok: >-
+  La retry est saine sur les erreurs transitoires réelles avec backoff ;
+  l'anti-pattern est la retry aveugle, immédiate et sans plafond sur les
+  pannes durables.
+relationships:
+  references:
+    - https://github.com/microsoftdocs/architecture-center/blob/main/docs/antipatterns/retry-storm/index.md
+    - https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/circuit-breaker.html
+  uses: []
+  validated_by: []

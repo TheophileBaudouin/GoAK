@@ -23,13 +23,10 @@ adding unsupported volume or ambiguity.
 - **Tag v2.1.0:** marqueur de la première version benchmarkable (aligné sur `manifest.yaml`), pas encore une politique de release formelle. `install.sh` (racine) est l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future.
 - **Auth:** `gh auth setup-git` (compte TheophileBaudouin). Le credential helper macOS a contenu un ancien identifiant theocode29 — toujours vérifier l'identité effective avant push.
 - **Conséquence:** `docs/evidence/` est VCS-versionné, `.github/workflows/ci.yml` peut tourner, PR-based evaluation gates deviennent possibles, et un consommateur peut installer le kit par `curl …/install.sh | sh`.
+
 ## Architecture
 
-Four analytical architecture shapes are now validated for agentic CLI tooling: L = local binary; CS = client/server with a separated backend; D = distributed harness with registries/transports/brokers; H = hybrid local-first / remote workbench. KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject.
-
-The metaproject `.agent/cognitive/` owns the design-time Retrieve → Reason → Generate → Validate → Remember protocol, graph schema, source transformation catalog, context budgets, and subagent contracts. KitV2 now ships a self-contained `tools/offline/` resolver, manifest, attribution, and content-addressed Effective Go bundle. Product source metadata is active only because the resolver and bundle ship together.
-
-Future distribution architecture: a dedicated `gak` CLI is the canonical installer and lifecycle entry point (`init`, `update`, `doctor`, `validate`, `remove`, `info`), with package-manager-style UX, explicit versions/checksums, atomic installation, and deterministic/reproducible output. This is deliberately deferred until a public repository, published module, installer, and release process exist. The canonical consumer runtime is `.pi/`; root `.agent/` remains metaproject-only governance/control-plane material and must not be installed as a competing runtime. Future PI, Claude Code, Codex, Cursor, and Gemini CLI integrations are selected adapters projecting the same runtime, not parallel runtimes. Future versioned modules compose Rules, Recipes, Patterns, Snippets, Templates, and Evaluations without duplicating graph artifacts.
+KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject. Since 2026-08-04, `.agent/kit-governance/` holds the 15 construction contracts (C0, C1, C2, Z1–Z10, A1, N1) that govern each KitV2 zone: mission, format, actionable rules, patterns, anti-patterns, validation criteria. Every rule a contract states must be verifiable by the product validator or an explicit review control. Templates policy (owner directive 2026-08-04): templates are NEVER agent-authored — each is a minimally-adapted fork of a real, reliable, functional, single-responsibility open-source project under MIT license; existing agent scaffolds are marked `legacy` and candidates for replacement.
 
 ## Artifact graph and module format
 
@@ -47,7 +44,7 @@ requiring approval and migration of all modules in the same change:
 ---
 name: <kebab-case-id>                # REQUIRED by Pi (a-z 0-9 hyphens, ≤64). Also the kit module id.
 description: "What it does AND when to load it"  # REQUIRED by Pi (≤1024). Drives auto-discovery.
-category: recipe | rule | pattern | library | reference-project | checklist  # kit facet (Pi ignores)
+category: recipe | rule | pattern | library | reference-project | checklist | workflow  # kit facet (Pi ignores); `workflow` = .pi/skills only (2026-08-04)
 tags: [rest, chi, http]              # kit search facets (Pi ignores)
 last-verified: YYYY-MM-DD            # date the content + deps were last checked
 ---
@@ -68,8 +65,9 @@ Body rules:
 
 Every reusable artifact must carry a stable `id`, `title`, `kind`, `version`,
 `status`, `owner`, `tags`, `go_version`, `dependencies`, and `last_verified`.
-Where applicable, declare `depends_on`, `uses`, `implements`, `references`,
-`requires`, `supersedes`, `validated_by`, and `generated_from` relationships.
+Where applicable, declare `depends_on`, `uses`, `implements`, `extends`,
+`references`, `requires`, `supersedes`, `validated_by`, and `generated_from`
+relationships (`extends` is declared but unused as of 2026-08-04).
 
 ## Conventions
 
@@ -112,4 +110,7 @@ the reason.
 
 ## Verification status
 
-The KitV2 gate and probes pass through the 2026-08-03 evidence records. The root harness validator is `.agent/validators/validate-instructions.py`; KitV2 uses `KitV2/tools/validators/validate-kitv2.py`. The sequential audit of all 34 Niveau S/A registry resources is complete and dedicated Source artifacts ship in KitV2 knowledge. **VCS is now unblocked**: the metaproject is a Git repository pushed to <https://github.com/TheophileBaudouin/GoAK> (branch `main`, commit `690aa35`), so evidence versioning is provable and CI workflows can run. Remaining PARTIAL: no real non-probe consumer-project maturity evidence; Pi discovery, Wails, and TUI remain separate/uncovered runtime checks; bootstrap CLI/runtime architecture remains documented-only (no CLI, installer, or release pipeline yet).
+The KitV2 gate and probes pass through the 2026-08-04 evidence records
+(phase 1 audit + phase 2 governance; 45 product skills, 5/5 probes). The root
+harness validator is `.agent/validators/validate-instructions.py`; KitV2 uses
+`KitV2/tools/validators/validate-kitv2.py`. The sequential audit of all 34 Niveau S/A registry resources is complete and dedicated Source artifacts ship in KitV2 knowledge. **VCS is now unblocked**: the metaproject is a Git repository pushed to <https://github.com/TheophileBaudouin/GoAK> (branch `main`, commit `690aa35`), so evidence versioning is provable and CI workflows can run. Remaining PARTIAL: no real non-probe consumer-project maturity evidence; Pi discovery, Wails, and TUI remain separate/uncovered runtime checks; bootstrap CLI/runtime architecture remains documented-only (no CLI, installer, or release pipeline yet).

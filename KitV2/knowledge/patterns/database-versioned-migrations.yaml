@@ -1,0 +1,36 @@
+id: pattern:database:versioned-migrations
+title: Migrations versionnées — le schéma est du code
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, migrations, schema, versioning]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Modifier le schéma en prod par SQL ad hoc ou « ALTER à la main » rend
+  l'état des bases inconnu et les environnements divergents.
+context: >-
+  S'applique dès qu'une base de données partagée existe, en particulier dès
+  que deux environnements (dev, prod) doivent rester synchronisés.
+solution: >-
+  Migrations versionnées (fichiers numérotés, appliqués une fois, suivis dans
+  le VCS) via un outil dédié — golang-migrate (catalog du kit) ou une lib
+  équivalente : up/down explicites, application ordonnée, état tracé dans une
+  table de versions. Les migrations font partie du déploiement.
+benefits: >-
+  État de base reproductible et auditable, rollback possible, revue des
+  changements de schéma comme du code, CI qui applique les migrations avant
+  les tests.
+costs: >-
+  Les migrations destructrices (drop, rename) exigent des plans de
+  déploiement (backward-compatible d'abord) ; l'ordre et les conflits entre
+  branches se gèrent comme pour le code.
+related: >-
+  Catalog : golang-migrate (knowledge/catalogs/libraries/golang-migrate.yaml).
+relationships:
+  references:
+    - https://github.com/golang-migrate/migrate
+  uses: []
+  validated_by: []

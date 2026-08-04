@@ -1,0 +1,42 @@
+id: pattern:testing:seam-injection
+title: Seams testables — purifier la logique des effets
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, seam, design-for-testability]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  La logique mêlée aux effets (terminal, horloge, framework) est impossible à
+  tester sans harnais lourds, et les tests deviennent fragiles (voir
+  pattern:antipattern:test-sleep-based et
+  pattern:antipattern:test-implementation-details).
+context: >-
+  S'applique à toute logique à décision (état, transformation, choix) adossée
+  à un effet externe : TUI, CLI, handler, job.
+solution: >-
+  Séparer la logique pure (fonction de données en entrée → décision en
+  sortie) des effets : `handleKey(string)`, `render()`, `execute(command)`
+  purs, testés directement ; l'effet (tea.Program, os.Args, time.Now) reste
+  un fil fin autour du seam. Injecter l'horloge et les dépendances comme
+  paramètres (voir pattern:go:constructor-injection).
+benefits: >-
+  Tests déterministes sans sleep ni terminal, refactors internes sans casser
+  les tests (le contrat est le seam), et couverture des chemins d'erreur
+  simples (voir recipe-cli-interactif pour l'exemple canonique).
+costs: >-
+  Exige de concevoir les seams dès l'écriture ; un seam trop fin (tout pur)
+  déplace la complexité dans le fil d'effets — garder le fil minimal et non
+  testé.
+related: >-
+  Recette : recipe-cli-interactif (seam handleKey). Homologue négatif :
+  pattern:antipattern:test-sleep-based,
+  pattern:antipattern:test-implementation-details.
+relationships:
+  references:
+    - https://martinfowler.com/bliki/UnitTest.html
+    - pattern:antipattern:test-sleep-based
+  uses: []
+  validated_by: []

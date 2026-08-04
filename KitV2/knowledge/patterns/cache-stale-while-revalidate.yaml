@@ -1,0 +1,42 @@
+id: pattern:cache:stale-while-revalidate
+title: Stale-while-revalidate — fraîcheur sans pointe de charge
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [cache, stale-while-revalidate, performance]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  L'expiration d'une entrée populaire provoque un pic de misses simultanés
+  (stampede, voir pattern:antipattern:cache-stampede) et l'invalidation
+  aveugle sert des données périmées sans contrôle (voir
+  pattern:antipattern:cache-stale).
+context: >-
+  S'applique aux données à lecture fréquente dont la fraîcheur tolère une
+  fenêtre de dérive (contenu, agrégats, référentiels).
+solution: >-
+  Servir la valeur périmée pendant qu'une revalidation asynchrone recharge la
+  source : TTL court (fraîcheur) + TTL long (validité maxi) ; le premier
+  lecteur après expiration déclenche le refresh (verrouillé par
+  pattern:concurrency:singleflight) et les autres reçoivent la valeur
+  existante. Ajouter du jitter sur les TTL pour désynchroniser les
+  expirations.
+benefits: >-
+  Latence de lecture constante (jamais de miss qui frappe la source en
+  masse), fraîcheur bornée et contrôlée, et dégradation douce de la source.
+costs: >-
+  Complexité (deux TTL, revalidation, état du refresh) ; la valeur servie
+  peut être périmée de la fenêtre — inacceptable pour les données critiques
+  (prix en temps réel) où l'invalidation à l'écriture reste nécessaire.
+related: >-
+  Homologue négatif : pattern:antipattern:cache-stampede,
+  pattern:antipattern:cache-stale.
+relationships:
+  references:
+    - https://redis.io/blog/cache-consistency-strategies/
+    - https://en.wikipedia.org/wiki/Cache_stampede
+    - pattern:antipattern:cache-stampede
+  uses: []
+  validated_by: []

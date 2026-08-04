@@ -1,0 +1,38 @@
+id: pattern:messaging:dead-letter-queue
+title: File de messages morts — isoler les messages non processables
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [messaging, kafka, dlq, resilience]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Un message structurellement invalide boucle en retry et bloque la partition
+  (voir pattern:antipattern:msg-poison-pill-no-dlq) : les messages valides
+  derrière ne sont jamais traités.
+context: >-
+  S'applique à tout consommateur de file (Kafka, AMQP) dont les messages
+  peuvent être corrompus ou non conformes.
+solution: >-
+  Séparer les erreurs : transitoires → retry borné ; définitives
+  (désérialisation, validation) → routage vers une DLQ avec la cause et les
+  métadonnées. Consommer la DLQ par un processus dédié (réparation, rejeu,
+  alerte) et mesurer son volume.
+benefits: >-
+  La partition avance toujours, l'ordre des messages valides est préservé,
+  et les problèmes de contrat sont visibles et traitables — pas silencieux.
+costs: >-
+  Infrastructure supplémentaire (topic + consommateur) et politiques de
+  rétention/rejeu à définir ; une DLQ non surveillée devient une poubelle
+  silencieuse — alerter sur sa croissance.
+related: >-
+  Homologue négatif : pattern:antipattern:msg-poison-pill-no-dlq.
+relationships:
+  references:
+    - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/
+    - https://www.conduktor.io/blog/dead-letter-topics-handling-poison-pills
+    - pattern:antipattern:msg-poison-pill-no-dlq
+  uses: []
+  validated_by: []

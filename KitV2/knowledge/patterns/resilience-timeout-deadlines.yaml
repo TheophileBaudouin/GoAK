@@ -1,0 +1,41 @@
+id: pattern:resilience:timeout-deadlines
+title: Délais stricts — deadlines de contexte à chaque frontière
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [resilience, timeout, context, latency]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Sans délai, un appel bloqué (réseau, DB, service) fige un worker
+  indéfiniment et la latence s'accumule (voir
+  pattern:antipattern:http-no-timeouts).
+context: >-
+  S'applique à chaque frontière d'I/O : serveur HTTP, client de service,
+  base de données, files de messages.
+solution: >-
+  Imposer une deadline par opération : `context.WithTimeout(parent, d)` (avec
+  `defer cancel()`) à l'entrée d'un appel bloquant, timeouts `http.Server`
+  (ReadHeader/Read/Write/Idle) pour le serveur, `http.TimeoutHandler` pour les
+  handlers longs. Respecter l'héritage : un délai enfant ne peut pas
+  dépasser le délai parent (vérifier `ctx.Deadline()` si besoin).
+benefits: >-
+  Chaque opération a un coût maximum borné ; la dégradation est prévisible
+  (deadline exceeded) au lieu d'une attente infinie ; la propagation des
+  délais empêche l'emballement en cascade.
+costs: >-
+  Un délai trop court provoque des échecs prématurés (à régler par mesure) ;
+  les valeurs dépendent du produit — la règle est d'en fixer, pas une valeur
+  universelle.
+related: >-
+  Recette : recipe-graceful-shutdown. Homologue négatif :
+  pattern:antipattern:http-no-timeouts.
+relationships:
+  references:
+    - https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
+    - https://pkg.go.dev/context
+    - pattern:antipattern:http-no-timeouts
+  uses: []
+  validated_by: []

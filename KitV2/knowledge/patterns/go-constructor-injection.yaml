@@ -1,0 +1,41 @@
+id: pattern:go:constructor-injection
+title: Injection par constructeur — dépendances explicites sans framework
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, dependency-injection, design, testing]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les dépendances (db, logger, config, clients) sont lues depuis des globals ou
+  construites à l'intérieur des types : impossibles à remplacer en test,
+  ordre d'initialisation opaque, état partagé (voir
+  pattern:antipattern:go-mutable-global-state).
+context: >-
+  S'applique à tout type qui a besoin d'une dépendance pour fonctionner, dès
+  qu'il est testé ou réutilisé.
+solution: >-
+  Constructeur conventionnel `New(deps…) (*T, error)` qui stocke les
+  dépendances dans les champs du type ; composition des graphes dans `main`
+  ou une fonction `wire()`/`newApp()` unique. Pas de framework : l'injection
+  manuelle par constructeur couvre ~95 % des cas.
+benefits: >-
+  Testable (dépendances réelles ou fakes par construction, jamais de
+  mutation globale), initialisation explicite et ordonnée, erreurs de
+  construction retournées au lieu de paniquer.
+costs: >-
+  Le passage manuel des dépendances devient verbeux dans les grands graphes
+  (seuil où fx/wire se justifient) ; le constructeur doit rester sans effet
+  de bord (voir pattern:antipattern:go-init-misuse).
+related: >-
+  Homologue négatif : pattern:antipattern:go-mutable-global-state,
+  pattern:antipattern:go-init-misuse.
+relationships:
+  references:
+    - https://go.dev/wiki/CodeReviewComments
+    - https://100go.co/
+    - pattern:antipattern:go-mutable-global-state
+  uses: []
+  validated_by: []

@@ -1,0 +1,40 @@
+id: pattern:antipattern:go-interface-everywhere
+title: Interface pour chaque dépendance (over-abstraction)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, interfaces, design, abstraction, testing]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Chaque dépendance a une interface définie avant son implémentation unique :
+  couches repository/factory/service qui ne font que relayer vers une seule
+  implémentation concrète.
+detect: >-
+  - Interface avec une seule implémentation dans le même package.
+  - Pour comprendre un flux, il faut traverser 4-5 fichiers qui s'appellent
+    sans ajouter de comportement.
+  - `grep -c interface` anormalement élevé pour la taille du projet.
+problem: >-
+  L'interface ajoute de l'indirection sans bénéfice : navigation coûteuse,
+  tests plus complexes, et une surface d'API plus large à maintenir. Le wiki Go
+  recommande de définir une interface là où elle est consommée, quand une
+  abstraction est réellement nécessaire — pas par défaut.
+fix: >-
+  Retourner des types concrets ; définir une interface du côté du consommateur
+  (petite, avec les méthodes réellement utilisées) uniquement quand un mock ou
+  une seconde implémentation est justifié. Laisser le compilateur vérifier la
+  conformité (`var _ Interface = (*Concrete)(nil)`). Privilégier l'injection de
+  dépendances concrètes et les fonctions.
+when_ok: >-
+  Une interface se justifie pour découpler un package consommateur d'une
+  implémentation instable (I/O, réseau, horloge) ou quand des implémentations
+  multiples existent réellement. Philosophie du kit : `rules/core/philosophy`.
+relationships:
+  references:
+    - https://100go.co/
+    - https://go.dev/wiki/CodeReviewComments
+  uses: []
+  validated_by: []

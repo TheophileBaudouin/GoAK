@@ -1,0 +1,43 @@
+id: pattern:testing:fakes-over-mocks
+title: Fakes par rôle plutôt que mocks d'interactions
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, fakes, mocks, test-doubles]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les mocks d'interaction figent l'API interne, rendent les tests fragiles et
+  vérifient des attentes plutôt que des contrats (voir
+  pattern:antipattern:test-over-mocking).
+context: >-
+  S'applique aux dépendances d'un test : repository, client HTTP, horloge —
+  à la frontière instable uniquement.
+solution: >-
+  Utiliser la taxonomie des test doubles par rôle (Meszaros) : **fake**
+  (implémentation fonctionnelle en mémoire, ex. repo en map), **stub**
+  (réponses fixes), **spy** (enregistre et relit) — en privilégiant les
+  fakes sur les mocks (vérification d'état, pas d'interaction). Pour HTTP :
+  `httptest.Server` (voir pattern:testing:httptest). Les frameworks de mock
+  (mockery, testify/mock) ne sont justifiés que pour les interfaces
+  réellement instables.
+benefits: >-
+  Tests stables au refactor interne, contrats vérifiés sur données réelles,
+  moins de configuration de doubles — et les fakes sont réutilisables.
+costs: >-
+  Un fake est du code à maintenir (garder le plus simple possible) ; il doit
+  refléter le vrai contrat, sinon il crée une fausse confiance (un test
+  d'intégration minimal reste nécessaire).
+related: >-
+  Règles du kit : `rules/registry/testing`. Recette : recipe-sqlite-sqlc
+  (base réelle en test). Homologue négatif :
+  pattern:antipattern:test-over-mocking.
+relationships:
+  references:
+    - http://xunitpatterns.com/Mock%20Object.html
+    - https://go.dev/wiki/CodeReviewComments
+    - pattern:antipattern:test-over-mocking
+  uses: []
+  validated_by: []

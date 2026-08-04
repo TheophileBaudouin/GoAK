@@ -1,0 +1,37 @@
+id: pattern:antipattern:go-loop-variable-capture
+title: Capture de la variable de boucle dans une goroutine
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, loop, race, closure]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Une goroutine (ou closure différée) lancée dans une boucle `for` utilise la
+  variable de boucle directement : `for i := range items { go func() {
+  fmt.Println(i) }() }`.
+detect: >-
+  - `go func() { ... }()` dans une boucle utilisant la variable itérée.
+  - `go test -race` détecte la course (pré-1.22) ; revue des closures de boucle.
+  - Depuis Go 1.22 la variable de boucle est ré-initialisée par itération — la
+    règle concerne le code ciblant des toolchains antérieures ou la portabilité.
+problem: >-
+  Avant Go 1.22, toutes les itérations partagent la même variable : les
+  goroutines lisent la valeur finale ou une valeur concurrente — sorties
+  dupliquées, données fausses, course de données.
+fix: >-
+  Sur une toolchain < 1.22 : `i := i` en tête de boucle ou passer la valeur en
+  argument (`go func(i int) { ... }(i)`). Sur Go 1.22+ : comportement corrigé
+  par itération, mais rester explicite quand la boucle capture d'autres
+  variables mutées (même règle qu'avant).
+when_ok: >-
+  Sur Go 1.22+ la capture simple est sûre ; la vigilance reste requise pour les
+  variables déclarées hors boucle et mutées dans l'itération.
+relationships:
+  references:
+    - https://go.dev/wiki/CodeReviewConcurrency
+    - https://100go.co/
+  uses: []
+  validated_by: []

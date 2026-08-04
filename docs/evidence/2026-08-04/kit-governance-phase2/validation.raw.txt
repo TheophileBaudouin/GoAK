@@ -1,0 +1,48 @@
+# Kit governance phase 2 — validation gate (2026-08-04)
+
+## validate-kitv2.py
+kitv2: PASS (45 product skills, 3 snippets, standalone, offline bundle)
+exit=0
+
+## gofmt
+gofmt: clean (exit 0)
+
+## go vet
+vet: PASS
+
+## go test -race
+ok  	go-agent-kit-v2/recipes/recipe-cli-minimal	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-config-koanf	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-config-viper	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-desktop-app	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-graceful-shutdown	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-rest-chi	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-sqlite-sqlc	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-worker-pool	(cached)
+?   	go-agent-kit-v2/snippets/bounded-worker	[no test files]
+?   	go-agent-kit-v2/snippets/errors-once	[no test files]
+?   	go-agent-kit-v2/snippets/http-json	[no test files]
+ok  	go-agent-kit-v2/tools/offline	(cached)
+
+## golangci-lint
+0 issues.
+
+## gosec
+  Nosec  : 5
+  Issues : [1;32m0[0m
+
+## govulncheck
+these vulnerabilities.
+Use '-show verbose' for more details.
+
+## probes
+--- probes/cli-minimal ---
+cli-minimal: PASS
+--- probes/rest-chi ---
+rest-chi: PASS
+--- probes/sqlite-sqlc ---
+sqlite-sqlc: PASS
+--- probes/worker-shutdown ---
+worker-shutdown: PASS
+--- probes/offline ---
+offline: PASS

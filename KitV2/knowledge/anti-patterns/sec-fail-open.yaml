@@ -1,0 +1,40 @@
+id: pattern:antipattern:sec-fail-open
+title: Échec ouvert — sécurité désactivée par défaut ou sur erreur
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, authorization, error-handling, design]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Les contrôles de sécurité sont conditionnels à un flag activable, les
+  erreurs d'autorisation échouent en « accès autorisé », l'authentification
+  est contournée quand le fournisseur d'identité est indisponible.
+detect: >-
+  - `if authEnabled { … }` autour des contrôles, défaut = désactivé.
+  - Sur erreur de vérification, le chemin par défaut continue (le deny n'est
+    pas explicite).
+  - OWASP A10 2025 « Mishandling of Exceptional Conditions » : les chemins
+    d'erreur doivent échouer fermé.
+problem: >-
+  Un échec ouvert transforme une panne en brèche : la moindre erreur (timeout
+  du IdP, bug du middleware, config oubliée) laisse passer des accès non
+  authentifiés. Les défauts permissifs sont la classe d'erreur la plus
+  dangereuse car silencieuse jusqu'à l'incident.
+fix: >-
+  Défaut fermé : refuser par défaut, autoriser explicitement ; toute erreur
+  de vérification → rejeter (401/403) et logger. Ne jamais conditionner un
+  contrôle à un flag désactivé par défaut. Tester explicitement les chemins
+  d'erreur du contrôle (IdP down, token invalide, timeout).
+when_ok: >-
+  Un mode « dégradé » ouvert se justifie seulement avec une décision produit
+  explicite et un risque accepté documenté (ex. lecture publique) — jamais
+  par accident.
+relationships:
+  references:
+    - https://owasp.org/Top10/2025/A10_2025-Mishandling_of_Exceptional_Conditions/
+    - https://owasp.org/Top10/2025/A06_2025-Insecure_Design/
+  uses: []
+  validated_by: []

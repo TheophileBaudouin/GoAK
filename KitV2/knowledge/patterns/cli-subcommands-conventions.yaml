@@ -1,0 +1,40 @@
+id: pattern:cli:subcommands-conventions
+title: CLI structurée — sous-commandes et conventions
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [cli, cobra, subcommands, conventions]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une CLI sans structure (flags globaux, actions ad hoc, sortie incohérente)
+  est imprévisible et non scriptable (voir
+  pattern:antipattern:cli-flag-and-convention-abuse).
+context: >-
+  S'applique à tout outil en ligne de commande avec plus de quelques
+  opérations ou destiné à d'autres utilisateurs/CI.
+solution: >-
+  Arbre de sous-commandes (git/gcloud/docker) : `outil groupe action
+  [flags]` ; help complet et `--version` ; codes de sortie signifiants
+  (0 succès, 2 usage, ≠0 erreur) ; flags optionnels avec défauts sûrs et
+  aliases cohérents ; sortie stable pour les scripts (JSON/--quiet quand
+  nécessaire). En Go : stdlib flag pour le minimal (recipe-cli-minimal),
+  cobra pour l'arborescence (recipe-cli-cobra, catalog cobra).
+benefits: >-
+  Découverte par `help`, scriptabilité prévisible, conventions familières
+  (utilisables par les humains ET les LLM), et tests du help/codes de sortie.
+costs: >-
+  Un outil à une seule action n'a pas besoin de sous-commandes (le minimal
+  suffit) ; l'arborescence ajoute de la surface de doc à maintenir.
+related: >-
+  Recettes : recipe-cli-minimal, recipe-cli-cobra, recipe-cli-interactif.
+  Catalog : cobra. Homologue négatif :
+  pattern:antipattern:cli-flag-and-convention-abuse.
+relationships:
+  references:
+    - https://clig.dev/
+    - pattern:antipattern:cli-flag-and-convention-abuse
+  uses: []
+  validated_by: []

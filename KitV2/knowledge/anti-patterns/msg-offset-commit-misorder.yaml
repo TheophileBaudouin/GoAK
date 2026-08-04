@@ -1,0 +1,42 @@
+id: pattern:antipattern:msg-offset-commit-misorder
+title: Mauvais ordre de commit des offsets consommateur
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [messaging, kafka, consumer, offset, data-loss]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Offsets commités avant traitement (perte de données si le crash suit),
+  auto-commit activé avec traitement manuel, ou commit après traitement
+  asynchrone non ordonné (un commit d'un message plus ancien régresse
+  l'offset).
+detect: >-
+  - `enable.auto.commit=true` alors que la logique de traitement est
+    manuelle/asynchrone.
+  - Commit immédiat après réception, avant le traitement et sa persistance.
+  - Traitement concurrent par partitions/rangs sans garantie d'ordre de
+    commit (position qui recule).
+problem: >-
+  Commit trop tôt = perte de messages à la panne ; commit trop tard ou
+  désordonné = reprocessing et doublons. Les deux modes corrompent
+  l'exactitude du flux (au-most-once vs at-least-once incontrôlé).
+fix: >-
+  Choisir explicitement la sémantique : at-least-once → traiter puis commiter
+  (commit après persistance, en vérifiant l'erreur), en désactivant
+  l'auto-commit si le traitement n'est pas synchrone. Pour le traitement
+  concurrent, committer dans l'ordre (suivre la position du rang le plus
+  ancien) et gérer le rebalance (voir rebalance listener). Idempotence du
+  traitement pour absorber les doublons.
+when_ok: >-
+  Au-most-once (commit avant traitement) peut convenir à des flux de
+  télémétrie où la perte est acceptée ; c'est un choix produit documenté, pas
+  un accident.
+relationships:
+  references:
+    - https://docs.axonops.com/data-platforms/kafka/application-development/anti-patterns/
+    - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/
+  uses: []
+  validated_by: []

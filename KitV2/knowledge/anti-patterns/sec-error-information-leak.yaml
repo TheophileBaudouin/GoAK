@@ -1,0 +1,40 @@
+id: pattern:antipattern:sec-error-information-leak
+title: Fuite d'informations internes via les erreurs
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, errors, api, information-disclosure]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Les erreurs internes (SQL, stack traces, chemins de fichiers, versions de
+  dépendances) sont renvoyées telles quelles au client HTTP ou affichées à
+  l'utilisateur.
+detect: >-
+  - `http.Error(w, err.Error(), 500)` avec erreurs de base/stack.
+  - Logs applicatifs contenant des données sensibles (secrets, PII) — voir
+    obs-excessive-logging.
+  - Réponses d'API qui changent selon l'état interne de la base (indice
+    d'énumération).
+problem: >-
+  Les messages d'erreur révèlent la structure interne (schéma DB, stack,
+  chemins, versions) et facilitent l'attaque ciblée ; la distinction
+  erreur-brute/interne vs externe est un contrôle de sécurité documenté
+  (OWASP error handling, A05 security misconfiguration).
+fix: >-
+  Logger l'erreur complète avec un identifiant corrélé (request ID) côté
+  serveur ; renvoyer au client un message générique et un code stable.
+  Traduire les erreurs métier attendues en réponses structurées (voir
+  rest-ignoring-http-semantics) ; jamais `err.Error()` brut vers l'extérieur.
+when_ok: >-
+  Les environnements de développement peuvent exposer les détails (mode
+  debug) ; la règle s'applique aux environnements partagés et à la
+  production.
+relationships:
+  references:
+    - https://owasp.org/www-community/Improper_Error_Handling
+    - https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+  uses: []
+  validated_by: []

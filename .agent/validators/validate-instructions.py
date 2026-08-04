@@ -13,6 +13,11 @@ NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 CATEGORY_RE = re.compile(r"^(recipe|rule|pattern|library|reference-project|checklist)$")
 ALLOWED_REGISTRY_FIELDS = {"name", "description", "category", "tags", "last-verified"}
 REQUIRED_REGISTRY_FIELDS = ALLOWED_REGISTRY_FIELDS
+# Workflow skills (.pi/skills/) carry the kit-only `category: workflow` value
+# (Decisions.md 2026-08-04) plus tags/last-verified; the rest of the schema
+# matches the module schema so freshness checks apply uniformly.
+ALLOWED_WORKFLOW_FIELDS = ALLOWED_REGISTRY_FIELDS
+REQUIRED_WORKFLOW_FIELDS = {"name", "description", "last-verified"}
 
 
 def frontmatter(path: Path) -> dict[str, str]:
@@ -35,13 +40,14 @@ def frontmatter(path: Path) -> dict[str, str]:
 def check_skill(path: Path, registry: bool) -> list[str]:
     errors: list[str] = []
     values = frontmatter(path)
-    required = REQUIRED_REGISTRY_FIELDS if registry else {"name", "description"}
+    if registry:
+        required, allowed = REQUIRED_REGISTRY_FIELDS, ALLOWED_REGISTRY_FIELDS
+    else:
+        required, allowed = REQUIRED_WORKFLOW_FIELDS, ALLOWED_WORKFLOW_FIELDS
     missing = required - values.keys()
     if missing:
         errors.append(f"{path}: missing frontmatter fields: {sorted(missing)}")
-    unknown = set(values) - (
-        ALLOWED_REGISTRY_FIELDS if registry else {"name", "description"}
-    )
+    unknown = set(values) - allowed
     if unknown:
         errors.append(f"{path}: unexpected frontmatter fields: {sorted(unknown)}")
     name = values.get("name", "")
@@ -63,6 +69,8 @@ def check_skill(path: Path, registry: bool) -> list[str]:
         tags = values.get("tags", "")
         if not tags.startswith("[") or not tags.endswith("]"):
             errors.append(f"{path}: tags must be a YAML list")
+    elif not DATE_RE.fullmatch(values.get("last-verified", "")):
+        errors.append(f"{path}: last-verified must use YYYY-MM-DD")
     if len(path.read_text(encoding="utf-8").splitlines()) > 500:
         errors.append(f"{path}: body exceeds 500 lines")
     return errors

@@ -787,6 +787,125 @@ Recherche intelligente dans des dépôts.
 
 ---
 
+# 21. Écosystème Charm (TUI, SSH, CLI)
+
+Écosystème cohérent de Charm (<https://github.com/charmbracelet>) : TUIs,
+SSH applicatif et CLI. Les modules v2 utilisent le vanity import `charm.land/...`.
+Sont exclues ici les applications destinées aux humains (gum, glow, vhs, crush,
+soft-serve…) et les bibliothèques pré-1.0 ou expérimentales (fantasy, catwalk,
+ultraviolet, x).
+
+## Bubble Tea
+
+- **Lien :** <https://github.com/charmbracelet/bubbletea> — docs <https://charm.sh/bubbletea>
+- **Description :** Framework TUI (Text User Interface) en Go, architecture MVU (Model-View-Update). Module : `charm.land/bubbletea/v2`.
+- **Utilité potentielle :**
+  - CLI interactives et interfaces terminal pour agents et outils internes.
+  - Déjà utilisé par le kit (recipe-cli-interactif).
+- **Priorité :** Critique
+- **Catégorie :** TUI
+
+## Bubbles
+
+- **Lien :** <https://github.com/charmbracelet/bubbles> — docs <https://charm.sh/bubbles>
+- **Description :** Bibliothèque de composants TUI pour Bubble Tea (listes, tables, textinput, spinner, paginator…). Module : `charm.land/bubbles/v2`.
+- **Utilité potentielle :**
+  - Composants réutilisables pour TUIs d'agents (sélection, formulaires, progression).
+- **Priorité :** Haute
+- **Catégorie :** TUI / Composants
+
+## Lip Gloss
+
+- **Lien :** <https://github.com/charmbracelet/lipgloss> — docs <https://charm.sh/lipgloss>
+- **Description :** Définition de styles pour mises en page terminal (couleurs, bordures, alignement, largeurs). Module : `charm.land/lipgloss/v2`.
+- **Utilité potentielle :**
+  - Styling cohérent des sorties CLI/TUI générées par un agent.
+- **Priorité :** Haute
+- **Catégorie :** TUI / Style
+
+## Glamour
+
+- **Lien :** <https://github.com/charmbracelet/glamour> — docs <https://charm.sh/glamour>
+- **Description :** Rendu Markdown stylé (feuilles de style) dans le terminal. Module : `charm.land/glamour/v2`.
+- **Utilité potentielle :**
+  - Afficher documentation, sorties LLM ou rapports Markdown dans une CLI.
+- **Priorité :** Haute
+- **Catégorie :** TUI / Markdown
+
+## Huh
+
+- **Lien :** <https://github.com/charmbracelet/huh> — docs <https://charm.sh/huh>
+- **Description :** Construction de formulaires et invites terminal (input, select, confirm, multi-select). Module : `charm.land/huh/v2`.
+- **Utilité potentielle :**
+  - Saisie interactive structurée pour workflows agents (wizards, confirmations).
+- **Priorité :** Haute
+- **Catégorie :** TUI / Formulaires
+
+## Log
+
+- **Lien :** <https://github.com/charmbracelet/log> — docs <https://charm.sh/log>
+- **Description :** Logger minimal et coloré pour CLI, implémente un handler `log/slog`. Module : `charm.land/log/v2`.
+- **Utilité potentielle :**
+  - Logs lisibles en terminal pour les outils CLI.
+- **Priorité :** Moyenne
+- **Catégorie :** Logging
+
+## Wish
+
+- **Lien :** <https://github.com/charmbracelet/wish> — docs <https://charm.sh/wish>
+- **Description :** Framework d'applications SSH (serveur, sessions, PTY, middleware). Module : `charm.land/wish/v2`.
+- **Utilité potentielle :**
+  - Workbenches distants SSH pour agents (architecture H hybride local/remote).
+- **Priorité :** Haute
+- **Catégorie :** SSH / Applications
+
+## SSH
+
+- **Lien :** <https://github.com/charmbracelet/ssh> — docs <https://charm.sh/ssh>
+- **Description :** API SSH serveur moderne fondée sur `golang.org/x/crypto/ssh` (sessions, PTY, signal). Module : `charm.land/ssh`.
+- **Utilité potentielle :**
+  - Serveurs SSH intégrés ; fondation de Wish.
+- **Priorité :** Haute
+- **Catégorie :** SSH
+
+## Harmonica
+
+- **Lien :** <https://github.com/charmbracelet/harmonica>
+- **Description :** Animation physique (ressorts) pour TUIs. Module : `github.com/charmbracelet/harmonica`.
+- **Utilité potentielle :**
+  - Transitions et animations fluides dans les interfaces terminal.
+- **Priorité :** Moyenne
+- **Catégorie :** TUI / Animation
+
+## Sequin
+
+- **Lien :** <https://github.com/charmbracelet/sequin>
+- **Description :** Lecture/écriture de séquences ANSI lisibles. Module : `github.com/charmbracelet/sequin`.
+- **Utilité potentielle :**
+  - Manipulation de texte terminal avec codes ANSI (couleurs, styles).
+- **Priorité :** Moyenne
+- **Catégorie :** Terminal / ANSI
+
+## Colorprofile
+
+- **Lien :** <https://github.com/charmbracelet/colorprofile>
+- **Description :** Détection des capacités couleur du terminal (successeur de termenv). Module : `github.com/charmbracelet/colorprofile`.
+- **Utilité potentielle :**
+  - Adaptation des couleurs selon le terminal (256, truecolor).
+- **Priorité :** Moyenne
+- **Catégorie :** Terminal / Couleurs
+
+## Keygen
+
+- **Lien :** <https://github.com/charmbracelet/keygen>
+- **Description :** Génération de paires de clés SSH (Ed25519, RSA, ECDSA). Module : `github.com/charmbracelet/keygen`.
+- **Utilité potentielle :**
+  - Génération de clés pour tooling SSH sécurisé.
+- **Priorité :** Moyenne
+- **Catégorie :** SSH / Sécurité
+
+---
+
 # Priorités pour un Agent Coding Go
 
 ## Niveau S (indispensable)
@@ -828,6 +947,9 @@ Recherche intelligente dans des dépôts.
 - Go by Example
 - Awesome Go
 - OpenAI Go SDK
+- Bubble Tea
+- Bubbles
+- Lip Gloss
 
 ## Niveau B (selon projet)
 
@@ -837,3 +959,12 @@ Recherche intelligente dans des dépôts.
 - RabbitMQ
 - Resty
 - Cookiecutter
+- Glamour
+- Huh
+- Log
+- Wish
+- SSH
+- Harmonica
+- Sequin
+- Colorprofile
+- Keygen

@@ -1,0 +1,37 @@
+id: pattern:antipattern:go-json-omitempty-zero
+title: omitempty qui masque des zéros significatifs
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, json, api, serialization, zero-value]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `json:"count,omitempty"`, `json:"found,omitempty"`, `json:"score,omitempty"`
+  sur des champs où 0/false est une valeur métier valide — le client reçoit un
+  champ absent au lieu de `0`/`false`.
+detect: >-
+  - Tag `omitempty` sur des champs numériques, booléens ou durée dont le zéro a
+    un sens (compteurs, indicateurs, délais).
+  - Tests d'API qui n'assertent pas la présence/absence du champ zéro.
+problem: >-
+  Le zéro est omis silencieusement : le consommateur ne distingue plus
+  « absent » de « zéro » — compteurs affichés nuls par défaut, conditions
+  fausses par défaut, contrats d'API implicites qui changent au refactor. La
+  sémantique d'un champ ne doit pas dépendre du tag de sérialisation.
+fix: >-
+  Retirer `omitempty` quand le zéro est significatif. Pour distinguer
+  explicitement absent vs zéro, utiliser un pointeur (`*int`) ou
+  `datatypes`/wrapper optionnel, et décider champ par champ : `omitempty` pour
+  les options d'affichage facultatives, jamais pour les faits métier.
+when_ok: >-
+  `omitempty` est adapté aux champs réellement facultatifs (descriptions,
+  extensions, champs de rendu) où l'absence est la valeur par défaut voulue.
+relationships:
+  references:
+    - https://pkg.go.dev/encoding/json
+    - https://100go.co/
+  uses: []
+  validated_by: []

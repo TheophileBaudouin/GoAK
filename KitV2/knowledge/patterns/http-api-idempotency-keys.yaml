@@ -1,0 +1,37 @@
+id: pattern:http:api-idempotency-keys
+title: Clés d'idempotence — retries sûres pour les écritures
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [http, api, idempotency, reliability]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une retry réseau ou client duplique un effet métier (paiement, création,
+  envoi) — les POST ne sont pas idempotents par nature (voir
+  pattern:antipattern:api-no-pagination).
+context: >-
+  S'applique aux écritures non-idempotentes (création, action) où un doublon
+  coûte cher.
+solution: >-
+  Le client envoie un en-tête `Idempotency-Key` (UUID) ; le serveur stocke la
+  clé et la réponse associée (table clé → réponse/état), et renvoie la même
+  réponse pour une retry avec la même clé. En Go : middleware ou couche
+  service qui consulte/écrit la table dans la même transaction que l'effet.
+benefits: >-
+  Les clients peuvent retenter sans risque, les incidents réseau ne produisent
+  plus de doublons, et le contrat est simple à documenter.
+costs: >-
+  Coût de stockage/expiration des clés (TTL) et de la vérification ; la clé
+  doit être vérifiée AVANT l'effet (race) — la stocker atomiquement avec la
+  création.
+related: >-
+  Homologue négatif : pattern:antipattern:api-no-pagination.
+relationships:
+  references:
+    - https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
+    - pattern:antipattern:api-no-pagination
+  uses: []
+  validated_by: []

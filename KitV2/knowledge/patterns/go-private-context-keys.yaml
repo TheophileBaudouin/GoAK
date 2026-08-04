@@ -1,0 +1,38 @@
+id: pattern:go:private-context-keys
+title: Clés de contexte privées et typées
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, context, values, keys, api]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Porter des valeurs de requête (user ID, request ID, tenant) dans le contexte
+  sans collision ni fuite d'implémentation entre packages.
+context: >-
+  S'applique quand des valeurs de requête traversent plusieurs couches et ne
+  doivent pas être des paramètres de fonction (cross-cutting, middleware).
+solution: >-
+  Type de clé privé au package qui lit la valeur
+  (`type ctxKey string` + constante privée non exportée), fonctions d'accès
+  exportées (`WithUser(ctx, u)`, `UserFrom(ctx)`) qui encapsulent la clé.
+  Garder le nombre de clés minimal et documenter chaque valeur.
+benefits: >-
+  Impossible de collisionner avec un autre package ; l'API publique expose des
+  fonctions, pas des clés ; les valeurs sont typées à la lecture (pas de
+  cast hasardeux).
+costs: >-
+  Une indirection (fonctions) ; le contexte reste adapté aux valeurs de
+  requête, pas aux paramètres métier — ne pas y cacher des dépendances (voir
+  pattern:go:constructor-injection).
+related: >-
+  Homologue négatif : pattern:antipattern:go-context-key-collision.
+relationships:
+  references:
+    - https://go.dev/blog/context
+    - https://pkg.go.dev/context
+    - pattern:antipattern:go-context-key-collision
+  uses: []
+  validated_by: []

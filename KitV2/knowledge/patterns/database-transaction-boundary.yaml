@@ -1,0 +1,38 @@
+id: pattern:database:transaction-boundary
+title: Frontière de transaction — BeginTx + Rollback en defer
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, transactions, atomicity]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Plusieurs écritures doivent être atomiques ; un BEGIN/COMMIT manuel ou un
+  commit sans rollback laisse la base dans un état imprévisible en cas
+  d'erreur (voir pattern:antipattern:db-raw-transactions).
+context: >-
+  S'applique à toute opération multi-écritures (créer + références, valider +
+  statuts, outbox) qui doit réussir ou échouer ensemble.
+solution: >-
+  `tx, err := db.BeginTx(ctx, nil)` ; toutes les opérations sur `tx` ;
+  `defer tx.Rollback()` (sans effet après commit) ; `tx.Commit()` en fin avec
+  vérification de son erreur. Garder la transaction courte (pas d'I/O
+  externe dedans) et sa frontière à une fonction.
+benefits: >-
+  Atomicité garantie par l'API (jamais d'état orphelin), rollback automatique
+  sur tout chemin d'erreur, et une transaction = une fonction testable.
+costs: >-
+  La transaction verrouille des lignes et réserve une connexion du pool (voir
+  pattern:database:pool-config) — la courte durée est la contrepartie ; pas
+  d'API savepoint en database/sql (SQL brut driver-dépendant si nécessaire).
+related: >-
+  Homologue négatif : pattern:antipattern:db-raw-transactions.
+relationships:
+  references:
+    - https://go.dev/doc/database/execute-transactions
+    - https://pkg.go.dev/database/sql
+    - pattern:antipattern:db-raw-transactions
+  uses: []
+  validated_by: []

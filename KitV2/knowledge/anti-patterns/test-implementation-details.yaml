@@ -1,0 +1,41 @@
+id: pattern:antipattern:test-implementation-details
+title: Tester l'implémentation, pas le comportement
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [testing, behavior, refactoring, mocking]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Tests qui vérifient comment le code fait (nombre d'appels à une fonction
+  interne, ordre des appels, valeurs intermédiaires privées) plutôt que ce
+  qu'il produit.
+detect: >-
+  - Tests accédant à des champs/méthodes non exportés via le même package ou
+    comptant des appels internes.
+  - Refactor interne (fusion de fonctions, changement de structure) cassant
+    les tests sans changement de sortie.
+  - Mocks de fonctions triviales (ex. un wrapper de `strings.ToUpper`).
+problem: >-
+  Les tests sur l'implémentation figent des détails qui doivent rester libres
+  de changer : ils transforment chaque refactor en travail de test, gonflent
+  la maintenance et ne protègent pas le vrai contrat — le comportement
+  observable depuis l'extérieur.
+fix: >-
+  Tester par le comportement : entrées publiques → sorties publiques (voir
+  recipe-cli-interactif : test du seam `handleKey(string)` et non du framework).
+  Pour les dépendances, utiliser des interfaces consommateur petites ou des
+  fakes de données, pas des compteurs d'appels internes. Un refactor interne
+  ne doit pas toucher les tests.
+when_ok: >-
+  Une assertion sur un détail interne se justifie pour documenter un
+  comportement non observable autrement (ex. ordre de fermeture de
+  ressources) — rare et à commenter.
+relationships:
+  references:
+    - http://xunitpatterns.com/TestSmells.html
+    - https://testsmells.org/
+  uses: []
+  validated_by: []

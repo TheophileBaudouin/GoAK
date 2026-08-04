@@ -1,0 +1,40 @@
+id: pattern:messaging:transactional-outbox
+title: Outbox transactionnelle — événement et état atomiques
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [messaging, outbox, transactions, events]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Publier un événement et modifier l'état ne peuvent pas être atomiques
+  directement (dual-write) : l'événement est perdu si la publication échoue,
+  ou dupliqué si la transaction est rejouée.
+context: >-
+  S'applique à tout service qui doit émettre des événements garantis à la
+  suite d'un changement d'état (intégrations, event-driven).
+solution: >-
+  Écrire l'événement dans une table `outbox` dans la **même transaction** que
+  l'état (voir pattern:database:transaction-boundary) ; un relais (poller ou
+  CDC) publie ensuite vers le broker et marque l'événement publié. L'état et
+  l'engagement de publication ne peuvent plus diverger.
+benefits: >-
+  Élimine le dual-write : zéro événement perdu, publication au-moins-une-fois
+  (compensée par pattern:messaging:idempotent-consumer), et pas de
+  transaction distribuée (2PC).
+costs: >-
+  Table + relais + gestion du rejeu (ordre, at-least-once) ; la publication
+  n'est pas instantanée (latence du poller) ; le schéma de l'outbox doit être
+  versionné (voir pattern:database:versioned-migrations).
+related: >-
+  Homologue négatif : pattern:antipattern:msg-offset-commit-misorder (la
+  publication fiabilisée réduit le reprocessing).
+relationships:
+  references:
+    - https://microservices.io/patterns/data/transactional-outbox.html
+    - https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html
+    - pattern:antipattern:msg-offset-commit-misorder
+  uses: []
+  validated_by: []

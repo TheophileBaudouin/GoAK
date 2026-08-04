@@ -1,0 +1,41 @@
+id: pattern:antipattern:obs-logging-not-observability
+title: Logging confondu avec observabilité
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [observability, logging, metrics, tracing, debugging]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Des logs existent (parfois massifs) mais une question de production
+  (« pourquoi cette requête est lente ? », « quelle file de messages est en
+  retard ? ») reste sans réponse sans instrumentation supplémentaire.
+detect: >-
+  - Incident débogué en ajoutant des logs puis en redéployant (boucle).
+  - Aucune corrélation (request ID) entre les signaux ; pas de métriques de
+    latence/débit, pas de traces.
+  - « Dashboard as a security blanket » : des dashboards existent mais ne
+    racontent pas l'incident.
+problem: >-
+  Le logging seul est passif : il enregistre ce qu'on a pensé à logger avant
+  l'incident, sans structure pour répondre à des questions nouvelles.
+  L'observabilité relie logs, métriques et traces (corrélation) pour
+  reconstruire le comportement d'un système distribué.
+fix: >-
+  Instrumenter les trois signaux : métriques RED/USE sur les endpoints et
+  files, traces distribuées avec contexte (opentelemetry — voir
+  source:go:opentelemetry), logs structurés corrélés (request/span ID).
+  Formuler les questions opérationnelles attendues et vérifier qu'un
+  dashboard y répond avant l'incident.
+when_ok: >-
+  Un script ou outil interne court peut vivre sans observabilité complète ;
+  tout service partagé ou distribué en a besoin dès la première mise en
+  production.
+relationships:
+  references:
+    - https://observability-antipatterns.github.io/
+    - https://opentelemetry.io/docs/languages/go/
+  uses: []
+  validated_by: []

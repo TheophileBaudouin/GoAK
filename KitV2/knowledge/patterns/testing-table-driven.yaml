@@ -1,0 +1,37 @@
+id: pattern:testing:table-driven
+title: Tests table-driven — cas en table, assertion en boucle
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, table-driven]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Un test par cas duplique le harnais (appel, assertion, setup) ; les tests
+  copiés divergent et les cas limites sont oubliés.
+context: >-
+  S'applique à toute fonction testable par entrées/sorties avec plusieurs cas
+  (nominal, limites, erreurs).
+solution: >-
+  Le pattern idiomatique Go (wiki officiel) : une slice de cas `{name,
+  input, want}` + `t.Run(name, func(t *testing.T) { … })` en boucle. Nommer
+  chaque cas, tester les erreurs comme des sorties (wantErr), utiliser des
+  sous-tests pour l'isolation.
+benefits: >-
+  Un harnais unique, ajout de cas trivial, exécution isolée par sous-test
+  (`-run TestX/cas`), et lisibilité du contrat complet en un coup d'œil.
+costs: >-
+  Les cas aux setup très différents (dépendances lourdes) cassent la table —
+  extraire alors un harnais dédié ; ne pas forcer des scénarios étatiques
+  complexes dans une table plate.
+related: >-
+  Règles du kit : `rules/registry/testing`. Homologue négatif :
+  pattern:antipattern:test-brittle-tests.
+relationships:
+  references:
+    - https://go.dev/wiki/TableDrivenTests
+    - pattern:antipattern:test-brittle-tests
+  uses: []
+  validated_by: []

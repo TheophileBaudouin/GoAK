@@ -1,0 +1,40 @@
+id: pattern:antipattern:msg-poison-pill-no-dlq
+title: Poison pill sans file de messages morts (DLQ)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [messaging, kafka, consumer, resilience, dlq]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Un message qui échoue toujours à être consommé (désérialisation, validation,
+  logique) est retenté indéfiniment ou bloque la partition : le consommateur
+  boucle en erreur et le lag s'accumule.
+detect: >-
+  - Consommateur en retry infini sur une partition (lag constant + erreurs
+    répétées).
+  - Aucune destination pour les messages non processables (pas de DLQ/topic
+    d'échec).
+  - Erreurs de désérialisation traitées comme des erreurs transitoires.
+problem: >-
+  Une poison pill arrête la progression de toute la partition : les messages
+  suivants (valides) ne sont jamais traités, les retries sans fin gaspillent
+  la CPU et l'ordre de traitement est perdu. Le retry automatique ne résout
+  pas un message structurellement invalide.
+fix: >-
+  Séparer les erreurs : transitoires → retry borné avec backoff ; définitives
+  (validation, désérialisation) → routage immédiat vers une DLQ (dead letter
+  topic) avec les métadonnées de cause. Consommer la DLQ régulièrement
+  (réparation, rejeu, alerte). Définir clairement la frontière retry/DLQ.
+when_ok: >-
+  Un système sans DLQ peut exister si chaque message est garanti processable
+  (contrat strict en amont) ; l'absence de DLQ doit être une décision, pas un
+  oubli.
+relationships:
+  references:
+    - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/
+    - https://www.conduktor.io/blog/dead-letter-topics-handling-poison-pills
+  uses: []
+  validated_by: []

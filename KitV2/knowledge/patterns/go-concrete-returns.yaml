@@ -1,0 +1,40 @@
+id: pattern:go:concrete-returns
+title: Retours concrets, interfaces côté consommateur
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, interfaces, api, design]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une fonction qui retourne une interface force tous ses appelants dans une
+  abstraction, souvent pour une seule implémentation — indirection sans
+  bénéfice (voir pattern:antipattern:go-interface-everywhere).
+context: >-
+  S'applique aux API de package : constructeurs, factories, services qui
+  exposent des implémentations concrètes à leurs consommateurs.
+solution: >-
+  Retourner le type concret (`*Store`, `*Client`) ; définir une interface
+  minimale là où elle est consommée, avec les méthodes réellement utilisées,
+  uniquement quand un mock ou une seconde implémentation se justifie.
+  Vérifier la conformité à la compilation : `var _ Interface =
+  (*Concrete)(nil)`.
+benefits: >-
+  API simple à comprendre et à étendre, aucun coût de dispatch virtuel
+  inutile, et la liberté de varier l'abstraction du côté qui en a besoin.
+costs: >-
+  Le consommateur ne peut pas substituer une implémentation sans interface
+  (acceptable quand une seule existe) ; un retour concret crée un couplage de
+  type — à peser pour les frontières réellement stables.
+related: >-
+  Règles du kit : `rules/core/philosophy`. Homologue négatif :
+  pattern:antipattern:go-interface-everywhere.
+relationships:
+  references:
+    - https://100go.co/
+    - https://go.dev/wiki/CodeReviewComments
+    - pattern:antipattern:go-interface-everywhere
+  uses: []
+  validated_by: []

@@ -1,0 +1,38 @@
+id: pattern:antipattern:go-context-key-collision
+title: Clé de contexte exportée ou de type string
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, context, values, collision, correctness]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `context.WithValue(ctx, "user", u)` avec une clé de type `string` ou un type
+  exporté défini dans un autre package.
+detect: >-
+  - `context.WithValue` dont la clé est une string littérale ou un type exporté
+    (lint : `revive` rule `context-key-type`).
+  - Recherche des clés de contexte partagées entre packages.
+problem: >-
+  La doc officielle est explicite : les clés doivent être d'un type défini dans
+  le package de l'appelant et non exporté. Une clé string ou exportée crée des
+  collisions silencieuses entre packages (deux packages écrivent la même clé,
+  lecture d'une valeur corrompue) et rend l'API impossible à inspecter.
+fix: >-
+  Définir un type privé dans le package qui lit la valeur :
+  `type ctxKey struct{}` (ou `type ctxKey string` avec constante privée), et
+  exporter uniquement des fonctions d'accès (`WithUser(ctx, u)`,
+  `UserFrom(ctx)`)
+  qui encapsulent la clé.
+when_ok: >-
+  Jamais de clé exportée ou string pour des valeurs portées par le contexte ;
+  si la valeur doit être visible d'autres packages, exposer une fonction
+  d'accès, pas la clé.
+relationships:
+  references:
+    - https://go.dev/blog/context
+    - https://pkg.go.dev/context
+  uses: []
+  validated_by: []

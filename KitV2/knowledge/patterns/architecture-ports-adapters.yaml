@@ -1,0 +1,41 @@
+id: pattern:architecture:ports-adapters
+title: Ports & adaptateurs — domaine découplé de l'infrastructure
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, hexagonal, ports, adapters, domain]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  La logique métier mêlée à l'infrastructure (HTTP, SQL, files) rend le
+  domaine impossible à tester isolément et couplé à chaque technologie (voir
+  pattern:antipattern:arch-big-ball-of-mud).
+context: >-
+  S'applique aux services qui interagissent avec plusieurs systèmes externes
+  ou exposent plusieurs entrées (HTTP, gRPC, CLI, worker) ; surdimensionné
+  pour du CRUD simple.
+solution: >-
+  Le domaine ne dépend que de **ports** (interfaces consommateur) ; les
+  **adaptateurs** (handlers HTTP, repository SQL, producteur Kafka)
+  implémentent ces interfaces. En Go : interfaces petites définies côté
+  consommateur (voir pattern:go:concrete-returns), câblage explicite dans le
+  constructeur (pattern:go:constructor-injection), `context.Context` aux
+  frontières I/O.
+benefits: >-
+  Domaine testable sans infrastructure (fakes sur les ports, voir
+  pattern:testing:fakes-over-mocks), remplacement de technologie localisé,
+  et extraction vers un service (voir pattern:architecture:modular-monolith).
+costs: >-
+  Indirection et nombre de fichiers ; chaque port doit refléter un vrai
+  besoin du domaine — des ports calqués sur les libs réintroduisent le
+  couplage (voir pattern:antipattern:go-interface-everywhere).
+related: >-
+  Homologue négatif : pattern:antipattern:arch-big-ball-of-mud.
+relationships:
+  references:
+    - https://softwarepatternslexicon.com/go/architectural-patterns-in-go/hexagonal-architecture-ports-and-adapters/
+    - pattern:antipattern:arch-big-ball-of-mud
+  uses: []
+  validated_by: []

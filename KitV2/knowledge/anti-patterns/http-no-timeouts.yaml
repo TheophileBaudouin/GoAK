@@ -1,0 +1,38 @@
+id: pattern:antipattern:http-no-timeouts
+title: Serveur HTTP sans timeouts (valeurs par défaut)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [http, server, timeout, availability, net-http]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `http.Server{Addr: ":8080"}` sans `ReadTimeout`, `ReadHeaderTimeout`,
+  `WriteTimeout`, `IdleTimeout` — ou `http.ListenAndServe` brut.
+detect: >-
+  - Struct `http.Server` avec uniquement Addr/Handler.
+  - Revue des handlers : opérations longues sans `http.TimeoutHandler` ni
+    gestion du contexte de requête.
+problem: >-
+  Les défauts du ServeMux n'imposent aucun timeout : un client lent occupe un
+  worker indéfiniment, les connexions inactives s'accumulent, et un handler
+  bloqué fait grossir la file — déni de service trivial (slowloris) et
+  indisponibilité sous charge. Le guide Cloudflare documente la distinction
+  entre les timeouts serveur et handler.
+fix: >-
+  Configurer tous les timeouts : `ReadHeaderTimeout` (5-10s), `ReadTimeout`
+  (10-30s), `WriteTimeout` (30-60s), `IdleTimeout` (60-120s) selon le profil.
+  Pour les opérations longues, `http.TimeoutHandler` au niveau handler et
+  respecter `r.Context()` ; `http.Server.Shutdown(ctx)` pour l'arrêt gracieux
+  (voir recipe-graceful-shutdown).
+when_ok: >-
+  Les valeurs exactes dépendent du produit ; la règle est d'en définir —
+  aucune valeur par défaut n'est acceptable en production.
+relationships:
+  references:
+    - https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
+    - https://pkg.go.dev/net/http
+  uses: []
+  validated_by: []

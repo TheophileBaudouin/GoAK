@@ -1,0 +1,39 @@
+id: pattern:antipattern:db-pool-misconfig
+title: Pool de connexions mal configuré (défauts ou fuites)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, pool, connection, performance]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `sql.Open` sans `SetMaxOpenConns`/`SetMaxIdleConns`/`SetConnMaxLifetime`,
+  lignes non fermées, transactions qui réservent la connexion trop longtemps.
+detect: >-
+  - `sql.Open` sans réglage du pool (le défaut MaxOpenConns = illimité épuise
+    max_connections du SGBD).
+  - `rows`/`stmt` jamais fermés (fuite de connexions — voir go-ignored-error).
+  - `MaxIdleConns` > `MaxOpenConns` ou 0, sans `ConnMaxLifetime`.
+  - Erreurs « too many connections » / timeouts de pool en charge.
+problem: >-
+  `sql.Open` est paresseux (aucune connexion ouverte à l'appel) et les défauts
+  sont dangereux : pool illimité, connexions qui vieillissent sans
+  `ConnMaxLifetime` (échecs après failover/firewall), fuites par rows non
+  fermés. Les conséquences (blocages, timeouts DB) n'apparaissent qu'en charge.
+fix: >-
+  Configurer explicitement : `SetMaxOpenConns`, `SetMaxIdleConns`,
+  `SetConnMaxIdleTime`, `SetConnMaxLifetime` en cohérence avec le SGBD.
+  Toujours `defer rows.Close()` (consommer l'erreur), fermer stmt après usage,
+  et court-circuiter les transactions longues. Vérifier avec
+  `db.Stats()` (InUse, Idle, WaitCount) sous charge de test.
+when_ok: >-
+  Les valeurs exactes dépendent du SGBD et de la charge ; la règle est d'en
+  fixer (jamais les défauts), pas une valeur universelle.
+relationships:
+  references:
+    - https://pkg.go.dev/database/sql
+    - https://github.com/golang/go/issues/27434
+  uses: []
+  validated_by: []

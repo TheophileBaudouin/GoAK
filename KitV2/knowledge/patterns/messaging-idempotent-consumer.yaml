@@ -1,0 +1,39 @@
+id: pattern:messaging:idempotent-consumer
+title: Consommateur idempotent — absorber les doublons
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [messaging, kafka, idempotency, consumer]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les files garantissent au-moins-une-fois : un message peut être reçu
+  plusieurs fois (rebalance, retry, redelivery). Traiter deux fois un effet
+  non-idempotent produit des doublons (voir
+  pattern:antipattern:msg-offset-commit-misorder).
+context: >-
+  S'applique à tout consommateur dont le traitement a un effet externe
+  (écriture DB, appel API, envoi).
+solution: >-
+  Rendre le traitement idempotent par clé métier : dédupliquer par
+  `event_id` (table de processus traités vérifiée atomiquement avec l'effet,
+  ou contrainte unique sur la clé), ou concevoir l'effet pour être rejouable
+  (upsert, PUT). Commiter l'offset après traitement réussi
+  (voir pattern:messaging:transactional-outbox pour la fiabilisation).
+benefits: >-
+  Doublons absorbés sans coût, retry et rebalance sans conséquence, et
+  sémantique at-least-once assumée proprement.
+costs: >-
+  Stockage de déduplication (TTL) ou contraintes à concevoir ; l'idempotence
+  par clé exige une clé stable côté producteur — documenter le contrat
+  d'événement.
+related: >-
+  Homologue négatif : pattern:antipattern:msg-offset-commit-misorder.
+relationships:
+  references:
+    - https://kafka.apache.org/documentation/#semantics
+    - pattern:antipattern:msg-offset-commit-misorder
+  uses: []
+  validated_by: []

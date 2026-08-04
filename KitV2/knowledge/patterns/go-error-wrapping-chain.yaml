@@ -1,0 +1,43 @@
+id: pattern:go:error-wrapping-chain
+title: Chaîne d'erreurs — wrap avec %w et inspection errors.Is/As
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, errors, wrapping, is, as]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Une erreur remontée sans contexte perd l'origine : impossible de savoir quelle
+  opération a échoué (quel repository, quel appel réseau) une fois en haut de
+  la pile.
+context: >-
+  S'applique dès qu'une fonction ajoute de l'information à une erreur avant de
+  la propager (couche service, handler, adaptateur) ou quand un appelant doit
+  distinguer la cause d'un échec.
+solution: >-
+  Propager avec `fmt.Errorf("opérer %s: %w", id, err)` en conservant la chaîne
+  (`%w`), inspecter avec `errors.Is(err, sentinel)` pour l'identité et
+  `errors.As` pour le type. Ne pas wrap-per chaque couche : une seule
+  annotation contextuelle par frontière, sans « wrappite ».
+benefits: >-
+  La cause reste inspectable à chaque niveau, le message est lisible, et les
+  décisions de code (retry, mapping HTTP) reposent sur Is/As et non sur des
+  chaînes (voir pattern:go:sentinel-errors).
+costs: >-
+  Coût d'ajout par wrap (formatage) négligeable ; l'erreur d'origine n'est plus
+  directement comparable à une sentinelle sans `errors.Is`. Trop de wraps
+  rendent les messages verbeux — borner à une annotation par frontière.
+related: >-
+  Règles du kit : `rules/core/errors` (handle-once, sentinel/typed/opaque).
+  Homologue négatif : pattern:antipattern:go-error-string-matching et
+  pattern:antipattern:go-ignored-error.
+relationships:
+  references:
+    - https://go.dev/blog/errors-are-values
+    - https://pkg.go.dev/errors
+    - pattern:antipattern:go-error-string-matching
+    - pattern:antipattern:go-ignored-error
+  uses: []
+  validated_by: []

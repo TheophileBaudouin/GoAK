@@ -166,8 +166,73 @@ Rules in `KitV2/rules/` and `KitV2/knowledge/` are added only when a real source
 - 2026-08-02 — The initial correction wave established deterministic probes, raw evidence, and instruction validation. Its historical v1 paths are preserved only in the external archive/evidence record; active KitV2 tooling uses the standalone product paths.
 - 2026-08-02 — `KIT_CHARTER.md` is process authority. Structural approvals are recorded in this file before implementation. The current product probe runner is `KitV2/probes/run.sh`; Pi discovery remains a separate runtime check.
 
+## Kit governance audit — phase 1 decisions (2026-08-04)
+
+Owner decisions recorded from the governance audit
+(`docs/research/2026-08-04-kit-audit-governance.md`, §4.7), taken before the
+phase-2 contract drafting:
+
+1. **Bibliothèques — format unique.** `knowledge/catalogs/libraries/` : les
+   bibliothèques admises (admission 9 critères passée) sont des modules
+   SKILL.md ; les simples pointeurs « à considérer » restent des artefacts
+   YAML Source dans un sous-dossier distinct (ex. `pointers/`). La distinction
+   actuelle devient explicite et vérifiable par le validateur.
+2. **Module Go unique.** Le Kit conserve un go.mod racine unique
+   (`go-agent-kit-v2`) pour recettes, templates, probes et tools. Pas de
+   modules isolés par recette ; les exceptions éventuelles (dépendance lourde)
+   nécessitent une décision dédiée.
+3. **Skills de workflow dans le produit.** Les 5 skills `KitV2/.pi/skills/`
+   (go-code-review, go-implementation-plan, go-source-retrieval,
+   go-testing-verification, go-idiomatic-implementation) restent dans le
+   produit comme skills de workflow du processus de dev. Le contrat Z8
+   délimite les trois rôles (prompts = orchestrateurs, skills = procédures,
+   modules = contenu) et complète leur frontmatter (description,
+   last-verified).
+4. **Nettoyages actés (phase 2, avant rédaction des contrats) :**
+   - supprimer `KitV2/embeddings/` (héritage vide ; graphe + index généré le
+     remplacent ; Decision Record note le rejet) ;
+   - supprimer `KitV2/tools/analyzers/` (vide, sans contrat ; la vérification
+     de duplication est absorbée par le validateur étendu) ;
+   - renommer `rules/core/rules/universal` → `rules/core/universal`
+     (anomalie d'imbrication, migration du chemin dans settings et
+     références) ;
+   - remplir `knowledge/debugging/` (procédures d'échec observé, promis par
+     l'INDEX) comme objectif de phase 2.
+
+En attente (défauts proposés dans les contrats, à confirmer à la revue) :
+seuil de fraîcheur `last_verified` (12 mois → warning, 18 → déprécié), budget
+de compacité core (≤ 6 modules, ≤ 300 lignes), nouvelles shapes de templates
+(library, desktop/wails) listées en roadmap.
+
+## Kit governance audit — décisions phase 2 (2026-08-04)
+
+1. **Seuil de fraîcheur approuvé.** `last_verified` : 12 mois → warning,
+   18 mois → statut déprécié. Applicable à tous les artefacts datés du Kit
+   (modules SKILL.md, YAML-graphe, recettes).
+2. **Budget de compacité core approuvé.** `rules/core/` ≤ 6 modules, chacun
+   ≤ 300 lignes ; dépassement = admission bloquée (coût permanent de session).
+   Unité de compte : dossier top-level de `rules/core/` contenant une SKILL.md
+   (5 au 2026-08-04).
+3. **Politique templates — directive propriétaire (majeure).** Les templates
+   du Kit ne sont **jamais écrits par un agent**. Chaque template est une
+   copie (fork léger, adaptations minimales documentées) d'un **projet open
+   source réel, fiable, fonctionnel, à responsabilité unique**, qui respecte
+   les règles du Kit, et sous **licence MIT** (totalement ouverte). Les
+   templates doivent être directement réutilisables avec très peu de
+   modifications, simples et documentées. Un template non fonctionnel est
+   interdit. Il peut y avoir **moins de templates mais très qualitatifs**,
+   améliorés par la communauté au fil du temps. Les squelettes agent-générés
+   existants dans `templates/` sont marqués `legacy` et candidats au
+   remplacement par des templates sourcés MIT.
+4. **Extension de schéma `category: workflow`.** Les 5 skills de
+   `KitV2/.pi/skills/` portent `category: workflow` (hors jeu validé des
+   modules : recipe|rule|pattern|library|reference-project|checklist). Cette
+   valeur kit-only ne s'applique qu'aux skills de workflow ; le validateur
+   produit ne la contrôle pas (hors de ses chemins). Enregistrée le
+   2026-08-04 avec le frontmatter complété (category, tags, last-verified).
+
 ## Deferred by reconciliation
 
-- Secret scanning, SARIF publication, SLSA provenance, and release/versioning infrastructure are deferred because this is a personal, local kit and the deliverable is not currently a public/shared release pipeline. Revisit if the kit or generated apps are distributed outside the machine.
+- Secret scanning, SARIF publication, SLSA provenance, and release/versioning infrastructure were deferred while the kit was local-only. Since the repository is public (2026-08-03), the reason is obsolete: release/versioning infrastructure is now a planned future task (see Progress — Future deployment foundation); secret scanning, SARIF, and SLSA remain deferred until the kit or generated apps are distributed outside the machine.
 - Dedicated Claude/Codex/Gemini generators are deferred until the core, recipes, and spec-driven workflow are solid. A root `AGENTS.md` plus the existing Pi skills covers the current need without adding parallel output surfaces.
 - Fuzzing, `go fix`, `testing/synctest` adoption in recipes, and modern `tool` dependencies remain secondary; adopt only where a concrete recipe gains verified value.

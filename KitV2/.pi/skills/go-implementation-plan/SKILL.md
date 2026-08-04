@@ -1,5 +1,8 @@
 ---
 name: go-implementation-plan
+category: workflow
+tags: [planning, implementation-plan, review, tasks]
+last-verified: 2026-08-04
 description: Create a reviewable, source-backed implementation plan for a non-trivial Go change. Use before writing code when the request spans multiple files, needs a recipe or architecture decision, or has meaningful testing, compatibility, or operational risk.
 ---
 

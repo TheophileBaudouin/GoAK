@@ -1,5 +1,8 @@
 ---
 name: go-idiomatic-implementation
+category: workflow
+tags: [go, idiomatic, implementation, design, refactoring]
+last-verified: 2026-08-04
 description: Apply source-backed, idiomatic Go design while writing or refactoring Go code. Use when changing packages, APIs, error handling, concurrency, tests, or project structure; do not use it as a substitute for a task-specific recipe or public-contract approval.
 ---
 

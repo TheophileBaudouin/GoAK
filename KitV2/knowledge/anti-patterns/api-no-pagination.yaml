@@ -1,0 +1,38 @@
+id: pattern:antipattern:api-no-pagination
+title: Collection sans pagination ni idempotence
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [http, rest, api, pagination, idempotency]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `GET /items` renvoie tout en une réponse (ou une limite arbitraire non
+  documentée), et les POST de création n'ont pas d'idempotence (doublons à la
+  retry).
+detect: >-
+  - Endpoints de liste sans paramètres de pagination (`page`/`cursor`/`limit`).
+  - Corps de réponse de liste sans métadonnées (total, next).
+  - POST sans clé d'idempotence, doublons observés sur retry réseau.
+problem: >-
+  Une collection non paginée dégénère : réponses énormes, timeouts, charge
+  inutile, impossible à consommer pour les gros volumes. Sans idempotence, une
+  retry (réseau, client) duplique des effets métier (paiement, création).
+fix: >-
+  Pagination par curseur (recommandée pour les données volatiles) ou page/limit
+  avec métadonnées (`next`, `total`). Pour les écritures : `Idempotency-Key`
+  (ou POST avec identifiant client) et stocker la réponse associée pour les
+  retries. Toujours documenter les limites et les défauts.
+when_ok: >-
+  Une collection interne bornée par construction (< quelques centaines) peut
+  rester non paginée ; la pagination et l'idempotence sont obligatoires dès
+  qu'un client externe ou des écritures sensibles existent.
+relationships:
+  references:
+    - https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
+    - https://github.com/microsoft/api-guidelines
+    - https://www.infoq.com/articles/rest-anti-patterns
+  uses: []
+  validated_by: []

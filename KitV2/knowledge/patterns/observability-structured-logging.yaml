@@ -1,0 +1,41 @@
+id: pattern:observability:structured-logging
+title: Logging structuré — slog comme interface standard
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [observability, logging, slog, structured]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les logs texte libres (fmt.Printf) ne sont ni filtrables, ni corrélables, ni
+  interrogeables en masse — et le bruit détruit la valeur (voir
+  pattern:antipattern:obs-excessive-logging).
+context: >-
+  S'applique à tout programme qui journalise des événements exploitables
+  (opérations, erreurs, démarrages), en particulier ceux déployés.
+solution: >-
+  `log/slog` (Go 1.21+) : clés/valeurs typées (`slog.Info("started", "port",
+  p)`), niveaux (debug/info/warn/error), handlers remplaçables (text, JSON,
+  ou charm log coloré — catalog log). La règle du kit : Error = échec,
+  contexte explicite par appel, jamais de concaténation de messages.
+benefits: >-
+  Logs interrogeables (JSON → outil de collecte), ajout de contexte sans
+  formattage fragile, interface standard évitant le lock-in d'un logger
+  tiers.
+costs: >-
+  Une ligne slog coûte une allocation par clé (négligeable hors chemins
+  ultra-chauds) ; les messages doivent rester concis — l'agrégation et le
+  volume se gèrent par niveau, pas par plus de texte.
+related: >-
+  Règles du kit : `rules/registry/logging`. Catalog : log
+  (knowledge/catalogs/libraries/log). Homologue négatif :
+  pattern:antipattern:obs-excessive-logging.
+relationships:
+  references:
+    - https://go.dev/blog/slog
+    - https://pkg.go.dev/log/slog
+    - pattern:antipattern:obs-excessive-logging
+  uses: []
+  validated_by: []

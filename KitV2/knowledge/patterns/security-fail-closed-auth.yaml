@@ -1,0 +1,39 @@
+id: pattern:security:fail-closed-auth
+title: Échec fermé — refuser par défaut
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, authorization, fail-closed]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les contrôles d'accès dont le défaut autorise (ou qui échouent ouvert en
+  cas d'erreur) transforment une panne en brèche (voir
+  pattern:antipattern:sec-fail-open).
+context: >-
+  S'applique à toute décision d'authentification/autorisation : middleware,
+  API, accès aux ressources.
+solution: >-
+  Refuser par défaut, autoriser explicitement : `return 403` sur tout chemin
+  non validé, la vérification d'autorisation n'est jamais conditionnelle à un
+  flag, et toute erreur de vérification (IdP indisponible, token illisible,
+  timeout) est traitée comme un refus avec log. Tester explicitement les
+  chemins d'erreur du contrôle.
+benefits: >-
+  La défaillance d'un composant de sécurité dégrade vers le refus (dispo
+  réduite) jamais vers l'accès (brèche) — la seule orientation acceptable
+  pour les contrôles.
+costs: >-
+  Un IdP en panne bloque les accès (choix de disponibilité) ; le « mode
+  dégradé ouvert » exige une décision produit documentée et un risque
+  accepté, jamais un défaut.
+related: >-
+  Homologue négatif : pattern:antipattern:sec-fail-open.
+relationships:
+  references:
+    - https://owasp.org/Top10/2025/A10_2025-Mishandling_of_Exceptional_Conditions/
+    - pattern:antipattern:sec-fail-open
+  uses: []
+  validated_by: []

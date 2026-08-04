@@ -1,0 +1,36 @@
+id: pattern:antipattern:db-function-on-column
+title: Fonction appliquée à une colonne indexée dans le WHERE
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, performance, index]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `WHERE date(created_at) = '2026-08-04'`, `WHERE lower(email) = 'x@y.z'`,
+  `WHERE YEAR(birth) = 1990` — la fonction empêche l'usage de l'index sur la
+  colonne.
+detect: >-
+  - Requêtes lentes avec plan d'exécution montrant un SEQ SCAN / FULL TABLE SCAN
+    sur une colonne indexée.
+  - `EXPLAIN` : l'index n'apparaît pas alors que la colonne est indexée.
+problem: >-
+  Une fonction sur la colonne rend l'index inutilisable : le SGBD parcourt
+  toutes les lignes et calcule la fonction sur chacune. Le coût passe de
+  logarithmique à linéaire dès que la table grossit — c'est la cause n°1 de
+  requêtes qui « ralentissent d'un coup ».
+fix: >-
+  Exprimer la condition sur la colonne nue : `created_at >= ? AND created_at < ?
+  ` (intervalle), `email = ?` avec normalisation à l'écriture (stockage en
+  lowercase), index sur l'expression si le SGBD le supporte
+  (`CREATE INDEX ON t (lower(email))`). Garder la fonction hors de la colonne.
+when_ok: >-
+  Sur de très petites tables (< quelques milliers de lignes) l'impact est nul ;
+  la règle devient critique à l'échelle — la concevoir dès l'écriture.
+relationships:
+  references:
+    - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/
+  uses: []
+  validated_by: []

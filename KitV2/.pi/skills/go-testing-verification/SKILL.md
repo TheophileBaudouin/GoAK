@@ -1,5 +1,8 @@
 ---
 name: go-testing-verification
+category: workflow
+tags: [testing, verification, scenario, behavior, evidence]
+last-verified: 2026-08-04
 description: Design focused Go tests and verify a finished change through mechanical checks and a real user-observable scenario. Use after planning or implementation when behavior, concurrency, persistence, APIs, CLIs, or release readiness must be evidenced; do not treat a green unit test as proof of user intent.
 ---
 

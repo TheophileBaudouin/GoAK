@@ -1,0 +1,42 @@
+id: pattern:antipattern:arch-nano-services
+title: Nano-services — décomposition trop fine
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, microservices, deployment, overhead]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Des services minuscules (un handler, une table) déployés séparément :
+  « chaque endpoint est un microservice », des dizaines de dépôts pour une
+  petite équipe.
+detect: >-
+  - Services avec une seule responsabilité atomique mais des dépendances
+    partagées à d'autres services (appels inter-services constants).
+  - Coût d'opération (déploiement, observabilité, CI) supérieur au coût du
+    code de chaque service.
+  - Presque toutes les requêtes traversent plusieurs services (voir
+    arch-distributed-monolith).
+problem: >-
+  La décomposition fine multiplie les points de défaillance, la latence
+  inter-service et le coût d'exploitation sans apporter de frontière métier :
+  la maintenabilité globale se dégrade alors que chaque unité est « propre ».
+  C'est la sur-correction inverse du monolithe.
+fix: >-
+  Décomposer par frontière métier cohérente (agrégats, cycles de vie
+  indépendants) plutôt que par fonction technique. Regrouper les opérations
+  qui partagent données et invariants dans un même service. Mesurer : un
+  service se justifie s'il a un cycle de vie, une équipe ou une échelle
+  propres.
+when_ok: >-
+  Une taille réduite est acceptable si les frontières sont réelles et les
+  données non partagées ; le signal d'erreur est la conversation
+  inter-services permanente, pas la taille en lignes.
+relationships:
+  references:
+    - https://dzone.com/articles/antipatterns-of-microservices
+    - https://algomaster.io/learn/microservices/anti-patterns-reference
+  uses: []
+  validated_by: []

@@ -1,0 +1,43 @@
+id: pattern:antipattern:sec-no-threat-modeling
+title: Aucun modèle de menaces — conception « sûre » par intuition
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, threat-modeling, design, owasp]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  L'architecture est validée sur des fonctionnalités sans examiner les
+  menaces : pas de limites de confiance identifiées, pas d'hypothèses
+  d'attaquant, sécurité ajoutée en fin de développement « quand on aura le
+  temps ».
+detect: >-
+  - Aucune mention des limites de confiance (entrées non fiables, frontières
+    entre processus) dans la conception.
+  - Contrôles de sécurité post-hoc (auth ajoutée après le modèle de données,
+    validation d'entrée après les handlers).
+  - OWASP A06 2025 « Insecure Design » : le problème est la conception, pas
+    l'implémentation — les scanners ne le détectent pas.
+problem: >-
+  Les failles de conception (autorisation par défaut, objets exposés,
+  traitement de fichiers non fiable) ne sont pas des bugs de code : elles
+  sont indétectables par les scanners et coûtent une réécriture quand elles
+  sont découvertes. Sans modèle de menaces, la sécurité repose sur l'intuition
+  et l'oubli.
+fix: >-
+  Faire un modèle de menaces léger dès la conception : identifier les
+  acteurs, les limites de confiance, les données sensibles et les chemins
+  d'attaque réalistes (STRIDE simplifié), puis traduire chaque menace en
+  exigence de contrôle (validation d'entrée, authz, rate limiting). Réviser
+  le modèle à chaque changement d'architecture.
+when_ok: >-
+  Le niveau de rigueur suit l'exposition : un service interne avec données
+  non sensibles peut avoir un modèle minimal ; tout système exposé ou traitant
+  des données à risque exige un modèle documenté.
+relationships:
+  references:
+    - https://owasp.org/Top10/2025/A06_2025-Insecure_Design/
+  uses: []
+  validated_by: []

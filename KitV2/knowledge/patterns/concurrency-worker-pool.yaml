@@ -1,0 +1,40 @@
+id: pattern:concurrency:worker-pool
+title: Worker pool — fan-out borné avec errgroup.SetLimit
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, worker, errgroup, backpressure]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Lancer une goroutine par tâche sans limite épuise la mémoire et les
+  connexions sous charge (voir pattern:antipattern:go-goroutine-leak).
+context: >-
+  S'applique quand un lot de tâches indépendantes (items à traiter, requêtes
+  à émettre) doit être exécuté avec une concurrence plafonnée.
+solution: >-
+  `errgroup.Group` avec `SetLimit(n)` : la limite borne les goroutines
+  actives, `Wait()` propage la première erreur, `WithContext` annule les
+  autres tâches. Remplacer un canal de workers manuel quand la seule
+  mécanique est le fan-out borné.
+benefits: >-
+  Backpressure par construction, erreur propagée et première-erreur
+  respectée, annulation coordonnée, code court et testable
+  (voir recipe-worker-pool).
+costs: >-
+  Pas de file d'attente intégrée (les tâches excédentaires attendent dans le
+  groupe) ; pour une file persistante ou un débit priorisé, un canal bufferisé
+  ou un worker dédié reste nécessaire.
+related: >-
+  Règles du kit : `rules/core/concurrency` (bounded fan-out). Recette :
+  recipe-worker-pool. Homologue négatif :
+  pattern:antipattern:go-goroutine-leak.
+relationships:
+  references:
+    - https://pkg.go.dev/golang.org/x/sync/errgroup
+    - https://go.dev/blog/pipelines
+    - pattern:antipattern:go-goroutine-leak
+  uses: []
+  validated_by: []

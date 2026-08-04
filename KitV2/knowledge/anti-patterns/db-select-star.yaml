@@ -1,0 +1,35 @@
+id: pattern:antipattern:db-select-star
+title: SELECT * en production — colonnes non nommées
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, performance, schema]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  `SELECT * FROM users` dans le code applicatif, ou un `rows.Scan` qui dépend de
+  l'ordre et du nombre de colonnes de la table.
+detect: >-
+  - Occurrences de `SELECT *` hors requêtes d'exploration (grep SQL).
+  - `rows.Columns()` utilisé pour adapter dynamiquement le scan.
+problem: >-
+  `SELECT *` transfère toutes les colonnes (y compris blob, json volumineux,
+  colonnes ajoutées plus tard), empêche l'optimiseur d'utiliser des index
+  couvrants, et casse `Scan` dès qu'une colonne est ajoutée/supprimée — le
+  contrat devient implicite et fragile.
+fix: >-
+  Lister explicitement les colonnes nécessaires (`SELECT id, name, …`) et
+  mapper vers des champs nommés. Pour les gros objets, projeter les colonnes
+  lourdes seulement si besoin. Ré-évaluer la liste à chaque changement de
+  schéma (générer les requêtes depuis des types ou des modèles).
+when_ok: >-
+  `SELECT *` se justifie dans l'exploration interactive (psql), les
+  démonstrations, ou les vues avec colonnes réellement toutes consommées et
+  contrôlées ; pas dans le code de production.
+relationships:
+  references:
+    - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/
+  uses: []
+  validated_by: []

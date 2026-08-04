@@ -1,0 +1,39 @@
+id: pattern:antipattern:rest-tunneling
+title: Tunnel RPC — tout par GET ou POST
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [http, rest, api, design]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Toutes les opérations passent par `GET /api/action?op=delete` ou
+  `POST /api/do` avec une enveloppe JSON « action » ; les verbes HTTP et les
+  codes de statut ne portent aucune information.
+detect: >-
+  - Endpoints génériques (`/api`, `/execute`) avec des noms d'action en
+    paramètre ou en corps.
+  - Réponses toujours 200 avec un champ `success`/`error` dans le corps.
+  - Opérations non-idempotentes exposées en GET (casse la mise en cache, les
+    clients, les robots).
+problem: >-
+  Réinventer RPC au-dessus d'HTTP perd les garanties du protocole : cache,
+  idempotence, statuts standard, découverte. Les clients ne peuvent rien
+  déduire, l'API est opaque, et les GET destructeurs provoquent des accidents.
+fix: >-
+  Exposer des ressources avec les verbes HTTP : GET (lecture, idempotent),
+  POST (création/action non idempotente), PUT (remplacement), PATCH (mise à
+  jour partielle), DELETE ; utiliser les codes de statut et les en-têtes
+  standards. Voir recipe-rest-chi pour une base conforme.
+when_ok: >-
+  Les « action endpoints » REST (POST /orders/{id}/cancel) sont légitimes
+  quand l'action n'est pas une simple CRUD sur ressource ; le tunnel est
+  l'abus, pas l'action endpoint.
+relationships:
+  references:
+    - https://www.infoq.com/articles/rest-anti-patterns
+    - https://www.innoq.com/blog/st/2008/07/rest-anti-patterns/
+  uses: []
+  validated_by: []

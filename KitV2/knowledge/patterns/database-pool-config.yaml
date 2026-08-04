@@ -1,0 +1,38 @@
+id: pattern:database:pool-config
+title: Pool de connexions explicite et mesuré
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql, pool, connection]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Les défauts du pool (connexions illimitées, jamais recyclées, fuites)
+  épuisent le SGBD ou figent l'application sous charge (voir
+  pattern:antipattern:db-pool-misconfig).
+context: >-
+  S'applique à toute application qui ouvre un `*sql.DB` : serveur, worker,
+  CLI de traitement.
+solution: >-
+  Configurer explicitement après `sql.Open` : `SetMaxOpenConns` (borné selon
+  le SGBD et l'app), `SetMaxIdleConns` (≤ MaxOpen), `SetConnMaxIdleTime` et
+  `SetConnMaxLifetime` (recyclage). Surveiller avec `db.Stats()` (InUse,
+  Idle, WaitCount) sous charge de test et ajuster par mesure.
+benefits: >-
+  Charge prévisible sur le SGBD, connexions recyclées (pas de zombie après
+  failover/firewall), et détection des fuites via les stats.
+costs: >-
+  Un MaxOpen trop bas crée des files d'attente (WaitCount qui monte) ; les
+  valeurs justes dépendent du SGBD et du profil d'accès — la règle est
+  d'en fixer et mesurer, pas une valeur universelle.
+related: >-
+  Recette : recipe-sqlite-sqlc. Homologue négatif :
+  pattern:antipattern:db-pool-misconfig.
+relationships:
+  references:
+    - https://pkg.go.dev/database/sql
+    - pattern:antipattern:db-pool-misconfig
+  uses: []
+  validated_by: []

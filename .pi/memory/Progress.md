@@ -131,7 +131,11 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed (this session)
 
-- [ ] Terminer l'audit d'intégration des 6 ressources Niveau B (GORM, Fiber, Kafka, RabbitMQ, Resty, Cookiecutter) + audit global du registre : 21 entrées Source conditionnelles ajoutées (6 Niveau B + 15 entrées non classées du corps), matrice de couverture 59/59, gate complète PASS, evidence docs/evidence/2026-08-03/b-resource-integration-audit.md, registre non modifié.
+- [x] Terminer l'audit d'intégration des 6 ressources Niveau B (GORM, Fiber, Kafka, RabbitMQ, Resty, Cookiecutter) + audit global du registre : 21 entrées Source conditionnelles ajoutées (6 Niveau B + 15 entrées non classées du corps), matrice de couverture 59/59, gate complète PASS, evidence docs/evidence/2026-08-03/b-resource-integration-audit.md, registre non modifié.
+- [x] Corriger les skill conflicts Pi du benchmark : suppression des 5 placeholders .md vides de rules/ (architecture, go-style, performance, security, testing), check validateur « aucun .md vide » dans validate-kitv2.py (test négatif vérifié), ruff I001 sur le validateur, gate PASS, push main 0399cdd, tag v2.1.0 déplacé sur le commit corrigé, tarball v2.1.0 vérifié sans .md vide.
+- [x] Ajouter l'écosystème Charm au registre des sources : 12 libs Go retenues (bubbletea, bubbles, lipgloss, glamour, huh, log, wish, ssh, harmonica, sequin, colorprofile, keygen), section #21 + Niveau A/B, apps humaines et libs pré-1.0/expérimentales exclues (crush, gum, glow, vhs, fantasy, catwalk, ultraviolet, x…), modules vérifiés via go.mod (vanity charm.land), evidence docs/evidence/2026-08-04/charm-ecosystem-registry/evidence.md.
+- [x] Audit de gouvernance complet du Kit (phase 1) : rapport docs/research/2026-08-04-kit-audit-governance.md — audit des 12 zones + racine, 17 sources externes vérifiées (agentskills spec, Anthropic skill best-practices, Google Agent Skills governance, Red Hat ACE pitfalls, obra/superpowers, write-gate kkrlstrm, SemVer skills), vision globale, architecture cible, plan de 14 contrats MetaProjet (C0-C2, Z1-Z10, A1, N1) et 10 décisions requises. Aucun fichier d'instruction final créé (phase 2).
+- [x] Phase 2 gouvernance exécutée : 15 contrats MetaProjet créés (.agent/kit-governance/ : C0, C1, C2, Z1-Z10, A1, N1 + README index), nettoyages approuvés exécutés (suppression embeddings/, tools/analyzers/, templates/api-service/ ; renommage rules/core/rules/universal → rules/core/universal ; README knowledge/debugging/ ; squelettes templates marqués legacy), politique templates MIT documentée (jamais agent-écrit), frontmatter des 5 skills .pi/skills/ complété (category: workflow), gate complète PASS (validateur 45 skills, gofmt, vet, go test -race, lint 0, gosec 0, govulncheck, probes 5/5), revue fresh-context REQUEST-CHANGES → 2 blocages corrigés (fermetures Markdown 7 contrats, évidence+mémoire) + nits intégrés, evidence docs/evidence/2026-08-04/kit-governance-phase2/, plan docs/plans/2026-08-04-kit-governance-phase2.md.
 
 ## KitV2 knowledge catalogs
 
@@ -145,6 +149,9 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `req` — imroc/req (**extract-only**: global-state API)
 - [x] Enrichir le registre des sources critiques avec les références officielles Go, modules/toolchains, tests, sécurité et outils de validation; revue indépendante PARTIAL et VCS BLOCKED.
 - [x] Terminer l’audit séquentiel des 34 ressources Niveau S/A du registre; toutes vérifiées, intégrations dédiées ajoutées, validation KitV2/tests/format/probes PASS; VCS evidence BLOCKED.
+- [x] Promouvoir l'écosystème Charm en knowledge catalogs : 12 SKILL.md sous knowledge/catalogs/libraries/ (bubbletea, bubbles, lipgloss Niveau A ; glamour, huh, log, wish, ssh, harmonica, sequin, colorprofile, keygen Niveau B), EXPECTED_PRODUCT_SKILLS 33→45, gate complète PASS (validators, gofmt, vet, lint, tests, gosec, 4 probes), evidence docs/evidence/2026-08-04/charm-ecosystem-registry/evidence.md.
+- [x] Remplir knowledge/anti-patterns/ : 47 anti-patterns YAML (go 14, database 6, http 4, architecture 6, testing 4, security 4, observability 2, cli 1, messaging 3, config-cache 3) avec contrat de graphe + symptom/detect/problem/fix/when_ok + sources primaires vérifiées, rapport docs/research/2026-08-04-anti-patterns-research.md, plan docs/plans/2026-08-04-anti-patterns.md, gate complète PASS, revue fraîche-contexte APPROVE-WITH-NITS intégrée, evidence docs/evidence/2026-08-04/anti-patterns/evidence.md.
+- [x] Remplir knowledge/patterns/ : 38 patterns positifs YAML (go 8, concurrency 3, resilience 3, http/api 4, database 4, architecture 2, testing 4, observability 2, cli 1, messaging 3, config-cache 2, security 2) avec schéma positif problem/context/solution/benefits/costs/related, ids pattern:<domaine>:<slug> (séparés de pattern:antipattern:*), homologues anti-patterns référencés, 50 URLs vérifiées 200, rapport docs/research/2026-08-04-patterns-research.md, plan docs/plans/2026-08-04-patterns.md, gate complète PASS, revue fraîche-contexte intégrée (2 URL mortes corrigées), evidence docs/evidence/2026-08-04/patterns/evidence.md.
 
 ## Meta-project / KitV2 separation
 
@@ -152,19 +159,12 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] Root `.pi/memory/` is the only authoritative metaproject memory.
 - [x] `KitV2/.pi/` ships reusable settings, prompts, and Pi-native skills; no
       pre-populated consumer memory is committed.
-- [x] `KitV2/.pi/prompts/workflow-memory.md` instructs fresh consumer projects
-- [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted
-      to initialize local memory without copying metaproject history.
+- [x] `KitV2/.pi/prompts/workflow-memory.md` instructs fresh consumer projects to initialize local memory without copying metaproject history.
+- [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted.
 
 ## Infrastructure
 
 - [x] KitV2 product tree, module `go-agent-kit-v2`, and native `.pi/` resources.
 - [x] Validation toolchain installed: gofmt, go vet, golangci-lint v2, gosec, govulncheck.
 - [x] Metaproject memory: root `.pi/memory/` Brief / Progress / Gotchas / Agent / Decisions.
-- [x] Root CI and Dependabot point to KitV2; root and product ignore rules are present.
-- [x] External former-product archive and restore drill passed before deletion.
 - [x] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
-emory/` Brief / Progress / Gotchas / Agent / Decisions.
-- [x] Root CI and Dependabot point to KitV2; root and product ignore rules are present.
-- [x] External former-product archive and restore drill passed before deletion.
-- [ ] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.

@@ -1,0 +1,40 @@
+id: pattern:antipattern:go-mutable-global-state
+title: État mutable au niveau package (variables globales)
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, design, global-state, testing, race]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Variables de package mutables (`var db *sql.DB`, `var config map[string]any`)
+  initialisées dans `init()` ou au premier usage, lues/écrites depuis plusieurs
+  packages.
+detect: >-
+  - `var` de package non constante hors des types et sentinelles.
+  - Accès à une variable de package depuis plusieurs goroutines sans
+    synchronisation (race).
+  - Tests qui interfèrent entre eux (état partagé non remis à zéro).
+problem: >-
+  Les globals mutables créent des dépendances cachées : les packages s'appellent
+  implicitement, l'ordre d'initialisation (`init`) est opaque, les tests ne sont
+  plus isolés (non-déterminisme), et la concurrence introduit des courses. C'est
+  le vecteur classique des bugs « ça marche en dev, pas en prod ».
+fix: >-
+  Dépendance injectée : construire les dépendances (db, logger, config) dans
+  `main` ou une fonction `New(...)` et les passer explicitement. Pour les
+  valeurs de configuration, un type `Config` construit une fois et passé en
+  paramètre. Garder les globals uniquement pour les valeurs immuables et les
+  sentinelles.
+when_ok: >-
+  Les singletons process-wide réellement partagés (pool de connexion) peuvent
+  vivre en variable de package s'ils sont construits explicitement et non
+  réassignés après démarrage — l'injection reste préférable pour la testabilité.
+relationships:
+  references:
+    - https://dave.cheney.net/paste/going-without.pdf
+    - https://100go.co/
+  uses: []
+  validated_by: []

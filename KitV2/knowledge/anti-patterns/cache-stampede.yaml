@@ -1,0 +1,40 @@
+id: pattern:antipattern:cache-stampede
+title: Cache stampede — effondrement d'accès simultanés
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [caching, performance, availability, redis]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Quand une entrée populaire expire, toutes les requêtes simultanées ratent
+  le cache et frappent la source (base, API) en même temps : pic de charge,
+  latence, éventuellement panne de la source.
+detect: >-
+  - TTL synchronisés (toutes les entrées expirent à la même heure) ou entrées
+    populaires avec TTL uniforme.
+  - Pic de requêtes vers la source au moment de l'expiration (métriques).
+  - Échec en cascade : le cache vide (expiration globale) → source saturée →
+    cache toujours vide.
+problem: >-
+  Le stampede (dog-piling) transforme une expiration banale en outage : la
+  source reçoit n fois la charge normale au pire moment. Sans protection,
+  l'effondrement se reproduit à chaque cycle d'expiration.
+fix: >-
+  Jitter sur les TTL (expirations désynchronisées), verrouillage par clé
+  (single-flight : une seule requête recalcule, les autres attendent),
+  stale-while-revalidate (servir la valeur périmée pendant le recalcul), ou
+  préchargement planifié des entrées chaudes. En Go : `singleflight.Group`
+  ou un mutex par clé.
+when_ok: >-
+  Un cache à faible concurrence par clé (peu de lecteurs simultanés) peut
+  vivre sans protection ; le stampede devient critique dès que la charge par
+  clé est élevée.
+relationships:
+  references:
+    - https://en.wikipedia.org/wiki/Cache_stampede
+    - https://redis.io/blog/cache-consistency-strategies/
+  uses: []
+  validated_by: []
