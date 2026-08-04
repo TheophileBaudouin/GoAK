@@ -22,13 +22,22 @@ d'un squelette maison. La qualité vient de la communauté, pas de l'agent.
 3. **Source réelle, fiable** : projet maintenu (commits/releases récents), testé,
    CI, communauté active, **une responsabilité unique**, conforme aux règles du
    Kit (idiomatique, stdlib-first, pas de framework imposé).
-4. **Fonctionnel obligatoire** : compile et passe ses tests dans le Kit. Un
+4. **Ultra-spécifique et minimal** (critère de sélection élevé) : le projet
+   implémente **presque exclusivement** la technologie du template — une seule
+   stack, un seul domaine, aucune technologie annexe hors périmètre (auth,
+   observabilité, K8s, ORM, CI lourde…). Le codebase est **petit et parcourable
+   de bout en bout** : pas de méga-dépôt, pas d'arbre vendored/généré, pas de
+   dépendances lourdes. La structure est **claire, bien organisée et
+   modulaire** : chaque composant est isolé et remplaçable, de sorte que
+   l'intégration dans un projet quelconque se fait par copie de modules bien
+   délimités, et la modification reste simple.
+5. **Fonctionnel obligatoire** : compile et passe ses tests dans le Kit. Un
    template non fonctionnel est interdit, quelle que soit la source.
-5. **Réutilisable directement** : très peu de modifications pour l'adopter ;
+6. **Réutilisable directement** : très peu de modifications pour l'adopter ;
    les modifications nécessaires sont simples et documentées.
-6. **Adaptations minimales documentées** : chaque écart par rapport à la source
+7. **Adaptations minimales documentées** : chaque écart par rapport à la source
    est listé dans `ATTRIBUTION.md` avec sa raison.
-7. **Moins de templates, très qualitatifs** : il n'y a pas d'objectif de
+8. **Moins de templates, très qualitatifs** : il n'y a pas d'objectif de
    quantité ; une shape sans template sourcé MIT reste une roadmap.
 
 ## 3. Structure d'un template
@@ -60,7 +69,9 @@ conformes à la politique.
 ## 5. Maintenance
 
 - **Admission** : projet identifié (source + version) → licence MIT vérifiée →
-  copie + LICENSE + ATTRIBUTION.md → adaptations minimales → compile + tests +
+  **périmètre technique vérifié** (une seule technologie, pas de technologie
+  annexe, taille parcourable — preuve écrite dans `ATTRIBUTION.md`) → copie +
+  LICENSE + ATTRIBUTION.md → adaptations minimales → compile + tests +
   scénario observable exécuté (`PASS`/`PARTIAL`/`BLOCKED`) → statut `sourced` →
   mise à jour de `TEMPLATES.md` et du validateur.
 - **Mise à jour (suivi communautaire)** : bump de version épinglée, diff des
@@ -80,6 +91,8 @@ conformes à la politique.
 
 - Template écrit par l'agent (le cas des scaffolds legacy — acceptés
   transitoirement, plus jamais admis).
+- **Template fourre-tout** : une stack large (router + ORM + auth + K8s + CI…)
+  au lieu d'une seule technologie — rejeté quel que soit le projet source.
 - Licence non-MIT ; projet non maintenu ; template non fonctionnel.
 - Clone sans attribution ni version épinglée ; adaptations non documentées.
 - Template « starter » qui impose une architecture (leçon ardanlabs :
@@ -89,7 +102,12 @@ conformes à la politique.
 ## 8. Critères de validation (C2)
 
 - [ ] Tout template non-legacy : `LICENSE` (MIT) + `ATTRIBUTION.md` (source,
-      version, adaptations) + `README.md` + `template.yaml` présents.
+      version, adaptations, **périmètre technique**) + `README.md` +
+      `template.yaml` présents.
+- [ ] `ATTRIBUTION.md` atteste une seule technologie et l'absence de technologie
+      annexe (contrôle de revue ; C2 vérifie la présence de la section).
+- [ ] Borne de taille respectée (nb de fichiers source et de lignes bornés, pas
+      d'arbre vendored/généré lourd) — C2.
 - [ ] Compile + tests + scénario observable tracé.
 - [ ] `TEMPLATES.md` cohérent avec l'arborescence (statuts à jour).
 - [ ] Aucun nouveau scaffold (statut legacy figé au 2026-08-04).

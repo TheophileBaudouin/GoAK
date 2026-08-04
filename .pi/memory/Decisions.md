@@ -224,6 +224,15 @@ de compacité core (≤ 6 modules, ≤ 300 lignes), nouvelles shapes de template
    améliorés par la communauté au fil du temps. Les squelettes agent-générés
    existants dans `templates/` sont marqués `legacy` et candidats au
    remplacement par des templates sourcés MIT.
+   **Précision 2026-08-04 (complément propriétaire)** : le critère de
+   sélection est élevé — le projet source doit être **ultra-spécifique et
+   minimal** : presque exclusivement la/les technologie(s) du template, une
+   seule stack, aucune technologie annexe hors périmètre, codebase petit et
+   parcourable de bout en bout, structure claire, bien organisée et
+   **modulaire** (composants isolés et remplaçables, intégration dans un
+   projet quelconque par copie de modules bien délimités, modification
+   simple). Le périmètre technique est attesté dans `ATTRIBUTION.md` et
+   contrôlé (C2 + revue) — voir contrat Z5.
 4. **Extension de schéma `category: workflow`.** Les 5 skills de
    `KitV2/.pi/skills/` portent `category: workflow` (hors jeu validé des
    modules : recipe|rule|pattern|library|reference-project|checklist). Cette
