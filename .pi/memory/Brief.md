@@ -19,11 +19,7 @@ adding unsupported volume or ambiguity.
 
 ## Repository
 
-- **Remote (origin):** <https://github.com/TheophileBaudouin/GoAK> — public repo, branch `main`, poussé (identité de commit locale corrigée : TheophileBaudouin — le commit initial 690aa35 était attribué à theocode29).
-- **Tag v2.1.0:** marqueur de la première version benchmarkable (aligné sur `manifest.yaml`), pas encore une politique de release formelle. `install.sh` (racine) est l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future.
-- **Auth:** `gh auth setup-git` (compte TheophileBaudouin). Le credential helper macOS a contenu un ancien identifiant theocode29 — toujours vérifier l'identité effective avant push.
-- **Conséquence:** `docs/evidence/` est VCS-versionné, `.github/workflows/ci.yml` peut tourner, PR-based evaluation gates deviennent possibles, et un consommateur peut installer le kit par `curl …/install.sh | sh`.
-
+- **Tag v2.2.0:** livré avec le semantic resource router (commit e38c068, 2026-08-05) — manifest v2.2.0, index 206 ressources, install.sh amélioré (ANSI minimaliste, étapes, résumé, retry). Install vérifiée de bout en bout : `curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.2.0/install.sh | sh -s -- <dir>` → validation PASS (45 skills + router 206) puis pi -a fonctionnel. `install.sh` (racine) reste l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future. CI gate rouge préexistante (coverage floor 70% vs 66% réel) — voir Gotchas.
 ## Architecture
 
 KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject. Since 2026-08-04, `.agent/kit-governance/` holds the 15 construction contracts (C0, C1, C2, Z1–Z10, A1, N1) that govern each KitV2 zone: mission, format, actionable rules, patterns, anti-patterns, validation criteria. Every rule a contract states must be verifiable by the product validator or an explicit review control. Templates policy (owner directive 2026-08-04): templates are NEVER agent-authored — each is a minimally-adapted fork of a real, reliable, functional, single-responsibility open-source project under MIT license; existing agent scaffolds are marked `legacy` and candidates for replacement.
