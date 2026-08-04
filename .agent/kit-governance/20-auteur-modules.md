@@ -14,18 +14,28 @@
 1. **Frontmatter immuable** : `name`, `description`, `category`, `tags`,
    `last-verified`. Aucun champ nouveau sans migration globale ; `name` =
    dossier parent.
-2. **Progressive disclosure** : L1 description (seule chose en contexte
+2. **Recherche fraîche** : toute écriture ou mise à jour d'un catalogue est
+   précédée d'une recherche web actuelle sur des sources primaires. Chaque
+   source utilisée est datée dans `Sources vérifiées` ; la date `last-verified`
+   est celle de la relecture complète.
+3. **Une information, un emplacement** : une fiche ne répète pas une limite,
+   une alerte ou une décision dans une autre langue ou section. Une section
+   optionnelle sans contenu nouveau est supprimée.
+4. **Exemple vérifiable** : tout bloc Go présenté comme minimal/runnable traite
+   les retours et ressources selon les rules applicables. Un extrait abrégé
+   porte la mention `illustrative` et n'est pas présenté comme compilable.
+5. **Progressive disclosure** : L1 description (seule chose en contexte
    permanent) ; L2 corps ≤ 500 lignes ; L3 détails en fichiers référencés
    (un niveau de profondeur) — jamais dans le corps.
-3. **Description = quoi + quand + contraintes négatives** : c'est le goulot de
+6. **Description = quoi + quand + contraintes négatives** : c'est le goulot de
    découvrabilité (Red Hat : « écrivez vos L1 comme des abstracts optimisés
    pour la recherche »). « Extracts text from PDFs. Use when working with PDF
    documents. Not for images. » — jamais « Helps with PDFs ».
-4. **Chemins relatifs** au module ; références croisées taggées (ids stables),
+7. **Chemins relatifs** au module ; références croisées taggées (ids stables),
    jamais de lien en prose qui pourrit.
-5. **Sources primaires** pour tout fait ; une synthèse est un point de départ,
+8. **Sources primaires** pour tout fait ; une synthèse est un point de départ,
    jamais la seule base.
-6. **Pas de sections artificielles** : une section n'existe que si elle a du
+9. **Pas de sections artificielles** : une section n'existe que si elle a du
    contenu ; aucun gabarit universel de corps.
 
 ## 2. Matrice par catégorie

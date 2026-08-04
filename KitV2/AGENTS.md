@@ -4,7 +4,7 @@ KitV2 is the standalone consumable Go agent kit.
 
 ## Source of truth
 
-- `rules/` — agent rules and principles.
+- `rules/` — agent rules and principles, including catalog freshness, single-source, and example consistency.
 - `knowledge/` — sourced product indexes and decision context; it must not duplicate rule or recipe bodies or metaproject history.
 - `recipes/` — runnable Go recipes, tests, and procedure documents.
 - `snippets/` — metadata-bearing, focused examples linked to a canonical recipe or rule.
@@ -14,7 +14,7 @@ KitV2 is the standalone consumable Go agent kit.
 - `router/` — generated read-only routing index (index.json + meta.json); the search_kit_resources tool uses it to route tasks to resources without loading the kit.
 - `.pi/` — native Pi settings, prompt templates, skills, and the search_kit_resources extension loaded after trust.
 
-If two files answer the same question, keep one canonical answer and replace the other with a pointer. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
+If two files answer the same question, keep one canonical answer and replace the other with a pointer. Catalog updates require fresh primary-source research and dated `Sources vérifiées`; fenced Go examples must handle returned errors or be marked `illustrative`. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
 
 ## Workflow
 

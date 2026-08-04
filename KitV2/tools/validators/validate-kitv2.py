@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -43,7 +45,7 @@ GRAPH_ID_RE = re.compile(
     r"^(?:rule|recipe|pattern|snippet|template|capability|evaluation|decision-record|source|memory):[^:]+:.+$"
 )
 URL_RE = re.compile(r"^https?://")
-EXPECTED_PRODUCT_SKILLS = 62
+EXPECTED_PRODUCT_SKILLS = 65
 EXPECTED_TEMPLATES = {
     "rest-api",
     "grpc",
@@ -53,6 +55,19 @@ EXPECTED_TEMPLATES = {
     "monolith",
     "cloud-service",
 }
+CATALOG_MAX_AGE_DAYS = 90
+REFERENCE_MAX_AGE_DAYS = 180
+SOURCE_HEADING_RE = re.compile(
+    r"^##+\s+Sources v[ée]rifi[ée]es\s*$", re.IGNORECASE | re.MULTILINE
+)
+GO_FENCE_RE = re.compile(r"^```(?:go|golang)\s*$", re.IGNORECASE)
+FENCE_RE = re.compile(r"^```\s*$")
+BLANK_RETURN_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]*\s*,\s*_\s*:=")
+UNCHECKED_CALL_RE = re.compile(
+    r"(?:\.Close|\.Run|\.Write|\.Copy|\.Encode|\.Decode|\.ListenAndServe|"
+    r"\.Query|\.Open|\.Convert|\.LoadFromData|\.GenericContainer|"
+    r"\.MappedPort)\([^)]*\)"
+)
 
 
 def parse_frontmatter(path: Path) -> dict[str, str]:
@@ -100,6 +115,90 @@ def check_skill(path: Path) -> list[str]:
     if len(path.read_text(encoding="utf-8").splitlines()) > 500:
         errors.append(f"{path}: exceeds 500 lines")
     return errors
+
+
+def check_catalog_freshness(path: Path) -> list[str]:
+    """Require dated source evidence for catalog modules.
+
+    Catalog prose still needs human source review; this check only enforces the
+    deterministic part of the contract: a source section and a bounded date.
+    """
+    errors: list[str] = []
+    text = path.read_text(encoding="utf-8")
+    values = parse_frontmatter(path)
+    source_heading = SOURCE_HEADING_RE.search(text)
+    if source_heading is None:
+        return [f"{path}: missing 'Sources vérifiées' section"]
+    source_text = text[source_heading.end():]
+    if not re.search(r"https?://", source_text):
+        errors.append(f"{path}: Sources vérifiées must contain a URL")
+    if not re.search(r"20\d{2}-\d{2}-\d{2}", source_text):
+        errors.append(f"{path}: Sources vérifiées must contain a verification date")
+    try:
+        verified = date.fromisoformat(values.get("last-verified", ""))
+    except ValueError:
+        return errors
+    age = (date.today() - verified).days
+    limit = (
+        REFERENCE_MAX_AGE_DAYS
+        if "reference-projects" in path.parts
+        else CATALOG_MAX_AGE_DAYS
+    )
+    if age > limit:
+        errors.append(
+            f"{path}: catalog evidence is {age} days old (limit {limit})"
+        )
+    return errors
+
+
+def check_markdown_examples(path: Path) -> list[str]:
+    """Tripwire for unchecked returns in fenced Go examples.
+
+    This deliberately reports suspicious snippets rather than pretending a
+    Markdown block is a complete Go package. Canonical behavior belongs in the
+    compiled recipe/snippet tests.
+    """
+    errors: list[str] = []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    in_go = False
+    for number, line in enumerate(lines, start=1):
+        if GO_FENCE_RE.match(line):
+            in_go = True
+            continue
+        if in_go and FENCE_RE.match(line):
+            in_go = False
+            continue
+        if not in_go or "illustrative" in line.lower():
+            continue
+        if BLANK_RETURN_RE.search(line):
+            errors.append(
+                f"{path}:{number}: fenced Go example ignores a return value"
+            )
+        if UNCHECKED_CALL_RE.search(line) and not re.search(
+            r"(?:if\s+[^\n]*\berr\b|\berr\s*:=|\breturn\s+[^\n]*\berr\b|"
+            r"\blog\.Fatal)",
+            line,
+        ):
+            errors.append(
+                f"{path}:{number}: fenced Go call may return an unchecked error"
+            )
+    return errors
+
+
+def check_internal_duplicates(path: Path) -> list[str]:
+    """Catch exact duplicate paragraphs while leaving semantic review to humans."""
+    paragraphs = [
+        " ".join(block.split())
+        for block in re.split(r"\n\s*\n", path.read_text(encoding="utf-8"))
+        if len(block.split()) >= 12
+    ]
+    duplicates = sorted(
+        {paragraph for paragraph in paragraphs if paragraphs.count(paragraph) > 1}
+    )
+    return [
+        f"{path}: exact duplicate paragraph detected: {paragraph[:100]}…"
+        for paragraph in duplicates
+    ]
 
 
 def check_snippet(path: Path) -> list[str]:
@@ -355,8 +454,15 @@ def main() -> int:
         + list((ROOT / "recipes").rglob("SKILL.md"))
         + list((ROOT / "knowledge" / "catalogs").rglob("SKILL.md"))
     )
+    strict_catalog = os.environ.get("KITV2_STRICT_CATALOG") == "1"
     for path in skills:
         errors.extend(check_skill(path))
+        if strict_catalog and path.is_relative_to(ROOT / "knowledge" / "catalogs"):
+            errors.extend(check_catalog_freshness(path))
+            errors.extend(check_markdown_examples(path))
+            errors.extend(check_internal_duplicates(path))
+        if strict_catalog and path.is_relative_to(ROOT / "recipes"):
+            errors.extend(check_markdown_examples(path))
     if len(skills) != EXPECTED_PRODUCT_SKILLS:
         errors.append(
             f"skills: expected {EXPECTED_PRODUCT_SKILLS}, found {len(skills)}"

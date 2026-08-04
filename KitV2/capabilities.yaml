@@ -28,8 +28,8 @@ capabilities:
     source: router/
     status: generated-read-only-index-and-native-pi-tool
 coverage:
-  product_skills: 62
-  rules: 10
+  product_skills: 65
+  rules: 13
   recipes: 10
   knowledge_catalogs: 42
   probes: 5

@@ -5,13 +5,13 @@
   "pattern": 39,
   "prompt": 8,
   "recipe": 10,
-  "rule": 10,
+  "rule": 13,
   "skill": 6,
   "snippet": 3,
   "source": 40,
   "template": 7
  },
- "index_sha256": "d55b68982d8a577a78a1a485b20a2dc171ad7c26e0bc420489e34a4dfc912b4c",
+ "index_sha256": "7af2b6c6a23a1d7c467870ab2e2ac7e537c3cae7b11fb251741c073522f0d84f",
  "schema": 1,
  "stopwords": [
   "a",

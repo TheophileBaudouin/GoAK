@@ -50,6 +50,20 @@ règle/recette (charte §4) ni la mémoire du metaprojet.
 5. Un domaine vide n'existe pas : soit ≥ 1 artefact actif, soit un README
    contrat + roadmap (`debugging/` — voir §7).
 6. `knowledge/` n'héberge ni historique metaprojet ni évidence brute.
+7. **Freshness catalogue** : toute création ou mise à jour d'un module de
+   catalogue exige une recherche web fraîche sur des sources primaires au
+   moment de l'écriture. Les bibliothèques sont revalidées sous 90 jours ; les
+   projets de référence sous 180 jours. Le fichier porte une section
+   `Sources vérifiées` avec URLs et dates réelles ; un URL vivant ne prouve pas
+   à lui seul la validité de l'affirmation.
+8. **Single source interne** : une décision, limite, alerte ou règle d'usage
+   n'est écrite qu'une fois par fichier. Les sections en français sont des
+   synthèses, pas des traductions duplicatives ; une section facultative est
+   supprimée si elle n'ajoute aucune information.
+9. **Exemples cohérents** : tout bloc Go présenté comme `Minimal use`,
+   `Example` ou runnable traite ses erreurs, ressources et annulations selon
+   les rules chargées. Un bloc abrégé est marqué `illustrative` et ne prétend
+   pas compiler ni prouver un comportement.
 
 ## 5. Patterns
 
