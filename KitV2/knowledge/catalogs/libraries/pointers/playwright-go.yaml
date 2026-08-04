@@ -1,0 +1,31 @@
+---
+id: source:go:playwright-go
+title: Playwright Go — browser automation binding
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [go, browser, automation, computer-use, playwright, testing]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/mxschmitt/playwright-go
+selection: >-
+  Pointer only — consider for browser/computer-use agents when no API
+  alternative exists ("API first" rule). Do NOT admit as a recipe dependency:
+  pre-1.0 versioning (v0.6100.0 mirrors the Playwright driver) and heavy
+  browser-binary downloads.
+limits:
+  - >-
+    Pre-1.0 versioning by convention (v0.x mirrors the driver version); the
+    import path moved from playwright-community to mxschmitt (Moved
+    Permanently).
+  - >-
+    Requires browser binaries at install; high resource consumption; browser
+    automation is inherently fragile — prefer API integration first.
+  - >-
+    Extract-only posture: document when automation is justified, never as a
+    default dependency.
+relationships:
+  references:
+    - https://playwright.dev/docs/intro

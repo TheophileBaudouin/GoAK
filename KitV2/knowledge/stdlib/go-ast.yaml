@@ -1,0 +1,28 @@
+---
+id: source:go:ast
+title: Go AST — native code analysis (go/ast, go/parser, go/token)
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, ast, parsing, analysis, refactoring, codegen]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://pkg.go.dev/go/ast
+selection: >-
+  Load when analyzing, transforming, refactoring, or generating Go source
+  (symbol extraction, dependency analysis, code generation, tooling that
+  inspects packages). Zero-CGO, stdlib-only — the native alternative to
+  tree-sitter for Go-specific semantics.
+limits:
+  - >-
+    Go-only: tree-sitter (pointer) is the cross-language incremental parser;
+    gopls/LSP provide compiler-aware intelligence as external tools.
+  - >-
+    go/ast gives syntax, not types — use go/types for type information and
+    golang.org/x/tools/go/packages for complete package loading.
+relationships:
+  references:
+    - https://pkg.go.dev/go/parser
+    - https://pkg.go.dev/go/types

@@ -1,0 +1,31 @@
+---
+id: source:go:sqlite-vec
+title: sqlite-vec — vector search extension for SQLite
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [go, sqlite, vector, search, embeddings, rag]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/asg017/sqlite-vec
+selection: >-
+  Pointer only — consider for local vector similarity search (RAG) if a
+  concrete need materializes. NOT admitted: pre-1.0 (v0.1.9), docs stale,
+  Go bindings in a separate repo with CGO and WASM variants.
+limits:
+  - >-
+    Pre-1.0 (v0.1.x, "revival" release 2026-05): docs site stale, workflows
+    being repaired.
+  - >-
+    Official Go bindings live in asg017/sqlite-vec-go-bindings (separate
+    repo); CGO or WASM depending on usage — conflicts with zero-CGO
+    preference.
+  - >-
+    The kit's resource router explicitly rejected embeddings (decision
+    2026-08-05, BM25 over vectors for its corpus) — coherence check required
+    before any admission.
+relationships:
+  references:
+    - https://github.com/asg017/sqlite-vec-go-bindings

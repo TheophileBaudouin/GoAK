@@ -1,0 +1,30 @@
+---
+id: source:go:eino
+title: Eino — Go LLM application framework (CloudWeGo/ByteDance)
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [go, llm, agent, orchestration, framework, cloudwego]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/cloudwego/eino
+selection: >-
+  Pointer only — study the orchestration patterns (graphs, workflows,
+  streaming, tool calling, multi-agent) for architecture inspiration. Do NOT
+  depend on Eino for recipes: it is pre-1.0 (v0.9.13) and the kit is not a
+  framework (decision order: stdlib and small composable parts first).
+limits:
+  - >-
+    pre-1.0 (v0.9.x) — API still evolving; pinning a framework contradicts the
+    kit's "not a framework" prime directive.
+  - >-
+    Adds framework concepts; unnecessary for simple agents (per the catalog's
+    own recommendation: "use only where abstractions provide value").
+  - >-
+    Issue-mined (381): compat/breaking themes and feature requests are active;
+    architecture extraction only, no admission until ≥1.0.
+relationships:
+  references:
+    - https://www.cloudwego.io/docs/eino/

@@ -1,0 +1,32 @@
+---
+id: source:go:tree-sitter
+title: tree-sitter — official Go binding (incremental parsing)
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [go, tree-sitter, parsing, ast, code-intelligence, cgo]
+go_version: "1.23+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/tree-sitter/go-tree-sitter
+selection: >-
+  Pointer only — consider for code intelligence (incremental parsing, AST,
+  symbol extraction) in agent tooling. NOT admitted: pre-1.0 (v0.24.0) and
+  CGO required (cgo CFLAGS, mattn/go-pointer, C grammar modules).
+limits:
+  - >-
+    Pre-1.0 (v0.24.0, no GitHub "latest release"); the registry excludes
+    pre-1.0/experimental libraries (line 795 precedent).
+  - >-
+    CGO mandatory (#cgo CFLAGS, import "C", unsafe, mattn/go-pointer, C
+    grammar modules) — conflicts with the kit's zero-CGO preference.
+  - >-
+    Re-evaluate after a ≥1.0 release, or via explicit owner decision lifting
+    both exclusions. Do NOT use the abandoned smacker/go-tree-sitter.
+  - >-
+    For Go-only analysis, go/ast (stdlib) is the zero-CGO alternative;
+    gopls/LSP cover compiler-aware intelligence as external tools.
+relationships:
+  references:
+    - https://pkg.go.dev/go/ast

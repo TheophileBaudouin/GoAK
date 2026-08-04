@@ -43,7 +43,7 @@ GRAPH_ID_RE = re.compile(
     r"^(?:rule|recipe|pattern|snippet|template|capability|evaluation|decision-record|source|memory):[^:]+:.+$"
 )
 URL_RE = re.compile(r"^https?://")
-EXPECTED_PRODUCT_SKILLS = 46
+EXPECTED_PRODUCT_SKILLS = 51
 EXPECTED_TEMPLATES = {
     "rest-api",
     "grpc",

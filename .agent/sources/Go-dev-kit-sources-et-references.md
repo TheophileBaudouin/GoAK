@@ -89,9 +89,44 @@
 - **Priorité :** Haute
 - **Catégorie :** Concurrence / Extended stdlib
 
+## go/ast
+
+- **Lien :** <https://pkg.go.dev/go/ast>
+- **Description :** Analyse de code Go native de la stdlib : AST, parser,
+  tokens, transformations, génération de code. Zéro-CGO, stdlib-only
+  (completé par go/types et golang.org/x/tools/go/packages). Knowledge
+  stdlib admis dans le kit.
+- **Utilité potentielle :**
+  - Analyse sémantique Go (refactoring, dépendances, génération).
+- **Priorité :** Haute
+- **Catégorie :** Langage / Analyse de code
+
 ---
 
 # 2. Outils officiels Go
+
+## gopls
+
+- **Lien :** <https://github.com/golang/tools/tree/master/gopls>
+- **Description :** Serveur de langage Go officiel (autocomplete,
+  diagnostics, références, symboles, refactoring) — interface LSP pour
+  Go. Outil externe (pas une dépendance Go).
+- **Utilité potentielle :**
+  - Capacités niveau IDE pour agents coding Go.
+- **Priorité :** Haute
+- **Catégorie :** LSP / Tooling officiel
+
+## LSP Protocol
+
+- **Lien :** <https://microsoft.github.io/language-server-protocol/>
+- **Description :** Protocole universel de communication IDE↔langage
+  (spécification) — permet aux agents d'interagir avec Go, Rust, Python,
+  TypeScript, C++ via leurs serveurs de langage. Spécification (pas une
+  dépendance Go).
+- **Utilité potentielle :**
+  - Agents coding multi-langages.
+- **Priorité :** Haute
+- **Catégorie :** Protocole / IDE
 
 ## Go Toolchain
 
@@ -564,6 +599,18 @@ Client Redis officiel Go.
   - Queues.
 - **Priorité :** Haute
 
+## Ristretto
+
+- **Lien :** <https://github.com/dgraph-io/ristretto>
+- **Description :** Cache mémoire haute performance avec politique
+  d'admission (TinyLFU) et budget mémoire borné. Module :
+  `github.com/dgraph-io/ristretto` (v2.4.x, Apache-2.0, zéro-CGO). Catalog
+  admis dans le kit.
+- **Utilité potentielle :**
+  - Cache de réponses LLM, fichiers parsés, embeddings (avec budget).
+- **Priorité :** Haute
+- **Catégorie :** Cache / Mémoire
+
 ---
 
 # 13. Messaging
@@ -676,6 +723,25 @@ Implémentation JWT.
 ---
 
 # 18. IA / LLM
+
+## Eino
+
+- **Lien :** <https://github.com/cloudwego/eino> — docs <https://www.cloudwego.io/docs/eino/>
+- **Description :** Framework d'orchestration d'applications LLM (workflows, graphes, streaming, tools, multi-agents) par CloudWeGo/ByteDance. **Pointeur uniquement** — pré-1.0 (v0.9.x), à étudier pour les patterns, pas à dépendre (kit ≠ framework). Pointeur catalog : `pointers/eino.yaml`.
+- **Utilité potentielle :**
+  - Étude des patterns d'orchestration pour agents style Claude Code.
+- **Priorité :** Moyenne
+- **Catégorie :** IA / LLM / Orchestration
+
+## MCP (Model Context Protocol)
+
+- **Lien :** <https://modelcontextprotocol.io> — SDK Go <https://github.com/modelcontextprotocol/go-sdk>
+- **Description :** Protocole standard d'interopérabilité agents/outils (tool discovery, resources, prompts). SDK officiel Go v1.7.0 (maintenu avec Google) — catalog admis dans le kit.
+- **Utilité potentielle :**
+  - Serveurs/outils MCP compatibles Claude Code.
+  - Interopérabilité multi-agents.
+- **Priorité :** Haute
+- **Catégorie :** Protocole / Agents
 
 ## OpenAI Go SDK
 
@@ -933,6 +999,15 @@ ultraviolet, x).
 - **Priorité :** Haute
 - **Catégorie :** Desktop / GUI
 
+## Fyne
+
+- **Lien :** <https://github.com/fyne-io/fyne> — docs <https://fyne.io>
+- **Description :** GUI toolkit Go pur API (rendu OpenGL via cgo glfw), sans dépendance navigateur. v2.8.0 (BSD-3). **CGO requis** (limite documentée). Catalog admis dans le kit.
+- **Utilité potentielle :**
+  - Apps desktop sans frontend web (embarqué, léger).
+- **Priorité :** Moyenne
+- **Catégorie :** Desktop / GUI / Pure Go
+
 # 23. Temps réel / WebSocket
 
 ## coder/websocket
@@ -950,6 +1025,76 @@ ultraviolet, x).
 
 ---
 
+# 24. Git / Versionnage
+
+## go-git
+
+- **Lien :** <https://github.com/go-git/go-git>
+- **Description :** Implémentation Git en pur Go (clone, fetch, commit,
+  branch, diff, log) sans binaire `git` externe. v5.19.x (Apache-2.0), v6
+  alpha en cours. Utilisé par Gitea, Pulumi, Keybase. Catalog admis dans le
+  kit.
+- **Utilité potentielle :**
+  - Commits, diffs, analyse de dépôt par des agents.
+- **Priorité :** Haute
+- **Catégorie :** Git / VCS
+
+# 25. Recherche / Indexation
+
+## Bleve
+
+- **Lien :** <https://github.com/blevesearch/bleve>
+- **Description :** Moteur de recherche plein texte Go pur (index scorch,
+  ranking BM25, facettes, highlight, géo), embarquable, zéro-CGO, zéro
+  serveur. v2.6.0 (Apache-2.0). Catalog admis dans le kit.
+- **Utilité potentielle :**
+  - Recherche locale sur documents/code (agents).
+- **Priorité :** Haute
+- **Catégorie :** Recherche / Indexation
+
+# 26. Browser automation / Computer use
+
+## Playwright Go
+
+- **Lien :** <https://github.com/mxschmitt/playwright-go>
+- **Description :** Bindings Go pour Playwright (Chromium/Firefox/WebKit) —
+  automation navigateur, computer-use agents. **Pointeur uniquement** :
+  pré-1.0 par convention (v0.x miroir du driver), binaires navigateur lourds.
+  Pointeur catalog : `pointers/playwright-go.yaml`.
+- **Utilité potentielle :**
+  - Agents web autonomes quand aucune API n'existe (API first).
+- **Priorité :** Moyenne
+- **Catégorie :** Browser / Automation
+
+# 27. Code intelligence / Parsing
+
+## Tree-sitter (binding officiel)
+
+- **Lien :** <https://github.com/tree-sitter/go-tree-sitter>
+- **Description :** Parsing incrémental multi-langages (AST, navigation,
+  indexation) — binding **officiel** Go (le repo smacker est abandonné).
+  **Pointeur uniquement** : pré-1.0 (v0.24.0) + CGO obligatoire. Pointeur
+  catalog : `pointers/tree-sitter.yaml`.
+- **Utilité potentielle :**
+  - Indexation de code, chunking sémantique, extraction de symboles.
+- **Priorité :** Moyenne
+- **Catégorie :** Code intelligence / Parsing
+
+# 28. Vector search
+
+## sqlite-vec
+
+- **Lien :** <https://github.com/asg017/sqlite-vec>
+- **Description :** Recherche vectorielle dans SQLite (RAG local). **Pointeur
+  uniquement** : pré-1.0 (v0.1.9), docs stale, bindings Go séparés (CGO/WASM).
+  Pointeur catalog : `pointers/sqlite-vec.yaml`.
+- **Utilité potentielle :**
+  - RAG local sur petites machines (si besoin concret).
+- **Priorité :** Moyenne
+- **Catégorie :** Vector search / RAG
+
+---
+
 # Priorités pour un Agent Coding Go
 
 ## Niveau S (indispensable)
@@ -961,6 +1106,7 @@ ultraviolet, x).
 - Go Testing
 - Go Security Best Practices
 - pkg.go.dev
+- go/ast
 
 ## Niveau A (très utile)
 
@@ -997,6 +1143,12 @@ ultraviolet, x).
 - Lip Gloss
 - Wails
 - coder/websocket
+- go-git
+- MCP (Model Context Protocol)
+- Bleve
+- Ristretto
+- gopls
+- LSP Protocol
 
 ## Niveau B (selon projet)
 
@@ -1015,3 +1167,8 @@ ultraviolet, x).
 - Sequin
 - Colorprofile
 - Keygen
+- Fyne
+- Eino (pointeur)
+- Playwright Go (pointeur)
+- Tree-sitter (pointeur)
+- sqlite-vec (pointeur)
