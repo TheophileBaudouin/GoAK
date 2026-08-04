@@ -116,6 +116,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] Audit architecture and apply minimal corrections — product graph IDs, standalone relationship resolution, documentation boundary cleanup, and canonical universal-rule reference; evidence in `docs/evidence/2026-08-03/architecture-audit-minimal-corrections/`
 - [x] Audit referenced technology documentation — metaproject-only coverage registry, official source cache units, exact versions/dates/licenses, and validator enforcement in `.agent/cognitive/technology-documentation.yaml`
 - [x] Integrate source points 3–4 — Viper v1.21.0, Koanf v2.3.5, and Cobra v1.10.2 recipes/catalogs, pinned dependencies, offline module allowlist, and five green probes; evidence in `docs/evidence/2026-08-03/config-cli-integration/`
+- [ ] Placement analysis of the 26-technology catalog on the existing architecture (research only, no product change)
 
 ## Completed maintenance
 
