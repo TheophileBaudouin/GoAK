@@ -1,109 +1,113 @@
 ---
 name: ristretto
-description: "github.com/dgraph-io/ristretto v2.4 — high-performance in-memory cache with admission policy (TinyLFU), bounded memory, and configurable key/value costs. Use when caching hot data (LLM responses, parsed files, embeddings) with strict memory budgets and you need better hit ratios than a plain LRU."
+description: "github.com/dgraph-io/ristretto/v2 v2.4.2 — concurrent generic in-memory cache with TinyLFU admission, sampled-LFU eviction, cost-based capacity, and optional TTL. Use for single-process hot-data caching under a memory budget; not for distributed storage or durable state."
 category: library
 tags: [cache, memory, performance, tiny-lfu, in-memory]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# ristretto — bounded in-memory cache
+# ristretto — cache mémoire borné
 
 ## Selection
 
-[`github.com/dgraph-io/ristretto`](https://github.com/dgraph-io/ristretto)
-(v2.4.2, Apache-2.0, ~7.0k★, pushed 2026-07-15).
-
-**Why it passes the gate** (actual reason, not stars): a cache with a real
-admission policy — TinyLFU with an LFU "door-keeper" and a sample-based LFU
-eviction — plus explicit memory budgeting (per-key cost, `MaxCost`). That
-combination gives materially better hit ratios than a plain LRU under churn,
-which is the exact profile of LLM-response/parsed-file caching. Small, focused
-API, production-grade (used by Dgraph), zero-CGO, actively maintained (v2.4.x
-2025-2026).
+[`github.com/dgraph-io/ristretto/v2`](https://github.com/dgraph-io/ristretto)
+v2.4.2, released 2026-07-07, is a generic concurrent cache using TinyLFU admission,
+SampledLFU eviction, cost-based capacity, batching, and optional TTL. It is
+admitted for a focused single-process hot-cache boundary, active maintenance,
+tests, documentation, and real use; not for popularity or distributed storage.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.4.2 (2026), releases through 2025
-- [x] Single responsibility — in-memory cache with admission/eviction policy
-- [x] Idiomatic Go — small typed API, no globals
-- [x] Tests present + CI — yes
-- [x] Documentation — README, design doc, benchmarks
-- [x] Real-world usage — Dgraph and the wider Go ecosystem
-- [x] Readable end-to-end — yes, compact core
-- [x] Justified by need — cache churn needs policy, not just eviction
+- [x] Current v2.4.2 and Go 1.24+.
+- [x] Single responsibility: concurrent in-memory cache.
+- [x] Generic `Get`/`Set` API with explicit cost and capacity.
+- [x] Tests, CI, design documentation, benchmarks, and active releases exist.
+- [x] The asynchronous admission/eviction semantics are documented for callers.
 
 ## Minimal use
 
 ```go
-cache, _ := ristretto.NewCache(&ristretto.Config{
-    NumCounters: 1e7,     // number of keys to track frequency of (approx)
-    MaxCost:     1 << 30, // maximum cost of cache (1 GB)
-    BufferItems: 64,      // number of keys per Get buffer
-})
-cache.Set("key", value, 1)
-value, ok := cache.Get("key")
+func cacheValue() (string, bool) {
+    cache, err := ristretto.NewCache(&ristretto.Config[string, string]{
+        NumCounters: 1e4,
+        MaxCost: 1 << 20,
+        BufferItems: 64,
+    })
+    if err != nil {
+        return "", false
+    }
+    if !cache.Set("key", "value", 1) {
+        return "", false
+    }
+    cache.Wait()
+    value, ok := cache.Get("key")
+    return value, ok
+}
 ```
+
+`Set` is buffered and can be dropped under contention; call `Wait` when a test
+or boundary needs pending writes applied. Choose `MaxCost` in a meaningful
+application unit rather than assuming it means bytes automatically.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| `sync.Map` / hand LRU | No admission policy or memory bound; hit ratio suffers under churn. |
-| bigcache (dgraph-free) | Serialized values ([]byte), no cost model — ristretto is typed with budgets. |
-
-## Notes
-
-- `Get` returns `(interface{}, bool)` — type-assert on the consumer side.
-- Issue-mined (130 issues): TTL support requested (#43, 25r) — ristretto
-  does not expire by TTL natively; pair with an explicit expiry layer if
-  needed. GitHub issue tracker is being deprecated by the project (#175).
-- Use for hot-path caching where **memory bounds** matter; for ephemeral
-  single-key memoization, `sync.Map` or a one-line map+mutex may be enough.
+| `sync.Map`/map+mutex | Prefer for simple low-volume memoization without admission or cost policy. |
+| bigcache | Choose for a byte-oriented sharded cache when its serialization model fits. |
+| freecache | Choose for a simpler byte cache when TinyLFU/cost semantics are unnecessary. |
+| Redis/remote cache | Choose for shared/distributed cache state; Ristretto is process-local. |
 
 ## Utiliser cette librairie quand
 
-- Cacher des données chaudes (réponses LLM, fichiers parsés, embeddings)
-  avec un **budget mémoire strict** (`MaxCost`, coût par clé).
-- Le profil de charge a du churn (accès répétés à un sous-ensemble qui
-  change) : la politique d'admission TinyLFU bat un LRU simple.
-- Le taux de hit doit être meilleur qu'un LRU sans exploser la mémoire.
+- Hot data needs a process-local memory budget and an admission policy under
+  churn.
+- Values are generic and entries can expose a meaningful cost.
+- Asynchronous buffered writes and eventual cache admission are acceptable.
 
 ## Ne pas utiliser cette librairie quand
 
-- Une mémoïsation éphémère mono-clé suffit : `sync.Map` ou une map+mutex
-  d'une ligne.
-- Un cache avec expiration TTL est requis : ristretto n'expire pas
-  nativement (issue #43) — il faut une couche d'expiration explicite.
-- Les valeurs doivent être typées à la sortie : `Get` retourne
-  `(interface{}, bool)` — assertion côté consommateur.
+- Cache state must be shared between processes or survive process restart.
+- Every `Set` must synchronously guarantee admission or every `Get` must observe
+  the write immediately.
+- Durable data, exact LRU semantics, or a simple one-key memo is required.
 
 ## Avantages
 
-- Admission TinyLFU (door-keeper LFU + éviction échantillonnée) : meilleur
-  taux de hit sous churn qu'un LRU.
-- Budget mémoire explicite (coût par clé, `MaxCost`).
-- API petite et typée, zéro-CGO, production-grade (Dgraph, v2.4.2 2026-07).
+- TinyLFU admission plus SampledLFU eviction avoids wasting capacity on cold
+  churn better than a naive LRU in the intended workload.
+- Generic v2 API, explicit cost, optional TTL, metrics, and concurrent operation.
+- Pure Go, single-process deployment, and small focused surface.
 
 ## Inconvénients
 
-- **Pas de TTL natif** : l'expiration est à construire (issue #43, 25r).
-- `Get` non typé : assertions manuelles à chaque lecture.
-- Le tracker d'issues GitHub est en cours de dépréciation par le projet
-  (#175) — suivre via les releases.
+- Buffered operations can be dropped or delayed under contention.
+- Capacity is cost-based; the caller must define a meaningful cost model.
+- TTL uses bucket/ticker semantics rather than precise per-entry scheduling.
+- It is not durable or distributed.
 
 ## Pièges connus
 
-- Ne pas attendre d'expiration TTL : coupler avec une couche d'expiration
-  explicite si les données périssent.
-- Dimensionner `NumCounters` (≈ nombre de clés suivies) et `BufferItems`
-  avant la prod — le cache ne se corrige pas tout seul.
-- Type-assert les valeurs à la sortie, jamais avant.
+- Call `Wait` when a test or lifecycle boundary needs buffered `Set` operations
+  applied; do not assert immediate visibility without that synchronization.
+- Treat a false `Set` result as a rejected/dropped admission, not as durable
+  storage failure recovery.
+- Configure `NumCounters`, `MaxCost`, and `BufferItems` from workload measurements.
+- Add an application expiry policy when the cache's TTL granularity is too coarse.
+- Never use a process-local cache as the source of truth for user or security
+  state.
 
 ## Sources vérifiées
 
-- [dgraph-io/ristretto (repo officiel, v2.4.2)](https://github.com/dgraph-io/ristretto)
-  — vérifié 2026-08-04
-- [Issue #43 — TTL support demandé](https://github.com/dgraph-io/ristretto/issues/43)
-  — vérifié 2026-08-04 (issue officielle)
-- Artefacts internes : `pattern:cache:stale-while-revalidate`,
-  `pattern:antipattern:cache-stampede`, `pattern:antipattern:cache-stale`
+- [Official Ristretto repository](https://github.com/dgraph-io/ristretto) —
+  maintenance, design, license, checked 2026-08-05.
+- [Ristretto v2.4.2 releases](https://github.com/dgraph-io/ristretto/releases) —
+  exact version and memory regression fix, checked 2026-08-05.
+- [Ristretto v2 on pkg.go.dev](https://pkg.go.dev/github.com/dgraph-io/ristretto/v2)
+  — generic API, checked 2026-08-05.
+- [Cache implementation](https://github.com/dgraph-io/ristretto/blob/main/cache.go)
+  — buffering and lifecycle, checked 2026-08-05.
+- [TTL implementation](https://github.com/dgraph-io/ristretto/blob/main/ttl.go)
+  — expiry semantics, checked 2026-08-05.
+- [Issue #493](https://github.com/dgraph-io/ristretto/issues/493) — v2.4.2
+  memory regression context, checked 2026-08-05.
