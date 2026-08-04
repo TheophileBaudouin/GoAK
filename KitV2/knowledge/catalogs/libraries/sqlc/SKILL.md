@@ -1,34 +1,29 @@
 ---
 name: sqlc
-description: "sqlc — compile-time type-safe Go generated from SQL (no ORM, no runtime reflection). Use when choosing a Go database access layer, adopting sqlc, or comparing it to sqlx/squirrel/ORMs."
+description: "sqlc v1.24.0 — compile-time type-safe code generation from static SQL for Go, Kotlin, Python, and TypeScript. Use when SQL remains the source of truth and query shapes are static; not for dynamic WHERE/ORDER/columns or an ORM abstraction."
 category: library
 tags: [database, sql, codegen, type-safety]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# sqlc — SQL → Go code generation
+# sqlc — génération de code depuis SQL
 
 ## Selection
 
-[`sqlc`](https://github.com/sqlc-dev/sqlc) (CLI, supports SQLite/PostgreSQL/MySQL).
-
-**Why it passes the gate** (actual reason, not stars): it is the only tool that
-takes **plain SQL as the source of truth** and generates type-safe Go query
-methods at build time. A `:one` query becomes `GetFoo(ctx, id) (Foo, error)`;
-a `:many` query becomes `ListFoos(ctx) ([]Foo, error)`. SQL errors surface at
-generation time, and there is no runtime reflection — the generated code is
-plain `database/sql`.
+[`github.com/sqlc-dev/sqlc`](https://github.com/sqlc-dev/sqlc) v1.24.0 is a
+build-time SQL compiler. It validates SQL against a schema and emits typed query
+methods without runtime reflection. It targets PostgreSQL, MySQL, and SQLite,
+with Go and other language/plugin outputs. It is admitted for explicit static
+SQL and active code generation, tests, documentation, and production use; it
+is not an ORM and not a dynamic query builder.
 
 ## Admission checklist
 
-- [x] Actively maintained — ongoing releases, active community
-- [x] Single responsibility — SQL compiler → Go (one thing, well)
-- [x] Idiomatic Go — generates stdlib `database/sql` code
-- [x] Tests present + CI — yes
-- [x] Documentation — docs.sqlc.dev + SQLite tutorial
-- [x] Real-world usage — adopted in production services
-- [x] Readable end-to-end — `examples/authors/` shows the full workflow
-- [x] Justified by need (type safety from SQL), NOT popularity
+- [x] Current v1.24.0 release and active upstream maintenance.
+- [x] Single responsibility: schema-aware SQL parsing and code generation.
+- [x] Generates plain typed code with no sqlc runtime dependency.
+- [x] Tests, CI, documentation, examples, and plugin architecture exist.
+- [x] The static-query boundary is explicit before adoption.
 
 ## Minimal workflow
 
@@ -39,103 +34,90 @@ SELECT id, name FROM foos WHERE id = ?;
 ```
 
 ```sh
-sqlc generate   # → emits models.go + query.sql.go (type-safe methods)
+sqlc generate
 ```
+
+Generated code is called explicitly by the application:
 
 ```go
-q := db.New(conn)                       // *Queries, generated
-foo, err := q.GetFoo(ctx, int64(1))     // type-safe, no manual Scan
+func getFoo(ctx context.Context, q *db.Queries, id int64) (db.Foo, error) {
+    foo, err := q.GetFoo(ctx, id)
+    if err != nil {
+        return db.Foo{}, fmt.Errorf("get foo: %w", err)
+    }
+    return foo, nil
+}
 ```
 
-## Hard limits (the #1 adoption pain — 600 open issues, top by reactions)
+## Hard limits
 
-sqlc generates code for **static queries only**. It cannot handle:
+sqlc generates **static queries only**. Decide this boundary before adopting it:
 
-- **Dynamic WHERE / column lists / ORDER BY** (#3414 "support dynamic queries"
-  53👍, #2061 "dynamic order by" 35👍, #200 "optional WHERE" 25👍). If your query
-  shape changes at runtime, sqlc is the wrong tool — use `database/sql` + a query
-  builder (`squirrel`) or `sqlx`.
-- **`sqlc.embed()` NULL handling in LEFT/RIGHT JOINs** (#2348 50👍, #2997 45👍,
-  #3240 33👍) — the generated structs may declare non-nullable fields for columns
-  that can be NULL. Verify generated nullability, or avoid `embed` on outer joins.
-- **SQLite engine gaps** (#3132 "UPDATE FROM not supported") — the SQLite backend
-  lacks some Postgres features; check your statement is supported before relying
-  on it (relevant to `recipe-sqlite-sqlc`).
-
-Decide sqlc vs raw `database/sql` on this boundary first — it is the single most
-common reason users abandon sqlc.
-
-See `recipe-sqlite-sqlc` for a runnable, tested example.
+- Dynamic WHERE, column lists, or ORDER BY need `database/sql` plus a query
+  builder/helper instead.
+- `sqlc.embed()` on outer joins requires verifying generated nullability; a SQL
+  column that can be NULL must not be represented as a guaranteed value.
+- Engine-specific features differ, especially between PostgreSQL and SQLite;
+  validate every target statement with the selected engine.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| `database/sql` raw | Manual `rows.Scan(&a,&b)`, no compile-time SQL checking — the exact boilerplate sqlc removes. |
-| `jmoiron/sqlx` | Reflection-based scanning; still dynamic, SQL not validated until runtime. |
-| `Masterminds/squirrel` | A query *builder* — you stop writing SQL, and lose SQL-as-source-of-truth. Not type-safe from SQL. |
-| ORM (gorm, ent) | Hides SQL behind a heavy abstraction; rejected for a kit favouring explicit, auditable SQL. |
-
-## Notes
-
-- sqlc is a **build-time tool**, not a runtime dependency — the generated code
-  has zero sqlc imports. Nothing to vendor in your binary.
-- The generated `*Queries` works against both `*sql.DB` and `*sql.Tx` (via its
-  `DBTX` interface), so the same code runs inside or outside a transaction.
+| raw `database/sql` | Choose for dynamic SQL or when a query is too small to justify generation. |
+| `sqlx` | Choose for a thin reflection/scanning helper when runtime query flexibility matters. |
+| Squirrel/query builder | Choose for dynamic SQL construction; it does not replace schema-aware code generation. |
+| GORM/Ent | Choose only when an ORM/data-model abstraction is an explicit product decision. |
 
 ## Utiliser cette librairie quand
 
-- SQL est la source de vérité : requêtes statiques typées compilées à la
-  génération (`:one`/`:many` → méthodes Go typées).
-- L'erreur SQL doit apparaître au moment de la génération, sans réflexion
-  runtime.
-- Le code généré doit rester du `database/sql` standard (zéro dépendance
-  runtime).
+- SQL is the source of truth and query shapes are known at build time.
+- Generated methods should expose typed rows/errors without runtime reflection.
+- The project wants the same generated query contract across `*sql.DB` and
+  `*sql.Tx` through its driver boundary.
 
 ## Ne pas utiliser cette librairie quand
 
-- Les requêtes sont **dynamiques** (WHERE/ORDER BY/colonnes variables au
-  runtime) : sqlc est statique uniquement (#3414, #2061, #200) — passer à
-  database/sql + squirrel/sqlx (voir `pattern:antipattern:db-codegen-dynamic-queries`).
-- Des LEFT/RIGHT JOIN avec `sqlc.embed()` doivent gérer la NULLabilité :
-  vérifier le code généré ou éviter embed sur les outer joins (#2348, #2997).
-- Le moteur cible est SQLite et la requête utilise des features absentes
-  (ex. `UPDATE FROM`, #3132).
+- WHERE, ORDER BY, columns, or joins change dynamically at runtime.
+- The application needs an ORM's model lifecycle, migrations, or associations.
+- The selected database engine does not support the SQL syntax being generated.
+- Generated nullability cannot be reviewed for outer joins.
 
 ## Avantages
 
-- SQL comme source de vérité unique : pas de réflexion runtime, typage
-  généré.
-- Build-time uniquement : zéro import sqlc dans le binaire généré.
-- Compatible `*sql.DB` ET `*sql.Tx` (interface DBTX) — même code dans et
-  hors transaction.
-- Alternatives ORM rejetées pour le kit (SQL explicite et auditable).
+- SQL remains visible/auditable and schema errors surface during generation.
+- Generated code has no sqlc runtime dependency or reflection requirement.
+- Plugin architecture supports multiple output languages and database engines.
+- Generated query interfaces fit transaction boundaries explicitly.
 
 ## Inconvénients
 
-- **Statique uniquement** : c'est la limite #1 d'adoption (600 issues
-  ouvertes, top par réactions) — le périmètre dynamique est hors outil.
-- `sqlc.embed()` fragile sur NULL des outer joins (vérifier la nullabilité
-  générée).
-- Moteur SQLite avec des gaps de features PostgreSQL (vérifier par requête).
+- Static-only query model is a hard adoption boundary.
+- Generated output must be regenerated and reviewed with schema/query changes.
+- Engine differences and nullable joins still require database-specific testing.
+- Plugin/codegen versions become part of the build reproducibility policy.
 
 ## Pièges connus
 
-- Tronquer la décision sur la frontière statique/dynamique AVANT de
-  s'engager — c'est la raison la plus fréquente d'abandon.
-- Générer et vérifier la nullabilité des embeds sur JOIN.
-- Utiliser `sqlc.nembed()` (nullable embed) quand disponible pour les LEFT
-  JOIN.
+- Resolve static versus dynamic SQL before writing the first query; do not force
+  dynamic filters into malformed static workarounds.
+- Inspect generated nullability for `LEFT`/`RIGHT` joins and `embed` usage.
+- Pin the sqlc CLI/plugin versions and run generation in CI so generated code
+  cannot silently drift.
+- Validate SQLite/PostgreSQL/MySQL-specific features against the actual target
+  engine rather than the SQL parser alone.
 
 ## Sources vérifiées
 
-- [sqlc-dev/sqlc (repo officiel)](https://github.com/sqlc-dev/sqlc) — vérifié
-  2026-08-02
-- [Issue #3414 — dynamic queries](https://github.com/sqlc-dev/sqlc/issues/3414)
-  / [#2061](https://github.com/sqlc-dev/sqlc/issues/2061) /
-  [#2348 — embed NULL](https://github.com/sqlc-dev/sqlc/issues/2348) —
-  vérifiées 2026-08-04 (issues officielles)
-- [docs.sqlc.dev](https://docs.sqlc.dev/) — vérifié 2026-08-02
-- Artefacts internes : `recipe-sqlite-sqlc`,
-  `pattern:antipattern:db-codegen-dynamic-queries`, catalog
-  `modernc-sqlite`
+- [Official sqlc repository](https://github.com/sqlc-dev/sqlc) — API,
+  maintenance, license, checked 2026-08-05.
+- [sqlc v1.24.0 release](https://github.com/sqlc-dev/sqlc/releases/tag/v1.24.0)
+  — current version and plugin changes, checked 2026-08-05.
+- [sqlc package on pkg.go.dev](https://pkg.go.dev/github.com/sqlc-dev/sqlc) —
+  CLI/plugin API, checked 2026-08-05.
+- [sqlc documentation](https://docs.sqlc.dev/en/latest/overview/) — supported
+  engines and workflow, checked 2026-08-05.
+- [SQLC issue tracker](https://github.com/sqlc-dev/sqlc/issues) — dynamic-query
+  and generation boundaries, checked 2026-08-05.
+- [sqlc security advisories](https://github.com/sqlc-dev/sqlc/security/advisories)
+  — package-specific security status, checked 2026-08-05.

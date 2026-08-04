@@ -1,95 +1,95 @@
 ---
 name: sequin
-description: "github.com/charmbracelet/sequin — human-readable ANSI escape sequence parsing and writing for Go. Use when a TUI/CLI must parse, transform, or measure terminal text that contains ANSI codes (styled output, logs, pipelines)."
+description: "github.com/charmbracelet/sequin v0.3.1 — CLI for inspecting and explaining ANSI escape sequences. Use when debugging or inspecting styled terminal output; not as a reusable parser library or a styling layer."
 category: library
 tags: [ansi, terminal, parsing, tui, sequences]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# sequin — ANSI sequence parsing
+# sequin — inspection de séquences ANSI
 
 ## Selection
 
-[`github.com/charmbracelet/sequin`](https://github.com/charmbracelet/sequin).
-
-**Why it passes the gate** (actual reason, not stars): ANSI parsing is the
-classic "regex over escape bytes" trap — subtle and wrong at the edges (OSC,
-hyperlinks, multi-byte SGR). Sequin is a real tokenizer/parser for escape
-sequences with an equally clean writer, maintained by the team that owns the
-terminal stack. It is the stable sibling of the experimental `x/ansi` packages.
+[`github.com/charmbracelet/sequin`](https://github.com/charmbracelet/sequin) v0.3.1,
+released 2025-01-27, is a focused CLI that reads ANSI output, executes commands
+in a fake TTY, and explains the resulting escape sequences. It is admitted as a
+debugging/inspection tool in the Charm terminal ecosystem, not as a reusable Go
+library despite the catalog's library surface.
 
 ## Admission checklist
 
-- [x] Actively maintained — v0.3.x releases, commits 2026
-- [x] Single responsibility — ANSI sequence parse/write
-- [x] Idiomatic Go — tokenizer API, no globals
-- [x] Tests present + CI — yes
-- [x] Documentation — README + examples
-- [x] Real-world usage — Charm terminal tooling
-- [x] Readable end-to-end — yes
-- [x] Justified by need — correct ANSI handling is genuinely hard
+- [x] Stable v0.3.1 with active repository maintenance.
+- [x] Single responsibility: human-readable ANSI sequence inspection.
+- [x] Reads stdin or a command and prints parsed sequence explanations.
+- [x] Uses the maintained Charm ANSI parsing stack and has documentation/tests.
+- [x] Complements, rather than replaces, Lip Gloss/colorprofile runtime APIs.
 
 ## Minimal use
 
-```go
-tokens, err := sequin.Parse("\x1b[31mred\x1b[0m")
-// tokens: text("red") with an SGR style token around it — inspect/rewrite safely
+```sh
+printf '\033[31mred\033[0m' | sequin
+sequin -- go run ./cmd/example
 ```
+
+There is no supported Go package API to embed; use `charmbracelet/x/ansi` or a
+higher-level styling package when code must parse/produce ANSI programmatically.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Regex over escape codes | Fragile: breaks on OSC/CSI variants, hyperlinks, and multi-byte sequences. |
-| `charmbracelet/x/ansi` | Experimental umbrella package — fine to try, but sequin is the stabilized API. |
-| ansiwrap (third-party) | Niche, smaller maintenance story. |
-
-## Notes
-
-- Use it before measuring visible string width of styled text (ANSI bytes
-  inflate `len()`).
-- Pair with `colorprofile` to decide whether to strip or keep codes for a
-  given terminal.
+| `charmbracelet/x/ansi` | Use for programmatic ANSI parsing in Go; sequin is the human-facing CLI. |
+| Lip Gloss | Use for producing styled terminal output, not explaining existing sequences. |
+| Golden/teatest tools | Use for testing rendered TUI output; sequin helps inspect what the output contains. |
+| Regex over escape bytes | Reject: it misses OSC/CSI/hyperlink and multi-byte edge cases. |
 
 ## Utiliser cette librairie quand
 
-- Parser, transformer ou mesurer du texte terminal contenant des codes ANSI
-  (sorties stylées, logs, pipelines) sans « regex sur bytes d'échappement ».
-- La largeur visible d'un texte stylé doit être mesurée (les bytes ANSI
-  gonflent `len()`).
-- Écrire des séquences ANSI propres sans concaténer des codes bruts.
+- Debugging a CLI/TUI whose output contains ANSI sequences.
+- Inspecting a command's terminal protocol, colors, hyperlinks, cursor, or mode
+  changes in a readable form.
+- Comparing piped/golden output with what a terminal parser sees.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le texte est déjà nettoyé (aucun ANSI) : pas de parsing nécessaire.
-- `charmbracelet/x/ansi` (expérimental) suffit pour un prototype — sequin est
-  l'API stabilisée, préférable en prod.
+- A Go service needs a reusable parser or writer API.
+- The task is producing styles: use Lip Gloss/colorprofile.
+- ANSI is absent and ordinary text measurement is sufficient.
+- The application requires complete Kitty graphics/APC interpretation.
 
 ## Avantages
 
-- Vrai tokenizer/parser de séquences d'échappement (CSI, OSC, hyperlinks,
-  multi-byte SGR) — pas de regex fragile.
-- Écrivain propre pour produire des séquences.
-- Maintenu par l'équipe qui possède la stack terminal (sibling stable de
-  x/ansi).
+- Human-readable inspection instead of manual escape-byte decoding.
+- Fake-TTY command execution helps debug output that depends on terminal mode.
+- Handles common CSI/OSC/DCS/SGR and terminal control sequences through Charm's
+  maintained parser stack.
 
 ## Inconvénients
 
-- API orientée tokens : un cas simple « coloriser une chaîne » passe par
-  lipgloss plutôt que sequin.
-- Surface étroite (parse/write) : les décisions de profil (stripper ou
-  garder) restent à `colorprofile`.
+- CLI-only; it is not a library dependency with a stable embedding API.
+- APC/Kitty graphics sequences are not fully supported.
+- It explains sequences; it does not render or normalize terminal text for an
+  application's layout policy.
 
 ## Pièges connus
 
-- Mesurer la largeur visible APRÈS parsing (les bytes ANSI faussent `len()`).
-- Combiner avec `colorprofile` pour décider stripper/garder selon le
-  terminal cible.
-- Ne pas écrire de parser ANSI maison : les cas limites (OSC, hyperlinks)
-  sont précisément ce que sequin couvre.
+- Do not infer that a parsed byte length equals visible terminal width; use the
+  appropriate width/parser policy for layout.
+- Treat unknown sequences as unknown rather than silently discarding them.
+- Use a real TTY fixture when terminal-dependent behavior matters; piped input
+  and fake TTY execution are different paths.
+- Keep `sequin` as a debugging tool and use `x/ansi`, Lip Gloss, or colorprofile
+  for program code.
 
 ## Sources vérifiées
 
-- [charmbracelet/sequin (repo officiel, v0.3.x)](https://github.com/charmbracelet/sequin)
-  — vérifié 2026-08-04
-- Artefact interne : catalog `colorprofile` (décision stripper/garder)
+- [Official sequin repository](https://github.com/charmbracelet/sequin) — README,
+  CLI scope, maintenance, license, checked 2026-08-05.
+- [sequin v0.3.1 release](https://github.com/charmbracelet/sequin/releases/tag/v0.3.1)
+  — exact version and date, checked 2026-08-05.
+- [sequin on pkg.go.dev](https://pkg.go.dev/github.com/charmbracelet/sequin) —
+  module/package scope, checked 2026-08-05.
+- [sequin source](https://github.com/charmbracelet/sequin/blob/main/sgr.go) —
+  ANSI/SGR handling, checked 2026-08-05.
+- [Charm ANSI package](https://pkg.go.dev/github.com/charmbracelet/x/ansi)
+  — programmatic alternative, checked 2026-08-05.
