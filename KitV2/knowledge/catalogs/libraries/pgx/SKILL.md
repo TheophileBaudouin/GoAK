@@ -32,7 +32,7 @@ func query(ctx context.Context, dsn string, tenantID int64) error {
     if err != nil {
         return fmt.Errorf("create postgres pool: %w", err)
     }
-    defer pool.Close()
+    defer pool.Close() // pool.Close has no error return
     if err := pool.Ping(ctx); err != nil {
         return fmt.Errorf("ping postgres: %w", err)
     }
@@ -41,7 +41,7 @@ func query(ctx context.Context, dsn string, tenantID int64) error {
     if err != nil {
         return fmt.Errorf("query items: %w", err)
     }
-    defer rows.Close()
+    defer rows.Close() // rows.Close has no error return
     for rows.Next() {
         // scan the row at this application boundary
     }
