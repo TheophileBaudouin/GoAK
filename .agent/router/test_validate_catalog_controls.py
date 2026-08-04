@@ -87,11 +87,18 @@ value, _ := load()
     def test_duplicate_positive(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "SKILL.md"
-            path.write_text(skill("first distinct paragraph with enough words to pass the scanner."), encoding="utf-8")
+            path.write_text(
+                skill(
+                    "first distinct paragraph with enough words to pass the scanner."
+                ),
+                encoding="utf-8",
+            )
             self.assertEqual(validate.check_internal_duplicates(path), [])
 
     def test_duplicate_negative(self) -> None:
-        paragraph = "This exact paragraph contains enough words to be detected as a duplicate."
+        paragraph = (
+            "This exact paragraph contains enough words to be detected as a duplicate."
+        )
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "SKILL.md"
             path.write_text(skill(f"{paragraph}\n\n{paragraph}"), encoding="utf-8")

@@ -1,127 +1,104 @@
 ---
 name: bubbletea
-description: "charm.land/bubbletea/v2 — the standard TUI framework for Go, implementing The Elm Architecture (Model/Update/View) with commands and subscriptions. Use when building an interactive terminal UI in Go, including agent-facing CLIs, and you want the MVU logic unit-testable without a real terminal."
+description: "charm.land/bubbletea/v2 v2.0.8 — Go TUI framework implementing Model/Update/View with commands and subscriptions. Use for interactive terminal applications whose state machine should be testable without a real terminal; not for static output or web/desktop UIs."
 category: library
 tags: [tui, cli, mvu, elm-architecture, terminal]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# bubbletea — TUI framework (MVU)
+# bubbletea — framework TUI MVU
 
 ## Selection
 
-[`charm.land/bubbletea/v2`](https://github.com/charmbracelet/bubbletea) (v2, Go 1.22+).
-
-**Why it passes the gate** (actual reason, not stars): it is a compact (~10k LOC)
-framework implementing **The Elm Architecture** — pure `Model` state, `Update`
-(state transitions from messages), `View` (render). That model is intrinsically
-testable: the state machine is a pure function of messages, so recipes in this
-kit test `handleKey(string)` seams without driving a real terminal (see
-`recipe-cli-interactif`). It is the de-facto Go TUI standard (Azure, Cockroach
-Labs, NVIDIA, MinIO use it), actively maintained with a stable v2 API and a
-vanity import.
+[`charm.land/bubbletea/v2`](https://github.com/charmbracelet/bubbletea) v2.0.8
+is the current v2 module. It implements the Elm-style Model/Update/View loop,
+commands, and subscriptions for interactive terminal programs. It is admitted
+for its focused TUI responsibility, active maintenance, tests, documentation,
+and broad production use, not for popularity.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.0.x releases, very active (2026)
-- [x] Single responsibility — terminal UI framework
-- [x] Idiomatic Go — plain structs + methods, no globals, no magic
-- [x] Tests present + CI — yes, extensive
-- [x] Documentation — README, examples, charm.sh docs
-- [x] Real-world usage — Azure, Cockroach Labs, NVIDIA, MinIO, Charm's own CLI suite
-- [x] Readable end-to-end — yes, small core
-- [x] Justified by need — interactive CLIs/agents need a testable UI layer
+- [x] Active v2 maintenance with current patch release v2.0.8.
+- [x] Single responsibility: interactive terminal event loop and rendering.
+- [x] Explicit model lifecycle: `Init`, `Update`, and `View`.
+- [x] Tests, CI, documentation, and examples are maintained upstream.
+- [x] The state-machine shape gives consumers a test seam without a live
+      terminal.
 
 ## Minimal use
 
 ```go
-p := tea.NewProgram(model{})
-if _, err := p.Run(); err != nil { os.Exit(1) }
-```
-
-```go
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    if k, ok := msg.(tea.KeyPressMsg); ok {
-        return m.handleKey(k.String()) // pure, testable seam
+func run(model tea.Model) error {
+    _, err := tea.NewProgram(model).Run()
+    if err != nil {
+        return fmt.Errorf("run TUI: %w", err)
     }
-    return m, nil
+    return nil
 }
 ```
 
-See `recipe-cli-interactif` for a runnable, tested example with the
-`handleKey(string)` testability pattern.
+In v2, `View` returns a declarative `tea.View`, and key messages use the v2
+message types. Keep application logic in pure state transitions where possible;
+the kit's `recipe-cli-interactif` tests a `handleKey(string)` seam rather than
+constructing framework message structs.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| tview | Widget/imperative style; couples logic to a global app; weaker pure-logic story. Fine for quick dashboards, not for testable agent TUIs. |
-| tcell / termbox-go | Low-level cell buffers; you build the event loop, cursor and layout yourself. termbox-go is unmaintained. |
-| gocui | Simplest widget-ish layer, but less maintained and smaller ecosystem. |
-| pterm | Output formatting only, not an interactive framework — complementary, not an alternative. |
-
-## Ecosystem notes
-
-The Charm family composes: `lipgloss` (styling), `bubbles` (ready components:
-list, table, textinput…), `huh` (forms). Prefer those over hand-rolling.
-
-## Version note
-
-v1 moved to the vanity import `charm.land/bubbletea/v2`. Never import the old
-`github.com/charmbracelet/bubbletea` v1 path for new code; `tea.KeyMsg` was
-renamed `tea.KeyPressMsg` in v2 — drive messages through `k.String()` in tests,
-never construct framework key structs.
+| tview | Choose for an imperative widget tree; it is the main Go alternative to MVU. |
+| tcell | Choose when low-level terminal control is required and the application accepts owning the event loop and layout. |
+| lipgloss | Companion styling library, not an interactive framework. |
+| Ratatui | Rust alternative; not a Go dependency choice. |
 
 ## Utiliser cette librairie quand
 
-- Construire une CLI interactive (wizards, menus, dashboards, TUIs
-  agent-facing) avec une vraie boucle d'événements.
-- La logique MVU doit être testable unitairement sans terminal réel (seam
-  `handleKey(string)`).
-- Composer l'écosystème Charm : `lipgloss` (style), `bubbles` (widgets),
-  `huh` (formulaires).
+- Building an interactive Go CLI, wizard, dashboard, or agent-facing TUI.
+- The state transitions should be unit-testable without a real terminal.
+- Commands and subscriptions are useful for asynchronous work or terminal
+  events.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le besoin est seulement de la sortie terminale formatée (lipgloss/pterm
-  suffisent — pterm n'est pas un framework interactif).
-- Un dashboard rapide non testable est acceptable (tview peut suffire).
-- Le contrôle bas niveau de la cellule terminal est requis (tcell).
-- L'interface est web ou desktop (hors périmètre — wails/fyne).
+- The program only formats or prints terminal output.
+- The interface belongs in a browser or desktop webview.
+- An imperative widget tree is a better fit than MVU.
+- The project cannot accept the breaking import/API migration from v1 to v2.
 
 ## Avantages
 
-- MVU pur : l'état est une fonction pure des messages → testable sans
-  terminal, exactement le besoin des recettes du kit (`recipe-cli-interactif`).
-- Standard de facto du TUI Go : Azure, Cockroach Labs, NVIDIA, MinIO,
-  suite CLI de Charm.
-- Maintenance très active, API v2 stable, import vanity.
-- Écosystème complet (bubbles, lipgloss, huh, glamour…).
+- A clear Model/Update/View architecture with explicit asynchronous commands.
+- The application state can be tested independently from terminal rendering.
+- The v2 API exposes terminal capabilities and keyboard enhancements through a
+  structured `tea.View`.
+- It composes with Bubbles widgets, Lip Gloss styling, and Huh forms.
 
 ## Inconvénients
 
-- Discipline MVU obligatoire : tout passe par Update/commands/subscriptions —
-  le code impératif « classique » doit être restructuré.
-- v2 a cassé l'import path et renommé `tea.KeyMsg` → `tea.KeyPressMsg` :
-  migration nécessaire depuis v1.
-- Framework opiné : les cas exotiques (multiplexage avancé, protocoles
-  custom) demandent un travail d'intégration.
+- MVU adds ceremony for a one-screen or non-interactive command.
+- v2 is a breaking migration: vanity import path, key message names, and View
+  return type differ from v1.
+- Terminal capabilities such as clipboard or keyboard enhancements depend on
+  the user's terminal.
 
 ## Pièges connus
 
-- Ne jamais importer l'ancien chemin v1 `github.com/charmbracelet/bubbletea`
-  pour du nouveau code.
-- En v2, `tea.KeyPressMsg` et `k.String()` pour les tests ; ne jamais
-  construire les structs de messages clavier (instables entre majors).
-- La vue se construit via `tea.NewView(s)` (v2) — vérifier la doc de la
-  version épinglée.
-- Tester la seam pure, jamais le terminal réel (cf. Gotcha recipe
-  cli-interactif).
+- Pin `charm.land/bubbletea/v2`; do not copy v1 examples using the old import
+  path or `tea.KeyMsg`.
+- Keep the framework message at the adapter seam and test pure transitions
+  instead of constructing unstable framework structs.
+- Treat `Run` as a boundary error: return or handle it once; do not hide it in
+  a library or service layer.
+- Add Bubbles separately when standard widgets are needed; Bubble Tea itself is
+  the framework, not the widget catalog.
 
 ## Sources vérifiées
 
-- [charmbracelet/bubbletea (repo officiel, v2)](https://github.com/charmbracelet/bubbletea)
-  — vérifié 2026-08-04
-- [charm.land/bubbletea/v2 (pkg.go.dev)](https://pkg.go.dev/charm.land/bubbletea/v2)
-  — vérifié 2026-08-04
-- Artefact interne : `recipe-cli-interactif` (seam `handleKey` testé)
+- [Official Bubble Tea repository](https://github.com/charmbracelet/bubbletea) —
+  maintenance, license, architecture, checked 2026-08-05.
+- [Bubble Tea v2.0.8 release](https://github.com/charmbracelet/bubbletea/releases/tag/v2.0.8)
+  — exact current release, checked 2026-08-05.
+- [Bubble Tea v2 on pkg.go.dev](https://pkg.go.dev/charm.land/bubbletea/v2) —
+  API and module path, checked 2026-08-05.
+- [v2 upgrade guide](https://github.com/charmbracelet/bubbletea/blob/v2.0.0/UPGRADE_GUIDE_V2.md)
+  — breaking changes, checked 2026-08-05.

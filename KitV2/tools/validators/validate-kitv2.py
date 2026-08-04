@@ -129,7 +129,7 @@ def check_catalog_freshness(path: Path) -> list[str]:
     source_heading = SOURCE_HEADING_RE.search(text)
     if source_heading is None:
         return [f"{path}: missing 'Sources vérifiées' section"]
-    source_text = text[source_heading.end():]
+    source_text = text[source_heading.end() :]
     if not re.search(r"https?://", source_text):
         errors.append(f"{path}: Sources vérifiées must contain a URL")
     if not re.search(r"20\d{2}-\d{2}-\d{2}", source_text):
@@ -145,9 +145,7 @@ def check_catalog_freshness(path: Path) -> list[str]:
         else CATALOG_MAX_AGE_DAYS
     )
     if age > limit:
-        errors.append(
-            f"{path}: catalog evidence is {age} days old (limit {limit})"
-        )
+        errors.append(f"{path}: catalog evidence is {age} days old (limit {limit})")
     return errors
 
 
@@ -171,9 +169,7 @@ def check_markdown_examples(path: Path) -> list[str]:
         if not in_go or "illustrative" in line.lower():
             continue
         if BLANK_RETURN_RE.search(line):
-            errors.append(
-                f"{path}:{number}: fenced Go example ignores a return value"
-            )
+            errors.append(f"{path}:{number}: fenced Go example ignores a return value")
         if UNCHECKED_CALL_RE.search(line) and not re.search(
             r"(?:if\s+[^\n]*\berr\b|\berr\s*:=|\breturn\b|\blog\.Fatal|"
             r"//[^\n]*(?:best-effort|preserve|justif|cannot recover))",
