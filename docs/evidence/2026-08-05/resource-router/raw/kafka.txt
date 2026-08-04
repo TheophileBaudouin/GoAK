@@ -1,0 +1,28 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedKit search: "kafka producer consumer streaming" → 19 match(es), showing top 5 (index v2.2.0).
+
+[catalog] source:go:franz-go (score 22.15)
+path: knowledge/catalogs/libraries/franz-go-kafka.yaml
+matched terms: kafka, consumer, messaging, event, stream
+franz-go Kafka client reference Consider for an explicitly requested Kafka-based event-driven architecture. franz-go is the actively maintained community client covering the modern Kafka protocol (con…
+
+[pattern] pattern:messaging:dead-letter-queue (score 15.85)
+path: knowledge/patterns/messaging-dead-letter-queue.yaml
+matched terms: kafka, messaging, message, queue
+File de messages morts — isoler les messages non processables Un message structurellement invalide boucle en retry et bloque la partition (voir pattern:antipattern:msg-poison-pill-no-dlq) : les messag…
+
+[pattern] pattern:messaging:idempotent-consumer (score 15.44)
+path: knowledge/patterns/messaging-idempotent-consumer.yaml
+matched terms: kafka, consumer, messaging, message
+Consommateur idempotent — absorber les doublons Les files garantissent au-moins-une-fois : un message peut être reçu plusieurs fois (rebalance, retry, redelivery). Traiter deux fois un effet non-idemp…
+
+[anti-pattern] pattern:antipattern:msg-poison-pill-no-dlq (score 11.45)
+path: knowledge/anti-patterns/msg-poison-pill-no-dlq.yaml
+matched terms: kafka, consumer, messaging, message
+Poison pill sans file de messages morts (DLQ) Une poison pill arrête la progression de toute la partition : les messages suivants (valides) ne sont jamais traités, les retries sans fin gaspillent la C…
+
+[catalog] source:go:nats (score 8.92)
+path: knowledge/catalogs/libraries/nats.yaml
+matched terms: messaging, queue
+NATS Go client reference Consider for request-reply, pub/sub, queue groups, or JetStream messaging after delivery, durability, and failure semantics are specified.
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24 · template 7.

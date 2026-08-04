@@ -1,0 +1,28 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedKit search: "http rest api with routing and json" → 51 match(es), showing top 5 (index v2.2.0).
+
+[recipe] recipe-rest-chi (score 17.73)
+path: recipes/recipe-rest-chi/SKILL.md
+matched terms: http, rest, api, json
+Build a minimal idiomatic REST API with the chi v5 router — composable middleware, route groups, path parameters, and JSON in/out. Use when creating or reviewing a Go HTTP/REST service with chi.
+
+[prompt] checklist-api (score 15.83)
+path: .pi/prompts/checklist-api.md
+matched terms: http, api, routing, endpoint
+Review a Go HTTP API against routing, trust-boundary, error, concurrency, security, and behavior evidence before declaring the endpoint complete.
+
+[snippet] http-json-response (score 14.95)
+path: snippets/http-json/SNIPPET.yaml
+matched terms: http, json, net
+Encode a JSON HTTP response with an explicit status.
+
+[catalog] chi (score 12.91)
+path: knowledge/catalogs/libraries/chi/SKILL.md
+matched terms: http, rest, api, net
+go-chi/chi v5 — a lightweight HTTP router 100% compatible with net/http, for composable middleware, route groups, and path params. Use when choosing a Go HTTP router or building/maintaining a chi-base…
+
+[pattern] pattern:http:rest-resource-modeling (score 11.24)
+path: knowledge/patterns/http-rest-resource-modeling.yaml
+matched terms: http, rest, api
+Modélisation REST — ressources, verbes et statuts Une API qui tunnelise tout par POST/GET générique est opaque : pas de cache, pas d'idempotence, statuts inexploitables (voir pattern:antipattern:rest-…
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24 · template 7.

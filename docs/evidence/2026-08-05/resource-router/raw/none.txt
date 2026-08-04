@@ -1,0 +1,1 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedNo kit resource matches "quantum computing compiler" — the query appears outside the kit's domain (most terms have no coverage). Reformulate with Go-specific terms or conclude that no kit resource applies.

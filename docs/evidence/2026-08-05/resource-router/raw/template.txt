@@ -1,0 +1,28 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedKit search: "scaffold a new project template" → 20 match(es), showing top 5 (index v2.2.0).
+
+[template] go-template-cli (score 12.88)
+path: templates/cli/template.yaml
+matched terms: scaffold, project, template
+go-template-cli — Minimal runnable scaffold for the cli project shape.
+
+[template] go-template-grpc (score 12.88)
+path: templates/grpc/template.yaml
+matched terms: scaffold, project, template
+go-template-grpc — Minimal runnable scaffold for the grpc project shape.
+
+[template] go-template-microservice (score 12.88)
+path: templates/microservice/template.yaml
+matched terms: scaffold, project, template
+go-template-microservice — Minimal runnable scaffold for the microservice project shape.
+
+[template] go-template-monolith (score 12.88)
+path: templates/monolith/template.yaml
+matched terms: scaffold, project, template
+go-template-monolith — Minimal runnable scaffold for the monolith project shape.
+
+[template] go-template-worker (score 12.88)
+path: templates/worker/template.yaml
+matched terms: scaffold, project, template
+go-template-worker — Minimal runnable scaffold for the worker project shape.
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24 · template 7.

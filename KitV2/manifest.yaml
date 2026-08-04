@@ -1,5 +1,5 @@
 name: go-agent-kit-v2
-version: 2.1.0
+version: 2.2.0
 schema_version: 1
 language:
   name: go
@@ -21,6 +21,7 @@ capabilities:
   - go-probes
   - source-registry
   - offline-source-retrieval
+  - resource-routing
 canonical:
   rules: rules/
   knowledge: knowledge/
@@ -28,6 +29,7 @@ canonical:
   snippets: snippets/
   templates: templates/
   product_verification: probes/
+  resource_routing: router/
 product_status: standalone
 metadata_role: product manifest, not a Pi instruction entrypoint
 avoid:

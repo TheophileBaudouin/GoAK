@@ -2,11 +2,13 @@
 # Go Agent Kit — one-command installer (bootstrap, tree-based version).
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.1.0/install.sh | sh -s -- [target-dir]
+#   curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.2.0/install.sh | sh -s -- [target-dir]
 #
 # Environment:
-#   GAK_REF   git ref to install (default: v2.1.0). Use GAK_REF=main for the
-#             latest branch head, or any tag/commit for a pinned install.
+#   GAK_REF    git ref to install (default: v2.2.0). Use GAK_REF=main for the
+#              latest branch head, or any tag/commit for a pinned install.
+#   GAK_SKIP_VERIFY   set to 1 to skip the product verification step.
+#   NO_COLOR          set to any value to disable colored output.
 #
 # This bootstrap installer materializes the standalone KitV2 product (the only
 # consumable part of this repository) into a target directory. It never copies
@@ -17,36 +19,57 @@
 set -eu
 
 repo="TheophileBaudouin/GoAK"
-ref="${GAK_REF:-v2.1.0}"
+ref="${GAK_REF:-v2.2.0}"
 target="${1:-./go-agent-kit}"
 
-for tool in curl tar; do
-	if ! command -v "$tool" >/dev/null 2>&1; then
-		echo "error: required tool '$tool' is missing" >&2
-		exit 1
-	fi
-done
-
-if [ -e "$target" ] && [ -n "$(ls -A "$target" 2>/dev/null)" ]; then
-	echo "error: $target exists and is not empty; pick another directory or empty it" >&2
-	exit 1
+# --- output helpers: minimal, portable (POSIX sh), auto-disabled ---
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-}" != "dumb" ]; then
+	C_RESET='\033[0m' C_BOLD='\033[1m' C_CYAN='\033[36m' C_GREEN='\033[32m'
+	C_YELLOW='\033[33m' C_RED='\033[31m' C_DIM='\033[2m'
+else
+	C_RESET='' C_BOLD='' C_CYAN='' C_GREEN='' C_YELLOW='' C_RED='' C_DIM=''
 fi
 
-echo "go-agent-kit: installing ref $ref into $target"
+say()  { printf '%b\n' "$*"; }
+step() { printf '%b\n' "${C_CYAN}→${C_RESET} $*"; }
+ok()   { printf '%b\n' "${C_GREEN}✓${C_RESET} $*"; }
+warn() { printf '%b\n' "${C_YELLOW}!${C_RESET} $*" >&2; }
+die()  { printf '%b\n' "${C_RED}✗${C_RESET} $*" >&2; exit 1; }
 
+say ""
+say "${C_BOLD}${C_CYAN}Go Agent Kit — installer${C_RESET} ${C_DIM}(ref ${ref} → ${target})${C_RESET}"
+say ""
+
+# --- prerequisites ---
+step "checking prerequisites"
+for tool in curl tar sed; do
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		die "required tool '$tool' is missing (install it first)"
+	fi
+done
+ok "curl, tar, sed available"
+
+if [ -e "$target" ] && [ -n "$(ls -A "$target" 2>/dev/null)" ]; then
+	die "target '$target' exists and is not empty — pick another directory or empty it"
+fi
+
+# --- download ---
+step "downloading ${repo}@${ref}"
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/gak-install.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
 url="https://codeload.github.com/$repo/tar.gz/$ref"
-if ! curl -fsSL "$url" -o "$tmp/repo.tgz"; then
-	echo "error: cannot download $url (check the ref and network)" >&2
-	exit 1
+if ! curl -fsSL --retry 2 --retry-delay 1 "$url" -o "$tmp/repo.tgz"; then
+	die "cannot download $url (check the ref and network)"
 fi
+size=$(wc -c < "$tmp/repo.tgz" | tr -d ' ')
+ok "downloaded ${size} bytes"
 
+# --- extract ---
+step "extracting the KitV2 product tree"
 top=$(tar -tzf "$tmp/repo.tgz" | sed -n '1s#^\([^/]*/\).*#\1#p')
 if [ -z "$top" ]; then
-	echo "error: cannot determine archive layout" >&2
-	exit 1
+	die "cannot determine archive layout"
 fi
 
 mkdir -p "$target"
@@ -55,36 +78,41 @@ mkdir -p "$target"
 tar -xzf "$tmp/repo.tgz" -C "$target" --strip-components=2 "${top}KitV2"
 
 if [ ! -f "$target/manifest.yaml" ]; then
-	echo "error: extracted tree has no manifest.yaml — install aborted" >&2
-	exit 1
+	die "extracted tree has no manifest.yaml — install aborted"
 fi
 
 version=$(sed -n 's/^version: //p' "$target/manifest.yaml" | head -n 1)
 [ -n "$version" ] || version="unknown"
+ok "product tree extracted (manifest version ${version})"
 
-# Verification. A missing toolchain is reported as PARTIAL, never as PASS.
-if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; then
-	if (cd "$target" && python3 tools/validators/validate-kitv2.py); then
-		echo "verification: PASS"
-	else
-		echo "error: product verification failed — install is incomplete" >&2
-		exit 1
-	fi
+# --- verify ---
+if [ "${GAK_SKIP_VERIFY:-0}" = "1" ]; then
+	warn "verification skipped (GAK_SKIP_VERIFY=1)"
 else
-	echo "warning: python3/PyYAML unavailable — verification PARTIAL (run"
-	echo "         'cd $target && python3 tools/validators/validate-kitv2.py' later)"
+	step "verifying product"
+	# A missing toolchain is reported as PARTIAL, never as PASS.
+	if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; then
+		if (cd "$target" && python3 tools/validators/validate-kitv2.py); then
+			ok "verification: PASS"
+		else
+			die "product verification failed — install is incomplete"
+		fi
+	else
+		warn "python3/PyYAML unavailable — verification PARTIAL (run"
+		warn "  'cd $target && python3 tools/validators/validate-kitv2.py' later)"
+	fi
 fi
 
-cat <<EOF
-
-Go Agent Kit installed: $target (ref $ref, manifest version $version)
-
-Next steps:
-  cd $target
-  pi                    # loads .pi/ prompts, skills and AGENTS.md
-  bash probes/run.sh    # runs the product probes (needs a Go toolchain)
-
-This is the tree-based bootstrap install; the future \`gak\` CLI is the
-canonical distribution entrypoint once a published module and release
-pipeline exist.
-EOF
+# --- summary ---
+say ""
+say "${C_GREEN}✓${C_RESET} ${C_BOLD}Go Agent Kit v${version} installed${C_RESET} ${C_DIM}(ref ${ref})${C_RESET}"
+say ""
+say "  ${C_BOLD}target${C_RESET}   ${target}"
+say "  ${C_BOLD}next steps${C_RESET}"
+say "    cd ${target}"
+say "    pi                  # loads .pi/ prompts, skills and AGENTS.md"
+say "    bash probes/run.sh  # runs the product probes (needs a Go toolchain)"
+say ""
+say "${C_DIM}Tree-based bootstrap install; the future \`gak\` CLI is the canonical"
+say "distribution entrypoint once a published module and release pipeline exist.${C_RESET}"
+say ""

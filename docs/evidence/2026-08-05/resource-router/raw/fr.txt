@@ -1,0 +1,30 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finished30 match(es), showing top 5 (index v2.2.0):
+
+```
+[recipe] recipe-sqlite-sqlc (score 26.03)
+path: recipes/recipe-sqlite-sqlc/SKILL.md
+matched terms: sqlite, sqlc, database, sql, codegen
+Type-safe SQLite access in Go via sqlc code generation with the pure-Go (cgo-free) modernc.org/sqlite driver. Use when building a Go service backed by SQLite, choosing a driver, or adopting sqlc for t…
+
+[catalog] sqlc (score 17.25)
+path: knowledge/catalogs/libraries/sqlc/SKILL.md
+matched terms: sqlc, database, sql, codegen
+sqlc — compile-time type-safe Go generated from SQL (no ORM, no runtime reflection). Use when choosing a Go database access layer, adopting sqlc, or comparing it to sqlx/squirrel/ORMs.
+
+[pattern] pattern:database:transaction-boundary (score 12.24)
+path: knowledge/patterns/database-transaction-boundary.yaml
+matched terms: base, database, db, sql
+Frontière de transaction — BeginTx + Rollback en defer Plusieurs écritures doivent être atomiques ; un BEGIN/COMMIT manuel ou un commit sans rollback laisse la base dans un état imprévisible en cas d'…
+
+[anti-pattern] pattern:antipattern:db-n-plus-one (score 11.39)
+path: knowledge/anti-patterns/db-n-plus-one.yaml
+matched terms: base, database, db, sql
+Requête N+1 — une requête par élément Chaque élément coûte un aller-retour réseau + plan d'exécution : une liste de 1000 éléments génère 1001 requêtes, secondes de latence et charge inutile sur la bas…
+
+[catalog] source:go:sqlx (score 11.16)
+path: knowledge/catalogs/libraries/sqlx.yaml
+matched terms: sqlc, database, sql
+sqlx database/sql extension reference Consider as a thin extension of database/sql when scanning into structs, named parameters, or in-clause helpers are needed without adopting an ORM. The sqlc catal…
+```
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24.

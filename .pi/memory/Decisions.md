@@ -245,3 +245,25 @@ de compacité core (≤ 6 modules, ≤ 300 lignes), nouvelles shapes de template
 - Secret scanning, SARIF publication, SLSA provenance, and release/versioning infrastructure were deferred while the kit was local-only. Since the repository is public (2026-08-03), the reason is obsolete: release/versioning infrastructure is now a planned future task (see Progress — Future deployment foundation); secret scanning, SARIF, and SLSA remain deferred until the kit or generated apps are distributed outside the machine.
 - Dedicated Claude/Codex/Gemini generators are deferred until the core, recipes, and spec-driven workflow are solid. A root `AGENTS.md` plus the existing Pi skills covers the current need without adding parallel output surfaces.
 - Fuzzing, `go fix`, `testing/synctest` adoption in recipes, and modern `tool` dependencies remain secondary; adopt only where a concrete recipe gains verified value.
+
+## Semantic Resource Router (2026-08-05)
+
+- **Index de routage, pas RAG** : le kit embarque un index généré
+  (`KitV2/router/index.json` + `meta.json`) utilisé en lecture seule par
+  l'outil Pi natif `search_kit_resources`. L'index ne contient que des
+  descriptions ; la vérité reste les fichiers du kit.
+- **Pas d'embeddings (décision utilisateur 2026-08-05)** : recherche BM25
+  (k1=1.2, b=0.75) + synonymes bilingues (runtime-only) sur les descriptions
+  frontmatter curées ; l'agent LLM fait le tri final sur le top-K compact.
+  API externe (coût, réseau, requête à encoder côté consommateur) et modèle
+  local Ollama (service chez l'utilisateur) rejetées — sources web vérifiées
+  (BM25 ≥ embeddings sur petit corpus).
+- **Stockage JSON versionné** : index.json + meta.json (sha256, compteurs,
+  stopwords source unique). SQLite rejeté (surdimensionné à ~206 ressources).
+- **Déclenchement : recherche obligatoire avant tout travail technique**
+  (décision utilisateur) — encodée dans la skill `kit-resource-routing`.
+- **Outil = extension Pi native** (`registerTool`, zéro dépendance npm —
+  typebox fourni par Pi). CLI python3 rejeté (dépendance d'exécution).
+- **Séparation stricte** : builder dans le méta-projet
+  (`.agent/router/build_index.py`, déterministe, --check) ; kit en lecture
+  seule. Gate étendue (couverture + hash) → toute dérive bloque la release.

@@ -1,0 +1,11 @@
+=== builder tests ===
+
+OK
+=== builder --check ===
+router index: up to date (/Users/theophilebaudouin/Documents/devellopement/Go/KitV2/router)
+=== product validator ===
+kitv2: PASS (45 product skills, 3 snippets, standalone, offline bundle, router index 206 resources)
+=== harness ===
+instruction-artifacts: PASS
+=== ruff ===
+All checks passed!

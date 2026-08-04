@@ -11,13 +11,14 @@ KitV2 is the standalone consumable Go agent kit.
 - `templates/` — runnable project bases or explicitly labelled partial contracts.
 - `probes/` — product-facing runnable verification scenarios, including the offline retrieval probe.
 - `tools/offline/` — stdlib-only resolver, manifest, pinned source bundle, and attribution files.
-- `.pi/` — native Pi settings, prompt templates, and skills loaded after trust.
+- `router/` — generated read-only routing index (index.json + meta.json); the search_kit_resources tool uses it to route tasks to resources without loading the kit.
+- `.pi/` — native Pi settings, prompt templates, skills, and the search_kit_resources extension loaded after trust.
 
 If two files answer the same question, keep one canonical answer and replace the other with a pointer. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
 
 ## Workflow
 
-Use the native `.pi/prompts/` workflow templates in order for non-trivial work.
+Use the native `.pi/prompts/` workflow templates in order for non-trivial work. Before planning or implementing technical work, call `search_kit_resources` (see the `kit-resource-routing` skill) to route to the relevant rules, recipes, and catalogs instead of scanning the kit tree.
 
 ## Validation
 

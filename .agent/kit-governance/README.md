@@ -28,6 +28,7 @@ produit reste autonome (Z9, N1).
 | [18-zone-agents.md](18-zone-agents.md) | `AGENTS.md` produit (Z9) | actif |
 | [19-registre-artefacts.md](19-registre-artefacts.md) | Gabarit de métadonnées + relations (Z10) | actif |
 | [20-auteur-modules.md](20-auteur-modules.md) | Écriture des SKILL.md (A1) | actif |
+| [21-zone-router.md](21-zone-router.md) | `router/` — index de routage sémantique (Z11) | actif |
 | [30-conventions.md](30-conventions.md) | Nommage, formats, frontières (N1) | actif |
 
 ## Origine

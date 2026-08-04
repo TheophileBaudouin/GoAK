@@ -1,0 +1,28 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedKit search: "build a go service" → 134 match(es), showing top 5 (index v2.2.0).
+
+[recipe] recipe-rest-chi (score 8.31)
+path: recipes/recipe-rest-chi/SKILL.md
+matched terms: build, go, service
+Build a minimal idiomatic REST API with the chi v5 router — composable middleware, route groups, path parameters, and JSON in/out. Use when creating or reviewing a Go HTTP/REST service with chi.
+
+[source] source:go:command (score 7.15)
+path: knowledge/stdlib/go-command.yaml
+matched terms: build, go
+Go command reference Load when automating Go build, test, module, environment, cross-compilation, or build-constraint operations.
+
+[catalog] ardanlabs-service (score 5.14)
+path: knowledge/catalogs/reference-projects/ardanlabs-service/SKILL.md
+matched terms: go, service
+ardanlabs/service — Go service starter (DDD/data-oriented, ~4.1k★). EXTRACT-ONLY: extract layer separation (business/app/foundation) + observability wiring; NEVER copy its Kubernetes-first architectur…
+
+[prompt] checklist-release (score 4.90)
+path: .pi/prompts/checklist-release.md
+matched terms: build, go
+Prepare a Go application for release by running the mechanical gate, checking supply-chain and operational risks, and recording a real behavior result. Use before publishing or handing off a build.
+
+[source] source:go:opentelemetry (score 4.03)
+path: knowledge/observability/otel-go.yaml
+matched terms: go, service
+OpenTelemetry Go observability Load when adding vendor-neutral tracing, metrics, context propagation, or instrumentation to a Go service.
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24.

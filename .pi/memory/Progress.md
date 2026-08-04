@@ -12,6 +12,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `rules/core/errors/` — sentinel/typed/opaque decisions and handle-once rule.
 - [x] `rules/core/concurrency/` — goroutine lifetimes, cancellation, bounded fan-out.
 - [x] `rules/core/validation/` — golangci-lint, gosec, govulncheck.
+- [ ] Semantic Resource Router — système de routage par index (2026-08-05)
 
 ## KitV2 recipes (Pi skills: SKILL.md + code)
 
@@ -160,6 +161,15 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `KitV2/.pi/` ships reusable settings, prompts, and Pi-native skills; no
       pre-populated consumer memory is committed.
 - [x] `KitV2/.pi/prompts/workflow-memory.md` instructs fresh consumer projects to initialize local memory without copying metaproject history.
+- [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted.
+
+## Infrastructure
+
+- [x] KitV2 product tree, module `go-agent-kit-v2`, and native `.pi/` resources.
+- [x] Validation toolchain installed: gofmt, go vet, golangci-lint v2, gosec, govulncheck.
+- [x] Metaproject memory: root `.pi/memory/` Brief / Progress / Gotchas / Agent / Decisions.
+- [x] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
+s/workflow-memory.md` instructs fresh consumer projects to initialize local memory without copying metaproject history.
 - [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted.
 
 ## Infrastructure

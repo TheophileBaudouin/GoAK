@@ -1,0 +1,28 @@
+]777;notify;Terax;pi;working]777;notify;Terax;pi;finishedKit search: "bounded worker pool with context cancellation" → 38 match(es), showing top 5 (index v2.2.0).
+
+[recipe] recipe-worker-pool (score 44.08)
+path: recipes/recipe-worker-pool/SKILL.md
+matched terms: bounded, worker, pool, context, cancellation, concurrency, goroutine, errgroup, cancel
+Bounded concurrent fan-out in Go with first-error-cancel via errgroup.SetLimit (~5 lines). Use when processing N items concurrently with a concurrency cap, error propagation, or context cancellation.
+
+[pattern] pattern:concurrency:worker-pool (score 25.04)
+path: knowledge/patterns/concurrency-worker-pool.yaml
+matched terms: worker, pool, concurrency, goroutine, errgroup
+Worker pool — fan-out borné avec errgroup.SetLimit Lancer une goroutine par tâche sans limite épuise la mémoire et les connexions sous charge (voir pattern:antipattern:go-goroutine-leak).
+
+[source] source:go:context (score 20.21)
+path: knowledge/stdlib/go-context.yaml
+matched terms: bounded, context, cancellation, concurrency, timeout
+Go context package Load when propagating cancellation, deadlines, request scope, or bounded operation lifetime through Go APIs.
+
+[snippet] bounded-worker-cancellation (score 19.03)
+path: snippets/bounded-worker/SNIPPET.yaml
+matched terms: bounded, worker, cancellation, concurrency
+Bound concurrent work and stop accepting new work after cancellation.
+
+[pattern] pattern:go:contextual-worker (score 18.21)
+path: knowledge/patterns/go-contextual-worker.yaml
+matched terms: worker, context, cancellation, concurrency, goroutine
+Worker contextuel — goroutine avec condition de sortie explicite Lancer une goroutine est trivial ; la faire s'arrêter proprement ne l'est pas. Sans condition de sortie, les goroutines fuient (mémoire…
+
+Index coverage: anti-pattern 47 · catalog 53 · pattern 38 · prompt 8 · recipe 10 · rule 10 · skill 6 · snippet 3 · source 24 · template 7.
