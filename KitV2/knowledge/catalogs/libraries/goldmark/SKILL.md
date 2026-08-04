@@ -1,115 +1,102 @@
 ---
 name: goldmark
-description: "github.com/yuin/goldmark v1.8.5 — CommonMark 0.31.2 compliant markdown parser for Go, zero dependencies, extensible via AST. Use when choosing a markdown→HTML rendering library. Not for sanitizing untrusted HTML output (see pièges) or for non-CommonMark dialects (GFM tables need an extension)."
+description: "github.com/yuin/goldmark v1.8.5 — extensible CommonMark 0.31.2 parser and renderer for Go. Use for controlled Markdown parsing or HTML/AST pipelines; not for rendering untrusted HTML without sanitization or for terminal output."
 category: library
 tags: [markdown, commonmark, parsing, rendering, goldmark, extension]
 last-verified: 2026-08-05
 ---
 
-# goldmark — parsing markdown (CommonMark)
+# goldmark — parser Markdown CommonMark
 
 ## Selection
 
-[`github.com/yuin/goldmark`](https://github.com/yuin/goldmark) (v1.8.5,
-Go 1.22+).
-
-**Why it passes the gate** (actual reason, not stars): **zero dependencies**,
-full CommonMark 0.31.2 compliance, AST-based extension model, and an
-extensible renderer — the de-facto markdown engine in the Go ecosystem (Hugo,
-Mattermost tools, many docs pipelines). Fuzzed (scorecard fuzzing 10/10) and
-actively maintained.
+[`github.com/yuin/goldmark`](https://github.com/yuin/goldmark) v1.8.5 is a
+zero-dependency, extensible CommonMark 0.31.2 parser with an AST and renderer
+interfaces. It is admitted for this focused parsing/rendering boundary, active
+maintenance, tests, fuzzing, and real use in documentation systems, not for
+popularity. The v2 line is still beta; production code should pin v1.8.5.
 
 ## Admission checklist
 
-- [x] Actively maintained — v1.8.5 (2026-07-28), push 2026-08-02
-- [x] Single responsibility — CommonMark parsing + rendering
-- [x] Idiomatic Go — AST (`ast.Node`) + renderer visitors, no magic
-- [x] Tests present + CI — extensive CommonMark spec tests; fuzzing 10/10
-- [x] Documentation — README + godoc + extensions catalogue
-- [x] Real-world usage — Hugo et al.
-- [x] Readable end-to-end — core ~8 kLOC, layered (parser/AST/renderer)
-- [x] Justified by need — the kit covered templ HTML mais pas le markdown ;
-      NOT popularity
+- [x] Current stable v1.8.5 and Go 1.22+.
+- [x] Single responsibility: Markdown parsing, AST, extensions, and rendering.
+- [x] CommonMark conformance tests, CI, documentation, and fuzzing exist.
+- [x] Extension interfaces support GFM and application-specific AST/renderers.
+- [x] The security boundary is explicit: raw HTML and URL policy remain caller
+      decisions.
 
 ## Minimal use
 
 ```go
-md := goldmark.New()                 // extensions : goldmark.New(extension.GFM)
-var buf bytes.Buffer
-md.Convert([]byte("# Titre\n\nTexte **gras**"), &buf)
+func renderMarkdown(input []byte) ([]byte, error) {
+    var out bytes.Buffer
+    if err := goldmark.New().Convert(input, &out); err != nil {
+        return nil, fmt.Errorf("convert markdown: %w", err)
+    }
+    return out.Bytes(), nil
+}
 ```
 
-Compilé et vérifié avec v1.8.5 le 2026-08-05.
+Add `extension.GFM` through `goldmark.New` when the consumer needs GFM tables,
+strikethrough, or task lists. The output policy must be chosen separately from
+parsing.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| `github.com/gomarkdown/markdown` | Conforme mais moins actif, AST moins propre ; goldmark est la référence CommonMark moderne. |
-| `github.com/microcosm-cc/bluemonday` (sanitizer) | N'est PAS un parser markdown : à *combiner* avec goldmark quand l'entrée n'est pas de confiance (voir Pièges). |
-| Rendu « maison » par regex | Anti-pattern documenté : jamais de markdown par regex (injection, non-conformité). |
-| glamour (déjà au catalogue) | Rendu markdown **terminal** (TUI) — complémentaire, pas concurrent (goldmark = HTML/ast). |
-
-## Security note
-
-- Historique : 1 advisory **GO-2026-5320 / CVE-2026-5160 / GHSA-c97m-vxhj-p7j6**
-  — XSS via le rendu de certains contenus, corrigé en **v1.7.17**.
-  Épingler ≥ v1.7.17 ; v1.8.5 sain (vérifié 2026-08-05, OSV).
-- goldmark rend du **HTML brut** présent dans le markdown (blocs HTML et
-  `rawHTML` par défaut) : pour une entrée non contrôlée (commentaires, UGC),
-  sanitiser la sortie avec bluemonday **et** désactiver les blocs HTML si non
-  requis. Le XSS n'est pas un bug du parser : c'est le contrat du rendu.
+| `bluemonday` | Sanitizer, not a parser; combine it with goldmark for untrusted HTML output. |
+| `glamour` | Choose for terminal Markdown rendering; goldmark remains the parser/AST boundary. |
+| `gomarkdown/markdown` | Consider when its dialect/API is required; verify maintenance independently. |
+| Regex rendering | Rejected: it cannot provide CommonMark correctness or safe URL/HTML policy. |
 
 ## Utiliser cette librairie quand
 
-- Rendre du markdown CommonMark en HTML côté serveur (docs, README, articles).
-- Besoin d'extensions ciblées (GFM tables/strikethrough, front matter, syntax
-  highlighting) via l'AST.
-- Entrée de confiance (contenu éditorial interne) : le rendu par défaut suffit.
+- A Go service needs CommonMark parsing, HTML output, an AST, or targeted GFM
+  extensions.
+- The application needs custom AST transforms or renderer visitors.
+- Input trust and output sanitization can be made explicit at the boundary.
 
 ## Ne pas utiliser cette librairie quand
 
-- L'entrée est du contenu utilisateur non contrôlé **sans** sanitisation en
-  aval (bluemonday) : XSS garanti via blocs HTML (advisory GO-2026-5320).
-- Besoin d'un dialecte non-CommonMark exotique : vérifier l'extension avant
-  d'adopter.
-- Le markdown est un détail mineur d'une app TUI : voir `glamour` (rendu
-  terminal) à la place.
+- Untrusted Markdown is rendered without sanitization and safe HTML/URL policy.
+- The target is terminal output: use Glamour for the terminal renderer.
+- A different Markdown dialect is required but no compatible extension exists.
+- The project wants the unstable v2 beta API in a production contract.
 
 ## Avantages
 
-- Zéro dépendance, conformité CommonMark 0.31.2 testée par la spec officielle.
-- AST complet : extensions et transformations (TOC, liens, highlight) sans
-  hacks.
-- Rendu et parsing séparés : contrôler précisément la sortie.
-- Écosystème éprouvé (Hugo) et fuzzing.
+- Zero direct dependencies and tested CommonMark conformance.
+- Extensible AST and renderer interfaces instead of regex or string rewriting.
+- GFM and focused extensions can be selected without adopting a full framework.
 
 ## Inconvénients
 
-- Blocs HTML rendus par défaut (danger UGC — nécessite sanitizer).
-- v2 en beta avec breaking changes annoncés pour les extensions tierces :
-  épingler une v1.8.x exacte en production.
-- Pas de moteur de templates (titre/métadonnées) : à composer.
+- Raw HTML and dangerous-link policy require deliberate configuration and
+  downstream sanitization for untrusted content.
+- v2 beta is a future breaking boundary; extensions must be tested on upgrades.
+- It does not provide templates, terminal rendering, or application metadata
+  management.
 
 ## Pièges connus
 
-- XSS via rendu d'entrées non contrôlées (GO-2026-5320, fix ≥ 1.7.17) :
-  sanitiser avec bluemonday ; désactiver `WithUnsafe`/blocs HTML quand non
-  nécessaires.
-- Extensions tierces : l'API AST peut casser à la frontière v2 — épingler la
-  version exacte et tester à chaque bump.
-- Ne pas parser des markdown « imbriqués » (ex. markdown dans un champ JSON)
-  sans échappement explicite.
+- Use a patched release (v1.7.17 or later); current v1.8.5 addresses the
+  historical HTML-rendering XSS advisory.
+- Do not equate parsing with sanitization: apply a trusted HTML policy and a
+  sanitizer such as bluemonday for untrusted content.
+- Avoid `html.WithUnsafe()` unless raw HTML and dangerous URLs are explicitly
+  part of the trusted content contract.
+- Pin v1.8.5 and test third-party extensions while v2 remains beta.
 
 ## Sources vérifiées
 
-- [yuin/goldmark (repo officiel, v1.8.5)](https://github.com/yuin/goldmark)
-  — vérifié 2026-08-05
-- [pkg.go.dev/github.com/yuin/goldmark](https://pkg.go.dev/github.com/yuin/goldmark)
-  — vérifié 2026-08-05
-- [Advisory GO-2026-5320 / CVE-2026-5160 (XSS, fix 1.7.17)](https://osv.dev/vulnerability/GO-2026-5320)
-  — vérifié 2026-08-05 (sécurité officielle)
-- [goldmark v2 beta (breaking extensions)](https://github.com/yuin/goldmark/releases)
-  — vérifié 2026-08-05
-- Artefacts internes : `pattern:antipattern:sec-unsanitized-rendering`,
-  catalog `glamour`
+- [Official goldmark repository](https://github.com/yuin/goldmark) — API,
+  maintenance, license, checked 2026-08-05.
+- [goldmark on pkg.go.dev](https://pkg.go.dev/github.com/yuin/goldmark) — API,
+  CommonMark and extension behavior, checked 2026-08-05.
+- [goldmark releases](https://github.com/yuin/goldmark/releases) — v1.8.5
+  stable and v2 beta status, checked 2026-08-05.
+- [GO-2026-5320 advisory](https://pkg.go.dev/vuln/GO-2026-5320) — historical
+  HTML-rendering XSS and fixed release, checked 2026-08-05.
+- [GitHub advisory](https://github.com/advisories/GHSA-c97m-vxhj-p7j6) —
+  security details, checked 2026-08-05.

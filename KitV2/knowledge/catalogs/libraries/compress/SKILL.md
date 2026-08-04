@@ -1,128 +1,110 @@
 ---
 name: compress
-description: "github.com/klauspost/compress v1.19.1 — pure-Go compression library (zstd, s2, flate, gzip, snappy) with zero dependencies. Use when choosing a compression algorithm or replacing stdlib compress/* on performance grounds. Not for formats it does not implement (brotli, lzma, zlib-variants — check per subpackage)."
+description: "github.com/klauspost/compress v1.19.1 — pure-Go zstd, S2, gzip/flate, and related codecs. Use when a benchmark or format requirement justifies more than stdlib compression; not for unsupported formats, unbounded decompression, or encryption."
 category: library
 tags: [compression, zstd, s2, gzip, flate, performance]
 last-verified: 2026-08-05
 ---
 
-# compress — compression pure Go
+# compress — codecs compression Go
 
 ## Selection
 
-[`github.com/klauspost/compress`](https://github.com/klauspost/compress)
-(v1.19.1, Go 1.24+).
-
-**Why it passes the gate** (actual reason, not stars): **zero direct
-dependencies**, pure Go, fuzzed (scorecard fuzzing 10/10, SAST 10/10,
-vulnerabilities 10/10) — the strongest security profile among compression
-options — and the reference implementation for zstd/S2 in the Go ecosystem
-(used by MinIO, Grafana, VictoriaMetrics). Each subpackage is a single focused
-codec; the whole is readable by layer.
+[`github.com/klauspost/compress`](https://github.com/klauspost/compress) v1.19.1,
+released 2026-07-20, provides pure-Go codec packages for zstd, S2, gzip/flate,
+zlib, zip, huff0, and FSE. It is admitted for focused codec choice, active
+maintenance, tests/fuzzing, and real production use; stdlib remains the default
+when compatibility and measured performance do not require this dependency.
 
 ## Admission checklist
 
-- [x] Actively maintained — v1.19.1 (2026-07-20), push 2026-08-04
-- [x] Single responsibility — compression codecs (zstd, s2, flate, gzip, …)
-- [x] Idiomatic Go — pure Go, io.Reader/Writer interfaces, no cgo
-- [x] Tests present + CI — extensive; fuzzing 10/10, SAST 10/10 (scorecard 7.4)
-- [x] Documentation — README per subpackage + benchmarks
-- [x] Real-world usage — MinIO, Grafana, VictoriaMetrics, Caddy
-- [x] Readable end-to-end — per-codec packages, layered
-- [x] Justified by need — the kit had zero compression decision support and no
-      zstd option in stdlib; NOT popularity
+- [x] Current v1.19.1 release and Go 1.24+.
+- [x] Single responsibility: compression codecs and related I/O helpers.
+- [x] Pure Go with extensive tests, CI, benchmarks, and fuzzing.
+- [x] Subpackages expose familiar `io.Reader`/`io.Writer` boundaries.
+- [x] Real use in MinIO, Grafana, VictoriaMetrics, and other Go systems.
 
 ## Minimal use
 
 ```go
-// zstd — compression ratio
-zw, _ := zstd.NewWriter(&buf); zw.Write(data); zw.Close()
-zr, _ := zstd.NewReader(&r);  io.Copy(&out, zr)
-
-// s2 — speed (Snappy-compatible framing, 2x compression of snappy)
-w := s2.NewWriter(&buf); w.Write(data); w.Close()
-r := s2.NewReader(&buf); io.Copy(&out, r)
+func compressZstd(data []byte) ([]byte, error) {
+    var out bytes.Buffer
+    writer, err := zstd.NewWriter(&out)
+    if err != nil {
+        return nil, fmt.Errorf("create zstd writer: %w", err)
+    }
+    if _, err := writer.Write(data); err != nil {
+        _ = writer.Close()
+        return nil, fmt.Errorf("write zstd data: %w", err)
+    }
+    if err := writer.Close(); err != nil {
+        return nil, fmt.Errorf("close zstd writer: %w", err)
+    }
+    return out.Bytes(), nil
+}
 ```
 
-Compilé et vérifié (roundtrips zstd + s2) avec v1.19.1 le 2026-08-05.
+Choose a codec/subpackage for a format and benchmark the real workload. Use a
+bounded input/output policy around every decompressor; compression is not
+confidentiality.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| stdlib `compress/gzip`, `compress/flate` | Correct pour l'interopérabilité gzip ; performances et ratio inférieurs (gzip) — préférer compress/gzip pour la compat, klauspost pour la perf mesurée. |
-| `github.com/klauspost/pgzip` | Couche parallèle gzip séparée ; intégrée dans klauspost/compress (gzip est parallélisable via `pgzip` subpackage). |
-| `compress/brotli` (andybalholm) | Format brotli : klauspost/compress ne l'implémente pas ; bibliothèque séparée si le format est requis (cas rares). |
-| `github.com/pierrec/lz4` | Format lz4 : subpackage dédié ; préférer s2 pour le ratio à vitesse comparable. |
-
-## Security note
-
-- Historique : 1 advisory **GO-2026-5841 / GHSA-259r-337f-4rfw** — integer
-  overflow + écriture hors bornes dans `s2` (versions 1.16.0 → 1.18.6),
-  corrigé en **v1.18.7**. Épingler ≥ v1.18.7 ; v1.19.1 sain (vérifié
-  2026-08-05, OSV).
-- Toujours décoder depuis une source bornée/limitée : décompresser une entrée
-  non contrôlée peut amplifier la mémoire (zip-bomb class) — borner la taille
-  de sortie quand la source n'est pas de confiance (voir aussi l'advisory
-  data-amplification de kin-openapi).
-- Codecs fuzzés + govulncheck dans la gate : suivre les advisories s2/zstd.
+| stdlib `compress/gzip`/`flate` | Prefer for standard gzip/flate interoperability when no measured gain is required. |
+| `github.com/klauspost/pgzip` | Separate module for parallel gzip; choose only when the workload justifies it. |
+| Brotli/lzma/lz4 packages | Choose the library that owns the required format; this module does not implement every format. |
+| Encryption | Use `age` or a transport security layer; compression is not encryption. |
 
 ## Utiliser cette librairie quand
 
-- Besoin de compression zstd ou S2 en Go (ratio zstd, vitesse s2) — hors stdlib.
-- Remplacer `compress/gzip`/`flate` **avec un benchmark à l'appui** (gain
-  mesuré en ratio ou en latence sur le workload réel).
-- Contrainte zéro dépendance / zéro cgo (binaire autonome, embarqué).
+- zstd or S2 is required in a pure-Go Go service.
+- A benchmark shows a meaningful ratio, latency, or throughput gain over stdlib.
+- The project needs one of the module's supported codecs and can pin/scan its
+  dependency.
 
 ## Ne pas utiliser cette librairie quand
 
-- La compatibilité gzip au sens strict suffit et le workload n'est pas
-  mesuré : le stdlib est le choix minimal (voir `source:performance:
-  compression-selection`).
-- Le format requis est brotli/lzma/lz4 (non implémenté ici — bibliothèque
-  dédiée).
-- Le décodage doit accepter des entrées arbitraires non bornées : borner la
-  sortie à la charge de l'appelant, pas du codec.
+- Stdlib gzip/flate already satisfies interoperability and performance.
+- The required format is Brotli, LZMA, or another codec not supplied here.
+- Untrusted compressed input cannot be bounded for memory/output amplification.
+- The requirement is encryption, integrity policy, or key management.
 
 ## Avantages
 
-- Zéro dépendance directe, pure Go, fuzzé : profil sécurité de tête.
-- zstd et S2 de référence dans l'écosystème Go (adoption production massive).
-- API `io.Reader`/`io.Writer` familière ; parallelisation gzip incluse
-  (`pgzip`-style via le package gzip).
-- Perf mesurées et documentées par subpackage (benchmarks publiés).
+- Pure Go and broad codec coverage behind familiar I/O APIs.
+- zstd/S2 implementations with benchmarks and production adoption.
+- Subpackage selection keeps a chosen codec's surface smaller than the whole
+  module.
 
 ## Inconvénients
 
-- Couverture de formats incomplète : pas de brotli/lzma/lz4 (subpackages
-  séparés à choisir ailleurs).
-- Le zstd README évolue vite : suivre les releases pour les correctifs de
-  sécurité (1 advisory s2 en 2026).
-- La surface d'API est large (10+ codecs) : lisible par subpackage, pas
-  d'un seul tenant.
+- The module is broad; each codec has its own format and operational behavior.
+- New releases can change performance and memory characteristics.
+- Some formats and parallel helpers are separate modules or packages.
 
 ## Pièges connus
 
-- Advisory GO-2026-5841 : épingler ≥ v1.18.7 (integer overflow + écriture
-  hors bornes dans `s2` sur entrée non contrôlée). Vérifier les versions
-  transitives avec govulncheck.
-- `s2.Decode` décode un **bloc** Snappy ; un flux framé (sortie de
-  `s2.NewWriter`) se lit avec `s2.NewReader` — l'erreur « corrupt input »
-  signale ce mélange.
-- Ne pas paralléliser manuellement : chaque codec gère déjà l'état interne ;
-  utiliser les writers fournis par package.
-- La compression n'est pas du chiffrement : pour des données sensibles,
-  combiner avec age (voir `source:security:file-encryption`).
+- Pin v1.18.7 or later: the historical S2 dictionary advisory affects older
+  versions; v1.19.1 is the current checked version.
+- Match framed S2 streams with `s2.NewReader`; do not pass them to block APIs.
+- Bound decompressed output and memory for untrusted input.
+- Test truncation and interoperability: upstream tracks zstd EOF masking and
+  frame-size edge cases.
+- Do not manually parallelize a codec whose writer already owns its state.
 
 ## Sources vérifiées
 
-- [klauspost/compress (repo officiel, v1.19.1)](https://github.com/klauspost/compress)
-  — vérifié 2026-08-05
-- [pkg.go.dev/github.com/klauspost/compress](https://pkg.go.dev/github.com/klauspost/compress)
-  — vérifié 2026-08-05
-- [Advisory GO-2026-5841 / GHSA-259r-337f-4rfw (s2 OOB, fix 1.18.7)](https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw)
-  — vérifié 2026-08-05 (sécurité officielle)
-- OSV : `github.com/klauspost/compress` 1 advisory corrigé (requête API
-  2026-08-05)
-- Artefacts internes : `source:performance:compression-selection`,
-  `source:security:file-encryption`
+- [Official compress repository](https://github.com/klauspost/compress) — API,
+  maintenance, license, checked 2026-08-05.
+- [v1.19.1 release](https://github.com/klauspost/compress/releases/tag/v1.19.1)
+  — exact version and changes, checked 2026-08-05.
+- [compress on pkg.go.dev](https://pkg.go.dev/github.com/klauspost/compress) —
+  supported packages, checked 2026-08-05.
+- [S2 advisory](https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw)
+  — fixed version and impact, checked 2026-08-05.
+- [OSV GO-2026-5841](https://osv.dev/vulnerability/GO-2026-5841) — structured
+  vulnerability record, checked 2026-08-05.
+- [zstd issue #1128](https://github.com/klauspost/compress/issues/1128) —
+  truncation behavior, checked 2026-08-05.

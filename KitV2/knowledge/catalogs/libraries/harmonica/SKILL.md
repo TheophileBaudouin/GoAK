@@ -1,92 +1,94 @@
 ---
 name: harmonica
-description: "github.com/charmbracelet/harmonica — simple physics-based spring animation library for Go TUIs. Use when animating terminal UI motion (easing, spring, linear/quadratic curves) instead of hand-rolling easing math."
+description: "github.com/charmbracelet/harmonica v0.2.0 — framework-agnostic spring and projectile physics for Go animations. Use when a TUI or UI needs damped motion math; not for rendering, easing catalogs, or a full animation framework."
 category: library
-tags: [tui, animation, physics, easing, terminal]
-last-verified: 2026-08-04
+tags: [animation, physics, spring, tui, charm]
+last-verified: 2026-08-05
 ---
 
-# harmonica — Spring animation for TUIs
+# harmonica — physique d'animation
 
 ## Selection
 
-[`github.com/charmbracelet/harmonica`](https://github.com/charmbracelet/harmonica).
-
-**Why it passes the gate** (actual reason, not stars): it solves one narrow,
-commonly botched problem — frame-rate-independent easing — with a tiny API
-(springs, `Linear`/`Quadratic`/`Cubic`/`Exponential` curves, `FPS`-driven
-advance). The math (damping, stiffness) is already validated and tested; the
-package is stable and dependency-free.
+[`github.com/charmbracelet/harmonica`](https://github.com/charmbracelet/harmonica)
+v0.2.0 is a small MIT-licensed math library for damped spring and projectile
+motion. It is framework-agnostic: the caller advances the simulation and maps
+its result to a UI. It is admitted for this focused utility and tests in the
+Charm ecosystem, with the low release velocity recorded honestly.
 
 ## Admission checklist
 
-- [x] Actively maintained — commits 2026, stable v0.2 API
-- [x] Single responsibility — physics-based easing
-- [x] Idiomatic Go — small pure functions, no globals
-- [x] Tests present + CI — yes
-- [x] Documentation — README with usage
-- [x] Real-world usage — part of the Charm TUI ecosystem
-- [x] Readable end-to-end — yes, tiny
-- [x] Justified by need — easing math is easy to get subtly wrong
+- [x] Stable tagged release v0.2.0; later upstream commits are not a new tag.
+- [x] Single responsibility: spring/projectile simulation.
+- [x] No rendering framework or hidden global state.
+- [x] Go package documentation and tests exist.
+- [x] Useful when a consumer needs physical motion rather than a generic tween.
 
 ## Minimal use
 
 ```go
-spring := harmonica.NewSpring(harmonica.FPS(60), 0.8, 0.5) // damping, stiffness
-for !spring.IsSettled() {
-    value := spring.Update(1.0)
-    renderAt(value) // interpolate position/alpha with the spring value
+func step(spring harmonica.Spring, position, velocity float64) (float64, float64) {
+    return spring.Update(position, velocity, 0)
 }
 ```
+
+Create a spring with `NewSpring(deltaTime, angularFrequency, dampingRatio)`;
+call `Update` once per frame and render the returned position. `Projectile`
+provides the corresponding constant-acceleration model.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Hand-rolled easing | Fine for one hardcoded curve; springs and fps-independence are the error-prone part this package covers. |
-| `golang.org/x/exp/shiny` anim | Experimental, unrelated scope. |
-
-## Notes
-
-- Drive updates from `tea.Tick` in Bubble Tea, never from blocking sleeps.
-- Keep springs short (0.5-1.0s); terminal redraws are cheap but visible.
+| Bubble Tea commands/ticks | Use for event scheduling; harmonica supplies only the motion calculation. |
+| Generic easing/tween library | Use when fixed easing curves, not physical spring behavior, are required. |
+| Ebitengine/Pixi-like UI framework | Use when the project needs rendering and a full game/UI loop. |
 
 ## Utiliser cette librairie quand
 
-- Animer du mouvement TUI (position, alpha, taille) avec un easing
-  indépendant de la fréquence d'images.
-- Besoin de ressorts physiques (damping, stiffness) validés et testés plutôt
-  que de la math d'easing maison.
-- Le rendu est piloté par `tea.Tick` dans Bubble Tea.
+- A UI animation needs a damped spring, gravity, or projectile trajectory.
+- The application wants deterministic per-frame math independent of its renderer.
+- Multiple UI frameworks should be able to consume the same motion calculation.
 
 ## Ne pas utiliser cette librairie quand
 
-- Une seule courbe codée en dur suffit (easing maison acceptable).
-- La TUI n'a pas de boucle d'animation (sortie statique).
+- The project needs rendering, event scheduling, or an animation timeline.
+- Fixed easing curves are enough and a physics model adds needless state.
+- The project requires a maintained feature-rich animation framework rather than
+  a small math utility.
 
 ## Avantages
 
-- Tiny API, zéro dépendance, pure : springs + courbes
-  (Linear/Quadratic/Cubic/Exponential).
-- Easing frame-rate-independent (FPS-driven) : le problème le plus souvent
-  raté est résolu et testé.
-- Stable (v0.2), maintenance active, écosystème Charm.
+- Tiny, framework-agnostic API with explicit per-frame state.
+- Spring parameters map directly to physical behavior.
+- Can be tested without a terminal, window, or renderer.
 
 ## Inconvénients
 
-- Surface très étroite : animation physique seulement, pas de moteur de
-  transition d'écran.
-- Pas de gestion du temps global : le driver (tea.Tick) reste à écrire.
+- Low-velocity release cadence: v0.2.0 remains the latest tag.
+- No rendering, easing catalog, interpolation helpers, or lifecycle manager.
+- One spring instance models one spring; consumers manage collections and frame
+  scheduling themselves.
 
 ## Pièges connus
 
-- Piloter les mises à jour depuis `tea.Tick`, jamais depuis des `sleep`
-  bloquants.
-- Garder des ressorts courts (0.5–1.0 s) : les redraws terminal sont visibles.
-- Vérifier `IsSettled()` pour terminer l'animation et libérer la boucle.
+- Advance with a stable `deltaTime`; inconsistent frame steps change the motion.
+- Keep one simulation state per animated value and persist position/velocity
+  between frames.
+- Choose damping and angular frequency from the desired behavior; do not treat
+  the library as a generic zero-configuration tween.
+- Pin v0.2.0 and review the pseudo-version separately if consuming unreleased
+  changes.
 
 ## Sources vérifiées
 
-- [charmbracelet/harmonica (repo officiel)](https://github.com/charmbracelet/harmonica)
-  — vérifié 2026-08-04
-- Artefact interne : catalog `bubbletea` (driver tea.Tick)
+- [Official harmonica repository](https://github.com/charmbracelet/harmonica) —
+  maintenance, license, checked 2026-08-05.
+- [harmonica on pkg.go.dev](https://pkg.go.dev/github.com/charmbracelet/harmonica)
+  — exact tagged version and API, checked 2026-08-05.
+- [Spring implementation](https://github.com/charmbracelet/harmonica/blob/master/spring.go)
+  — state/update behavior, checked 2026-08-05.
+- [Projectile implementation](https://github.com/charmbracelet/harmonica/blob/master/projectile.go)
+  — projectile boundary, checked 2026-08-05.
+- [harmonica releases](https://github.com/charmbracelet/harmonica/releases) —
+  tagged-release status, checked 2026-08-05.
