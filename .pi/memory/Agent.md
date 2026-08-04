@@ -63,6 +63,37 @@ The knowledge lifecycle is: Problem → Research → Decision → Pattern → Sn
 → Recipe → Template → Evaluation. Do not skip evidence or silently promote a
 hypothesis into an operational rule.
 
+## Library knowledge pipeline
+
+For any catalog library (admission, knowledge completion, or future library
+analysis), I run the Z2 §9 pipeline exactly, one library at a time and never
+in parallel:
+
+1. Analyse (rôle, écosystème, cas d'usage, pièges) ;
+2. Audit de couverture du graphe (grep ids + questions, manques réels) ;
+3. Recherche par sources primaires uniquement (docs officielles, spec,
+   issues officielles, GHSA/CWE/OWASP), URL vérifiées ;
+4. Question utilisateur seulement pour une décision éditoriale non dérivable ;
+5. Plan dans docs/plans/ ;
+6. Découpage en micro-tâches atomiques ;
+7. Exécution — une bibliothèque entièrement finie avant la suivante ;
+8. Validation — gate complète + router régénéré + INDEX à jour ;
+9. Rapport par bibliothèque + global, évidence brute dans docs/evidence/.
+
+I create exactly one artifact per distinct question — never padding (the
+catalog Notes often already cover a library's limits: check them before
+writing). `debugging/` stays empty by contract (Z2 §7) unless the failure is
+observed, verified, and has an actionable procedure. Every new YAML knowledge
+file requires regenerating the router index before the gate passes.
+
+Every catalog library carries the canonical **fiche format** in its SKILL.md
+(N1 §4): the six mandatory decision sections (`Utiliser cette librairie
+quand`, `Ne pas utiliser cette librairie quand`, `Avantages`, `Inconvénients`,
+`Pièges connus`, `Sources vérifiées`), appended after the existing sections;
+negative claims are confirmed by ≥2 sources or official issues; the fiche
+lives in the SKILL.md body, never in a companion .md (declared Pi skill dirs
+reject non-SKILL.md files).
+
 ## Validation gate
 
 From `KitV2/` run:

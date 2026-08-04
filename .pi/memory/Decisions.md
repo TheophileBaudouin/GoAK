@@ -267,3 +267,42 @@ de compacité core (≤ 6 modules, ≤ 300 lignes), nouvelles shapes de template
 - **Séparation stricte** : builder dans le méta-projet
   (`.agent/router/build_index.py`, déterministe, --check) ; kit en lecture
   seule. Gate étendue (couverture + hash) → toute dérive bloque la release.
+
+## Knowledge completion pipeline (2026-08-04)
+
+- **Pipeline obligatoire pour toute bibliothèque du catalogue** (décision
+  utilisateur, suite au lot de complétion des 29 bibliothèques) : Analyse →
+  Audit de couverture → Recherche (sources primaires) → Question (si décision
+  éditoriale) → Plan → Découpage → Exécution (une bibliothèque à la fois) →
+  Validation → Rapport. Encodé dans le contrat Z2 §9 et la règle Agent.md
+  « Library knowledge pipeline ».
+- **Manques réels uniquement** (réponse utilisateur à la question éditoriale) :
+  un artefact par question distincte non couverte ; le volume non justifié est
+  un échec d'admission (write-gate C0 §4).
+- **Les Notes des catalogs couvrent souvent les limites** d'une bibliothèque
+  (ex. TTL de ristretto, v6 alpha de go-git) : les vérifier avant d'écrire un
+  artefact de connaissance, sous peine de duplication.
+- **Conventions d'écriture** : URLs canoniques jamais réécrites pour un lint
+  (échappement YAML `"...\<LF>  suite"` sur `source:` si nécessaire, vérifié
+  par yaml.safe_load) ; français pour patterns/anti-patterns, anglais pour les
+  pointeurs Source ; lignes > 80 non bloquantes (convention corpus).
+- **Contrôles de sortie** : gate C0 §8 + router régénéré après tout ajout YAML
+  knowledge + INDEX.md à jour (générateur d'index toujours en attente — Z2 §4).
+
+## Catalog fiche format (2026-08-04)
+
+- **28 bibliothèques enrichies** : chaque SKILL.md de `catalogs/libraries/`
+  porte les 6 sections décisionnelles du « format fiche » (Utiliser cette
+  librairie quand / Ne pas utiliser cette librairie quand / Avantages /
+  Inconvénients / Pièges connus / Sources vérifiées), ajoutées après les
+  sections vétées, en-têtes FR (spécification utilisateur), contenu libre.
+- **Placement contraint** : `knowledge/catalogs` est déclaré répertoire de
+  skills Pi dans `.pi/settings.json` → la fiche vit DANS le SKILL.md ; un
+  fichier compagnon (.md non-SKILL.md) casserait la découverte Pi (Gotcha
+  2026-08-03). Frontmatter des entrées vétées inchangé.
+- **Exigence multi-source** : toute critique négative d'une fiche est
+  confirmée par ≥ 2 sources ou issues officielles (jamais une source isolée) ;
+  chaque entrée de « Sources vérifiées » porte URL + date + type.
+- **Standard encodé** : N1 §4 (format fiche canonique du corps des catalog
+  SKILL.md) + Z2 §9.2 (admission = fiche complète). Le router est inchangé
+  (édition de corps uniquement, descriptions frontmatter intactes).

@@ -42,6 +42,16 @@ de ce tableau.
 - Corps : block scalars (`>-` / `|`) ; une idée par section ; pas de YAML
   imbriqué libre.
 - `go_version` : la version minimale **testée** ; jamais une version future.
+- URLs canoniques : **jamais réécrites** pour satisfaire un lint de style.
+  Si une ligne `source:` dépasse ~80 caractères (linter YAML externe, non
+  configuré dans le repo), utiliser l'échappement
+  YAML valide `"...\<saut de ligne>  suite"` (double-quote + backslash :
+  résout en une chaîne sans espace — vérifier avec `yaml.safe_load`).
+- Langue : ids ASCII, contenu libre (N1 §1) ; convention du corpus — français
+  pour patterns/anti-patterns, anglais pour les pointeurs Source/guidance.
+- Post-écriture : tout YAML-graphe créé est re-lu (`yaml.safe_load`) et sa
+  fraîcheur/relations contrôlées avant validation ; les lignes > 80 ne sont
+  pas une gate projet (le corpus en contient déjà — URLs et contenu).
 
 ## 4. SKILL.md — conventions (détaillées dans A1)
 
@@ -50,6 +60,16 @@ de ce tableau.
 - Progressive disclosure : description (L1) = quoi + quand + contraintes
   négatives ; corps (L2) ≤ 500 lignes ; détails en fichiers référencés (L3).
 - Chemins relatifs au module ; jamais de lien en prose qui pourrit.
+- Corps des catalog `libraries/` : **format « fiche » canonique** — les
+  sections décisionnelles suivantes sont obligatoires pour toute bibliothèque
+  admise : `## Utiliser cette librairie quand`, `## Ne pas utiliser cette
+  librairie quand`, `## Avantages`, `## Inconvénients`, `## Pièges connus`,
+  `## Sources vérifiées` (URL + date + type de source ; critiques négatives
+  confirmées par ≥ 2 sources indépendantes, ou ≥ 1 issue/advisory officielle
+  du projet). Les sections
+  préexistantes (Selection, Admission checklist, Minimal use, Alternatives,
+  Notes) sont conservées telles quelles. En-têtes de fiche en français
+  (spécification utilisateur), contenu libre.
 
 ## 5. Frontières Kit / MetaProjet (inviolables)
 

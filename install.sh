@@ -58,10 +58,10 @@ animate() {
 	while kill -0 "$pid" 2>/dev/null; do
 		# shellcheck disable=SC1003 # single backslash spinner frame
 		case $((i % 4)) in
-			0) ch='|' ;;
-			1) ch='/' ;;
-			2) ch='-' ;;
-			3) ch='\' ;;
+		0) ch='|' ;;
+		1) ch='/' ;;
+		2) ch='-' ;;
+		3) ch='\' ;;
 		esac
 		printf '\r  %s %s' "$ch" "$label"
 		i=$((i + 1))
