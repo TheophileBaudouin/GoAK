@@ -1,100 +1,105 @@
 ---
 name: glamour
-description: "charm.land/glamour/v2 — stylesheet-based markdown rendering for terminal apps, with built-in light/dark themes and custom style sheets. Use when a CLI/TUI must render Markdown (docs, LLM output, reports) to the terminal."
+description: "charm.land/glamour/v2 v2.0.1 — stylesheet-based Markdown-to-terminal rendering built on goldmark. Use when a Go CLI/TUI renders Markdown with dark/light/notty styles; not for HTML, images, or general terminal styling."
 category: library
 tags: [tui, markdown, terminal, rendering, cli]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# glamour — Markdown rendering for the terminal
+# glamour — rendu Markdown terminal
 
 ## Selection
 
-[`charm.land/glamour/v2`](https://github.com/charmbracelet/glamour) (v2).
-
-**Why it passes the gate** (actual reason, not stars): it renders GitHub-flavored
-Markdown to styled terminal output via CSS-like style sheets (dark/light/notty
-built in), reusing goldmark for parsing. One function call turns Markdown into
-ANSI-styled text that degrades cleanly on non-color terminals (`"notty"`). It is
-the rendering engine behind Glow and the Charm docs stack, actively maintained.
+[`charm.land/glamour/v2`](https://github.com/charmbracelet/glamour) v2.0.1,
+released 2026-06-12, renders Markdown as styled terminal text using themes and
+custom style sheets. It is admitted for the focused Markdown-to-terminal
+boundary, active maintenance, tests, and use in Glow/Charm applications, not
+for popularity.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.0.x (2026)
-- [x] Single responsibility — Markdown → terminal rendering
-- [x] Idiomatic Go — `glamour.Render(input, style)` one-call API
-- [x] Tests present + CI — yes
-- [x] Documentation — README + charm.sh docs
-- [x] Real-world usage — Glow, Charm CLI docs, many TUI apps
-- [x] Readable end-to-end — yes
-- [x] Justified by need — agents/CLIs routinely surface Markdown
+- [x] Current v2.0.1 release with active upstream maintenance.
+- [x] Single responsibility: Markdown parsing/rendering for terminal output.
+- [x] Built on goldmark with tests, CI, documentation, and examples.
+- [x] Provides dark/light/notty styles and custom style options.
+- [x] The project keeps HTML, image rendering, and general styling outside this
+      package's responsibility.
 
 ## Minimal use
 
 ```go
-out, err := glamour.Render(markdownText, "dark") // "dark" | "light" | "notty"
-fmt.Print(out)
+func render(markdown string) (string, error) {
+    renderer, err := glamour.NewTermRenderer(glamour.WithStandardStyle("dark"))
+    if err != nil {
+        return "", fmt.Errorf("create renderer: %w", err)
+    }
+    out, err := renderer.Render(markdown)
+    if err != nil {
+        return "", fmt.Errorf("render markdown: %w", err)
+    }
+    return out, nil
+}
 ```
+
+Use a `notty` style when output is piped or captured. In v2 the module path is
+`charm.land/glamour/v2`; the v1 import path and removed auto-style options must
+not be copied into new code.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Hand-rolled ANSI styling | Reimplements a parser + theme engine; bugs and inconsistent output. |
-| goldmark direct | HTML rendering; you still build the terminal renderer yourself. |
-| chroma alone | Syntax highlighting only, no document layout. |
-
-## Notes
-
-- Choose `"notty"` when output may be piped (log files, CI): plain text without
-  escape codes.
-- Themes are style sheets — `glamour.WithStyles(yourStyleJSON)` for brand
-  consistency.
-- Pair with `lipgloss` for non-Markdown layout around the rendered text.
+| goldmark | Choose when the output is HTML or a custom AST/renderer boundary is required. |
+| lipgloss | Companion for terminal layout and styling, not a Markdown renderer. |
+| Hand-written ANSI rendering | Rejected for non-trivial Markdown; it recreates parsing and layout bugs. |
+| glow | Choose the complete standalone Markdown reader; glamour is the embeddable renderer. |
 
 ## Utiliser cette librairie quand
 
-- Une CLI/TUI doit rendre du Markdown (docs, sortie LLM, rapports) au
+- A CLI/TUI needs to render Markdown documents, reports, or LLM output in a
   terminal.
-- Un rendu GitHub-flavored stylé (thèmes dark/light/notty intégrés) est
-  souhaité sans réimplémenter un parseur.
-- La sortie doit dégrader proprement sur terminaux sans couleur (`"notty"`).
+- Built-in dark/light/notty themes or a custom style sheet are sufficient.
+- The output must remain terminal text rather than HTML or images.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le rendu est de l'HTML (goldmark direct convient).
-- Seule la coloration syntaxique est nécessaire (chroma seul suffit).
-- Le contenu n'est pas du Markdown : lipgloss couvre le layout simple.
+- The target is HTML, a browser, or a rich document format.
+- Image rendering is a requirement.
+- Only ANSI styling/layout is needed without Markdown parsing.
+- A standalone Markdown reader is desired instead of an embedded library.
 
 ## Avantages
 
-- Une fonction : `glamour.Render(input, style)` — Markdown → ANSI stylé.
-- Basé sur goldmark (parseur maintenu), thèmes par feuilles de style
-  (`WithStyles`).
-- Usage réel : Glow, stack docs de Charm, nombreuses TUIs.
-- Dégradation propre (`notty`) pour les pipes et CI.
+- Focused Markdown-to-terminal API on top of goldmark.
+- Stylesheet-based customization and a plain `notty` mode for pipes/CI.
+- v2 has a clear vanity module path and a maintained Charm ecosystem boundary.
 
 ## Inconvénients
 
-- Rendu terminal seulement : pas de sortie HTML riche (goldmark reste la
-  référence pour HTML).
-- Thèmes par défaut limités à dark/light/notty — la marque exige une feuille
-  de style custom.
-- Dépend de la chaîne Charm (goldmark + styles) — coût d'installation pour un
-  rendu simple.
+- Terminal output only; it does not replace an HTML renderer or image pipeline.
+- Word wrapping and table width require deliberate configuration for narrow or
+  structured output.
+- v2 is a breaking import/API migration from the v1 package.
 
 ## Pièges connus
 
-- Toujours choisir `"notty"` quand la sortie peut être pipée (logs, CI) :
-  éviter les codes d'échappement parasites.
-- La cohérence de marque passe par `WithStyles` (JSON de style), pas par du
-  post-traitement ANSI.
-- Pour le layout non-Markdown autour du rendu, combiner avec `lipgloss`.
+- Use `notty` for pipes, logs, and CI; ANSI escape codes are not a substitute
+  for terminal capability detection.
+- Configure word wrap for tables and narrow terminals; upstream tracks width
+  and punctuation edge cases.
+- Do not copy removed v1 `WithAutoStyle` or `WithColorProfile` APIs.
+- Keep terminal styling around the rendered document in Lip Gloss, not by
+  post-processing arbitrary ANSI strings.
 
 ## Sources vérifiées
 
-- [charmbracelet/glamour (repo officiel, v2)](https://github.com/charmbracelet/glamour)
-  — vérifié 2026-08-04
-- [pkg.go.dev/charm.land/glamour/v2](https://pkg.go.dev/charm.land/glamour/v2)
-  — vérifié 2026-08-04
-- Artefact interne : catalog `lipgloss` (layout complémentaire)
+- [Official Glamour repository](https://github.com/charmbracelet/glamour) —
+  maintenance and architecture, checked 2026-08-05.
+- [Glamour v2.0.1 on pkg.go.dev](https://pkg.go.dev/charm.land/glamour/v2@v2.0.1)
+  — exact version and API, checked 2026-08-05.
+- [Glamour v2.0.1 release](https://github.com/charmbracelet/glamour/releases/tag/v2.0.1)
+  — release notes, checked 2026-08-05.
+- [Glamour v2 upgrade guide](https://github.com/charmbracelet/glamour/blob/main/UPGRADE_GUIDE_V2.md)
+  — removed APIs and migration, checked 2026-08-05.
+- [Glamour issues](https://github.com/charmbracelet/glamour/issues) — width,
+  wrapping, and image limitations, checked 2026-08-05.

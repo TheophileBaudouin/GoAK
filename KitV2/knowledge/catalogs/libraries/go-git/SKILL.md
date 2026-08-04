@@ -1,114 +1,105 @@
 ---
 name: go-git
-description: "github.com/go-git/go-git v5.19 — pure-Go Git implementation (clone, fetch, commit, branch, diff, log) with no external git binary. Use when a Go service must read or write Git repositories programmatically (repo analysis, agent commits, CI tooling) and you want zero runtime dependency on the git CLI."
+description: "github.com/go-git/go-git/v5 v5.19.1 — pure-Go Git implementation with repository, plumbing, and porcelain APIs. Use when embedding Git operations without a git binary; not for concurrent access to one repository or v6-alpha API adoption."
 category: library
-tags: [git, vcs, repository, pure-go, diff, clone]
-last-verified: 2026-08-04
+tags: [git, vcs, repository, pure-go, automation]
+last-verified: 2026-08-05
 ---
 
-# go-git — pure-Go Git
+# go-git — Git pur Go
 
 ## Selection
 
-[`github.com/go-git/go-git/v5`](https://github.com/go-git/go-git) (v5.19.2,
-Go 1.21+, Apache-2.0, ~7.6k★, pushed 2026-08-03).
-
-**Why it passes the gate** (actual reason, not stars): a pure-Go reimplementation
-of Git's object model and transport (clone, fetch, push, commit, branch,
-diff, log, worktree) that needs **no `git` binary** at runtime — the reason it
-is used by Gitea, Pulumi, and Keybase. Single responsibility (Git
-manipulation), idiomatic Go, extensive tests, active maintenance (v5.19.x
-2026, v6 alpha in progress).
+[`github.com/go-git/go-git/v5`](https://github.com/go-git/go-git) v5.19.1,
+released 2026-05-18, provides Git plumbing and common repository operations in
+pure Go. It is admitted for an embeddable Git boundary with active maintenance,
+tests, documentation, and real use, not for popularity. The v6 line remains an
+alpha migration target and is not the stable recommendation here.
 
 ## Admission checklist
 
-- [x] Actively maintained — v5.19.2 (2026), v6 alpha active
-- [x] Single responsibility — Git object model + transport
-- [x] Idiomatic Go — clean public API, `git.PlainClone` style entry points
-- [x] Tests present + CI — yes
-- [x] Documentation — README + pkg.go.dev + examples
-- [x] Real-world usage — Gitea, Pulumi, Keybase
-- [x] Readable end-to-end — yes, layered (storage/transport/plumbing)
-- [x] Justified by need — agent tools need repo ops without a git binary
+- [x] Current stable v5.19.1; v6 is explicitly pre-release.
+- [x] Single responsibility: Git repository and transport operations.
+- [x] Pure Go, no git binary required for the supported API.
+- [x] Tests, CI, documentation, examples, and regular upstream releases exist.
+- [x] The package is inspectable and supports both plumbing and common porcelain.
 
 ## Minimal use
 
 ```go
-repo, err := git.PlainClone("/tmp/repo", false, &git.CloneOptions{
-    URL:      "https://github.com/go-git/go-git",
-    Progress: os.Stdout,
-})
+func openRepository(path string) (*git.Repository, error) {
+    repo, err := git.PlainOpen(path)
+    if err != nil {
+        return nil, fmt.Errorf("open git repository: %w", err)
+    }
+    return repo, nil
+}
 ```
+
+Use `PlainClone` or explicit repository/transport APIs when the operation needs
+network credentials and a controlled filesystem. Keep repository mutation and
+concurrency ownership at the application boundary.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Shell out to `git` | Runtime dependency + parsing fragility; go-git is deterministic. |
-| `git2go` (libgit2) | CGO dependency; go-git is pure Go. |
-
-## Notes
-
-- `v6` is in alpha (transport/performance rework) — pin `v5` for stability.
-- Issue-mined (856 issues): top themes are missing features (sparse
-  checkout #90, signed commits #400, credentials #490) — go-git covers the
-  core operations well; verify edge-case coverage before relying on advanced
-  Git features.
-- Preferred pairing: go-git for repo **read/write** in-process; keep
-  `git` CLI only when signing or exotic plumbing is required.
+| `git2go`/libgit2 | Choose when full Git compatibility justifies a C dependency. |
+| `os/exec` with the git CLI | Choose when the host guarantees git and exact CLI behavior is more valuable than pure-Go portability. |
+| go-git v6 alpha | Track for migration, but do not use as the stable catalog recommendation until v6 is released. |
 
 ## Utiliser cette librairie quand
 
-- Un service Go doit lire/écrire des dépôts Git programmatiquement
-  (analyse de repos, commits d'agent, outillage CI) sans dépendance runtime
-  au binaire `git`.
-- Le clone/fetch/commit/branch/diff/log couvre le besoin (opérations cœur).
-- L'environnement interdit ou n'a pas de binaire git (conteneurs minimaux,
-  services embarqués).
+- A Go service must inspect, clone, fetch, commit, or push repositories without
+  spawning a git binary.
+- Pure-Go portability and an embeddable repository API matter.
+- The application can serialize access to each repository and own credentials.
 
 ## Ne pas utiliser cette librairie quand
 
-- La signature de commits, les features exotiques ou le plumbing avancé sont
-  requis : garder le CLI `git` (signing #400, credentials #490, sparse
-  checkout #90 non couverts).
-- Le binaire `git` est disponible et le besoin est simple : shell-out reste
-  plus simple (avec parsing à risque).
-- Le zéro-CGO est une contrainte absolue et git2go était envisagé : go-git
-  est pur-Go (le bon choix dans ce cas).
+- Multiple goroutines must mutate or read the same repository concurrently
+  without an explicit synchronization design.
+- Full porcelain parity or exact compatibility with the system Git client is a
+  hard requirement.
+- A C dependency is acceptable and libgit2 provides the required operation.
+- The project is not prepared to review v6's breaking alpha API.
 
 ## Avantages
 
-- Pur-Go : zéro binaire git requis au runtime, déterministe.
-- Opérations cœur complètes (clone, fetch, push, commit, branch, diff, log,
-  worktree).
-- Usage réel : Gitea, Pulumi, Keybase.
-- Maintenance active (v5.19.x 2026, v6 alpha en cours).
+- Pure-Go repository and transport APIs, no external git process.
+- Covers common clone/open/fetch/commit/push operations and lower-level Git
+  objects.
+- Stable v5 line with active maintenance and a clear v6 migration track.
 
 ## Inconvénients
 
-- Fonctionnalités avancées manquantes ou partielles (sparse checkout #90,
-  signed commits #400, credentials #490) — 856 issues ouvertes, majorité de
-  demandes de features.
-- v6 (transport/performance) en alpha : le code sur v5 devra migrer.
-- Performances historiquement moindres que git natif sur les gros dépôts
-  (rework attendu en v6).
+- Not thread-safe for concurrent access to one repository.
+- Some Git porcelain and edge behavior differ from the command-line client.
+- Authentication, redirects, filesystem isolation, and repository locking need
+  explicit application policy.
+- v6 changes filesystem bounds and transport APIs before stabilization.
 
 ## Pièges connus
 
-- Pinner `v5` : v6 est en alpha (rework transport/performance), pas pour la
-  production.
-- Vérifier la couverture des cas limites AVANT de s'appuyer sur une feature
-  avancée (issue-mining : sparse checkout, signatures, credentials).
-- Pour la signature ou le plumbing exotique, garder le CLI `git` — go-git ne
-  le remplace pas.
+- Serialize access to a repository; concurrent reads/writes can corrupt or
+  produce inconsistent state.
+- Treat HTTP redirects and credentials as a trust boundary; do not silently
+  replay credentials across origins.
+- Pin v5.19.1 for stable code; v6 alpha APIs are subject to change.
+- Use bounded repository paths and review filesystem behavior before accepting
+  untrusted repository names.
 
 ## Sources vérifiées
 
-- [go-git/go-git (repo officiel, v5.19.2)](https://github.com/go-git/go-git)
-  — vérifié 2026-08-04
-- [pkg.go.dev/github.com/go-git/go-git/v5](https://pkg.go.dev/github.com/go-git/go-git/v5)
-  — vérifié 2026-08-04
-- [Issue #90 — sparse checkout](https://github.com/go-git/go-git/issues/90) /
-  [#400 — signed commits](https://github.com/go-git/go-git/issues/400) /
-  [#490 — credentials](https://github.com/go-git/go-git/issues/490) —
-  vérifiées 2026-08-04 (issues officielles)
+- [Official go-git repository](https://github.com/go-git/go-git) — maintenance,
+  API, license, checked 2026-08-05.
+- [go-git releases](https://github.com/go-git/go-git/releases) — stable v5.19.1
+  and v6 alpha status, checked 2026-08-05.
+- [go-git documentation](https://go-git.github.io/docs/) — supported operations,
+  checked 2026-08-05.
+- [v5 to v6 migration guide](https://go-git.github.io/docs/tutorials/migrating-from-v5-to-v6/)
+  — breaking filesystem/transport changes, checked 2026-08-05.
+- [Issue #773](https://github.com/go-git/go-git/issues/773) — concurrency
+  limitation, checked 2026-08-05.
+- [Issue #2136](https://github.com/go-git/go-git/issues/2136) — HTTP auth
+  redirect behavior, checked 2026-08-05.

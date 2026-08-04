@@ -1,127 +1,110 @@
 ---
 name: golang-jwt
-description: "github.com/golang-jwt/jwt/v5 v5.3.1 — JWT signing and verification (HS256/RS256/ES256/EdDSA), the standard JWT library for Go. Use when choosing a JWT library for REST APIs, mobile clients, or service-to-service auth. Not for classic cookie-based web app sessions (prefer scs) and never use the legacy dgrijalva/jwt-go import path."
+description: "github.com/golang-jwt/jwt/v5 v5.3.1 — JWT signing and verification for Go. Use when an interoperable signed token is required for APIs or service-to-service auth; not for cookie sessions, key management, or unvalidated token trust."
 category: library
-tags: [security, jwt, authentication, tokens, api, rest]
+tags: [auth, jwt, security, token, api]
 last-verified: 2026-08-05
 ---
 
-# golang-jwt — JWT sign/verify
+# golang-jwt — signature et validation JWT
 
 ## Selection
 
-[`github.com/golang-jwt/jwt/v5`](https://github.com/golang-jwt/jwt) (v5.3.1,
-Go 1.21+).
-
-**Why it passes the gate** (actual reason, not stars): it is the standard JWT
-implementation for Go — sign, parse, and validate with explicit algorithm
-selection and a clean v5 API. Actively maintained (push 2026-08-01), strong
-security practices (scorecard 7.8 : security-policy 10/10, pinned 10/10,
-SAST 9/10), single responsibility (token lifecycle), mass adoption. This is a
-**promotion** of the legacy Source YAML (`golang-jwt.yaml`) to a vetted fiche.
+[`github.com/golang-jwt/jwt/v5`](https://github.com/golang-jwt/jwt) v5.3.1,
+released 2026-01-28, is an MIT-licensed implementation of JWT signing and
+verification. It is admitted for a focused interoperable token boundary, active
+maintenance, tests, and documented security advisories; it is not a session
+framework or a key-management service.
 
 ## Admission checklist
 
-- [x] Actively maintained — v5.3.1 (2026-01-28), push 2026-08-01
-- [x] Single responsibility — JWT signing/parsing/validation
-- [x] Idiomatic Go — clean v5 API, typed claims, no magic
-- [x] Tests present + CI — yes; SAST 9/10, scorecard 7.8
-- [x] Documentation — godoc + README + migration guide v4→v5
-- [x] Real-world usage — standard de facto (adoption massive)
-- [x] Readable end-to-end — ~9 kLOC, layered (parser/signing/claims)
-- [x] Justified by need — JWT est un besoin auth explicite du catalogue ;
-      NOT popularity (promotion d'un Source legacy)
+- [x] Current stable v5.3.1 with active upstream maintenance.
+- [x] Single responsibility: JWT/JWS token parsing, claims, and signing methods.
+- [x] Go 1.21+ API with `RegisteredClaims` and parser options.
+- [x] Tests, CI, documentation, and security advisory handling are present.
+- [x] The token contract is distinct from cookie sessions (`scs`) and OAuth.
 
 ## Minimal use
 
 ```go
-token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-    "user_id": 123,
-    "exp":     time.Now().Add(time.Hour).Unix(),
-})
-signed, _ := token.SignedString([]byte("secret"))
-
-parsed, err := jwt.Parse(signed, func(t *jwt.Token) (any, error) {
-    if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-        return nil, fmt.Errorf("unexpected method %v", t.Header["alg"])
+func sign(subject string, key []byte) (string, error) {
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+        Subject: subject,
+    })
+    signed, err := token.SignedString(key)
+    if err != nil {
+        return "", fmt.Errorf("sign token: %w", err)
     }
-    return []byte("secret"), nil
-})
+    return signed, nil
+}
 ```
 
-Compilé et vérifié (sign + parse) avec v5.3.1 le 2026-08-05.
+Verification must whitelist the expected signing method and validate issuer,
+audience, expiry, and subject for the application's contract. Do not treat a
+successful parse alone as authorization.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Sessions cookies (`scs`) | Le bon choix pour une **app web classique** (navigateur) : révocables, HttpOnly. Voir `pattern:security:auth-session-vs-jwt`. |
-| `dgrijalva/jwt-go` (ancien import path) | **Abandonné**, historique de CVEs — ne jamais utiliser l'ancien chemin d'import. |
-| PASETO (paseto-go) | Format token alternatif plus sûr par construction ; adoption moindre, moins d'outillage. |
-| JWT « maison » (HMAC signé à la main) | Anti-pattern : parsing/validation JWT est une classe d'erreur connue. |
-
-## Security note
-
-- Historique : advisory **GO-2025-3553 / GHSA-mh63-6h87-95cp** (allocation
-  mémoire excessive pendant le parsing du header, DoS), corrigé en **v5.2.2**
-  (v4.5.2 pour la v4). **Épingler ≥ v5.2.2** ; v5.3.1 sain (vérifié 2026-08-05,
-  OSV).
-- Toujours vérifier l'algorithme dans la keyfunc (whitelist) ou utiliser
-  `jwt.WithValidMethods([]string{"HS256", ...})` — anti-alg-confusion.
-- JWT n'est **pas révocable** par design : token court (exp) + jti + rotation.
-- Ne jamais mettre de données sensibles dans les claims (décodables par le
-  client) ; signer n'est pas chiffrer.
+| `scs` | Prefer for classic server-side browser sessions with cookies. |
+| `golang.org/x/oauth2` | Prefer for delegated OAuth provider flows; JWT is only one token representation. |
+| `lestrrat-go/jwx` | Consider when JWE/JWS breadth or JSON Canonicalization support is a hard requirement. |
+| `dgrijalva/jwt-go` | Discontinued predecessor; never use its legacy import path. |
 
 ## Utiliser cette librairie quand
 
-- API REST, SPA, mobile ou communication service-service : un token porteur
-  (`Authorization: Bearer`) est requis.
-- L'état d'authentification doit être **stateless** (pas de session côté
-  serveur) côté API.
-- Multi-clients (web + mobile + services) avec un format standard.
+- A service needs a signed, interoperable JWT for APIs or service-to-service
+  authentication.
+- The issuer, audience, expiry, signing method, and key rotation policy are
+  explicit application decisions.
+- The service can validate claims and signing method at its trust boundary.
 
 ## Ne pas utiliser cette librairie quand
 
-- App web classique servie par templates : les **sessions cookies** (`scs`)
-  sont plus simples et révocables — le JWT n'apporte rien ici (voir
-  `pattern:security:auth-session-vs-jwt`).
-- Besoin de révocation, d'invalidation immédiate ou de logout fort : JWT ne le
-  fournit pas — sessions côté serveur ou blacklist/rotation à construire.
-- Le login doit passer par Google/GitHub/entreprise : OAuth2/OIDC
-  (`golang.org/x/oauth2`) est la réponse, pas un JWT maison.
+- A server-side browser session is the actual requirement: prefer `scs`.
+- The application needs key storage, rotation, revocation, or a KMS/HSM policy
+  that JWT itself does not provide.
+- A token should be trusted merely because it parses or because its header picks
+  an algorithm.
+- The project needs JWE or broad JOSE capabilities not covered by this package.
 
 ## Avantages
 
-- Standard JWT complet (HS/RS/ES/EdDSA), API v5 propre et typée.
-- Maintien actif + pratiques sécurité fortes (scorecard 7.8, SAST).
-- Écosystème massif : docs, middleware, exemples.
-- Épingler la version corrige les 2 advisories connus (≤ 5.2.2).
+- Familiar JWT API and standard v5 module path.
+- `RegisteredClaims` and parser options make validation policy explicit.
+- Multiple signing methods and interoperable compact token format.
+- Small focused responsibility with active maintenance and security advisories.
 
 ## Inconvénients
 
-- Stateless = non révocable : exp court obligatoire, gestion des clés à soigner.
-- 2 advisories historiques (parsing DoS) : exige pin ≥ 5.2.2 et validation de
-  l'algorithme.
-- Pas de gestion de refresh token / OIDC : à composer (x/oauth2, coreos/go-oidc).
+- Signed JWTs are not encrypted and are usually bearer credentials.
+- Revocation, rotation, issuer/audience policy, and storage remain application
+  responsibilities.
+- Parser edge cases and cross-language JSON serialization require explicit tests.
 
 ## Pièges connus
 
-- Ne jamais utiliser `github.com/dgrijalva/jwt-go` (abandonné, CVEs).
-- Keyfunc sans whitelist d'algorithme = alg confusion (`alg=none`, RS→HS).
-- `jwt.Parse` accepte les tokens sans `exp` si le validator ne l'exige pas :
-  configurer `jwt.WithExpirationRequired()`.
-- Claims sensibles (email, rôle) lisibles par le client : signer ≠ chiffrer.
+- Whitelist the signing method and key source; never accept an algorithm or key
+  solely because the token header requests it.
+- Validate claims with the parser and application policy; `ParseUnverified` is
+  not an authorization path.
+- Bound token input before parsing and keep secrets out of logs and URLs.
+- Pin a patched v5 release: the project has published fixes for excessive
+  header parsing allocation and documented claim-error handling.
+- Do not use `SigningMethodNone` in application authentication.
 
 ## Sources vérifiées
 
-- [golang-jwt/jwt (repo officiel, v5.3.1)](https://github.com/golang-jwt/jwt)
-  — vérifié 2026-08-05
-- [pkg.go.dev/github.com/golang-jwt/jwt/v5](https://pkg.go.dev/github.com/golang-jwt/jwt/v5)
-  — vérifié 2026-08-05
-- [Advisory GO-2025-3553 / GHSA-mh63-6h87-95cp (header parsing DoS, fix 5.2.2)](https://osv.dev/vulnerability/GO-2025-3553)
-  — vérifié 2026-08-05 (sécurité officielle)
-- OSV : 2 entrées aliases pour `github.com/golang-jwt/jwt/v5`, corrigées ≤ 5.2.2
-  (requête API 2026-08-05)
-- Artefacts internes : `pattern:security:auth-session-vs-jwt`,
-  `pattern:security:fail-closed-auth`, `source:go:x-crypto`,
-  `pattern:antipattern:sec-missing-csrf`
+- [Official golang-jwt repository](https://github.com/golang-jwt/jwt) — API,
+  maintenance, license, checked 2026-08-05.
+- [Releases](https://github.com/golang-jwt/jwt/releases) — current stable
+  v5.3.1, checked 2026-08-05.
+- [JWT v5 on pkg.go.dev](https://pkg.go.dev/github.com/golang-jwt/jwt/v5) —
+  parser and claims API, checked 2026-08-05.
+- [CVE-2025-30204 advisory](https://github.com/golang-jwt/jwt/security/advisories/GHSA-mh63-6h87-95cp)
+  — parser allocation issue and fixed versions, checked 2026-08-05.
+- [CVE-2024-51744 advisory](https://github.com/golang-jwt/jwt/security/advisories/GHSA-29wx-vh33-7x7r)
+  — claim-error handling documentation, checked 2026-08-05.
+- [Issue #499](https://github.com/golang-jwt/jwt/issues/499) — parser behavior
+  regression to review during upgrades, checked 2026-08-05.
