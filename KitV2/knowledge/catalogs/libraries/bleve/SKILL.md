@@ -1,9 +1,9 @@
 ---
 name: bleve
-description: "github.com/blevesearch/bleve v2.6 — pure-Go full-text search and indexing library (scorch index, BM25 ranking, faceting, highlighting, geo queries). Use when a Go service needs local full-text search over documents or code (no external search engine) with zero-CGO and embeddable deployment."
+description: "github.com/blevesearch/bleve/v2 v2.6.0 — pure-Go full-text and vector search library (Scorch, BM25, faceting, highlighting, geo queries). Use when a Go service needs local embeddable search without an external engine; not for distributed search infrastructure."
 category: library
 tags: [search, full-text, indexing, bm25, scorch, pure-go]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
 # bleve — embeddable full-text search
@@ -24,7 +24,7 @@ contributors.
 
 ## Admission checklist
 
-+ [x] Actively maintained — v2.6.0 (2026-08), steady releases
++ [x] Actively maintained — v2.6.0 (2026-04-30), with upstream changes through 2026-07
 + [x] Single responsibility — full-text indexing and search
 + [x] Idiomatic Go — `bleve.Open`, `index.Index(docID, doc)`, `search.Search`
 + [x] Tests present + CI — yes
