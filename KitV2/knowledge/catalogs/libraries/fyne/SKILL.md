@@ -1,118 +1,101 @@
 ---
 name: fyne
-description: "fyne.io/fyne v2.8 — pure-Go-API GUI toolkit for desktop, mobile, and embedded (OpenGL rendering via cgo glfw). Use when building a desktop app without a web frontend (no browser dependency) and you accept CGO; prefer Wails when a web frontend is desired."
+description: "fyne.io/fyne/v2 v2.8.0 — pure-Go API for desktop, mobile, and embedded GUI applications using OpenGL/GLFW. Use when a native GUI without a web frontend is required and CGO is acceptable; prefer Wails for web-based desktop UI."
 category: library
-tags: [gui, desktop, cross-platform, cgo, embedded]
-last-verified: 2026-08-04
+tags: [gui, desktop, mobile, embedded, fyne, cgo]
+last-verified: 2026-08-05
 ---
 
-# fyne — pure-Go GUI toolkit
+# fyne — toolkit GUI Go
 
 ## Selection
 
-[`fyne.io/fyne/v2`](https://github.com/fyne-io/fyne) (v2.8.0, Go 1.22+,
-BSD-3-Clause, ~28.5k★, pushed 2026-08-04).
-
-**Why it passes the gate** (actual reason, not stars): a single-responsibility
-GUI toolkit (canvas, layout, widgets, windowing) with a deterministic testable
-surface (`fyne.io/fyne/v2/test` package drives the app without a display). It
-is the main **browser-free** desktop option in Go — the counterpart to Wails
-(web frontend). Actively maintained (v2.8.0 = "biggest release since v2.0.0":
-hardware acceleration, new canvas objects).
+[`fyne.io/fyne/v2`](https://github.com/fyne-io/fyne) v2.8.0 is a Go GUI
+toolkit for desktop, mobile, and embedded applications. It provides a native
+widget/canvas model and uses OpenGL through GLFW. It is admitted for its focused
+cross-platform GUI API, maintained releases, tests, documentation, and real
+use; it is not a zero-CGO solution.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.8.0 (2026), steady cadence (2.6/2.7/2.8)
-- [x] Single responsibility — GUI toolkit (canvas, layout, widgets)
-- [x] Idiomatic Go — canvas/widget API, `test` package for headless tests
-- [x] Tests present + CI — yes
-- [x] Documentation — fyne.io docs + examples
-- [x] Real-world usage — large community, many desktop apps
-- [x] Readable end-to-end — yes, layered and navigable
-- [x] Justified by need — pure-Go GUI with no browser dependency
-
-## ⚠ CGO requirement (limit, not a pass)
-
-Fyne renders via OpenGL through cgo (`go-gl/glfw`). Cross-compilation and
-static builds require CGO discipline. The kit's zero-CGO preference applies to
-*alternatives with a pure-Go equivalent* (SQLite: modernc > mattn); for GUI
-toolkits every real option (Wails, Fyne) touches native code. Choose Fyne when
-a browser-free desktop app justifies CGO; otherwise prefer Wails.
+- [x] Current stable release v2.8.0, minimum Go 1.22.
+- [x] Single responsibility: cross-platform GUI toolkit.
+- [x] Pure-Go application API with a CGO/OpenGL rendering boundary.
+- [x] Tests, CI, documentation, and examples are maintained.
+- [x] Desktop/mobile/embedded usage is established in the Fyne ecosystem.
 
 ## Minimal use
 
 ```go
-package main
-
-import "fyne.io/fyne/v2/app"
-import "fyne.io/fyne/v2/widget"
-
-func main() {
-    a := app.New()
-    w := a.NewWindow("Hello")
-    w.SetContent(widget.NewLabel("Hello Fyne!"))
-    w.ShowAndRun()
+func show() {
+    app := fyneapp.New()
+    window := app.NewWindow("GoAK")
+    window.SetContent(widget.NewLabel("hello"))
+    window.ShowAndRun()
 }
 ```
+
+The rendering loop is platform-bound and is not the kit's portable Go test
+surface. Keep application/service logic in ordinary Go packages and wire Fyne
+at the edge.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Wails (web frontend) | Different trade-off: Go backend + web UI, no CGO in the Go service logic. Choose per frontend need. |
-| Gio (gioui.org) | Immediate-mode GPU GUI, zero-CGO option; smaller ecosystem and docs than Fyne. |
-| electron via webview | Heavy; Fyne avoids the browser runtime. |
-
-## Notes
-
-- The `test` package renders widgets headlessly — keep UI logic in
-  deterministic functions, drive them via `test`, and keep wiring minimal.
-- Desktop-only recipes in this kit use Wails (see `recipe-desktop-app`);
-  Fyne is the documented alternative when no web frontend is wanted.
+| Wails | Prefer when the desktop UI is a web frontend and the Go service boundary should remain portable. |
+| Gio | Consider for an immediate-mode GPU GUI when its ecosystem and API fit. |
+| Web application | Prefer when browser deployment or web accessibility matters more than a native window. |
 
 ## Utiliser cette librairie quand
 
-- Construire une application desktop sans frontend web (pas de dépendance
-  navigateur) et accepter le CGO.
-- Un toolkit GUI complet en API Go pure (canvas, layout, widgets, windowing).
-- Des tests headless déterministes via le package `test` (sans affichage).
+- A native desktop, mobile, or embedded GUI is required without a browser UI.
+- The project accepts OpenGL/GLFW, CGO, platform toolchains, and native packaging.
+- Widgets, canvas objects, notifications, and platform windows are the desired
+  abstraction.
 
 ## Ne pas utiliser cette librairie quand
 
-- Un frontend web est souhaité : préférer Wails (`recipe-desktop-app`) —
-  logique Go sans CGO.
-- Le zéro-CGO est une exigence absolue (Fyne rend via OpenGL/cgo glfw).
-- Le besoin est une TUI ou un CLI : hors périmètre (bubbletea/wish).
+- Zero-CGO cross-compilation is a hard requirement.
+- A web frontend is desired: use Wails or a browser deployment boundary.
+- The application is primarily a server/service with no native GUI.
+- The target platform is outside Fyne's tested driver and packaging support.
 
 ## Avantages
 
-- API Go pure pour le GUI, écosystème complet et communauté large (~28.5k★).
-- Package `test` : rendu headless déterministe, UI testable sans display.
-- Active maintenance : v2.8.0 = plus grosse release depuis v2.0.0
-  (accélération matérielle, nouveaux objets canvas).
-- Couvre desktop, mobile et embedded.
+- One Go API across desktop, mobile, and embedded targets.
+- Widget and canvas abstractions avoid hand-building native event loops.
+- v2.8 adds richer canvas objects, scheduled notifications, accessibility
+  support, window positioning, and default Wayland support.
 
 ## Inconvénients
 
-- **CGO obligatoire** (OpenGL via go-gl/glfw) : cross-compilation et builds
-  statiques exigent une discipline CGO.
-- Plus lourd qu'une TUI : il faut accepter le runtime GUI.
-- Alternative Gio (gioui.org) : mode immédiat, zéro-CGO, mais écosystème et
-  docs plus petits.
+- OpenGL/GLFW makes CGO and a native compiler part of the build/deployment
+  story.
+- Cross-compilation requires `CGO_ENABLED=1` and a target C compiler.
+- Platform behavior and GUI rendering need host-level tests beyond portable
+  `go test`.
 
 ## Pièges connus
 
-- Garder la logique UI dans des fonctions déterministes et piloter via `test` —
-  le wiring minimal ; ne pas mettre la logique métier dans les callbacks de
-  widgets.
-- Le CGO n'est pas une option : l'accepter explicitement avant de choisir Fyne
-  (le zéro-CGO du kit s'applique aux alternatives pur-Go, pas aux toolkits GUI).
-- Pinner `v2` (fyne.io/fyne/v2) ; vérifier la compatibilité des assets
-  (images/fonts) entre versions majeures.
+- Do not claim a Fyne package is zero-CGO: the rendering driver uses OpenGL and
+  GLFW.
+- Keep Fyne imports at the UI boundary; test validation and domain logic
+  without creating a window.
+- Check the target OS support and native dependencies before choosing the
+  toolkit; v2.8 dropped old Windows/macOS versions.
+- Treat accessibility as an explicit feature decision; v2.8 support is off by
+  default and requires its documented build configuration.
 
 ## Sources vérifiées
 
-- [fyne-io/fyne (repo officiel, v2.8.0)](https://github.com/fyne-io/fyne) —
-  vérifié 2026-08-04
-- [docs.fyne.io](https://docs.fyne.io/) — vérifié 2026-08-04
-- Artefact interne : `recipe-desktop-app` (choix Wails vs Fyne documenté)
+- [Official Fyne repository](https://github.com/fyne-io/fyne) — maintenance,
+  architecture, license, checked 2026-08-05.
+- [Fyne v2.8.0 release](https://github.com/fyne-io/fyne/releases/tag/v2.8.0)
+  — exact version, API changes, minimum Go and OS changes, checked 2026-08-05.
+- [Fyne v2 on pkg.go.dev](https://pkg.go.dev/fyne.io/fyne/v2) — API and module
+  metadata, checked 2026-08-05.
+- [Fyne cross-compilation guidance](https://github.com/fyne-io/developer.fyne.io/blob/master/started/cross-compiling.md)
+  — CGO/toolchain requirements, checked 2026-08-05.
+- [Fyne documentation](https://docs.fyne.io/) — supported GUI model, checked
+  2026-08-05.
