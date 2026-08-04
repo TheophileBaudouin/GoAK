@@ -19,7 +19,7 @@ adding unsupported volume or ambiguity.
 
 ## Repository
 
-- **Tag v2.2.0:** livré avec le semantic resource router (commit e38c068, 2026-08-05) — manifest v2.2.0, index 206 ressources, install.sh amélioré (ANSI minimaliste, étapes, spinner TTY, résumé, retry). Install vérifiée de bout en bout : `curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.2.0/install.sh | sh -s -- <dir>` → validation PASS (45 skills + router 206) puis pi -a fonctionnel. `install.sh` (racine) reste l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future. **État accepté (2026-08-05) : CI gate rouge préexistante (coverage floor 70% vs 66% réel)** — normal en phase de fabrication, à garder en tête et réévaluer avant release (voir Gotchas).
+- **Tag v2.2.0:** livré avec le semantic resource router (commit e38c068, 2026-08-05) — manifest v2.2.0, index 206 ressources, install.sh amélioré (ANSI minimaliste, étapes, spinner TTY, résumé, retry). Tag v2.2.1 (2026-08-05) : installeur spinner livré par défaut. Install vérifiée de bout en bout : `curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.2.1/install.sh | sh -s -- <dir>` → validation PASS (45 skills + router 206) puis pi -a fonctionnel. `install.sh` (racine) reste l'installeur bootstrap transitoire ; le CLI `gak` reste l'entrée canonique future. **État accepté (2026-08-05) : CI gate rouge préexistante (coverage floor 70% vs 66% réel)** — normal en phase de fabrication, à garder en tête et réévaluer avant release (voir Gotchas).
 
 ## Architecture
 
