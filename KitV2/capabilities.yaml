@@ -31,7 +31,7 @@ coverage:
   product_skills: 45
   rules: 10
   recipes: 10
-  knowledge_catalogs: 25
+  knowledge_catalogs: 26
   probes: 5
   project_templates: 7
 metadata_role: product capability catalog, not an instruction entrypoint

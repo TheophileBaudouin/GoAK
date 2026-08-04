@@ -76,6 +76,19 @@
 - **Priorité :** Critique
 - **Catégorie :** Cycle de vie / Toolchain
 
+## golang.org/x/sync (errgroup)
+
+- **Lien :** <https://pkg.go.dev/golang.org/x/sync/errgroup>
+- **Description :** Extension semi-officielle de la stdlib maintenue par
+  l'équipe Go : `errgroup` (fan-out borné avec première-erreur via
+  `SetLimit`), `singleflight`, `semaphore`. Module : `golang.org/x/sync`.
+- **Utilité potentielle :**
+  - Workflows concurrents bornés (déjà utilisé par le kit :
+    recipe-worker-pool).
+  - Parallel agent tasks.
+- **Priorité :** Haute
+- **Catégorie :** Concurrence / Extended stdlib
+
 ---
 
 # 2. Outils officiels Go
@@ -906,6 +919,37 @@ ultraviolet, x).
 
 ---
 
+# 22. Desktop / GUI
+
+## Wails
+
+- **Lien :** <https://github.com/wailsapp/wails> — docs <https://wails.io>
+- **Description :** Applications desktop avec backend Go et frontend web.
+  v3 en Beta-to-GA (non stable — pinner la version exacte). Déjà utilisé par
+  le kit (recipe-desktop-app).
+- **Utilité potentielle :**
+  - Alternatives à Claude Desktop, IDEs IA, interfaces visuelles d'agents.
+  - Logique de service testable en Go pur (bindings documentés).
+- **Priorité :** Haute
+- **Catégorie :** Desktop / GUI
+
+# 23. Temps réel / WebSocket
+
+## coder/websocket
+
+- **Lien :** <https://github.com/coder/websocket>
+- **Description :** Implémentation WebSocket moderne en Go pur (client +
+  serveur, APIs context-aware, concurrency-safe). Successeur maintenu de
+  `nhooyr/websocket` (déprécié — voir gotcha). Module :
+  `github.com/coder/websocket`.
+- **Utilité potentielle :**
+  - Streaming de réponses LLM, événements d'agent, feedback d'outils.
+  - Couche transport MCP, communication terminal/navigateur.
+- **Priorité :** Haute
+- **Catégorie :** Réseau / Temps réel / WebSocket
+
+---
+
 # Priorités pour un Agent Coding Go
 
 ## Niveau S (indispensable)
@@ -929,6 +973,7 @@ ultraviolet, x).
 - context
 - errors
 - sync et sync/atomic
+- golang.org/x/sync (errgroup)
 - net/http
 - database/sql
 - slog
@@ -950,6 +995,8 @@ ultraviolet, x).
 - Bubble Tea
 - Bubbles
 - Lip Gloss
+- Wails
+- coder/websocket
 
 ## Niveau B (selon projet)
 
