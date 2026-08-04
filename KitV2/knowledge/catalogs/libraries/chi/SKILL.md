@@ -1,113 +1,101 @@
 ---
 name: chi
-description: "go-chi/chi v5 — a lightweight HTTP router 100% compatible with net/http, for composable middleware, route groups, and path params. Use when choosing a Go HTTP router or building/maintaining a chi-based REST API."
+description: "github.com/go-chi/chi/v5 v5.3.1 — lightweight net/http-compatible router with composable middleware, groups, and path parameters. Use for Go HTTP services when ServeMux is too small; not for an all-in-one framework or API generation."
 category: library
 tags: [http, router, middleware, rest]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# chi — HTTP router
+# chi — routeur HTTP
 
 ## Selection
 
-[`github.com/go-chi/chi/v5`](https://github.com/go-chi/chi) (v5, Go 1.23+).
-
-**Why it passes the gate** (actual reason, not stars): it is a ~1000-LOC router
-that is **100% compatible with `net/http`** — handlers are plain
-`http.HandlerFunc`, middleware are plain `func(http.Handler) http.Handler`. That
-means zero vendor lock-in: any `net/http` middleware in the ecosystem works
-unchanged. It adds composable middleware (`Use`/`With`), route groups
-(`Route`/`Mount`), and path parameters over the stdlib, without inventing a
-framework-specific `Context`.
+[`github.com/go-chi/chi/v5`](https://github.com/go-chi/chi) v5.3.1,
+released 2026-07-06, adds composable routing on top of standard `net/http`:
+plain handlers, middleware, groups, mounts, and path parameters. It is admitted
+for this small, focused portability boundary, active maintenance, tests, and
+real use; not for popularity.
 
 ## Admission checklist
 
-- [x] Actively maintained — v5, built for Go 1.23+, recent commits/releases
-- [x] Single responsibility — HTTP routing + optional middleware catalogue
-- [x] Idiomatic Go — stdlib `net/http` signatures, no magic
-- [x] Tests present + CI — yes
-- [x] Documentation — README + `_examples/`
-- [x] Real-world usage — Cloudflare, Heroku, 99Designs
-- [x] Readable end-to-end — ~1000 LOC core
-- [x] Justified by need (router + middleware composition), NOT popularity
+- [x] Current v5.3.1 release and active upstream maintenance.
+- [x] Single responsibility: HTTP routing and composable middleware helpers.
+- [x] Handlers remain `http.Handler`/`http.HandlerFunc`; no framework context.
+- [x] Tests, CI, documentation, and examples are present.
+- [x] The dependency is justified only when ServeMux composition is insufficient.
 
 ## Minimal use
 
 ```go
-r := chi.NewRouter()
-r.Use(middleware.RequestID, middleware.Logger, middleware.Recoverer)
-r.Get("/items/{id}", getItem)        // chi.URLParam(r, "id")
-http.ListenAndServe(":3333", r)
+func routes(handler http.Handler) http.Handler {
+    r := chi.NewRouter()
+    r.Use(middleware.RequestID, middleware.Recoverer)
+    r.Get("/items/{id}", func(w http.ResponseWriter, req *http.Request) {
+        id := chi.URLParam(req, "id")
+        _, _ = io.WriteString(w, id) // response write is best-effort at this boundary
+    })
+    r.Mount("/", handler)
+    return r
+}
 ```
 
-See `recipe-rest-chi` for a runnable, tested example.
+Use `recipe-rest-chi` for a complete server, JSON boundary, and test. The
+standard library's `http.ServeMux` remains the smallest choice for simple
+method/path routing.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| `net/http` ServeMux (Go 1.22+) | **Correct minimal choice** when you need method+path routing but NOT middleware composition or route groups. The stdlib boundary: prefer it until chi's leverage pays for the dependency. |
-| gin / echo | `net/http`-incompatible (own `Context`, own signatures). Couples handlers to the framework; rejected for a kit that values portability. |
-| gorilla/mux | Heavier; weaker middleware-composition story than chi; the mux was archived/moved. |
-
-## Security note
-
-`middleware.RealIP` is **deprecated** — vulnerable to IP spoofing
-(GHSA-3fxj-6jh8-hvhx et al.). Use exactly one `ClientIPFrom*` middleware matching
-your deployment (direct internet → `ClientIPFromRemoteAddr`; behind nginx/
-Cloudflare → `ClientIPFromHeader`; behind known proxy CIDRs → `ClientIPFromXFF`).
+| `net/http` `ServeMux` | Prefer for simple method/path routing without chi's grouping or middleware composition. |
+| gin / echo | Choose only when an application explicitly accepts framework-owned contexts and APIs. |
+| gorilla/mux | Do not choose for new work without independent maintenance verification; chi keeps the net/http boundary smaller. |
 
 ## Utiliser cette librairie quand
 
-- Construire une API REST Go avec composition de middleware, route groups et
-  path params.
-- L'interopérabilité `net/http` totale compte : handlers `http.HandlerFunc`,
-  middleware `func(http.Handler) http.Handler`, aucun Context maison.
-- Réutiliser l'écosystème middleware `net/http` existant sans adaptation.
+- A Go HTTP service needs route groups, mounts, path parameters, and middleware
+  composition while keeping standard `net/http` signatures.
+- Existing net/http middleware must remain reusable without adapter code.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le besoin est un simple routing méthode+path sans middleware ni groupes :
-  `net/http` ServeMux (Go 1.22+) est le choix minimal correct.
-- Un framework tout-en-un avec son propre `Context` est accepté (gin/echo —
-  couplage handlers ↔ framework).
-- Avant : gorilla/mux (projet archivé/migré, composition middleware plus
-  faible que chi).
+- `ServeMux` already covers the routing and middleware needs.
+- The project wants an all-in-one framework with integrated validation, auth,
+  rendering, or API generation.
+- The project cannot accept a third-party router dependency.
 
 ## Avantages
 
-- 100 % compatible `net/http` : zéro lock-in, middlewares de l'écosystème
-  réutilisables tels quels.
-- Noyau compact (~1000 LOC), idiomatique, tests + CI.
-- Middleware composables (`Use`/`With`), groupes (`Route`/`Mount`), path
-  params — sans inventer de framework.
-- Usage réel : Cloudflare, Heroku, 99Designs.
+- Standard handlers and middleware preserve portability and testability.
+- Groups, mounts, method routes, and path parameters are compact to compose.
+- The core is small compared with full HTTP frameworks.
 
 ## Inconvénients
 
-- Pas de génération de contrats/clients (OpenAPI à assembler soi-même).
-- Pas un framework applicatif : auth, validation, rendu restent à composer.
-- Le catalogue de middlewares fournis est inégal : certains ont eu des failles
-  (RealIP) — les choisir en connaissance de cause.
+- Authentication, validation, rendering, and API contracts remain application
+  responsibilities.
+- Middleware security depends on the deployment topology and selected helper.
+- OpenAPI/client generation is outside chi's responsibility.
 
 ## Pièges connus
 
-- `middleware.RealIP` est déprécié et vulnérable au spoofing IP
-  (GHSA-3fxj-6jh8-hvhx, GHSA-rjr7-jggh-pgcp, GHSA-9g5q-2w5x-hmxf) : utiliser
-  exactement UN `ClientIPFrom*` selon la topologie (voir Security note +
-  anti-pattern `pattern:antipattern:sec-ip-trust`).
-- Lire les path params avec `chi.URLParam(r, "id")`, jamais manuellement.
-- v5 exige Go 1.23+ — vérifier la version minimale du projet consommateur.
+- Do not use deprecated `middleware.RealIP`: its trust behavior enabled IP
+  spoofing. Use one `ClientIPFrom*` helper matching the actual proxy topology.
+- Read parameters with `chi.URLParam`; do not parse path strings manually.
+- Review redirect and proxy middleware advisories when upgrading; pin v5.3.1 or
+  a later patched release.
 
 ## Sources vérifiées
 
-- [go-chi/chi (repo officiel, v5)](https://github.com/go-chi/chi) — vérifié
-  2026-08-04
-- [pkg.go.dev/github.com/go-chi/chi/v5/middleware](https://pkg.go.dev/github.com/go-chi/chi/v5/middleware)
-  — vérifié 2026-08-04
-- [Security advisory GHSA-3fxj-6jh8-hvhx](https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx)
-  — vérifié 2026-08-04 (sécurité officielle)
-- [PR #967 — middleware.ClientIP (remplace RealIP)](https://github.com/go-chi/chi/pull/967)
-  — vérifié 2026-08-04
-- Artefacts internes : `recipe-rest-chi`, `pattern:antipattern:sec-ip-trust`,
-  `pattern:http:middleware-chain`
+- [Official chi repository](https://github.com/go-chi/chi) — API, maintenance,
+  license, checked 2026-08-05.
+- [chi v5.3.1 release](https://github.com/go-chi/chi/releases/tag/v5.3.1) —
+  exact version, checked 2026-08-05.
+- [chi on pkg.go.dev](https://pkg.go.dev/github.com/go-chi/chi/v5) — API and
+  standard-library boundary, checked 2026-08-05.
+- [RealIP advisory](https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx)
+  — trust-boundary limitation, checked 2026-08-05.
+- [RedirectSlashes advisory](https://github.com/go-chi/chi/security/advisories/GHSA-mqqf-5wvp-8fh8)
+  — upgrade/security scope, checked 2026-08-05.
+- [Compress issue #1074](https://github.com/go-chi/chi/issues/1074) — open
+  middleware limitation, checked 2026-08-05.

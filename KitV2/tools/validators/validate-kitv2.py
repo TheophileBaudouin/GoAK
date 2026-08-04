@@ -172,7 +172,8 @@ def check_markdown_examples(path: Path) -> list[str]:
             errors.append(f"{path}:{number}: fenced Go example ignores a return value")
         if UNCHECKED_CALL_RE.search(line) and not re.search(
             r"(?:if\s+[^\n]*\berr\b|\berr\s*:=|\breturn\b|\blog\.Fatal|"
-            r"//[^\n]*(?:best-effort|preserve|justif|cannot recover))",
+            r"//[^\n]*(?:best-effort|preserve|justif|cannot recover|"
+            r"no recoverable))",
             line,
         ):
             errors.append(

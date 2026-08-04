@@ -1,88 +1,92 @@
 ---
 name: cobra
-description: "spf13/cobra v1.10.2 — subcommand-based Go CLI framework with POSIX flags, generated help, aliases, and shell completion. Use when a CLI has multiple commands or needs generated help/completion; use recipe-cli-minimal for flat flags."
+description: "spf13/cobra v1.10.2 — Go CLI framework with command trees, POSIX flags, generated help, aliases, and shell completion. Use for multi-command CLIs; use recipe-cli-minimal and stdlib flag for a flat single-command CLI."
 category: library
 tags: [cli, cobra, subcommands, completion, help]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# cobra — multi-command CLI
+# cobra — CLI multi-commandes
 
 ## Selection
 
-Use `github.com/spf13/cobra` v1.10.2 when a CLI needs subcommands, nested
-commands, persistent flags, generated help, aliases, or shell completion. The
-standard-library `flag` recipe remains the correct choice for one command with
-a small flat flag set.
+Use [`github.com/spf13/cobra`](https://github.com/spf13/cobra) v1.10.2 for a
+CLI with subcommands, nested commands, persistent flags, aliases, generated
+help, or shell completion. Cobra builds on `spf13/pflag` and keeps command
+execution explicit through `RunE`/`ExecuteC`. It is admitted for this focused
+multi-command responsibility and active maintenance, not for popularity.
 
-## Official decision facts
+## Admission checklist
 
-- Commands form a tree; use `AddCommand` to compose subcommands.
-- Use `RunE` and `ExecuteC()` so application errors return to the caller and
-  remain testable; avoid `CheckErr` in reusable command code because it exits.
-- Cobra uses `spf13/pflag` for POSIX-compatible short and long flags.
-- `MarkFlagRequired`, mutually-exclusive flag validation, command groups, and
-  generated shell completion are optional features, not reasons to use Cobra
-  for every CLI.
-- The official Cobra documentation includes an LLM-ready CLI documentation
-  guide; no repository `llms.txt` file is required or copied into the kit.
+- [x] Current tagged release v1.10.2 and active upstream commits.
+- [x] Single responsibility: command trees, flags, help, and completion.
+- [x] Tests, CI, documentation, and a formal security policy exist.
+- [x] `RunE` and `ExecuteC` support explicit error propagation and tests.
+- [x] The dependency is justified only when stdlib `flag` is too small.
 
-## Limits and security
+## Minimal use
 
-- Cobra and pflag add dependencies and mutable package-level options; keep
-  command construction in a factory and avoid shared command trees in tests.
-- Validate arguments and flags at the command boundary.
-- Do not pass secrets through flags when process listings or shell history can
-  expose them; use a protected configuration source instead.
-- Pin versions and inspect pflag changes during upgrades.
+The canonical implementation and test live in `recipe-cli-cobra`; keep command
+construction in a factory and inject arguments/output there. A command should
+return failures through `RunE`, not terminate the process through `CheckErr`.
+
+## Alternatives considered
+
+| Alternative | Verdict |
+|---|---|
+| stdlib `flag` | Prefer for one command and a small flat flag set; see `recipe-cli-minimal`. |
+| `urfave/cli` | A valid alternative when its API and command model match the project; compare maintenance and dependency policy directly. |
+| Custom parsing | Avoid when help, completion, and command validation are required; it recreates Cobra's boundary. |
 
 ## Utiliser cette librairie quand
 
-- La CLI a plusieurs commandes ou commandes imbriquées (arbre de commandes),
-  des flags persistants, du help généré, des alias ou de la completion shell.
-- Des conventions POSIX de flags (short/long via pflag) sont attendues.
+- The CLI has multiple or nested commands, persistent/local flags, aliases,
+  generated help, or shell completion.
+- POSIX short/long flag behavior and command-level validation are required.
+- A command factory and explicit execution boundary can be maintained in tests.
 
 ## Ne pas utiliser cette librairie quand
 
-- Une seule commande avec un petit jeu de flags plats : stdlib `flag` suffit
-  (`recipe-cli-minimal`).
-- Le help généré et la completion shell ne sont pas nécessaires.
-- L'objectif est une librairie réutilisable qui ne doit pas appeler `os.Exit`.
+- A single command with a few flat flags is fully covered by stdlib `flag`.
+- The binary must remain dependency-free and does not need generated help or
+  completion.
+- The code is a reusable library that must never own process exit behavior.
 
 ## Avantages
 
-- Standard de facto des CLIs Go (docker, kubectl, gh, hugo).
-- Commandes composables (`AddCommand`), flags persistants/locaux, help +
-  completion générés.
-- `RunE` + `ExecuteC()` rendent les erreurs applicatives testables.
+- Composable command tree with persistent and local flags.
+- Generated help, aliases, validation hooks, and shell completion.
+- `RunE` plus `ExecuteC` keeps application errors testable and injectable.
 
 ## Inconvénients
 
-- Ajoute des dépendances (cobra + pflag) et des options package-level
-  mutables.
-- Modèle à apprendre (arbre de commandes, binding de flags) — coût réel pour
-  un CLI plat.
-- Sur-dimensionné quand `flag` couvre le besoin.
+- Adds Cobra and pflag dependencies and a command model to learn.
+- Mutable command options make package-global trees prone to order-dependent
+  tests.
+- Its feature set is unnecessary overhead for a flat command.
 
 ## Pièges connus
 
-- Éviter `CheckErr` dans le code réutilisable (il exit) : utiliser `RunE` et
-  `ExecuteC()` pour que les erreurs remontent à l'appelant.
-- Ne pas partager un arbre de commandes global dans les tests (état mutable) —
-  garder la construction dans une factory.
-- Valider arguments et flags à la frontière de commande.
-- Ne pas passer de secrets par flags (exposés dans le process listing et
-  l'historique shell) : source de configuration protégée.
-- Pinner les versions et inspecter pflag lors des montées de version.
+- Use `RunE` and handle the returned error at the process boundary; avoid
+  `CheckErr` in reusable command code.
+- Build a fresh command tree per test and per execution when mutable state could
+  leak between invocations.
+- Validate arguments and flags at the command boundary.
+- Never put secrets in flags: process listings and shell history can expose
+  them. Use a protected configuration source.
+- Pin Cobra and inspect pflag/transitive changes during upgrades.
 
 ## Sources vérifiées
 
-- [spf13/cobra (repo officiel, v1.10.2)](https://github.com/spf13/cobra) —
-  vérifié 2026-08-03
-- [pkg.go.dev/github.com/spf13/cobra](https://pkg.go.dev/github.com/spf13/cobra)
-  — vérifié 2026-08-03
-- [cobra.dev/docs](https://cobra.dev/docs/) — vérifié 2026-08-03
-- [cobra.dev — CLIs for LLMs](https://cobra.dev/docs/how-to-guides/clis-for-llms/)
-  — vérifié 2026-08-03
-- Artefacts internes : `recipe-cli-minimal` (frontière flag),
-  `pattern:cli:subcommands-conventions`
+- [Official Cobra repository](https://github.com/spf13/cobra) — maintenance,
+  API, and security policy, checked 2026-08-05.
+- [Cobra v1.10.2 releases](https://github.com/spf13/cobra/releases) — current
+  tagged version, checked 2026-08-05.
+- [Cobra on pkg.go.dev](https://pkg.go.dev/github.com/spf13/cobra) — API and
+  module metadata, checked 2026-08-05.
+- [Cobra documentation](https://cobra.dev/docs/) — command and completion
+  behavior, checked 2026-08-05.
+- [Cobra security policy](https://github.com/spf13/cobra/blob/main/SECURITY.md)
+  — supported security boundary, checked 2026-08-05.
+- [Open issue #2358](https://github.com/spf13/cobra/issues/2358) — flag parsing
+  limitation, checked 2026-08-05.
