@@ -1,104 +1,118 @@
 ---
 name: req
-description: "imroc/req — high-level Go HTTP client (requests-style, over net/http). EXTRACT-ONLY: extract retry/client-config patterns; do NOT copy its global package-level API. Canonical HTTP client in the kit stays net/http."
+description: "github.com/imroc/req/v3 v3.60.0 — high-level HTTP client over net/http with retries, HTTP/1.1/2/3, and request/response middleware. EXTRACT-ONLY: study explicit-client/retry patterns; do not impose its package-global API over the kit's net/http default."
 category: library
 tags: [http, client, retry, extract-only]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# req — HTTP client (extract-only)
+# req — client HTTP (extract-only)
 
-> **extract-only: true** — admitted as a pattern source, NOT as a dependency to
-> impose. The kit's canonical HTTP client is stdlib `net/http`.
+> **extract-only: true** — use the research to inform explicit `net/http`
+> patterns; do not copy a package-global singleton into consumer services.
 
-## Selection (with restriction)
+## Selection
 
-`imroc/req` v3 (4.8k★, pushed 2026-07, CI, in Awesome Go — passes the ≥500★ floor
-and the <12mo activity check). It is a capable high-level client: chainable
-client/request settings, retries, HTTP/1.1-2-3, request/response/transport
-middleware, dump/debug, marshalling.
+[`github.com/imroc/req`](https://github.com/imroc/req) v3.60.0,
+released 2026-07-02, is a high-level HTTP client with retries, HTTP/1.1/2/3,
+TLS/proxy options, middleware, and response handling. It is admitted as a
+pattern source while the kit's canonical client remains an explicit stdlib
+`*http.Client`: the convenience package API can hide mutable default state and
+wire behavior.
 
-**Why restricted, not imposed:** its idiomatic style uses **package-level global
-state** — `req.DevMode()`, `req.MustGet(...)`, `req.EnableForceHTTP1()` operate
-on a shared default client reached via the package name. That is hidden mutable
-global state, the exact anti-pattern this kit rejects. Copying it wholesale would
-teach agents to reach for globals.
+## Admission checklist
+
+- [x] Current v3.60.0 and active upstream maintenance.
+- [x] Single responsibility: configurable HTTP client ergonomics.
+- [x] Tests, CI, documentation, and a maintained v3 module exist.
+- [x] Retry, response-size, and streaming behavior have current issue/release
+      evidence.
+- [x] Restriction is explicit: this is not the kit's default client dependency.
 
 ## What you MAY extract
 
-- **Client-config pattern**: build one explicit `*req.Client` (or `*http.Client`),
-  reuse it for all requests — never the package-global one.
-- **Retry strategy**: configurable retry with backoff and a max-attempts cap.
-- **Unified error handling**: an `OnAfterResponse` hook that converts non-2xx API
-  bodies into Go errors, so handlers see only success-or-error.
-- **Debug dump**: dump full request/response only on error (not in steady state).
-
-These map cleanly onto stdlib `net/http` + a small `Retry` wrapper — you do not
-need req for them.
+- Build one explicit client and inject/reuse it rather than using a package
+  singleton.
+- Retry only eligible transient failures with context, bounded attempts, and
+  backoff.
+- Convert non-2xx responses into typed/opaque errors at one response boundary.
+- Bound response bodies with the current max-size option and use streaming for
+  large multipart uploads.
 
 ## What you must NEVER copy
 
-- `req.MustGet` / `req.DevMode` / any package-global client call.
-- Treating the package name as a singleton Client.
-- "Black Magic" auto-behaviours (auto-decode, auto-marshal) that hide what the
-  wire actually carries — fine for a quick script, an anti-pattern for auditable
-  service code.
+- Package-global default-client calls such as `req.MustGet` or `req.DevMode`.
+- Auto-decode/auto-marshal behavior when service auditability requires seeing
+  the wire contract explicitly.
+- Unlimited response reads, retries without a context/attempt cap, or debug
+  dumps containing credentials/tokens.
 
 ## Canonical alternative (the kit default)
 
-stdlib `net/http` with an explicit `*http.Client`, plus a ~15-line retry helper
-(see `recipe-worker-pool` for bounded-fanout, and build retry on the same
-context-cancellation primitives). Add req only if a team explicitly wants its
-ergonomics AND accepts the global-state caveat.
+Use stdlib `net/http` with an explicit `*http.Client`, a small retry helper, and
+explicit JSON/body handling. Add req only after a project explicitly accepts
+its API and dependency/security trade-offs.
 
-## References
+## Alternatives considered
 
-- imroc/req — <https://github.com/imroc/req> (4.8k★, 2026-07)
-- The net/http boundary is documented in `chi` (server-side) and the
-  stdlib philosophy in `rules/core/philosophy` (when it exists).
+| Alternative | Verdict |
+|---|---|
+| `net/http` | Kit default: smallest explicit client boundary and maximum auditability. |
+| `go-resty/resty` | Consider when its mature REST ergonomics and middleware match the project better. |
+| `goforj/httpx` | Wrapper built on req; not a lower-dependency replacement. |
+| Hand-written retry/client singleton | Reject hidden global state and unbounded retry behavior. |
 
 ## Utiliser cette librairie quand
 
-- En tant que **source de patterns** uniquement : client-config explicite,
-  retry avec backoff, conversion erreurs non-2xx, debug dump sur erreur.
-- Une équipe veut explicitement son ergonomie ET accepte le caveat
-  global-state.
+- As an extract-only source for explicit client setup, bounded retry, response
+  middleware, and body-size handling.
+- A project explicitly wants HTTP/3/TLS/proxy features and accepts the dependency
+  and API boundary after review.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le client HTTP canonique du kit est requis : `net/http` + `*http.Client`
-  explicite + un petit wrapper retry (~15 lignes).
-- L'auditabilité prime : les comportements auto (auto-decode, auto-marshal,
-  « Black Magic ») masquent ce que le wire transporte.
-- Le pattern global (`req.MustGet`, `req.DevMode`) serait copié : c'est
-  l'anti-pattern exact que le kit rejette.
+- The kit's canonical auditable `net/http` client is sufficient.
+- Package-global convenience calls would be copied into shared service code.
+- The response body may be unbounded or debug output may expose credentials.
 
 ## Avantages
 
-- Client haut niveau complet : chaînage, retries, HTTP/1.1-2-3, middleware
-  request/response/transport, dump/debug, marshalling.
-- Patterns extractibles propres (retry, hooks d'erreur) qui se cartographient
-  sur net/http sans la dépendance.
+- Rich HTTP/1.1/2/3 client, retries, middleware, TLS/proxy options, and upload
+  support in one package.
+- v3.60 adds response-size bounding and streams large multipart uploads through
+  `io.Pipe`.
+- Extractable patterns map cleanly to smaller stdlib implementations.
 
 ## Inconvénients
 
-- API idiomatique reposant sur de l'état global package-level (client par
-  défaut atteint via le nom de package) — mutable et caché.
-- « Black Magic » qui cache le wire réel — mauvais pour du code de service
-  auditable.
-- Restriction extract-only : ne pas l'imposer comme dépendance.
+- Larger surface and hidden convenience state than explicit `net/http`.
+- Auto-read response behavior must be bounded or disabled when handling large or
+  untrusted bodies.
+- Retry, impersonation, TLS fingerprinting, and HTTP/3 features need security
+  and operational review instead of being enabled by default.
 
 ## Pièges connus
 
-- Ne JAMAIS copier `req.MustGet` / `req.DevMode` / singleton par nom de
-  package (voir `pattern:antipattern:go-mutable-global-state`).
-- Toujours construire un `*req.Client` (ou `*http.Client`) explicite et le
-  réutiliser.
-- Dump debug uniquement en erreur, jamais en régime permanent.
+- Set a maximum response size; auto-read is enabled by default and an oversized
+  response must not be allowed to consume unbounded memory.
+- Use a replayable/streaming body intentionally: retries require a body that can
+  be recreated or rewound.
+- Treat malformed URLs and TLS fingerprinting as security-sensitive options.
+- Keep debug dumps off normal paths and redact authorization/cookie headers.
 
 ## Sources vérifiées
 
-- [imroc/req (repo officiel, v3)](https://github.com/imroc/req) — vérifié
-  2026-08-02
-- Artefacts internes : `pattern:antipattern:go-mutable-global-state`, catalog
-  `chi` (frontière net/http côté serveur), `rules/core/philosophy`
+- [Official req repository](https://github.com/imroc/req) — API, maintenance,
+  license, checked 2026-08-05.
+- [req v3 on pkg.go.dev](https://pkg.go.dev/github.com/imroc/req/v3) — module and
+  API metadata, checked 2026-08-05.
+- [req releases](https://github.com/imroc/req/releases) — v3.60.0 current
+  release and changes, checked 2026-08-05.
+- [req client source](https://github.com/imroc/req/blob/master/client.go) —
+  auto-read and response-size behavior, checked 2026-08-05.
+- [Issue #406](https://github.com/imroc/req/issues/406) — response size bound,
+  checked 2026-08-05.
+- [Issue #433](https://github.com/imroc/req/issues/433) — multipart memory
+  behavior and fix, checked 2026-08-05.
+- [GO-2024-3098](https://pkg.go.dev/vuln/GO-2024-3098) — malformed URL
+  advisory, checked 2026-08-05.
