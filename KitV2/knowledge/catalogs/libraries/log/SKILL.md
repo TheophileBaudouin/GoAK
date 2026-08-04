@@ -1,97 +1,99 @@
 ---
 name: log
-description: "charm.land/log/v2 — minimal, colorful, slog-compatible Go logging library with levels and caller reporting. Use when a CLI/TUI wants human-readable colored logs while keeping the standard log/slog handler interface."
+description: "charm.land/log/v2 v2.0.0 — colorful, leveled, slog-compatible logging handler for Go. Use when a human-facing CLI/TUI needs styled logs while retaining log/slog; not for high-throughput/security-audit pipelines or a replacement for the standard logging interface."
 category: library
 tags: [logging, slog, tui, cli, terminal]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# log — Colorful slog-compatible logging
+# log — handler slog coloré
 
 ## Selection
 
-[`charm.land/log/v2`](https://github.com/charmbracelet/log) (v2).
-
-**Why it passes the gate** (actual reason, not stars): it implements the
-standard `log/slog.Handler` interface, so it is a drop-in colored handler for
-the kit's mandated `slog` logging story — no logging paradigm change, just a
-handler swap. Small, readable, zero magic; the default for Charm CLIs.
+[`charm.land/log/v2`](https://github.com/charmbracelet/log) v2.0.0 is a
+human-oriented logging handler that implements `log/slog.Handler`. It keeps the
+standard structured logging API while adding terminal-friendly levels, formatters,
+and optional styling. It is admitted for the focused CLI/TUI presentation layer,
+active maintenance, tests, and Charm use; the kit's `slog` rule remains the
+interface boundary.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.0.x (2026)
-- [x] Single responsibility — colored human-readable log handler
-- [x] Idiomatic Go — implements `slog.Handler`
-- [x] Tests present + CI — yes
-- [x] Documentation — README + charm.sh docs
-- [x] Real-world usage — Gum, Soft Serve, and other Charm CLIs
-- [x] Readable end-to-end — yes, tiny core
-- [x] Justified by need — adds color/caller to slog with zero API change
+- [x] Current v2.0.0 module and active upstream maintenance.
+- [x] Single responsibility: human-readable structured log handler.
+- [x] Implements standard `slog.Handler` with text/JSON/logfmt options.
+- [x] Tests, CI, documentation, and real Charm CLI use exist.
+- [x] The kit can retain stdlib `slog` at call sites and swap the handler.
 
 ## Minimal use
 
 ```go
-import slog "log/slog"
-import charmLog "charm.land/log/v2"
-
-slog.SetDefault(slog.New(charmLog.New(charmLog.WithTimeFormat(time.Kitchen))))
-slog.Info("server started", "port", 8080)
+func newLogger(w io.Writer) *slog.Logger {
+    handler := charmLog.New(charmLog.WithOutput(w))
+    return slog.New(handler)
+}
 ```
+
+Keep the logger explicitly injected into application components. Choose JSON or
+logfmt for machine pipelines and disable styling when output is not a TTY.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| zap / zerolog | Structured JSON-first; overkill for human-facing CLI logs. Fine when logs feed a pipeline — then keep them instead. |
-| Standard slog text handler | Correct default; add charm log only when colored human output matters (CLI/TUI). |
-
-## Notes
-
-- Kit rule `logging` mandates `slog` as the interface: charm log is a handler,
-  not a replacement — code keeps using `slog`.
-- `WithReportCaller()` adds file:line; keep it off in perf-sensitive paths.
+| stdlib `log/slog` | Default choice for services and zero-dependency structured logging. |
+| zap / zerolog | Consider for measured high-throughput or JSON-first service workloads. |
+| logrus | Legacy compatibility only; do not choose for new code without a reason. |
 
 ## Utiliser cette librairie quand
 
-- Une CLI/TUI veut des logs colorés lisibles par un humain tout en gardant
-  l'interface standard `log/slog.Handler`.
-- Le handler slog par défaut est correct mais la sortie colorée/calmer
-  compte pour l'expérience utilisateur.
+- A CLI/TUI needs readable colored logs and the application still wants the
+  standard `slog` API.
+- Text, JSON, logfmt, caller reporting, or sub-loggers are useful at the edge.
+- Styling is a presentation decision, not an audit/security guarantee.
 
 ## Ne pas utiliser cette librairie quand
 
-- Les logs alimentent un pipeline JSON : garder zap/zerolog (ou slog JSON
-  handler) — pas un handler coloré.
-- La sortie doit rester du texte plat non coloré : le handler slog standard
-  suffit.
+- The service needs only stdlib `slog` and no human-facing styling.
+- Logs feed a high-throughput machine pipeline where performance is measured and
+  a specialized JSON logger is justified.
+- The requirement includes tamper-proof, encrypted, or compliance-grade audit
+  storage; a formatter cannot provide those properties.
 
 ## Avantages
 
-- Implémente `slog.Handler` : drop-in, zéro changement de paradigme de
-  logging (la règle kit `logging` reste l'interface).
-- Petit, lisible, sans magie — défaut des CLIs Charm.
-- `WithReportCaller()` pour file:line.
+- Standard `slog.Handler` compatibility preserves the kit's logging contract.
+- Human-readable levels, styles, text/JSON/logfmt formatters, and sub-loggers.
+- Terminal color behavior can be disabled at non-TTY output boundaries.
 
 ## Inconvénients
 
-- Orienté humain : pas fait pour des pipelines JSON volumineux.
-- Coloration = codes ANSI : à neutraliser quand la sortie est pipée
-  (notty/CI).
-- Utile seulement quand la lisibilité humaine prime.
+- Human-oriented styling is extra surface for a service that already uses
+  stdlib `slog`.
+- No custom slog levels, tamper-proof audit log, encryption, or compliance
+  guarantees.
+- Review concurrency behavior and output ownership for high-load use.
 
 ## Pièges connus
 
-- Ne pas remplacer slog par charm log : c'est un handler, le code continue
-  d'utiliser `slog`.
-- Couper `WithReportCaller()` sur les chemins sensibles à la perf (coût
-  file:line).
-- Sortie pipée : désactiver la couleur (notty) pour éviter les codes
-  parasites dans les logs/CI.
+- Keep using `slog` in application code; `charm.land/log/v2` is a handler, not
+  a reason to hide the logger in global state.
+- Select JSON/logfmt or disable colors for pipes, CI, and machine ingestion.
+- Use explicit logger injection and handle output errors at the boundary.
+- Review upstream concurrency issues before using it as the critical service
+  logger under extreme load.
 
 ## Sources vérifiées
 
-- [charmbracelet/log (repo officiel, v2)](https://github.com/charmbracelet/log)
-  — vérifié 2026-08-04
-- [pkg.go.dev/charm.land/log/v2](https://pkg.go.dev/charm.land/log/v2) —
-  vérifié 2026-08-04
-- Artefact interne : règle kit `logging` (slog par défaut)
+- [Official charm log repository](https://github.com/charmbracelet/log) — API,
+  maintenance, license, checked 2026-08-05.
+- [log v2 on pkg.go.dev](https://pkg.go.dev/charm.land/log/v2) — exact version
+  and handler API, checked 2026-08-05.
+- [log v2.0.0 release](https://github.com/charmbracelet/log/releases/tag/v2.0.0)
+  — module migration, checked 2026-08-05.
+- [Issue #116](https://github.com/charmbracelet/log/issues/116) — custom level
+  limitation, checked 2026-08-05.
+- [Issue #176](https://github.com/charmbracelet/log/issues/176) — concurrency
+  behavior to review, checked 2026-08-05.
+- [OSV package search](https://osv.dev/search?q=charmbracelet%2Flog) — no package
+  advisory found at verification time, checked 2026-08-05.
