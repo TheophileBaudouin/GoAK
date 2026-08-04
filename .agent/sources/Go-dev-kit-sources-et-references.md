@@ -733,6 +733,15 @@ Implémentation JWT.
 - **Priorité :** Moyenne
 - **Catégorie :** IA / LLM / Orchestration
 
+## ADK-Go (Agent Development Kit Go)
+
+- **Lien :** <https://github.com/google/adk-go> — docs <https://google.github.io/adk-docs/> — module <https://pkg.go.dev/google.golang.org/adk/v2>
+- **Description :** Framework Go « code-first » d'agents IA par Google (build, évaluation, déploiement cloud : Vertex AI, Agent Engine, Cloud Run, Eventarc). **Pointeur uniquement** — échoue le portail d'admission : 528 fichiers .go / ~129k LOC, 30+ deps directes (SDKs Google Cloud, gorilla/mux archivé), couplage cloud-native. v2.1.0 (2026-07) ; churn rapide (v1.0.0 mars → v2.0.0 juin 2026). À étudier pour les patterns d'orchestration, pas à dépendre (kit ≠ framework). Pointeur catalog : `pointers/adk-go.yaml`.
+- **Utilité potentielle :**
+  - Étude des patterns d'orchestration d'agents (workflow agents, tool registration, session memory, évaluation) pour la direction agents du kit.
+- **Priorité :** Basse
+- **Catégorie :** IA / LLM / Orchestration
+
 ## MCP (Model Context Protocol)
 
 - **Lien :** <https://modelcontextprotocol.io> — SDK Go <https://github.com/modelcontextprotocol/go-sdk>
