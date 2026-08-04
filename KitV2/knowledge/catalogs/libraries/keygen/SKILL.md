@@ -1,102 +1,104 @@
 ---
 name: keygen
-description: "github.com/charmbracelet/keygen — SSH key pair generation (Ed25519, RSA, ECDSA) with passphrase support and PEM/OpenSSH formats. Use when tooling must create SSH host or client keys programmatically instead of shelling out to ssh-keygen."
+description: "github.com/charmbracelet/keygen v0.5.4 — Go SSH key-pair generation for Ed25519, RSA, and ECDSA with passphrases and file permissions. Use for programmatic key creation; not for key rotation, agents, authorization, or parsing-only workflows."
 category: library
 tags: [ssh, keys, crypto, security, cli]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# keygen — SSH key pair generation
+# keygen — génération de clés SSH
 
 ## Selection
 
-[`github.com/charmbracelet/keygen`](https://github.com/charmbracelet/keygen).
-
-**Why it passes the gate** (actual reason, not stars): generating SSH keys
-correctly (right curve/params, correct PEM encoding, secure permissions) is
-security-sensitive boilerplate. Keygen wraps the stdlib crypto stack
-(`crypto/ed25519`, `crypto/rsa`, `crypto/ecdsa`, `x/crypto/ssh`) into a small
-API with passphrase support and explicit file permissions, used by Charm's own
-SSH tooling.
+[`github.com/charmbracelet/keygen`](https://github.com/charmbracelet/keygen) v0.5.4,
+released 2025-10-02, wraps Go crypto and `x/crypto/ssh` for generating SSH key
+pairs with secure file permissions and optional passphrases. It is admitted for
+this small security-sensitive utility boundary, tests, documentation, and Charm
+use; not for popularity. A later pseudo-version is not a stable release.
 
 ## Admission checklist
 
-- [x] Actively maintained — v0.5.x releases, commits 2026
-- [x] Single responsibility — SSH key pair generation
-- [x] Idiomatic Go — small constructor + file IO, no globals
-- [x] Tests present + CI — yes
-- [x] Documentation — README
-- [x] Real-world usage — Charm SSH tooling (wish/soft-serve ecosystem)
-- [x] Readable end-to-end — yes, tiny
-- [x] Justified by need — avoids hand-rolled crypto boilerplate with permissions bugs
+- [x] Stable v0.5.4 with active dependency/maintenance updates.
+- [x] Single responsibility: SSH key-pair generation and serialization.
+- [x] Ed25519, RSA, and ECDSA support with passphrase options.
+- [x] Tests, CI, documentation, and explicit private/public file permissions.
+- [x] The package avoids repeated crypto marshaling boilerplate but leaves key
+      lifecycle policy to the application.
 
 ## Minimal use
 
 ```go
-kp, err := keygen.New(keygen.Ed25519)
-if err != nil {
-    err = kp.WritePrivateKeyToFile("id_ed25519", 0o600) // host/client key
-    _ = kp.WritePublicKeyToFile("id_ed25519.pub", 0o644)
+func writeKeyPair(path string) error {
+    pair, err := keygen.New(path, keygen.WithKeyType(keygen.Ed25519))
+    if err != nil {
+        return fmt.Errorf("generate SSH key: %w", err)
+    }
+    if err := pair.WriteKeys(); err != nil {
+        return fmt.Errorf("write SSH keys: %w", err)
+    }
+    return nil
 }
 ```
+
+Choose a passphrase option and protect it outside process arguments. Keep private
+keys at `0600` and public keys at `0644` only when the deployment policy permits
+those modes.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Shelling out to `ssh-keygen` | Couples the binary to the host's ssh install; harder to test and control formats. |
-| Raw `crypto/*` + `x/crypto/ssh` | Correct but ~50 lines of error-prone marshaling per key type. |
-| `golang.org/x/crypto/ssh` key parsing | Parsing only, not generation. |
-
-## Security note
-
-- Prefer Ed25519; use RSA only for legacy compat (≥3072-bit).
-- Always `0o600` on private keys — keygen enforces explicit perms.
-- Passphrases: use `keygen.WithPassphrase` and keep the passphrase out of
-  process args (env/secret store).
+| `ssh-keygen` | Prefer for interactive one-shot host tooling when the binary is guaranteed. |
+| `crypto/ed25519` + `x/crypto/ssh` | Prefer when the application needs full control over formats or lifecycle policy. |
+| `x/crypto/ssh` parsing | Parsing/signing support, not a complete key-generation wrapper. |
+| KMS/HSM | Prefer for production key custody, rotation, audit, and non-exportable keys. |
 
 ## Utiliser cette librairie quand
 
-- De l'outillage doit créer des paires de clés SSH (hôte ou client)
-  programmatiquement au lieu de sheller vers `ssh-keygen`.
-- Les formats PEM/OpenSSH, passphrases et permissions de fichiers sécurisées
-  (0o600) doivent être gérés correctement sans boilerplate crypto maison.
-- L'environnement n'a pas de binaire ssh-keygen fiable (conteneurs, services).
+- A Go tool must generate host or client SSH keys without shelling out.
+- Ed25519/RSA/ECDSA, OpenSSH/PEM serialization, passphrases, and file modes are
+  enough for the generation boundary.
+- The application owns authorization, rotation, backup, and secure key storage.
 
 ## Ne pas utiliser cette librairie quand
 
-- Un one-shot interactif suffit (ssh-keygen CLI est disponible).
-- Le besoin est de parser des clés existantes (x/crypto/ssh parsing seul).
-- La gestion du cycle de vie complet (autorisation, rotation) est requise —
-  keygen ne génère que des paires.
+- A one-shot interactive command can use a trusted `ssh-keygen` binary.
+- Existing keys only need parsing or verification.
+- The system needs an SSH agent, KMS/HSM custody, rotation, authorization, or
+  audit lifecycle.
+- Hardware-backed Ed25519-SK or other unsupported key types are required.
 
 ## Avantages
 
-- API petite et sûre autour du stack crypto stdlib : moins de marshaling
-  erreur-prone par type de clé.
-- Support Ed25519, RSA, ECDSA + passphrase + permissions explicites.
-- Utilisé par l'outillage SSH de Charm (wish/soft-serve).
+- Small API over standard crypto and SSH marshaling.
+- Ed25519, RSA, ECDSA, passphrase support, and explicit file permissions.
+- Pure Go generation without a host binary dependency.
 
 ## Inconvénients
 
-- Génération seulement : pas de gestion d'autorisation, de rotation ni de
-  formatage avancé.
-- La sécurité finale dépend de l'usage (algorithme, passphrase, perms) —
-  la lib ne décide pas à votre place.
+- Generation only; no key discovery, agent, rotation, revocation, or authorization.
+- Passphrases remain application-managed sensitive data.
+- Stable v0.5.4 is older than the latest unreleased pseudo-version; pin the tag
+  for reproducibility.
 
 ## Pièges connus
 
-- Préférer Ed25519 ; RSA uniquement pour compatibilité legacy (≥ 3072 bits).
-- Toujours `0o600` sur les clés privées (keygen l'impose via l'API).
-- Passphrase via `WithPassphrase`, jamais dans les args de processus
-  (visible dans le process listing / historique) — env ou secret store.
-- Voir `source:ssh:key-generation` pour la guidance complète (algorithmes,
-  formats, protection).
+- Prefer Ed25519; use RSA only for legacy interoperability and select a strong
+  key size.
+- Keep private files `0600`; never log private material or passphrases.
+- Never place a passphrase in command-line arguments; use protected input or a
+  secret store.
+- Define a recovery/rotation policy before generating keys for a durable service.
 
 ## Sources vérifiées
 
-- [charmbracelet/keygen (repo officiel, v0.5.x)](https://github.com/charmbracelet/keygen)
-  — vérifié 2026-08-04
-- [ssh-keygen(1) — OpenBSD manual](https://man.openbsd.org/OpenBSD-current/man1/ssh-keygen.1)
-  — vérifié 2026-08-04 (référence officielle)
-- Artefact interne : `source:ssh:key-generation` (guidance security)
+- [Official keygen repository](https://github.com/charmbracelet/keygen) —
+  maintenance, API, license, checked 2026-08-05.
+- [keygen v0.5.4 releases](https://github.com/charmbracelet/keygen/releases) —
+  stable version and release date, checked 2026-08-05.
+- [keygen on pkg.go.dev](https://pkg.go.dev/github.com/charmbracelet/keygen)
+  — API and options, checked 2026-08-05.
+- [keygen implementation](https://github.com/charmbracelet/keygen/blob/v0.5.4/keygen.go)
+  — supported key types and file behavior, checked 2026-08-05.
+- [OpenBSD ssh-keygen manual](https://man.openbsd.org/OpenBSD-current/man1/ssh-keygen.1)
+  — interoperability reference, checked 2026-08-05.
