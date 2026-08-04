@@ -1,0 +1,43 @@
+---
+id: pattern:antipattern:sec-missing-csrf
+title: Sessions cookies sans protection CSRF
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, csrf, cookies, sessions, owasp, same-site, web]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-05
+symptom: >-
+  Une app web avec authentification par cookie (scs, gorilla/sessions) expose
+  des endpoints state-changing (POST /delete, /transfer, /settings) sans
+  jeton CSRF ni vérification d'origine ; le cookie de session n'a pas
+  SameSite configuré.
+detect: >-
+  - Formulaires POST sans jeton CSRF (double-submit ou synchronizer token).
+  - Aucune validation de l'en-tête Origin/Referer sur les mutations.
+  - Cookie de session sans `SameSite` (ou SameSite=None sans besoin).
+  - Tests manquants : une requête cross-origin forgée réussit.
+problem: >-
+  Un site tiers peut déclencher des requêtes cross-site qui portent le cookie
+  de session (le navigateur l'envoie automatiquement) : suppression, transfert,
+  changement de mot de passe à l'insu de l'utilisateur (attaque CSRF,
+  cheat sheet OWASP dédiée). SameSite=Strict atténue mais ne
+  couvre pas tous les contextes (subdomains, SameSite=Lax sur GET).
+fix: >-
+  Toujours : cookie `Secure` + `HttpOnly` + `SameSite=Strict` (ou Lax si
+  navigation externe nécessaire). Sur les endpoints state-changing : jeton
+  CSRF (synchronizer token ou double-submit) ou validation stricte
+  Origin/Referer ; valider sur le serveur, jamais seulement côté client.
+  Tester avec une requête cross-origin forgée.
+when_ok: >-
+  API à token porteur (JWT en header, jamais en cookie) : pas de cookie
+  automatique → surface CSRF réduite. Formulaires GET-only sans effet de
+  bord : pas de mutation à protéger.
+relationships:
+  references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+  uses:
+    - pattern:security:auth-session-vs-jwt
+  validated_by: []

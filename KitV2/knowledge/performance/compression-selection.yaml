@@ -1,0 +1,31 @@
+---
+id: source:performance:compression-selection
+title: Compression algorithm selection — zstd vs s2 vs stdlib gzip
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [performance, compression, zstd, s2, gzip, selection, benchmark]
+go_version: "1.24+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://github.com/klauspost/compress
+selection: >-
+  Load when choosing a compression algorithm or codec in Go: stdlib
+  compress/gzip stays the minimal choice for gzip interop; zstd (klauspost)
+  wins on ratio at high speed; s2 wins on speed with Snappy-compatible
+  framing; never switch away from stdlib without a measured benchmark on the
+  real workload (G4: measured guidance only).
+limits: >-
+  Published benchmarks (README subpackages) are synthetic; ratios and
+  throughput depend on data entropy, block size, and CPU. The library does not
+  implement brotli/lzma/lz4 — a format requirement is a separate decision.
+  Decoding untrusted input needs an output-size bound (amplification risk).
+relationships:
+  references:
+    - https://github.com/klauspost/compress
+    - https://pkg.go.dev/github.com/klauspost/compress/zstd
+    - https://pkg.go.dev/github.com/klauspost/compress/s2
+  uses:
+    - source:security:file-encryption
+  validated_by: []

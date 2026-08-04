@@ -1,0 +1,48 @@
+---
+id: pattern:antipattern:db-placeholder-cache-injection
+title: Injection SQL via modes de requête et littéraux dollar-quoted
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [database, sql-injection, pgx, postgresql, placeholder, query-mode]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-05
+symptom: >-
+  Des valeurs contrôlées par l'utilisateur finissent dans du SQL dont le
+  texte est assemblé avec des littéraux `$tag$...$tag$` (fonctions PL/pgSQL,
+  requêtes dynamiques), combiné à des modes de requête qui interprètent les
+  placeholders (`QueryExecModeCacheStatement`/`Describe` par défaut de pgx).
+  Un placeholder reconnu hors d'un littéral attendu devient une injection.
+detect: >-
+  - `$1..$n` ou des fragments concaténés dans du texte censé être un littéral
+    dollar-quoted (`$body$ ... $body$`).
+  - `QueryExecModeCacheStatement` actif (défaut pgx) avec requêtes construites
+    dynamiquement.
+  - Advisory GO-2026-5004 / GHSA-j88v-2chj-qfwx (fix pgx v5.9.2) : SQLi par
+    confusion de placeholders avec littéraux dollar-quoted en protocole
+    simple.
+problem: >-
+  Les requêtes paramétrées protègent les valeurs, pas le texte SQL : si le
+  SQL lui-même contient des fragments non contrôlés (littéraux `$tag$`,
+  clauses assemblées), un attaquant peut fermer le littéral et injecter des
+  commandes. La classe de bug est réapparue 3 fois sur pgx en 2 ans
+  (CVE-2024-27304, CVE-2026-33815/33816, GO-2026-5004).
+fix: >-
+  Épingler pgx ≥ v5.9.2 ; ne jamais placer de valeur contrôlée dans un
+  littéral dollar-quoted ; pour les requêtes dynamiques (filtres/ORDER BY),
+  choisir `QueryExecModeExec` ou valider chaque fragment contre une liste
+  blanche (voir `pattern:antipattern:db-codegen-dynamic-queries` pour le cas
+  sqlc). Tester avec des entrées adverses (`'$q$'; DROP ...`).
+when_ok: >-
+  SQL statique (aucun littéral `$tag$` ni fragment assemblé) + requêtes
+  paramétrées : le mode par défaut est sûr.
+relationships:
+  references:
+    - https://github.com/jackc/pgx/security/advisories/GHSA-j88v-2chj-qfwx
+    - https://github.com/jackc/pgx/security/advisories/GHSA-mrww-27vc-gghv
+    - https://osv.dev/vulnerability/GO-2026-4772
+  uses:
+    - pattern:antipattern:db-codegen-dynamic-queries
+  validated_by: []

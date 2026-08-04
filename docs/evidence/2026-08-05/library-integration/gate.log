@@ -1,0 +1,22 @@
+=== validate-kitv2 ===
+kitv2: PASS (60 product skills, 3 snippets, standalone, offline bundle, router index 246 resources)
+=== validate-instructions ===
+instruction-artifacts: PASS
+=== gofmt/vet/lint ===
+gofmt-OK
+vet-OK
+0 issues.
+=== tests ===
+11
+=== gosec ===
+  Issues : [1;32m0[0m
+=== govulncheck ===
+No vulnerabilities found.
+=== probes ===
+cli-minimal: PASS
+rest-chi: PASS
+sqlite-sqlc: PASS
+worker-shutdown: PASS
+offline: PASS
+=== router ===
+router index: up to date (/Users/theophilebaudouin/Documents/devellopement/Go/KitV2/router)

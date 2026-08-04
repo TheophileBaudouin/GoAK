@@ -28,10 +28,10 @@ capabilities:
     source: router/
     status: generated-read-only-index-and-native-pi-tool
 coverage:
-  product_skills: 45
+  product_skills: 62
   rules: 10
   recipes: 10
-  knowledge_catalogs: 31
+  knowledge_catalogs: 42
   probes: 5
   project_templates: 7
 metadata_role: product capability catalog, not an instruction entrypoint

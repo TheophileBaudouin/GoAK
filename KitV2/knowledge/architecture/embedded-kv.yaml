@@ -1,0 +1,31 @@
+---
+id: source:architecture:embedded-kv
+title: Embedded key-value store decision — bbolt vs embedded SQL vs server
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [architecture, storage, embedded, key-value, bbolt, sqlite, single-writer]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://github.com/etcd-io/bbolt
+selection: >-
+  Load when choosing the persistence layer for a single-process Go
+  application: bbolt (embedded B+tree KV, ACID, one writer) vs modernc-sqlite
+  (embedded SQL) vs a database server. bbolt wins on simplicity, zero
+  dependency, and cold-read performance; SQL wins when queries and secondary
+  indexes matter; a server wins when multiple processes or clients write.
+limits: >-
+  bbolt is single-writer by design (exclusive transaction lock): multi-process
+  or high-concurrency write workloads are out of scope. Values returned by
+  Bucket.Get are only valid inside the transaction. No replication, no
+  compaction automation — plan for manual compaction on high turnover.
+relationships:
+  references:
+    - https://github.com/etcd-io/bbolt
+    - https://pkg.go.dev/go.etcd.io/bbolt
+  uses:
+    - pattern:database:transaction-boundary
+    - pattern:go:minimal-layout
+  validated_by: []

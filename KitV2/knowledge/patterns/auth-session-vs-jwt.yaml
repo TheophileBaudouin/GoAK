@@ -1,0 +1,52 @@
+---
+id: pattern:security:auth-session-vs-jwt
+title: Choix du mécanisme d'auth — sessions cookies vs JWT vs OAuth2
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, authentication, sessions, jwt, oauth2, cookies, decision]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-05
+problem: >-
+  Le choix du mécanisme d'auth conditionne révocation, CSRF, mobilité et
+  complexité. Le JWT est souvent choisi par réflexe (« stateless »)
+  alors que les sessions cookies sont plus simples et révocables pour
+  une app web classique ; inversement, des sessions par cookie pour
+  une API mobile multiplient les pièges (CORS, CSRF, fixation).
+context: >-
+  S'applique au choix d'un mécanisme pour une nouvelle application ou un
+  endpoint : navigateur web (templates/SPA servies), API REST, mobile, ou
+  login tiers (Google/GitHub/entreprise).
+solution: >-
+  Choisir selon le client et les besoins de révocation :
+  - App web classique (navigateur) → **sessions cookies côté serveur**
+    (`scs`) : révocables, HttpOnly, SameSite ; CSRF obligatoire.
+  - API REST / mobile / service-service → **JWT** (`golang-jwt`) : stateless,
+    token court (exp) + rotation ; jamais de données sensibles dans les claims.
+  - Login tiers / entreprise → **OAuth2/OIDC** (`golang.org/x/oauth2`)
+    : déléguer l'authentification, ne jamais stocker de mots de passe.
+  - Mots de passe (login interne) : hash memory-hard **argon2id** (ou bcrypt
+    pour compat) via `golang.org/x/crypto`, jamais en clair ni SHA-256.
+benefits: >-
+  Mécanisme aligné sur le client (révocabilité, CSRF, mobilité) ; moins de
+  pièges de sécurité par construction ; décision explicite et documentée au
+  lieu d'un réflexe (« JWT partout »).
+costs: >-
+  Les besoins mixtes (SPA + mobile + web) demandent souvent deux mécanismes
+  (sessions pour le web, JWT pour l'API) et une gestion de clés/expiration
+  soignée ; OAuth2 ajoute le coût d'un IdP et du stockage d'identités
+  locales.
+related: >-
+  Homologues négatifs : pattern:antipattern:sec-fail-open,
+  pattern:antipattern:sec-missing-csrf ; voir aussi
+  pattern:security:secrets-management.
+relationships:
+  references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+    - https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html
+  uses:
+    - pattern:security:fail-closed-auth
+    - pattern:security:secrets-management
+  validated_by: []

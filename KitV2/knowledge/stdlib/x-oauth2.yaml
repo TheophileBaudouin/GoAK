@@ -1,0 +1,30 @@
+---
+id: source:go:x-oauth2
+title: golang.org/x/oauth2 — OAuth2/OIDC client flows (official Go)
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, oauth2, oidc, authentication, login, third-party]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://pkg.go.dev/golang.org/x/oauth2
+selection: >-
+  Load when implementing third-party login (Google, GitHub, Microsoft/Azure AD,
+  enterprise IdP) or OAuth2 client flows in Go: authorization code, device
+  flow, JWT bearer. The Go team module is the standard client; pair with
+  OIDC discovery (coreos/go-oidc or manual) for OpenID Connect.
+limits: >-
+  Pin golang.org/x/oauth2 >= v0.27.0 (GO-2025-3488: excessive memory during
+  token parsing). OIDC (id_token validation, discovery) is NOT included in the
+  base module — use golang.org/x/oauth2 + coreos/go-oidc or validate manually.
+  Never build OAuth2 exchanges on raw HTTP (state, PKCE, and token handling
+  are error-prone).
+relationships:
+  references:
+    - https://pkg.go.dev/golang.org/x/oauth2
+    - https://github.com/coreos/go-oidc
+  uses:
+    - pattern:security:auth-session-vs-jwt
+  validated_by: []

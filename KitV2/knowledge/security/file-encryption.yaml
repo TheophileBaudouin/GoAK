@@ -1,0 +1,32 @@
+---
+id: source:security:file-encryption
+title: File encryption at rest — age format and when to use it
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, encryption, age, files, backups, secrets, at-rest]
+go_version: "1.24+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://age-encryption.org/
+selection: >-
+  Load when encrypting files, archives, backups, or secrets at rest in a Go
+  program: age (X25519 + ChaCha20-Poly1305) removes protocol choices from the
+  caller and ships a stable, interoperable file format. Distinct from
+  secrets-management, which covers environment/config secrets and key
+  handling.
+limits: >-
+  age protects confidentiality and integrity of a file, not freshness (whole
+  replay is undetectable) and not transport. It has no key rotation,
+  revocation, or multi-user administration story — those need a KMS or an
+  application-level scheme. The plugin-name vulnerability (GHSA-32gq-x56h-299c)
+  requires pinning age >= v1.2.1.
+relationships:
+  references:
+    - https://age-encryption.org/
+    - https://github.com/FiloSottile/age
+    - https://github.com/FiloSottile/age/security/advisories/GHSA-32gq-x56h-299c
+  uses:
+    - pattern:security:secrets-management
+  validated_by: []

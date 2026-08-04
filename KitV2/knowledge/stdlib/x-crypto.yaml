@@ -1,0 +1,34 @@
+---
+id: source:go:x-crypto
+title: golang.org/x/crypto — bcrypt/argon2, keygen (official Go)
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, crypto, bcrypt, argon2, password, hashing]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://pkg.go.dev/golang.org/x/crypto
+selection: >-
+  Load when hashing passwords or deriving keys in Go: bcrypt for compatibility
+  with existing stores (72-byte input cap), argon2id for new code (memory-hard,
+  recommended over bcrypt). Also covers nacl/box, ssh, chacha20poly1305.
+  Distinct from file encryption (age) and from token signing (golang-jwt).
+limits: >-
+  Pin golang.org/x/crypto >= v0.52.0 (batch of advisories fixed in v0.52.0,
+  mostly ssh/agent). The openpgp package is deprecated and unsafe by design
+  (GO-2026-5932, no fix upstream) — never use it; migrate to the maintained
+  fork github.com/ProtonMail/go-crypto if openpgp is required. bcrypt
+  truncates input at 72 bytes (ErrPasswordTooLong); argon2id requires
+  explicit parameter selection —
+  prefer a vetted wrapper or documented defaults. Never use generic fast
+  hashes (SHA-256) for passwords.
+relationships:
+  references:
+    - https://pkg.go.dev/golang.org/x/crypto
+    - https://pkg.go.dev/golang.org/x/crypto/bcrypt
+    - https://pkg.go.dev/golang.org/x/crypto/argon2
+  uses:
+    - pattern:security:secrets-management
+  validated_by: []
