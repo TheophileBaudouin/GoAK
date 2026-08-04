@@ -1,104 +1,108 @@
 ---
 name: huh
-description: "charm.land/huh/v2 — terminal forms and prompts built on Bubble Tea: input, select, confirm, multi-select, file picker, with validation. Use when a CLI needs interactive structured input (wizards, confirmations, surveys) instead of raw fmt.Scan."
+description: "charm.land/huh/v2 v2.0.3 — interactive terminal forms and prompts built on Bubble Tea. Use for validated multi-field CLI forms; not for non-interactive input, a non-TTY environment, or a custom TUI without accepting the v2 framework."
 category: library
-tags: [tui, forms, prompts, input, bubbletea]
-last-verified: 2026-08-04
+tags: [tui, cli, forms, prompts, bubbletea, terminal]
+last-verified: 2026-08-05
 ---
 
-# huh — Terminal forms and prompts
+# huh — formulaires terminal
 
 ## Selection
 
-[`charm.land/huh/v2`](https://github.com/charmbracelet/huh) (v2).
-
-**Why it passes the gate** (actual reason, not stars): it is the maintained
-successor of the archived `AlecAivazis/survey`, built directly on Bubble Tea. It
-ships the standard prompt types (input, text, select, multi-select, confirm,
-file picker, spinner) with validation, help, themes, and accessibility-friendly
-key bindings — as one dependency instead of hand-rolled prompt loops.
+[`charm.land/huh/v2`](https://github.com/charmbracelet/huh) v2.0.3,
+released 2026-03-10, provides interactive `Form`, `Group`, and field models for
+inputs, selects, confirmations, text, spinners, and file pickers. It is admitted
+for a focused validated-form boundary, active maintenance, tests, and Charm
+ecosystem use; not for popularity. It uses Bubble Tea v2 and Lip Gloss v2.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.0.x, very active (2026)
-- [x] Single responsibility — terminal form/prompt library
-- [x] Idiomatic Go — `huh.NewForm(huh.NewGroup(...))`, composable
-- [x] Tests present + CI — yes
-- [x] Documentation — README + examples + charm.sh docs
-- [x] Real-world usage — Gum, Huh CLI, many Charm-based apps
-- [x] Readable end-to-end — yes
-- [x] Justified by need — survey (predecessor) is archived; this is the modern path
+- [x] Current v2.0.3 release and active upstream maintenance.
+- [x] Single responsibility: interactive terminal forms and prompts.
+- [x] Field-level validation, accessible mode, themes, and sizing are exposed.
+- [x] Tests, CI, documentation, and examples exist.
+- [x] The major version and TTY dependency are explicit adoption decisions.
 
 ## Minimal use
 
 ```go
-var name string
-err := huh.NewForm(huh.NewGroup(
-    huh.NewInput().Title("Name").Value(&name),
-    huh.NewConfirm().Title("Continue?").Value(&goOn),
-)).Run()
+func askName() (string, error) {
+    var name string
+    form := huh.NewForm(
+        huh.NewGroup(huh.NewInput().Title("Name").Value(&name)),
+    )
+    if err := form.Run(); err != nil {
+        return "", fmt.Errorf("run form: %w", err)
+    }
+    return name, nil
+}
 ```
+
+Use `RunAccessible`/accessible form mode when a terminal UI cannot be relied on
+or the user's accessibility workflow requires it. Keep validation at the form
+boundary and validate again at the application trust boundary.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| AlecAivazis/survey | Archived/unmaintained; survey's fork chzyer/readline is low-level. |
-| promptui | Older, smaller feature set, less maintained. |
-| Raw fmt.Scan / bufio | No editing, no validation, no cursor handling — only for throwaway scripts. |
-
-## Notes
-
-- Runs on Bubble Tea under the hood — do not embed huh forms inside a separate
-  `tea.Program`; use `huh.NewForm(...).WithProgram(...)` integration if needed.
-- Every field supports `.Validate(func(string) error)`.
-- For a full custom TUI with persistent state, use Bubble Tea directly; huh is
-  for the form-in-a-script case.
+| Bubble Tea directly | Choose for a custom state machine or form layout that Huh cannot express. |
+| stdlib `bufio`/`flag` | Prefer for non-interactive, scriptable, or single-value input. |
+| `asky`/`prompt` libraries | Consider for a smaller prompt surface; verify maintenance and TTY behavior independently. |
+| Web form | Prefer when the interaction must be browser-accessible or remotely managed. |
 
 ## Utiliser cette librairie quand
 
-- Une CLI a besoin de saisie structurée interactive (wizards, confirmations,
-  sondages) au lieu de `fmt.Scan` brut.
-- Les types de prompts standards suffisent : input, text, select,
-  multi-select, confirm, file picker, spinner.
-- La validation par champ (`.Validate(func(string) error)`) est souhaitée
-  sans boucle maison.
+- A CLI needs a validated wizard, select, multi-select, input, confirmation,
+  or multi-group form.
+- Bubble Tea v2/Lip Gloss v2 are acceptable transitive boundaries.
+- The user interaction is genuinely interactive and terminal-based.
 
 ## Ne pas utiliser cette librairie quand
 
-- Une TUI custom avec état persistant est visée : Bubble Tea directement.
-- Un prompt trivial one-shot suffit (scripts jetables : fmt.Scan accepté).
-- survey (prédécesseur) est archivé : ne pas l'utiliser.
+- Input must work non-interactively in pipes, CI, or scripts without an
+  accessible-mode design.
+- A single flag or line can use stdlib with less ceremony.
+- The project needs a custom TUI state machine rather than form primitives.
+- The application cannot accept a TTY dependency or the v2 import migration.
 
 ## Avantages
 
-- Successeur maintenu de survey (archivé), construit sur Bubble Tea.
-- Types de prompts complets avec validation, help, thèmes, bindings
-  accessibles.
-- Une dépendance au lieu de boucles de prompt maison.
-- `huh.NewForm(huh.NewGroup(...))` composable.
+- High-level fields, groups, validation, themes, sizing, and accessibility.
+- Bubble Tea model integration with much less form boilerplate.
+- Current v2 API aligns with the Charm TUI stack and handles common field types.
 
 ## Inconvénients
 
-- Basé sur Bubble Tea : ne pas l'embarquer dans un `tea.Program` séparé
-  (intégration via `WithProgram` si nécessaire).
-- Orientation « formulaire dans un script » : pas adapté aux TUIs à état
-  persistant.
-- Dépendance de la chaîne Charm (bubbletea sous le capot).
+- Interactive forms require a compatible terminal and terminal width.
+- v2 is a breaking migration from the old GitHub import path and theme API.
+- Dynamic/custom layouts can expose viewport and narrow-terminal edge cases.
+- Hidden fields may still trigger TTY behavior; accessible mode is an explicit
+  choice, not an automatic replacement.
 
 ## Pièges connus
 
-- Ne pas lancer huh à l'intérieur d'un autre `tea.Program` : utiliser
-  `huh.NewForm(...).WithProgram(...)` pour l'intégration.
-- Toujours associer `.Validate` aux champs sensibles — la validation est
-  par champ, pas globale par défaut.
-- Pour une TUI complète avec état, passer à Bubble Tea directement (huh est
-  le cas « formulaire dans un script »).
+- Check `Form.Run` and preserve its error; do not treat cancelled input as a
+  successful configuration.
+- Use the v2 import path and `ThemeCharm(isDark)` shape; do not copy v1 themes.
+- Test terminals narrower than five columns and resize/select filtering paths.
+- Keep domain validation after form submission; terminal validation alone is not
+  a trust-boundary guarantee.
+- Provide an accessible/non-interactive fallback when CI or automation can run
+  the command without a real TTY.
 
 ## Sources vérifiées
 
-- [charmbracelet/huh (repo officiel, v2)](https://github.com/charmbracelet/huh)
-  — vérifié 2026-08-04
-- [pkg.go.dev/charm.land/huh/v2](https://pkg.go.dev/charm.land/huh/v2) —
-  vérifié 2026-08-04
-- Artefact interne : catalog `bubbletea` (fondation)
+- [Official huh repository](https://github.com/charmbracelet/huh) — maintenance,
+  API, license, checked 2026-08-05.
+- [huh v2.0.3 on pkg.go.dev](https://pkg.go.dev/charm.land/huh/v2@v2.0.3) —
+  exact version and API, checked 2026-08-05.
+- [huh releases](https://github.com/charmbracelet/huh/releases) — v2 changes
+  and current tag, checked 2026-08-05.
+- [v2.0.0 release](https://github.com/charmbracelet/huh/releases/tag/v2.0.0)
+  — breaking import/theme/accessibility changes, checked 2026-08-05.
+- [TTY issue #718](https://github.com/charmbracelet/huh/issues/718) — non-TTY
+  behavior, checked 2026-08-05.
+- [Narrow terminal issue #671](https://github.com/charmbracelet/huh/issues/671)
+  — width limitation, checked 2026-08-05.

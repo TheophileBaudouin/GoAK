@@ -1,86 +1,106 @@
 ---
 name: koanf
-description: "knadh/koanf v2.3.5 — modular multi-source configuration with separate providers and parsers. Use when loading defaults plus file, environment, or flag sources with an explicit cascade and typed decoding."
+description: "github.com/knadh/koanf/v2 v2.3.6 — modular configuration cascade with explicit providers, parsers, and typed decoding. Use for defaults plus file/env/flag sources; not for a single flag, implicit global state, or unsynchronized reloads."
 category: library
 tags: [config, koanf, viper-alternative, env, flags]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# koanf — explicit configuration cascade
+# koanf — cascade de configuration explicite
 
 ## Selection
 
-Use `github.com/knadh/koanf/v2` when configuration comes from multiple
-sources and the application should choose providers, parsers, and precedence
-explicitly. Koanf v2 separates provider/parser modules so applications install
-only what they use.
+[`github.com/knadh/koanf/v2`](https://github.com/knadh/koanf) v2.3.6 is a modular
+configuration library: providers supply data, parsers decode it, and the
+application chooses load order and precedence. It is admitted for this
+explicit multi-source boundary, active maintenance, tests, documentation, and
+small focused design; stdlib remains preferable for trivial configuration.
 
-For one value or a small flat flag set, use the standard library. For an
-existing Viper application, do not migrate casually; use the Viper catalog and
-its upgrade guidance.
+## Admission checklist
 
-## Canonical shape
+- [x] Current v2.3.6 release and active upstream maintenance.
+- [x] Single responsibility: provider/parser/configuration cascade.
+- [x] Explicit modules avoid installing every possible source integration.
+- [x] Tests, CI, documentation, and typed decoding APIs exist.
+- [x] A stable v2 path and migration guidance are available.
 
-Load defaults first, then file, environment, and flags in the desired order.
-Later loads override earlier values. Unmarshal into a typed struct after the
-cascade. Use `StrictMerge` when incompatible types must fail rather than be
-silently replaced. Keep a configuration instance local or synchronize reloads
-with concurrent readers.
+## Minimal use
 
-## Official limits
+```go
+func loadConfig(p koanf.Provider, parser koanf.Parser) (*Config, error) {
+    k := koanf.New(".")
+    if err := k.Load(p, parser); err != nil {
+        return nil, fmt.Errorf("load configuration: %w", err)
+    }
+    var cfg Config
+    if err := k.Unmarshal("", &cfg); err != nil {
+        return nil, fmt.Errorf("decode configuration: %w", err)
+    }
+    return &cfg, nil
+}
+```
 
-- Koanf is case-sensitive and does not impose a load order.
-- Providers and parsers are separate modules with their own dependencies.
-- File/provider watching is not safe alongside concurrent `Get`/`Load` access
-  without synchronization.
-- v2 changes the module path to `/v2` and splits providers/parsers; consult
-  the official v2 migration/release notes before upgrading.
+Load defaults before file, environment, and flags when later sources should
+override earlier ones. Use `StrictMerge` when incompatible types must fail.
+
+## Alternatives considered
+
+| Alternative | Verdict |
+|---|---|
+| stdlib `flag`/`os.Getenv` | Prefer for a single source or a small flat command. |
+| Viper | Existing Viper applications should follow their migration policy; new code should compare global state, case handling, and dependency cost explicitly. |
+| envconfig | Env-only configuration; not a replacement for a multi-provider cascade. |
+| Typed configuration package | Consider when strict compile-time schema and validation are more important than provider flexibility. |
 
 ## Utiliser cette librairie quand
 
-- La config provient de plusieurs sources (défauts + fichier + env + flags)
-  avec une cascade de précédence explicite et un décodage typé.
-- Chaque source veut son provider/parser choisi explicitement, sans
-  dépendances inutiles.
-- Un projet neuf cherche une alternative structurée à Viper.
+- Defaults, files, environment, and flags need a visible precedence cascade.
+- Providers/parsers should be selected independently with typed decoding.
+- A new Go service wants an alternative to Viper's broader/global model.
 
 ## Ne pas utiliser cette librairie quand
 
-- Une seule valeur ou un petit jeu de flags plats : stdlib `flag` suffit.
-- Une application Viper existante : ne pas migrer au hasard (catalog viper +
-  guidance de migration).
-- Le watching de fichiers est requis SANS synchronisation avec les
-  `Get`/`Load` concurrents (koanf ne synchronise pas pour vous).
+- A single value or small flag set is enough for stdlib.
+- The project needs implicit case-insensitive keys or a global singleton.
+- File watching will run concurrently with `Get`/`Load` without synchronization.
+- The project is not prepared to pin and migrate the v2 module/provider paths.
 
 ## Avantages
 
-- Providers/parsers séparés : on installe seulement ce qu'on utilise.
-- Cascade explicite (dernier chargé écrase), décodage typé, `StrictMerge`
-  pour échouer sur types incompatibles.
-- Cas-sensitive assumé, pas de magie implicite d'ordre.
+- Provider/parser separation keeps dependencies deliberate.
+- Load order and override semantics are explicit.
+- Typed unmarshal and strict merge options expose configuration failures early.
+- Modular integrations cover file, env, flags, cloud, and secret providers.
 
 ## Inconvénients
 
-- Cas-sensitive et sans ordre imposé : la discipline de cascade est à la
-  charge de l'appelant.
-- Watching de fichiers non sûr avec accès concurrent sans synchronisation.
-- v2 a changé le chemin de module (/v2) et éclaté providers/parsers —
-  migration à faire consciencieusement.
+- Case-sensitive keys and no automatic load order require discipline.
+- Providers/parsers add separate modules and their own operational behavior.
+- Watching/reloading needs a synchronization policy owned by the application.
+- v2.3.6 requires Go 1.23+ and has evolving provider integrations.
 
 ## Pièges connus
 
-- Toujours charger les défauts AVANT fichier/env/flags (ordre = précédence).
-- Garder l'instance de config locale ou synchroniser les rechargements avec
-  les lecteurs concurrents.
-- Consulter les notes de migration v2 avant une montée de version.
-- Utiliser `StrictMerge` quand des types incompatibles doivent échouer plutôt
-  que d'être silencieusement remplacés.
+- Establish and test one cascade order; later loads override earlier values.
+- Synchronize reloads with concurrent readers; the library does not make the
+  whole application configuration immutable for you.
+- Use `StrictMerge` when incompatible types must be rejected instead of replaced.
+- Treat experimental providers as separate admission decisions and pin their
+  versions independently.
+- Do not store secrets in logs or use unbounded environment/file inputs without
+  validation at the configuration boundary.
 
 ## Sources vérifiées
 
-- [knadh/koanf (repo officiel, v2.3.5)](https://github.com/knadh/koanf) —
-  vérifié 2026-08-03
-- [pkg.go.dev/github.com/knadh/koanf/v2](https://pkg.go.dev/github.com/knadh/koanf/v2)
-  — vérifié 2026-08-03
-- Artefacts internes : `recipe-config-koanf`, catalog `viper` (comparaison),
-  `pattern:config:twelve-factor-config`, `pattern:antipattern:cfg-hardcoded-values`
+- [Official koanf repository](https://github.com/knadh/koanf) — maintenance,
+  architecture, license, checked 2026-08-05.
+- [koanf v2 on pkg.go.dev](https://pkg.go.dev/github.com/knadh/koanf/v2) — API,
+  providers/parsers, and current module metadata, checked 2026-08-05.
+- [koanf releases](https://github.com/knadh/koanf/releases) — v2.3.6 current
+  version and changes, checked 2026-08-05.
+- [v2.3.5 release](https://github.com/knadh/koanf/releases/tag/v2.3.5) —
+  provider and merge changes, checked 2026-08-05.
+- [Issue #402](https://github.com/knadh/koanf/issues/402) — flag-provider
+  precedence limitation, checked 2026-08-05.
+- [Issue #183](https://github.com/knadh/koanf/issues/183) — struct decoding
+  limitation, checked 2026-08-05.
