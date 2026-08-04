@@ -48,3 +48,46 @@ if profile == colorprofile.TrueColor { ... }
 
 - `colorprofile.Convert` maps a color to the target profile's palette.
 - For stripping ANSI before piping output, combine with `sequin`.
+
+## Utiliser cette librairie quand
+
+- La TUI/CLI doit adapter ses couleurs au terminal (truecolor, 256, 16, none)
+  et le sniffing TERM/COLORTERM manuel ne suffit pas.
+- Il faut convertir des couleurs entre profils (hex → 256 → ANSI) ou décider
+  d'un rendu selon les capacités détectées.
+- Remplacer termenv (projet retiré de l'org).
+
+## Ne pas utiliser cette librairie quand
+
+- `lipgloss` couvre déjà le besoin de styling (le plus souvent) : colorprofile
+  ne se justifie que si la valeur du profil elle-même est nécessaire.
+- Le rendu doit rester simple et le terminal cible est connu à l'avance.
+
+## Avantages
+
+- Centralise la logique de détection (TERM/COLORTERM/env + feature detection)
+  dans un package testé.
+- Conversion de couleurs entre profils.
+- Successeur maintenu de termenv, utilisé par Lip Gloss v2 et l'outillage
+  Charm.
+
+## Inconvénients
+
+- Petite surface : utile seulement quand le profil est une décision explicite.
+- Détection par heuristiques : aucun détecteur n'est parfait (terminaux
+  exotiques, multiplexeurs mal configurés).
+- Ne gère pas le styling (c'est lipgloss) — fonction unique, pas de surprise.
+
+## Pièges connus
+
+- termenv n'existe plus dans l'organisation : ne pas référencer (Gotcha) —
+  pointer colorprofile + sequin/x/ansi.
+- `Convert` suppose le profil cible connu : convertir avant de rendre, pas
+  après.
+- Pour stripper l'ANSI avant un pipe, combiner avec `sequin`.
+
+## Sources vérifiées
+
+- [charmbracelet/colorprofile (repo officiel, v0.4.x)](https://github.com/charmbracelet/colorprofile)
+  — vérifié 2026-08-04
+- Artefact interne : catalog `lipgloss` (usage sous le capot)

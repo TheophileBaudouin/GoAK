@@ -56,3 +56,56 @@ log.Fatal(srv.ListenAndServe())
   default wish setups allow any client with a valid key, so wire
   `wish.WithPublicKeyAuth` / allowlists before exposing anything.
 - Pair with `keygen` (this catalog) for host key generation.
+
+## Utiliser cette librairie quand
+
+- Exposer une TUI Bubble Tea (ou un handler SSH) sur des sessions SSH —
+  workbench distant / agent remote.
+- La **même logique TUI doit tourner en local ET être accessible par SSH**
+  (architecture H-shape du kit).
+- Les middlewares (logging, rate limiting, prometheus, contrôle d'accès)
+  doivent composer autour des sessions.
+
+## Ne pas utiliser cette librairie quand
+
+- Le serveur SSH est simple/one-off : `charm.land/ssh` (couche session/PTY)
+  ou x/crypto/ssh suffisent.
+- Seule la couche session/PTY est nécessaire, sans framework d'apps.
+
+## Avantages
+
+- Framework d'apps SSH : session → PTY → handler (Bubble Tea ou commande).
+- Middlewares composables (logging, ratelimit, prometheus, access control).
+- Fondation de l'architecture H-shape du kit (local-first / remote
+  workbench).
+- Usage réel : Soft Serve, Wishlist, apps SSH Charm.
+
+## Inconvénients
+
+- Framework opiné : le contrôle fin du protocole passe par les couches
+  basses (ssh/x/crypto).
+- La sécurité par défaut est permissive : allowlist et middlewares à câbler
+  explicitement (defaut = tout client avec une clé valide).
+
+## Pièges connus
+
+- Générer une clé hôte DÉDIÉE, jamais réutiliser une clé client (voir
+  `pattern:antipattern:sec-ssh-host-key-reuse` + `keygen`).
+- Middlewares dans le bon ordre : log d'abord, puis contrôle d'accès —
+  l'auth est traitée AVANT le ratelimiter (issue #325) : un ratelimit ne
+  protège pas l'auth par défaut.
+- `WithPublicKeyAuth`/allowlists avant d'exposer quoi que ce soit ;
+  `WithHostKeyPath` vers une clé persistée.
+- Observabilité : `promwish` expose les métriques de session
+  (voir `source:wish:ssh-metrics`).
+
+## Sources vérifiées
+
+- [charmbracelet/wish (repo officiel, v2)](https://github.com/charmbracelet/wish)
+  — vérifié 2026-08-04
+- [charmbracelet/promwish](https://github.com/charmbracelet/promwish) —
+  vérifié 2026-08-04
+- [Issue #325 — auth avant ratelimiter](https://github.com/charmbracelet/wish/issues/325)
+  — vérifié 2026-08-04 (issue officielle)
+- Artefacts internes : `source:wish:ssh-metrics`,
+  `pattern:antipattern:sec-ssh-host-key-reuse`, catalogs `ssh` et `keygen`

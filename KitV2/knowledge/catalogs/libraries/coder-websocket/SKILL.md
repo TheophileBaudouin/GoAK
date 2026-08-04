@@ -90,3 +90,56 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
   v1.8.x version (API may change at the v2 boundary).
 - **MCP transport** — a valid transport candidate for MCP servers; the MCP SDK
   remains the higher-level choice when adopting the protocol.
+
+## Utiliser cette librairie quand
+
+- Un service Go a besoin de streaming bidirectionnel temps réel (streaming de
+  tokens LLM, événements d'agent, feedback d'outils).
+- La vie par `context.Context` doit se composer avec le reste du code Go
+  (annulation, timeouts).
+- Un transport WebSocket pur-Go, zéro-CGO, avec API client ET serveur.
+
+## Ne pas utiliser cette librairie quand
+
+- Le besoin est un protocole applicatif complet : c'est la couche transport
+  uniquement, le modèle d'événements reste applicatif.
+- Adopter MCP : le SDK MCP (`mcp-go-sdk`) est le niveau supérieur ; websocket
+  n'est qu'un transport possible.
+- Un simple flux unidirectionnel par HTTP (SSE/streaming HTTP) suffit.
+
+## Avantages
+
+- Pur-Go, zéro-CGO, petit noyau focalisé (transport uniquement).
+- API context-aware (`Dial`/`Accept`/`Read`/`Write`), concurrency-safe,
+  idiomatique.
+- Successeur maintenu de nhooyr/websocket (même forme d'API, Coder, 5.4k★).
+- Usage réel : produits Coder, VS Code Server, écosystème Tailscale.
+
+## Inconvénients
+
+- Transport seul : pas de framing applicatif, pas de gestion d'état — tout le
+  modèle d'événements est à construire.
+- Churn à la frontière v2 (issue #402) : épingler une version v1.8.x exacte.
+- Pas de protocole de synchronisation d'état intégré (à ne pas réinventer
+  dessus).
+
+## Pièges connus
+
+- Ne pas construire de synchronisation d'état directement sur WebSocket :
+  définir des modèles d'événements explicites au niveau applicatif.
+- Streaming par `Read`/`Write` répétés sur la même connexion ; annulation par
+  contexte, jamais par fermeture du socket.
+- Pinner la version v1.8.x exacte (l'API peut changer à la frontière v2).
+- Sécuriser la poignée de main : validation d'Origin (voir
+  `pattern:antipattern:sec-cswsh` et `source:websocket:security`).
+
+## Sources vérifiées
+
+- [coder/websocket (repo officiel, v1.8.x)](https://github.com/coder/websocket)
+  — vérifié 2026-08-04
+- [pkg.go.dev/github.com/coder/websocket](https://pkg.go.dev/github.com/coder/websocket)
+  — vérifié 2026-08-04
+- [Issue #402 — v2.0.0 wishlist](https://github.com/coder/websocket/issues/402)
+  — vérifié 2026-08-04 (issue officielle)
+- Artefacts internes : `pattern:antipattern:sec-cswsh`,
+  `source:websocket:security`, catalog `mcp-go-sdk`

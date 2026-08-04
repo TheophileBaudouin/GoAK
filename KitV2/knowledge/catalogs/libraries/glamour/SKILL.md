@@ -51,3 +51,50 @@ fmt.Print(out)
 - Themes are style sheets — `glamour.WithStyles(yourStyleJSON)` for brand
   consistency.
 - Pair with `lipgloss` for non-Markdown layout around the rendered text.
+
+## Utiliser cette librairie quand
+
+- Une CLI/TUI doit rendre du Markdown (docs, sortie LLM, rapports) au
+  terminal.
+- Un rendu GitHub-flavored stylé (thèmes dark/light/notty intégrés) est
+  souhaité sans réimplémenter un parseur.
+- La sortie doit dégrader proprement sur terminaux sans couleur (`"notty"`).
+
+## Ne pas utiliser cette librairie quand
+
+- Le rendu est de l'HTML (goldmark direct convient).
+- Seule la coloration syntaxique est nécessaire (chroma seul suffit).
+- Le contenu n'est pas du Markdown : lipgloss couvre le layout simple.
+
+## Avantages
+
+- Une fonction : `glamour.Render(input, style)` — Markdown → ANSI stylé.
+- Basé sur goldmark (parseur maintenu), thèmes par feuilles de style
+  (`WithStyles`).
+- Usage réel : Glow, stack docs de Charm, nombreuses TUIs.
+- Dégradation propre (`notty`) pour les pipes et CI.
+
+## Inconvénients
+
+- Rendu terminal seulement : pas de sortie HTML riche (goldmark reste la
+  référence pour HTML).
+- Thèmes par défaut limités à dark/light/notty — la marque exige une feuille
+  de style custom.
+- Dépend de la chaîne Charm (goldmark + styles) — coût d'installation pour un
+  rendu simple.
+
+## Pièges connus
+
+- Toujours choisir `"notty"` quand la sortie peut être pipée (logs, CI) :
+  éviter les codes d'échappement parasites.
+- La cohérence de marque passe par `WithStyles` (JSON de style), pas par du
+  post-traitement ANSI.
+- Pour le layout non-Markdown autour du rendu, combiner avec `lipgloss`.
+
+## Sources vérifiées
+
+- [charmbracelet/glamour (repo officiel, v2)](https://github.com/charmbracelet/glamour)
+  — vérifié 2026-08-04
+- [pkg.go.dev/charm.land/glamour/v2](https://pkg.go.dev/charm.land/glamour/v2)
+  — vérifié 2026-08-04
+- Artefact interne : catalog `lipgloss` (layout complémentaire)

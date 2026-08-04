@@ -58,3 +58,67 @@ results, err := index.Search(searchReq)
   design for periodic merges on write-heavy workloads.
 + For code search specifically, consider pairing bleve (full-text) with
   tree-sitter (structure) once tree-sitter reaches ≥1.0 (see pointer).
+
+## Utiliser cette librairie quand
+
++ Un service Go a besoin de recherche plein-texte locale (documents, code,
+  logs) sans moteur externe ni serveur à déployer.
++ L'index doit être embarqué dans le processus, avec zéro-CGO et
+  cross-compilation simple.
++ Le ranking BM25, le faceting, le highlight ou les requêtes géo sont
+  nécessaires, avec une API Go idiomatique.
++ Le volume d'écriture est maîtrisable par lots (batching).
+
+## Ne pas utiliser cette librairie quand
+
++ Les données vivent déjà dans SQLite : FTS5 couvre le besoin sans index
+  séparé à synchroniser.
++ Le besoin est la similarité vectorielle, pas le plein-texte (sqlite-vec est
+  complémentaire, pas un remplaçant).
++ Une recherche distribuée multi-nœuds est exigée (Elasticsearch apporte
+  l'infra serveur, pas bleve).
++ L'ingestion est un flux continu de documents isolés sans batching possible :
+  Scorch accumule les segments et amplifie les écritures (voir Pièges).
+
+## Avantages
+
++ Pur-Go, zéro-CGO, embarquable : `bleve.Open` / `index.Search` sans serveur.
++ Vrai index inversé (format Scorch) avec ranking BM25, faceting, highlight,
+  géo.
++ Maintenance active (v2.6.0, 2026-08, ~11.2k★, 11 contributeurs) et usage
+  réel (écosystème Couchbase).
++ API v2 stable : le churn API historique (RFC v1.0.0 #1350, v2.0.0 #1495)
+  est résolu — pinner `v2`.
+
+## Inconvénients
+
++ Index séparé de la source : double écriture à maintenir en synchronisation.
++ Scorch (segments append-only + merges) : amplification d'écriture et
+  accumulation de segments en mémoire sur ingestion continue non batchée
+  (issue #1783, docs/persister.md).
++ Pas de recherche vectorielle native — pairing nécessaire (sqlite-vec,
+  tree-sitter) pour les besoins structurels/vectoriels.
++ 858 issues ouvertes, majoritairement des demandes de fonctionnalités.
+
+## Pièges connus
+
++ Écrire document par document dégrade fortement les écritures : batcher
+  (1–200 docs par lot, guidance issue #1783) ou régler `scorchMergePlanOptions`
+  si le batching est impossible.
++ Sur flux continu, surveiller l'accumulation de segments en mémoire et la
+  fréquence des merges (docs/persister.md) — dimensionner l'index avant mise
+  en prod, pas après.
++ Pinner `v2` explicitement : l'API a connu du churn majeur avant la
+  stabilisation.
+
+## Sources vérifiées
+
++ [blevesearch/bleve (README, v2.6.0)](https://github.com/blevesearch/bleve)
+  — vérifié 2026-08-04 (repo officiel)
++ [index/scorch/README.md — segmented index](https://github.com/blevesearch/bleve/blob/master/index/scorch/README.md)
+  — vérifié 2026-08-04 (docs officielles)
++ [docs/persister.md — memory management](https://github.com/blevesearch/bleve/blob/master/docs/persister.md)
+  — vérifié 2026-08-04 (docs officielles)
++ [Issue #1783 — batching guidance](https://github.com/blevesearch/bleve/issues/1783)
+  — vérifié 2026-08-04 (issue officielle)
++ Artefact interne : `source:search:index-merge` (performance/Scorch)

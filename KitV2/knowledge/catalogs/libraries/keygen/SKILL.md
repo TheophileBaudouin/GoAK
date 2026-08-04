@@ -54,3 +54,49 @@ if err != nil {
 - Always `0o600` on private keys — keygen enforces explicit perms.
 - Passphrases: use `keygen.WithPassphrase` and keep the passphrase out of
   process args (env/secret store).
+
+## Utiliser cette librairie quand
+
+- De l'outillage doit créer des paires de clés SSH (hôte ou client)
+  programmatiquement au lieu de sheller vers `ssh-keygen`.
+- Les formats PEM/OpenSSH, passphrases et permissions de fichiers sécurisées
+  (0o600) doivent être gérés correctement sans boilerplate crypto maison.
+- L'environnement n'a pas de binaire ssh-keygen fiable (conteneurs, services).
+
+## Ne pas utiliser cette librairie quand
+
+- Un one-shot interactif suffit (ssh-keygen CLI est disponible).
+- Le besoin est de parser des clés existantes (x/crypto/ssh parsing seul).
+- La gestion du cycle de vie complet (autorisation, rotation) est requise —
+  keygen ne génère que des paires.
+
+## Avantages
+
+- API petite et sûre autour du stack crypto stdlib : moins de marshaling
+  erreur-prone par type de clé.
+- Support Ed25519, RSA, ECDSA + passphrase + permissions explicites.
+- Utilisé par l'outillage SSH de Charm (wish/soft-serve).
+
+## Inconvénients
+
+- Génération seulement : pas de gestion d'autorisation, de rotation ni de
+  formatage avancé.
+- La sécurité finale dépend de l'usage (algorithme, passphrase, perms) —
+  la lib ne décide pas à votre place.
+
+## Pièges connus
+
+- Préférer Ed25519 ; RSA uniquement pour compatibilité legacy (≥ 3072 bits).
+- Toujours `0o600` sur les clés privées (keygen l'impose via l'API).
+- Passphrase via `WithPassphrase`, jamais dans les args de processus
+  (visible dans le process listing / historique) — env ou secret store.
+- Voir `source:ssh:key-generation` pour la guidance complète (algorithmes,
+  formats, protection).
+
+## Sources vérifiées
+
+- [charmbracelet/keygen (repo officiel, v0.5.x)](https://github.com/charmbracelet/keygen)
+  — vérifié 2026-08-04
+- [ssh-keygen(1) — OpenBSD manual](https://man.openbsd.org/OpenBSD-current/man1/ssh-keygen.1)
+  — vérifié 2026-08-04 (référence officielle)
+- Artefact interne : `source:ssh:key-generation` (guidance security)

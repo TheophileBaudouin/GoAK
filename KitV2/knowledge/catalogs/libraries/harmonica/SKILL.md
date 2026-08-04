@@ -50,3 +50,43 @@ for !spring.IsSettled() {
 
 - Drive updates from `tea.Tick` in Bubble Tea, never from blocking sleeps.
 - Keep springs short (0.5-1.0s); terminal redraws are cheap but visible.
+
+## Utiliser cette librairie quand
+
+- Animer du mouvement TUI (position, alpha, taille) avec un easing
+  indépendant de la fréquence d'images.
+- Besoin de ressorts physiques (damping, stiffness) validés et testés plutôt
+  que de la math d'easing maison.
+- Le rendu est piloté par `tea.Tick` dans Bubble Tea.
+
+## Ne pas utiliser cette librairie quand
+
+- Une seule courbe codée en dur suffit (easing maison acceptable).
+- La TUI n'a pas de boucle d'animation (sortie statique).
+
+## Avantages
+
+- Tiny API, zéro dépendance, pure : springs + courbes
+  (Linear/Quadratic/Cubic/Exponential).
+- Easing frame-rate-independent (FPS-driven) : le problème le plus souvent
+  raté est résolu et testé.
+- Stable (v0.2), maintenance active, écosystème Charm.
+
+## Inconvénients
+
+- Surface très étroite : animation physique seulement, pas de moteur de
+  transition d'écran.
+- Pas de gestion du temps global : le driver (tea.Tick) reste à écrire.
+
+## Pièges connus
+
+- Piloter les mises à jour depuis `tea.Tick`, jamais depuis des `sleep`
+  bloquants.
+- Garder des ressorts courts (0.5–1.0 s) : les redraws terminal sont visibles.
+- Vérifier `IsSettled()` pour terminer l'animation et libérer la boucle.
+
+## Sources vérifiées
+
+- [charmbracelet/harmonica (repo officiel)](https://github.com/charmbracelet/harmonica)
+  — vérifié 2026-08-04
+- Artefact interne : catalog `bubbletea` (driver tea.Tick)

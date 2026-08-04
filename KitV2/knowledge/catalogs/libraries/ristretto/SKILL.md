@@ -59,3 +59,51 @@ value, ok := cache.Get("key")
   needed. GitHub issue tracker is being deprecated by the project (#175).
 - Use for hot-path caching where **memory bounds** matter; for ephemeral
   single-key memoization, `sync.Map` or a one-line map+mutex may be enough.
+
+## Utiliser cette librairie quand
+
+- Cacher des données chaudes (réponses LLM, fichiers parsés, embeddings)
+  avec un **budget mémoire strict** (`MaxCost`, coût par clé).
+- Le profil de charge a du churn (accès répétés à un sous-ensemble qui
+  change) : la politique d'admission TinyLFU bat un LRU simple.
+- Le taux de hit doit être meilleur qu'un LRU sans exploser la mémoire.
+
+## Ne pas utiliser cette librairie quand
+
+- Une mémoïsation éphémère mono-clé suffit : `sync.Map` ou une map+mutex
+  d'une ligne.
+- Un cache avec expiration TTL est requis : ristretto n'expire pas
+  nativement (issue #43) — il faut une couche d'expiration explicite.
+- Les valeurs doivent être typées à la sortie : `Get` retourne
+  `(interface{}, bool)` — assertion côté consommateur.
+
+## Avantages
+
+- Admission TinyLFU (door-keeper LFU + éviction échantillonnée) : meilleur
+  taux de hit sous churn qu'un LRU.
+- Budget mémoire explicite (coût par clé, `MaxCost`).
+- API petite et typée, zéro-CGO, production-grade (Dgraph, v2.4.2 2026-07).
+
+## Inconvénients
+
+- **Pas de TTL natif** : l'expiration est à construire (issue #43, 25r).
+- `Get` non typé : assertions manuelles à chaque lecture.
+- Le tracker d'issues GitHub est en cours de dépréciation par le projet
+  (#175) — suivre via les releases.
+
+## Pièges connus
+
+- Ne pas attendre d'expiration TTL : coupler avec une couche d'expiration
+  explicite si les données périssent.
+- Dimensionner `NumCounters` (≈ nombre de clés suivies) et `BufferItems`
+  avant la prod — le cache ne se corrige pas tout seul.
+- Type-assert les valeurs à la sortie, jamais avant.
+
+## Sources vérifiées
+
+- [dgraph-io/ristretto (repo officiel, v2.4.2)](https://github.com/dgraph-io/ristretto)
+  — vérifié 2026-08-04
+- [Issue #43 — TTL support demandé](https://github.com/dgraph-io/ristretto/issues/43)
+  — vérifié 2026-08-04 (issue officielle)
+- Artefacts internes : `pattern:cache:stale-while-revalidate`,
+  `pattern:antipattern:cache-stampede`, `pattern:antipattern:cache-stale`

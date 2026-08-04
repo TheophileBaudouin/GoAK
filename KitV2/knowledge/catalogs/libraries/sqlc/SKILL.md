@@ -3,7 +3,7 @@ name: sqlc
 description: "sqlc — compile-time type-safe Go generated from SQL (no ORM, no runtime reflection). Use when choosing a Go database access layer, adopting sqlc, or comparing it to sqlx/squirrel/ORMs."
 category: library
 tags: [database, sql, codegen, type-safety]
-last-verified: 2026-08-02
+last-verified: 2026-08-04
 ---
 
 # sqlc — SQL → Go code generation
@@ -82,3 +82,60 @@ See `recipe-sqlite-sqlc` for a runnable, tested example.
   has zero sqlc imports. Nothing to vendor in your binary.
 - The generated `*Queries` works against both `*sql.DB` and `*sql.Tx` (via its
   `DBTX` interface), so the same code runs inside or outside a transaction.
+
+## Utiliser cette librairie quand
+
+- SQL est la source de vérité : requêtes statiques typées compilées à la
+  génération (`:one`/`:many` → méthodes Go typées).
+- L'erreur SQL doit apparaître au moment de la génération, sans réflexion
+  runtime.
+- Le code généré doit rester du `database/sql` standard (zéro dépendance
+  runtime).
+
+## Ne pas utiliser cette librairie quand
+
+- Les requêtes sont **dynamiques** (WHERE/ORDER BY/colonnes variables au
+  runtime) : sqlc est statique uniquement (#3414, #2061, #200) — passer à
+  database/sql + squirrel/sqlx (voir `pattern:antipattern:db-codegen-dynamic-queries`).
+- Des LEFT/RIGHT JOIN avec `sqlc.embed()` doivent gérer la NULLabilité :
+  vérifier le code généré ou éviter embed sur les outer joins (#2348, #2997).
+- Le moteur cible est SQLite et la requête utilise des features absentes
+  (ex. `UPDATE FROM`, #3132).
+
+## Avantages
+
+- SQL comme source de vérité unique : pas de réflexion runtime, typage
+  généré.
+- Build-time uniquement : zéro import sqlc dans le binaire généré.
+- Compatible `*sql.DB` ET `*sql.Tx` (interface DBTX) — même code dans et
+  hors transaction.
+- Alternatives ORM rejetées pour le kit (SQL explicite et auditable).
+
+## Inconvénients
+
+- **Statique uniquement** : c'est la limite #1 d'adoption (600 issues
+  ouvertes, top par réactions) — le périmètre dynamique est hors outil.
+- `sqlc.embed()` fragile sur NULL des outer joins (vérifier la nullabilité
+  générée).
+- Moteur SQLite avec des gaps de features PostgreSQL (vérifier par requête).
+
+## Pièges connus
+
+- Tronquer la décision sur la frontière statique/dynamique AVANT de
+  s'engager — c'est la raison la plus fréquente d'abandon.
+- Générer et vérifier la nullabilité des embeds sur JOIN.
+- Utiliser `sqlc.nembed()` (nullable embed) quand disponible pour les LEFT
+  JOIN.
+
+## Sources vérifiées
+
+- [sqlc-dev/sqlc (repo officiel)](https://github.com/sqlc-dev/sqlc) — vérifié
+  2026-08-02
+- [Issue #3414 — dynamic queries](https://github.com/sqlc-dev/sqlc/issues/3414)
+  / [#2061](https://github.com/sqlc-dev/sqlc/issues/2061) /
+  [#2348 — embed NULL](https://github.com/sqlc-dev/sqlc/issues/2348) —
+  vérifiées 2026-08-04 (issues officielles)
+- [docs.sqlc.dev](https://docs.sqlc.dev/) — vérifié 2026-08-02
+- Artefacts internes : `recipe-sqlite-sqlc`,
+  `pattern:antipattern:db-codegen-dynamic-queries`, catalog
+  `modernc-sqlite`

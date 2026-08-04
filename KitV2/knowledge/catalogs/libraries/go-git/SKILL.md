@@ -56,3 +56,59 @@ repo, err := git.PlainClone("/tmp/repo", false, &git.CloneOptions{
   Git features.
 - Preferred pairing: go-git for repo **read/write** in-process; keep
   `git` CLI only when signing or exotic plumbing is required.
+
+## Utiliser cette librairie quand
+
+- Un service Go doit lire/écrire des dépôts Git programmatiquement
+  (analyse de repos, commits d'agent, outillage CI) sans dépendance runtime
+  au binaire `git`.
+- Le clone/fetch/commit/branch/diff/log couvre le besoin (opérations cœur).
+- L'environnement interdit ou n'a pas de binaire git (conteneurs minimaux,
+  services embarqués).
+
+## Ne pas utiliser cette librairie quand
+
+- La signature de commits, les features exotiques ou le plumbing avancé sont
+  requis : garder le CLI `git` (signing #400, credentials #490, sparse
+  checkout #90 non couverts).
+- Le binaire `git` est disponible et le besoin est simple : shell-out reste
+  plus simple (avec parsing à risque).
+- Le zéro-CGO est une contrainte absolue et git2go était envisagé : go-git
+  est pur-Go (le bon choix dans ce cas).
+
+## Avantages
+
+- Pur-Go : zéro binaire git requis au runtime, déterministe.
+- Opérations cœur complètes (clone, fetch, push, commit, branch, diff, log,
+  worktree).
+- Usage réel : Gitea, Pulumi, Keybase.
+- Maintenance active (v5.19.x 2026, v6 alpha en cours).
+
+## Inconvénients
+
+- Fonctionnalités avancées manquantes ou partielles (sparse checkout #90,
+  signed commits #400, credentials #490) — 856 issues ouvertes, majorité de
+  demandes de features.
+- v6 (transport/performance) en alpha : le code sur v5 devra migrer.
+- Performances historiquement moindres que git natif sur les gros dépôts
+  (rework attendu en v6).
+
+## Pièges connus
+
+- Pinner `v5` : v6 est en alpha (rework transport/performance), pas pour la
+  production.
+- Vérifier la couverture des cas limites AVANT de s'appuyer sur une feature
+  avancée (issue-mining : sparse checkout, signatures, credentials).
+- Pour la signature ou le plumbing exotique, garder le CLI `git` — go-git ne
+  le remplace pas.
+
+## Sources vérifiées
+
+- [go-git/go-git (repo officiel, v5.19.2)](https://github.com/go-git/go-git)
+  — vérifié 2026-08-04
+- [pkg.go.dev/github.com/go-git/go-git/v5](https://pkg.go.dev/github.com/go-git/go-git/v5)
+  — vérifié 2026-08-04
+- [Issue #90 — sparse checkout](https://github.com/go-git/go-git/issues/90) /
+  [#400 — signed commits](https://github.com/go-git/go-git/issues/400) /
+  [#490 — credentials](https://github.com/go-git/go-git/issues/490) —
+  vérifiées 2026-08-04 (issues officielles)

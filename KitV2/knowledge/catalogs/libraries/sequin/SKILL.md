@@ -50,3 +50,46 @@ tokens, err := sequin.Parse("\x1b[31mred\x1b[0m")
   inflate `len()`).
 - Pair with `colorprofile` to decide whether to strip or keep codes for a
   given terminal.
+
+## Utiliser cette librairie quand
+
+- Parser, transformer ou mesurer du texte terminal contenant des codes ANSI
+  (sorties stylées, logs, pipelines) sans « regex sur bytes d'échappement ».
+- La largeur visible d'un texte stylé doit être mesurée (les bytes ANSI
+  gonflent `len()`).
+- Écrire des séquences ANSI propres sans concaténer des codes bruts.
+
+## Ne pas utiliser cette librairie quand
+
+- Le texte est déjà nettoyé (aucun ANSI) : pas de parsing nécessaire.
+- `charmbracelet/x/ansi` (expérimental) suffit pour un prototype — sequin est
+  l'API stabilisée, préférable en prod.
+
+## Avantages
+
+- Vrai tokenizer/parser de séquences d'échappement (CSI, OSC, hyperlinks,
+  multi-byte SGR) — pas de regex fragile.
+- Écrivain propre pour produire des séquences.
+- Maintenu par l'équipe qui possède la stack terminal (sibling stable de
+  x/ansi).
+
+## Inconvénients
+
+- API orientée tokens : un cas simple « coloriser une chaîne » passe par
+  lipgloss plutôt que sequin.
+- Surface étroite (parse/write) : les décisions de profil (stripper ou
+  garder) restent à `colorprofile`.
+
+## Pièges connus
+
+- Mesurer la largeur visible APRÈS parsing (les bytes ANSI faussent `len()`).
+- Combiner avec `colorprofile` pour décider stripper/garder selon le
+  terminal cible.
+- Ne pas écrire de parser ANSI maison : les cas limites (OSC, hyperlinks)
+  sont précisément ce que sequin couvre.
+
+## Sources vérifiées
+
+- [charmbracelet/sequin (repo officiel, v0.3.x)](https://github.com/charmbracelet/sequin)
+  — vérifié 2026-08-04
+- Artefact interne : catalog `colorprofile` (décision stripper/garder)

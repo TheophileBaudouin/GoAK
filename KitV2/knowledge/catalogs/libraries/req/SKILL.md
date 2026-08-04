@@ -3,7 +3,7 @@ name: req
 description: "imroc/req — high-level Go HTTP client (requests-style, over net/http). EXTRACT-ONLY: extract retry/client-config patterns; do NOT copy its global package-level API. Canonical HTTP client in the kit stays net/http."
 category: library
 tags: [http, client, retry, extract-only]
-last-verified: 2026-08-02
+last-verified: 2026-08-04
 ---
 
 # req — HTTP client (extract-only)
@@ -56,3 +56,49 @@ ergonomics AND accepts the global-state caveat.
 - imroc/req — <https://github.com/imroc/req> (4.8k★, 2026-07)
 - The net/http boundary is documented in `chi` (server-side) and the
   stdlib philosophy in `rules/core/philosophy` (when it exists).
+
+## Utiliser cette librairie quand
+
+- En tant que **source de patterns** uniquement : client-config explicite,
+  retry avec backoff, conversion erreurs non-2xx, debug dump sur erreur.
+- Une équipe veut explicitement son ergonomie ET accepte le caveat
+  global-state.
+
+## Ne pas utiliser cette librairie quand
+
+- Le client HTTP canonique du kit est requis : `net/http` + `*http.Client`
+  explicite + un petit wrapper retry (~15 lignes).
+- L'auditabilité prime : les comportements auto (auto-decode, auto-marshal,
+  « Black Magic ») masquent ce que le wire transporte.
+- Le pattern global (`req.MustGet`, `req.DevMode`) serait copié : c'est
+  l'anti-pattern exact que le kit rejette.
+
+## Avantages
+
+- Client haut niveau complet : chaînage, retries, HTTP/1.1-2-3, middleware
+  request/response/transport, dump/debug, marshalling.
+- Patterns extractibles propres (retry, hooks d'erreur) qui se cartographient
+  sur net/http sans la dépendance.
+
+## Inconvénients
+
+- API idiomatique reposant sur de l'état global package-level (client par
+  défaut atteint via le nom de package) — mutable et caché.
+- « Black Magic » qui cache le wire réel — mauvais pour du code de service
+  auditable.
+- Restriction extract-only : ne pas l'imposer comme dépendance.
+
+## Pièges connus
+
+- Ne JAMAIS copier `req.MustGet` / `req.DevMode` / singleton par nom de
+  package (voir `pattern:antipattern:go-mutable-global-state`).
+- Toujours construire un `*req.Client` (ou `*http.Client`) explicite et le
+  réutiliser.
+- Dump debug uniquement en erreur, jamais en régime permanent.
+
+## Sources vérifiées
+
+- [imroc/req (repo officiel, v3)](https://github.com/imroc/req) — vérifié
+  2026-08-02
+- Artefacts internes : `pattern:antipattern:go-mutable-global-state`, catalog
+  `chi` (frontière net/http côté serveur), `rules/core/philosophy`

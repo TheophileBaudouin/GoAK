@@ -3,7 +3,7 @@ name: modernc-sqlite
 description: "modernc.org/sqlite — a pure-Go (cgo-free) SQLite driver that cross-compiles with CGO_ENABLED=0. Use when choosing a SQLite driver for Go or deciding cgo vs pure-Go for SQLite."
 category: library
 tags: [database, sqlite, driver, pure-go, cgo-free]
-last-verified: 2026-08-02
+last-verified: 2026-08-04
 ---
 
 # modernc-sqlite — SQLite driver (pure Go)
@@ -56,3 +56,50 @@ bottleneck AND you can stomach the cgo build constraints.
 
 - No `CGO_ENABLED=1` needed — `GOOS=... GOARCH=... go build` just works.
 - Backed by `modernc.org/libc` (a Go libc) — several transitive deps, all pure Go.
+
+## Utiliser cette librairie quand
+
+- SQLite en Go avec cross-compilation simple (`CGO_ENABLED=0`, builds
+  statiques, cibles multiples sans toolchain C).
+- La portabilité de build prime sur le débit brut (la majorité des services).
+- Un driver `database/sql` standard (nom de driver `"sqlite"`).
+
+## Ne pas utiliser cette librairie quand
+
+- Le débit SQLite est MESURÉ comme le goulot d'étranglement ET le projet ne
+  build que sur une plateforme native : mattn/go-sqlite3 (cgo) peut alors se
+  justifier.
+- CGO est déjà requis par ailleurs (le cgo driver n'ajoute alors pas de
+  contrainte nouvelle).
+
+## Avantages
+
+- Zéro-CGO : `GOOS=... GOARCH=... go build` fonctionne sans compilateur C ni
+  cross-toolchain.
+- Driver `database/sql` standard, intégration triviale, compatible sqlc.
+- Maintien actif (dépôt GitLab canonique, matrice de tests étendue).
+
+## Inconvénients
+
+- Moteur transpilé opaque (modernc.org/libc, plusieurs deps transitives) —
+  débugger les bizarreries internes est difficile.
+- Légèrement plus lent que le driver cgo sur certains benchmarks (négligeable
+  pour la plupart des services — à mesurer si doute).
+- Écarts de fonctionnalités possibles vs SQLite C (ex. `UPDATE FROM`) — à
+  vérifier par moteur.
+
+## Pièges connus
+
+- Le nom du driver est `"sqlite"` (importer `_ "modernc.org/sqlite"`).
+- Vérifier les limites du moteur pur-Go sur les features avancées SQL avant
+  de s'y engager (cf. Gotcha sqlc/SQLite).
+- Ne pas choisir sur la réputation : la décision cgo vs pur-Go est une
+  décision de build, pas de benchmark théorique (mesurer si doute).
+
+## Sources vérifiées
+
+- [modernc.org/sqlite (dépôt GitLab officiel, v1.55+)](https://gitlab.com/cznic/sqlite)
+  — vérifié 2026-08-02
+- [pkg.go.dev/modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite) —
+  vérifié 2026-08-02
+- Artefacts internes : `recipe-sqlite-sqlc`, catalog `sqlc`

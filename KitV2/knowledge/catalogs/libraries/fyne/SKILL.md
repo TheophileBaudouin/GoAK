@@ -69,3 +69,50 @@ func main() {
   deterministic functions, drive them via `test`, and keep wiring minimal.
 - Desktop-only recipes in this kit use Wails (see `recipe-desktop-app`);
   Fyne is the documented alternative when no web frontend is wanted.
+
+## Utiliser cette librairie quand
+
+- Construire une application desktop sans frontend web (pas de dépendance
+  navigateur) et accepter le CGO.
+- Un toolkit GUI complet en API Go pure (canvas, layout, widgets, windowing).
+- Des tests headless déterministes via le package `test` (sans affichage).
+
+## Ne pas utiliser cette librairie quand
+
+- Un frontend web est souhaité : préférer Wails (`recipe-desktop-app`) —
+  logique Go sans CGO.
+- Le zéro-CGO est une exigence absolue (Fyne rend via OpenGL/cgo glfw).
+- Le besoin est une TUI ou un CLI : hors périmètre (bubbletea/wish).
+
+## Avantages
+
+- API Go pure pour le GUI, écosystème complet et communauté large (~28.5k★).
+- Package `test` : rendu headless déterministe, UI testable sans display.
+- Active maintenance : v2.8.0 = plus grosse release depuis v2.0.0
+  (accélération matérielle, nouveaux objets canvas).
+- Couvre desktop, mobile et embedded.
+
+## Inconvénients
+
+- **CGO obligatoire** (OpenGL via go-gl/glfw) : cross-compilation et builds
+  statiques exigent une discipline CGO.
+- Plus lourd qu'une TUI : il faut accepter le runtime GUI.
+- Alternative Gio (gioui.org) : mode immédiat, zéro-CGO, mais écosystème et
+  docs plus petits.
+
+## Pièges connus
+
+- Garder la logique UI dans des fonctions déterministes et piloter via `test` —
+  le wiring minimal ; ne pas mettre la logique métier dans les callbacks de
+  widgets.
+- Le CGO n'est pas une option : l'accepter explicitement avant de choisir Fyne
+  (le zéro-CGO du kit s'applique aux alternatives pur-Go, pas aux toolkits GUI).
+- Pinner `v2` (fyne.io/fyne/v2) ; vérifier la compatibilité des assets
+  (images/fonts) entre versions majeures.
+
+## Sources vérifiées
+
+- [fyne-io/fyne (repo officiel, v2.8.0)](https://github.com/fyne-io/fyne) —
+  vérifié 2026-08-04
+- [docs.fyne.io](https://docs.fyne.io/) — vérifié 2026-08-04
+- Artefact interne : `recipe-desktop-app` (choix Wails vs Fyne documenté)

@@ -54,3 +54,51 @@ err := huh.NewForm(huh.NewGroup(
 - Every field supports `.Validate(func(string) error)`.
 - For a full custom TUI with persistent state, use Bubble Tea directly; huh is
   for the form-in-a-script case.
+
+## Utiliser cette librairie quand
+
+- Une CLI a besoin de saisie structurée interactive (wizards, confirmations,
+  sondages) au lieu de `fmt.Scan` brut.
+- Les types de prompts standards suffisent : input, text, select,
+  multi-select, confirm, file picker, spinner.
+- La validation par champ (`.Validate(func(string) error)`) est souhaitée
+  sans boucle maison.
+
+## Ne pas utiliser cette librairie quand
+
+- Une TUI custom avec état persistant est visée : Bubble Tea directement.
+- Un prompt trivial one-shot suffit (scripts jetables : fmt.Scan accepté).
+- survey (prédécesseur) est archivé : ne pas l'utiliser.
+
+## Avantages
+
+- Successeur maintenu de survey (archivé), construit sur Bubble Tea.
+- Types de prompts complets avec validation, help, thèmes, bindings
+  accessibles.
+- Une dépendance au lieu de boucles de prompt maison.
+- `huh.NewForm(huh.NewGroup(...))` composable.
+
+## Inconvénients
+
+- Basé sur Bubble Tea : ne pas l'embarquer dans un `tea.Program` séparé
+  (intégration via `WithProgram` si nécessaire).
+- Orientation « formulaire dans un script » : pas adapté aux TUIs à état
+  persistant.
+- Dépendance de la chaîne Charm (bubbletea sous le capot).
+
+## Pièges connus
+
+- Ne pas lancer huh à l'intérieur d'un autre `tea.Program` : utiliser
+  `huh.NewForm(...).WithProgram(...)` pour l'intégration.
+- Toujours associer `.Validate` aux champs sensibles — la validation est
+  par champ, pas globale par défaut.
+- Pour une TUI complète avec état, passer à Bubble Tea directement (huh est
+  le cas « formulaire dans un script »).
+
+## Sources vérifiées
+
+- [charmbracelet/huh (repo officiel, v2)](https://github.com/charmbracelet/huh)
+  — vérifié 2026-08-04
+- [pkg.go.dev/charm.land/huh/v2](https://pkg.go.dev/charm.land/huh/v2) —
+  vérifié 2026-08-04
+- Artefact interne : catalog `bubbletea` (fondation)

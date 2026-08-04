@@ -56,3 +56,48 @@ log.Fatal(srv.ListenAndServe())
   enable password auth without rate limiting and lockout.
 - Configure `MaxTimeout`, `IdleTimeout`, and per-session `MaxSessions`.
 - Host keys: `ssh.HostKeyFile(path)` from a dedicated key (see `keygen`).
+
+## Utiliser cette librairie quand
+
+- Construire un serveur SSH en Go avec la couche session/PTY maintenue au
+  lieu du plumbing brut x/crypto/ssh.
+- `wish` est trop haut niveau (pas besoin du framework d'apps) : ssh
+  directement.
+- Les événements PTY, window-size et signaux doivent être gérés proprement.
+
+## Ne pas utiliser cette librairie quand
+
+- Le contrôle total du protocole est requis : x/crypto/ssh directement
+  (à construire à la main : sessions, PTYs, signaux).
+- Le besoin est un serveur SSH applicatif complet (TUI sur SSH, middlewares) :
+  `wish` est le niveau au-dessus.
+
+## Avantages
+
+- Successeur maintenu de gliderlabs/ssh (même forme d'API).
+- Session/PTY/window-size/signal déjà résolus, contexte par session.
+- Usage réel : Wish, Soft Serve, Wishlist.
+
+## Inconvénients
+
+- Serveur seulement : l'authentification, les limites et la politique de
+  session restent à configurer explicitement.
+- Dépend de x/crypto/ssh (base) — les advisories de sécurité de x/crypto
+  s'appliquent (suivre govulncheck).
+
+## Pièges connus
+
+- Authentification explicite : `ssh.PublicKeyAuth` avec allowlist ; jamais de
+  password auth sans rate limiting et lockout (voir `source:ssh:server-security`).
+- Configurer `MaxTimeout`, `IdleTimeout`, `MaxSessions` par session.
+- Clé hôte dédiée via `ssh.HostKeyFile(path)` — une clé par hôte, jamais
+  partagée (voir `pattern:antipattern:sec-ssh-host-key-reuse` et `keygen`).
+
+## Sources vérifiées
+
+- [charmbracelet/ssh (repo officiel, v0.4.x)](https://github.com/charmbracelet/ssh)
+  — vérifié 2026-08-04
+- [pkg.go.dev/github.com/charmbracelet/ssh](https://pkg.go.dev/github.com/charmbracelet/ssh)
+  — vérifié 2026-08-04
+- Artefacts internes : `source:ssh:server-security`,
+  `pattern:antipattern:sec-ssh-host-key-reuse`, catalogs `wish` et `keygen`
