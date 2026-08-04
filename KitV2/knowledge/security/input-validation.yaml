@@ -1,0 +1,32 @@
+---
+id: source:security:input-validation
+title: Input validation at the trust boundary — strategy and limits of tags
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, validation, input, trust-boundary, owasp, reflect]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: "https://cheatsheetseries.owasp.org/cheatsheets/\
+  Input_Validation_Cheat_Sheet.html"
+selection: >-
+  Load when designing validation for an untrusted input boundary (HTTP
+  payloads, CLI args, MCP tool calls): validate as early as possible,
+  combine syntactic (shape) and semantic (business) checks, and decide where
+  tag-based validation (go-playground/validator) ends and manual rules begin.
+limits: >-
+  Tag-based validation is syntactic; it never replaces semantic or
+  cross-field business rules, and its defaults surprise (nested slices and
+  maps are NOT validated without `dive`, issue #952). Reflection-based
+  validation has a per-field cost — measure on hot paths. CVEs historically
+  reported against this dependency were in transitive packages
+  (golang.org/x/text, fixed) — keep govulncheck in the gate.
+relationships:
+  references:
+    - https://pkg.go.dev/github.com/go-playground/validator/v10
+    - https://github.com/go-playground/validator/issues/952
+    - https://github.com/go-playground/validator/issues/773
+  uses: []
+  validated_by: []

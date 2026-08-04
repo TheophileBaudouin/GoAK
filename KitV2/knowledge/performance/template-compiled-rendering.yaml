@@ -1,0 +1,30 @@
+---
+id: source:template:compiled-rendering
+title: Compiled templates (templ) vs interpreted html/template — measured
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [performance, templates, templ, html, ssr, benchmarks]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/a-h/templ/tree/main/benchmarks
+selection: >-
+  Load when choosing a server-side HTML rendering path and throughput matters
+  (hot SSR routes, streaming responses): compiled templates execute as Go
+  code with no runtime reflection, while html/template interprets the syntax
+  tree per execution. Answers the question "is a compiled template engine
+  worth the build step for my workload".
+limits: >-
+  Micro-benchmarks (independent: amaro0/templ-benchmark; official: templ
+  benchmarks) show large per-render gaps, but they do not prove
+  application-level TTFB: measure on your own workload and render
+  complexity. Compiled rendering adds a code-generation step to the build.
+relationships:
+  references:
+    - https://amaro0.xyz/go-templ-benchmark/
+    - https://github.com/a-h/templ/issues/96
+    - https://pkg.go.dev/html/template
+  uses: []
+  validated_by: []

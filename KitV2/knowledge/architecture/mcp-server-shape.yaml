@@ -1,0 +1,51 @@
+---
+id: pattern:architecture:mcp-server-shape
+title: Forme d'un serveur MCP — primitives, transport et frontière
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [mcp, architecture, agent, tools, resources, prompts, json-rpc]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+problem: >-
+  Exposer des capacités à un agent LLM sans cadre produit des serveurs
+  ad-hoc, des frontières de sécurité floues et des protocoles incompatibles
+  entre clients (IDE, agents, applications). Comment structurer un serveur
+  MCP de façon cohérente avec la spec ?
+context: >-
+  S'applique quand on construit un serveur MCP (SDK officiel
+  github.com/modelcontextprotocol/go-sdk) ou qu'on décide du découpage entre
+  host, client et serveur dans une application agentique.
+solution: >-
+  Suivre l'architecture client-host-server de la spec : le host orchestre,
+  chaque client gère une session avec un serveur. Un serveur expose
+  exactement trois primitives distinctes — tools (fonctions exécutables que
+  le modèle peut appeler), resources (données/contextes lisibles), prompts
+  (modèles de tâches guidant l'interaction) — et les déclare via des schémas
+  explicites. Choisir un transport adapté (stdio pour les processus locaux,
+  HTTP/WebSocket streamable pour les serveurs distants), négocier la version
+  du protocole, et traiter chaque primitive comme une frontière de confiance
+  (l'entrée du modèle est non fiable, voir source:mcp:tool-security).
+benefits: >-
+  Interopérabilité avec tous les clients MCP, séparation claire
+  lecture (resources) / action (tools) / guidance (prompts), sessions
+  standardisées, et une frontière de sécurité identifiable pour les entrées
+  du modèle.
+costs: >-
+  Le protocole et ses évolutions de version ajoutent de la complexité par
+  rapport à une API HTTP simple ; les schémas de primitives doivent être
+  maintenus en synchronisation avec l'implémentation ; l'outillage est
+  pré-1.0-era (épingler les versions, cf. catalog mcp-go-sdk).
+related: >-
+  Homologue sécurité : source:mcp:tool-security. Catalogue de sélection :
+  `knowledge/catalogs/libraries/mcp-go-sdk`.
+relationships:
+  references:
+    - https://modelcontextprotocol.io/specification/2026-07-28
+    - https://modelcontextprotocol.io/docs/learn/server-concepts
+    - https://modelcontextprotocol.io/specification/2024-11-05/architecture/index
+    - https://go.sdk.modelcontextprotocol.io/protocol/
+  uses: []
+  validated_by: []

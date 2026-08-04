@@ -1,0 +1,32 @@
+---
+id: source:search:index-merge
+title: "bleve Scorch — segmented index, merges and write amplification"
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [search, full-text, bleve, scorch, performance, indexing]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/blevesearch/bleve/blob/master/index/scorch/README.md
+selection: >-
+  Load when designing a write-heavy bleve workload (bulk loads, continuous
+  ingestion), tuning merge behavior, or sizing a memory-bound index. Answers
+  the question "how does Scorch store and merge segments, and what is the
+  cost of writing many small batches?"
+limits:
+  - >-
+    The design docs describe architecture and defaults, not measured
+    guarantees for a specific corpus; sizing and merge tuning require
+    profiling on real data (correlate with source:go:profiling).
+  - >-
+    Merge policy options and batching are operational knobs; they do not
+    change the fundamental read/write trade-off of a segmented index.
+relationships:
+  references:
+    - https://github.com/blevesearch/bleve/blob/master/docs/persister.md
+    - https://github.com/blevesearch/bleve/issues/1783
+    - https://pkg.go.dev/github.com/blevesearch/bleve/index/scorch/mergeplan
+  uses: []
+  validated_by: []

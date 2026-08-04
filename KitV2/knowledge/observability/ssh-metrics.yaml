@@ -1,0 +1,29 @@
+---
+id: source:wish:ssh-metrics
+title: Observability for SSH apps — Prometheus metrics via promwish
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [observability, ssh, metrics, prometheus, wish, middleware]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://github.com/charmbracelet/promwish
+selection: >-
+  Load when operating an SSH application built with wish: expose session
+  metrics (created, completed, duration) on a Prometheus endpoint via the
+  promwish middleware, and compose it with the rest of the wish middleware
+  stack. Answers the question "how to observe an SSH app".
+limits: >-
+  promwish instruments the default registry and session lifecycle; command
+  or handler-level metrics require additional instrumentation. Middleware
+  ordering matters (auth runs before rate-limit, issue #325) — design the
+  stack with the failure mode in mind.
+relationships:
+  references:
+    - https://github.com/charmbracelet/wish/blob/main/README.md
+    - https://pkg.go.dev/github.com/charmbracelet/wish
+    - https://github.com/charmbracelet/wish/issues/325
+  uses: []
+  validated_by: []

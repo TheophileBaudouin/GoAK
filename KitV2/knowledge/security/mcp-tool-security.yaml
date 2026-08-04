@@ -1,0 +1,30 @@
+---
+id: source:mcp:tool-security
+title: MCP / LLM tool security — inputs du modèle comme frontière de confiance
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, mcp, llm, tools, prompt-injection, owasp]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: "https://owasp.org/www-project-top-10-for-large-language-\
+  model-applications/"
+selection: >-
+  Load when exposing tools, resources or prompts via MCP (or any agent tool
+  boundary): treat every model-generated input as untrusted, validate and
+  authorize per invocation, scope privileges to the minimum, and require
+  human confirmation for destructive or irreversible actions.
+limits: >-
+  OWASP LLM Top 10 describes vulnerability classes and mitigations, not a
+  formal guarantee: residual risk depends on the concrete tool surface,
+  the model in use and the deployment topology — validate with a threat
+  model of your own tools.
+relationships:
+  references:
+    - https://genai.owasp.org/llmrisk/llm01-prompt-injection/
+    - https://modelcontextprotocol.io/specification/2026-07-28
+    - https://github.com/modelcontextprotocol/go-sdk
+  uses: []
+  validated_by: []

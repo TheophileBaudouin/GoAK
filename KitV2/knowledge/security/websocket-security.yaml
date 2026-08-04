@@ -1,0 +1,30 @@
+---
+id: source:websocket:security
+title: WebSocket security — origin, auth, transport and monitoring
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, websocket, origin, wss, auth, monitoring]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: "https://cheatsheetseries.owasp.org/cheatsheets/\
+  WebSocket_Security_Cheat_Sheet.html"
+selection: >-
+  Load when exposing a WebSocket endpoint (coder/websocket or a stdlib
+  upgrade): validate Origin, authenticate the upgrade (not only the initial
+  HTTP request), treat every message as untrusted input, use wss/TLS, and plan
+  monitoring of an always-on channel. Complements the CSWSH failure pattern.
+limits: >-
+  The cheatsheet is generic guidance; it does not prove a concrete topology
+  (proxy termination, load-balanced upgrades, subprotocol negotiation) —
+  verify against RFC 6455 and the transport library in use.
+relationships:
+  references:
+    - https://cwe.mitre.org/data/definitions/1385.html
+    - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
+    - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/10-Testing_WebSockets
+    - https://pkg.go.dev/github.com/coder/websocket
+  uses: []
+  validated_by: []

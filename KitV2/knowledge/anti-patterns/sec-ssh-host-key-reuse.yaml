@@ -1,0 +1,46 @@
+---
+id: pattern:antipattern:sec-ssh-host-key-reuse
+title: Clé hôte SSH partagée entre instances ou régénérée à chaque boot
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, ssh, host-keys, mitm, infrastructure]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  La même clé hôte SSH est embarquée dans chaque instance, conteneur ou image
+  (ou committée dans le dépôt) ; ou elle est régénérée à chaque démarrage ;
+  wish avec `WithHostKeyPath` absent régénère une clé auto par défaut sur les
+  hôtes éphémères.
+detect: >-
+  - Une clé privée hôte dans le contrôle de version ou l'image Docker.
+  - Instances clonées/immutables avec une clé hôte identique (comparer les
+    empreintes dans known_hosts des clients).
+  - Clé absente du stockage persistant pour un hôte dont les clients
+    épinglent l'identité.
+problem: >-
+  Une clé privée partagée est « d'autant moins privée qu'elle est
+  partagée » : compromettre une instance permet d'usurper toutes les autres
+  (MITM indétectable pour les clients qui ont épinglé cette clé). Une clé
+  régénérée à chaque boot casse le pinning (TOFU) et ouvre la porte à un
+  premier-contact frauduleux ; un sshd refuse d'ailleurs les fichiers de clé
+  accessibles au groupe/monde.
+fix: >-
+  Une clé hôte par hôte : générer à la première installation, persister avec
+  permissions propriétaire uniquement (0600), et injecter via gestion de
+  secrets dans les infrastructures éphémères (jamais dans l'image ou le
+  dépôt). Pour wish, fournir `WithHostKeyPath` pointant vers la clé persistée
+  plutôt que la génération auto par défaut.
+when_ok: >-
+  Des hôtes éphémères sans clients qui épinglent l'identité peuvent
+  régénérer leur clé à chaque boot — documenter explicitement que la
+  continuité d'identité n'est pas garantie.
+relationships:
+  references:
+    - https://security.stackexchange.com/questions/41380/are-duplicate-ssh-server-host-keys-a-problem
+    - https://github.com/charmbracelet/wish/blob/main/README.md
+    - https://github.com/openssh/openssh-portable/blob/master/sshd_config.5
+  uses: []
+  validated_by: []

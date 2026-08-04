@@ -1,0 +1,28 @@
+---
+id: source:go:html-template
+title: html/template — auto-escaping, injection-safe HTML output
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, templates, html, xss, auto-escaping]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://pkg.go.dev/html/template
+selection: >-
+  Load when rendering HTML server-side with the stdlib, or when comparing
+  html/template to a compiled alternative (templ, see catalog): html/template
+  auto-escapes output in the detected HTML/JS/CSS context and should be used
+  instead of text/template whenever the output is HTML.
+limits: >-
+  Auto-escaping covers the contexts the template engine can detect; it is not
+  a substitute for input validation at trust boundaries. html/template parses
+  templates at runtime (interpreted) — compiled alternatives trade a build
+  step for faster rendering (see source:template:compiled-rendering).
+relationships:
+  references:
+    - https://go.dev/src/html/template/doc.go
+    - https://pkg.go.dev/text/template
+  uses: []
+  validated_by: []

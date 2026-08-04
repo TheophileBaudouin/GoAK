@@ -1,0 +1,30 @@
+---
+id: source:ssh:server-security
+title: SSH server hardening in Go — host keys, auth and limits
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, ssh, server, host-keys, authentication, x-crypto]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-04
+source: https://pkg.go.dev/golang.org/x/crypto/ssh
+selection: >-
+  Load when building an SSH server in Go (charm.land/ssh, wish, or raw
+  x/crypto/ssh): generate and persist a per-host key, restrict auth to
+  public-key (or password with constant-time compare), pin allowed
+  algorithms, and bound session lifetime. Complements the host-key reuse
+  failure pattern.
+limits: >-
+  Library guidance covers the SSH layer, not network-level controls:
+  rate limiting, connection quotas and firewall policy remain separate
+  (wish provides middlewares for several of them).
+relationships:
+  references:
+    - https://go.googlesource.com/crypto/+/refs/heads/master/ssh/server.go
+    - https://go.googlesource.com/crypto/+/refs/heads/master/ssh/example_test.go
+    - https://pkg.go.dev/github.com/charmbracelet/ssh
+    - https://github.com/charmbracelet/wish/blob/main/README.md
+  uses: []
+  validated_by: []

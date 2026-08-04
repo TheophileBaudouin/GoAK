@@ -1,0 +1,47 @@
+---
+id: pattern:antipattern:sec-cswsh
+title: Cross-Site WebSocket Hijacking — validation d'origine absente
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, websocket, origin, csrf, cswsh]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  Un serveur WebSocket accepte la poignée de main sans vérifier l'en-tête
+  Origin ; la connexion s'appuie sur un cookie de session HTTP ; un site
+  malveillant peut ouvrir une connexion WebSocket vers le serveur et parler
+  au nom de l'utilisateur authentifié.
+detect: >-
+  - Dans coder/websocket : `websocket.Accept(w, r, nil)` sans
+    `AcceptOptions.OriginPatterns`, ou `InsecureSkipVerify: true`.
+  - Aucune vérification de l'en-tête `Origin` dans le handler de handshake.
+  - Le service WebSocket réutilise l'authentification par cookie du site web.
+problem: >-
+  Le navigateur n'applique pas la same-origin policy aux WebSockets : c'est au
+  serveur de valider l'Origin à la poignée de main (WSTG, CWE-1385). Sans
+  cette validation, un attaquant détourne la session établie (CSWSH) pour
+  lire des données, émettre des commandes ou épuiser les connexions — l'IP
+  d'origine du navigateur étant légitime, les protections réseau ne voient
+  rien.
+fix: >-
+  Vérifier l'en-tête Origin sur la poignée de main : dans coder/websocket,
+  fournir `OriginPatterns` (liste explicite des origines autorisées) plutôt
+  que `InsecureSkipVerify` ; sinon, rejeter la handshake si l'Origin n'est
+  pas un domaine contrôlé. Ne pas s'appuyer sur un cookie pour l'auth WebSocket
+  sans token non-predictible (OWASP : utiliser un token CSRF/randomisé).
+  Servir en wss/TLS.
+when_ok: >-
+  Une vérification d'origine peut être omise quand le client est natif
+  (hors navigateur) et que l'authentification ne repose pas sur des cookies
+  de session — documenter alors pourquoi l'Origin n'est pas une frontière.
+relationships:
+  references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html
+    - https://cwe.mitre.org/data/definitions/1385.html
+    - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/10-Testing_WebSockets
+    - https://github.com/coder/websocket/blob/master/accept.go
+  uses: []
+  validated_by: []

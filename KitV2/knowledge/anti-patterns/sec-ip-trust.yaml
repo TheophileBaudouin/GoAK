@@ -1,0 +1,52 @@
+---
+id: pattern:antipattern:sec-ip-trust
+title: Confiance en l'IP client depuis des en-têtes proxy non vérifiés
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [security, http, proxy, ip-spoofing, rate-limit, middleware]
+go_version: "1.22+"
+dependencies: []
+last_verified: 2026-08-04
+symptom: >-
+  L'IP « client » est dérivée de X-Forwarded-For, X-Real-IP ou Forwarded sans
+  vérifier que le proxy qui a écrit l'en-tête est bien celui que vous
+  contrôlez ; le middleware RealIP de chi est utilisé ; rate-limit, audit ou
+  géo-filtrage se basent sur cette IP.
+detect: >-
+  - `middleware.RealIP` de go-chi/chi : déprécié, 3 advisories de spoofing
+    ouverts contre lui (GHSA-9g5q-2w5x-hmxf, GHSA-rjr7-jggh-pgcp,
+    GHSA-3fxj-6jh8-hvhx) — chercher l'appel dans le stack middleware.
+  - Lecture directe de `r.Header.Get("X-Forwarded-For")` dans le code
+    applicatif.
+  - Aucun `ClientIPFrom*` configuré alors que l'app est derrière un proxy.
+problem: >-
+  Un client peut forger X-Forwarded-For (ex. `X-Forwarded-For: 127.0.0.1`) :
+  seuls les segments ajoutés par des proxies que vous contrôlez sont fiables
+  (MDN). Une IP forgée contourne le rate-limit par IP, falsifie l'audit,
+  trompe les protections géographiques et détourne les décisions fondées sur
+  l'identité réseau — sans aucune trace d'effraction.
+fix: >-
+  Choisir exactement UN middleware `ClientIPFrom*` de chi (v5.3+) en fonction
+  de la topologie : exposition directe à Internet →
+  `ClientIPFromRemoteAddr` ; derrière un proxy unique connu (nginx,
+  Cloudflare) → `ClientIPFromHeader` avec le nom d'en-tête exact ; derrière
+  un ensemble de CIDR proxies connus → `ClientIPFromXFF`. Ne jamais faire
+  confiance aux segments d'en-tête que votre proxy ne contrôle pas, et
+  traiter toute IP dérivée d'en-têtes comme non fiable pour une décision de
+  sécurité quand la topologie est inconnue.
+when_ok: >-
+  Une IP forgeable est acceptable seulement si aucune décision de sécurité
+  (rate-limit, autorisation, audit d'accès) n'en dépend — documenter alors
+  explicitement cette non-fiabilité.
+relationships:
+  references:
+    - https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf
+    - https://github.com/go-chi/chi/security/advisories/GHSA-rjr7-jggh-pgcp
+    - https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx
+    - https://github.com/go-chi/chi/pull/967
+    - https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-For
+    - https://owasp.org/www-community/pages/attacks/ip_spoofing_via_http_headers.html
+  uses: []
+  validated_by: []
