@@ -1,10 +1,6 @@
-# Templates des documents d'analyse
+# Analysis Document Templates
 
-Templates des trois documents générés en phase 1 (Analyse profonde du
-projet). Sortie vers `docs/analysis/`. Ces documents servent deux buts : ils
-alimentent la phase 2 (Raffinement et confirmation de l'intention) pour une
-discussion utilisateur ancrée, et la phase 3 (Décomposition de la tâche) pour
-la planification.
+Templates for the three documents generated in Phase 1 (Deep Project Analysis). Output to `docs/analysis/`. These documents serve dual purpose: they feed into Phase 2 (Intent Refinement & Confirmation) for grounded user discussion, and into Phase 3 (Task Decomposition) for planning.
 
 ---
 
@@ -13,45 +9,36 @@ la planification.
 ```markdown
 # Project Overview
 
-## Direction préliminaire
-<!-- Résumé en une phrase de la direction de transformation prévue depuis la
-phase 0. Elle sera raffinée en définition de tâche confirmée en phase 2 après
-revue par l'utilisateur. -->
+## Preliminary Direction
+<!-- One-sentence summary of the intended transformation direction from Phase 0. This will be refined into a confirmed task definition in Phase 2 after the user reviews this analysis. -->
 
-## Architecture actuelle
-<!-- Diagramme d'architecture de haut niveau (Mermaid) et description -->
+## Current Architecture
+<!-- High-level architecture diagram (Mermaid) and description -->
 
-## Stack technologique
-| Couche        | Actuel          | Cible           |
-|:--------------|:----------------|:----------------|
-| Langage       |                 |                 |
-| Framework     |                 |                 |
-| Outil de build|                 |                 |
-| Gestionnaire  |                 |                 |
-| Base de données |               |                 |
-| Déploiement   |                 |                 |
+## Technology Stack
+| Layer        | Current          | Target           |
+|:-------------|:-----------------|:-----------------|
+| Language     |                  |                 |
+| Framework    |                  |                 |
+| Build Tool   |                  |                 |
+| Package Mgr  |                  |                 |
+| Database     |                  |                 |
+| Deployment   |                  |                 |
 
-## Points d'entrée
-<!-- Liste des points d'entrée principaux : commandes CLI, endpoints API,
-routes UI, etc. -->
+## Entry Points
+<!-- List of main entry points: CLI commands, API endpoints, UI routes, etc. -->
 
 ## Build & Run
-<!-- Comment builder, tester et exécuter le projet actuellement -->
+<!-- How to build, test, and run the project currently -->
 
-## Ligne de base de test
-<!-- Frameworks de test existants, commandes de test, lacunes de couverture,
-et si le nouveau travail de fonctionnalité a actuellement un endroit fiable
-pour ajouter des tests -->
+## Testing Baseline
+<!-- Existing test frameworks, test commands, coverage gaps, and whether new feature work currently has a reliable place to add tests -->
 
-## Ligne de base de gouvernance du projet
-<!-- Surfaces existantes d'instructions et de mémoire au niveau projet :
-AGENTS.md, mémoire native .pi/memory/ (fichiers réellement présents),
-fallback mémoire repo-local, règles Cursor/Windsurf/Cline/Codex ou
-équivalents. Note les emplacements canoniques, les lacunes et les conflits. -->
+## Project Governance Baseline
+<!-- Existing project-level instruction and memory surfaces: AGENTS.md, native memory .pi/memory/ (files actually present), repo-local fallback memory files, Cursor/Windsurf/Cline/Codex rules, or equivalents. Note canonical locations, gaps, and conflicts. -->
 
-## Intégrations externes
-<!-- APIs, bases de données, services, systèmes de fichiers avec lesquels le
-projet interagit -->
+## External Integrations
+<!-- APIs, databases, services, file systems the project interacts with -->
 ```
 
 ---
@@ -61,37 +48,28 @@ projet interagit -->
 ```markdown
 # Module Inventory
 
-| Module | Responsabilité | Dépendances | Fichiers | Lignes | Complexité | Score S.U.P.E.R |
-|:-------|:---------------|:------------|--------:|-------:|:-----------|:----------------|
-|        |                |             |         |       |            |                 |
+| Module | Responsibility | Dependencies | Files | Lines | Complexity | S.U.P.E.R Score |
+|:-------|:---------------|:-------------|------:|-------|:-----------|:----------------|
+|        |                |              |       |       |            |                 |
 
-> **Score S.U.P.E.R** : évalue chaque module comme 🟢 (conforme), 🟡 (partiel)
-> ou 🔴 (violation) sur les cinq principes. Format : `S🟢 U🟡 P🔴 E🟢 R🟡`
+> **S.U.P.E.R Score**: Rate each module as 🟢 (compliant), 🟡 (partial), or 🔴 (violation) based on the five principles. Format: `S🟢 U🟡 P🔴 E🟢 R🟡`
 
-## Détails des modules
+## Module Details
 
-### <Nom du module>
-- **Chemin** : `src/module_name/`
-- **Responsabilité** : ce que fait ce module
-- **API publique** : fonctions/classes clés exposées aux autres modules
-- **Dépendances internes** : quels modules du projet il importe
-- **Dépendances externes** : bibliothèques tierces utilisées
-- **Complexité** : Faible / Moyenne / Élevée / Critique
-- **Notes de transformation** : défis ou considérations spécifiques pour ce
-  module
-- **Évaluation S.U.P.E.R** :
-  - **S (Rôle unique)** : ce module a-t-il exactement une responsabilité ? Si
-    non, que faut-il diviser ?
-  - **U (Flux unidirectionnel)** : les dépendances sont-elles
-    unidirectionnelles ? Y a-t-il des dépendances circulaires ?
-  - **P (Ports sur l'implémentation)** : les entrées/sorties sont-elles
-    schéma-définies et sérialisables ? Les frontières de modules sont-elles
-    basées sur des contrats ?
-  - **E (Indépendant de l'environnement)** : y a-t-il des chemins codés en
-    dur, de la config embarquée ou des hypothèses spécifiques à la
-    plateforme ?
-  - **R (Parties remplaçables)** : ce module peut-il être échangé sans
-    changements en cascade ? Quel est le coût de remplacement ?
+### <Module Name>
+- **Path**: `src/module_name/`
+- **Responsibility**: What this module does
+- **Public API**: Key functions/classes exposed to other modules
+- **Internal Dependencies**: Which other project modules it imports
+- **External Dependencies**: Third-party libraries it uses
+- **Complexity Rating**: Low / Medium / High / Critical
+- **Transformation Notes**: Specific challenges or considerations for this module
+- **S.U.P.E.R Assessment**:
+  - **S (Single Purpose)**: Does this module have exactly one responsibility? If not, what should be split?
+  - **U (Unidirectional Flow)**: Are dependencies one-directional? Any circular dependencies?
+  - **P (Ports over Implementation)**: Are inputs/outputs schema-defined and serializable? Are module boundaries contract-based?
+  - **E (Environment-Agnostic)**: Any hardcoded paths, embedded config, or platform-specific assumptions?
+  - **R (Replaceable Parts)**: Can this module be swapped without cascading changes? What is the replacement cost?
 ```
 
 ---
@@ -101,52 +79,41 @@ projet interagit -->
 ```markdown
 # Risk Assessment
 
-## Résumé de santé d'architecture S.U.P.E.R
+## S.U.P.E.R Architecture Health Summary
 
-> Évalue le codebase actuel contre les principes S.U.P.E.R pour identifier
-> les risques d'architecture et guider la transformation.
+> Evaluate the current codebase against S.U.P.E.R principles to identify architectural risks and guide the transformation.
 
-| Principe | Statut | Résultats clés | Priorité de transformation |
-|:---------|:-------|:---------------|:---------------------------|
-| **S** Rôle unique | 🟢/🟡/🔴 | | Élevée / Moyenne / Faible |
-| **U** Flux unidirectionnel | 🟢/🟡/🔴 | | Élevée / Moyenne / Faible |
-| **P** Ports sur l'implémentation | 🟢/🟡/🔴 | | Élevée / Moyenne / Faible |
-| **E** Indépendant de l'environnement | 🟢/🟡/🔴 | | Élevée / Moyenne / Faible |
-| **R** Parties remplaçables | 🟢/🟡/🔴 | | Élevée / Moyenne / Faible |
+| Principle | Status | Key Findings | Transformation Priority |
+|:----------|:-------|:-------------|:------------------------|
+| **S** Single Purpose | 🟢/🟡/🔴 | | High / Medium / Low |
+| **U** Unidirectional Flow | 🟢/🟡/🔴 | | High / Medium / Low |
+| **P** Ports over Implementation | 🟢/🟡/🔴 | | High / Medium / Low |
+| **E** Environment-Agnostic | 🟢/🟡/🔴 | | High / Medium / Low |
+| **R** Replaceable Parts | 🟢/🟡/🔴 | | High / Medium / Low |
 
-**Santé globale** : _X/5 principes sains_ — [Saine / Refactorisation
-nécessaire / Alerte de dette technique]
+**Overall Health**: _X/5 principles healthy_ — [Healthy / Refactoring Needed / Technical Debt Alert]
 
-### Hotspots de violation S.U.P.E.R
-<!-- Liste les modules/fichiers principaux qui violent le plus de principes
-S.U.P.E.R, classés par sévérité. Ils deviennent des cibles prioritaires du
-plan de transformation. -->
+### S.U.P.E.R Violation Hotspots
+<!-- List the top modules/files that violate the most S.U.P.E.R principles, ranked by severity. These become priority targets in the transformation plan. -->
 
-## Matrice des risques
+## Risk Matrix
 
-| Risque | Impact | Probabilité | Sévérité | Atténuation |
-|:-------|:-------|:------------|:---------|:------------|
-|        |        |             |          |             |
+| Risk | Impact | Likelihood | Severity | Mitigation |
+|:-----|:-------|:-----------|:---------|:-----------|
+|      |        |            |          |            |
 
-## Risques de sévérité élevée
-<!-- Discussion détaillée de chaque risque de sévérité élevée -->
+## High-Severity Risks
+<!-- Detailed discussion of each high-severity risk -->
 
-## Dette technique
-<!-- Problèmes préexistants qui peuvent compliquer la transformation. Inclut
-les violations S.U.P.E.R comme catégorie de dette technique. -->
+## Technical Debt
+<!-- Pre-existing issues that may complicate the transformation. Include S.U.P.E.R violations as a category of technical debt. -->
 
-## Risques de test
-<!-- Harnais de test manquants, couverture de régression faible, tests
-lents/flaky, ou zones où le travail de fonctionnalité ne peut pas encore être
-validé en sécurité. -->
+## Testing Risks
+<!-- Missing test harnesses, weak regression coverage, slow/flaky tests, or areas where feature work cannot be safely validated yet. -->
 
-## Risques de gouvernance du projet
-<!-- Surfaces d'instructions/mémoire manquantes ou conflictuelles,
-instructions obsolètes, fichiers fallback non natifs utilisés sans
-confirmation, ou décisions durables qui n'existent actuellement que dans le
-contexte de conversation. -->
+## Project Governance Risks
+<!-- Missing or conflicting instruction/memory surfaces, stale instructions, non-native fallback files used without confirmation, or durable decisions that currently exist only in conversation context. -->
 
-## Préoccupations de compatibilité
-<!-- Compatibilité d'API, changements de format de données, changements de
-déploiement -->
+## Compatibility Concerns
+<!-- API compatibility, data format changes, deployment changes -->
 ```

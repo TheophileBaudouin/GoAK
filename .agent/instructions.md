@@ -25,17 +25,16 @@ completion from static checks alone. Every rule a kit-governance contract
 states must be verifiable by the product validator (`validate-kitv2.py`) or an
 explicit review control; unverifiable rules are hypotheses, not contracts.
 
-## Enforcement des instructions absolues
+## Enforcement of absolute instructions
 
-Le principe ci-dessus (« Every rule a kit-governance contract states must be
-verifiable… ») est étendu aux artefacts consommateurs du Kit (décision
-2026-08-05, D-2026-08-05-15) : toute instruction absolue (`MANDATORY`,
-« toujours », « jamais ») écrite dans une skill, un prompt, un AGENTS.md ou
-une recette doit soit s'accompagner d'un contrôle mécanique nommé (validateur
-C2 ou porte Pi), soit être consignée ici comme « guidance seule, non
-appliquée ». Ce registre est lu par l'audit (dimension « instructions
-absolues », `.pi/prompts/kit-audit.md` phase C9).
+The principle above ("Every rule a kit-governance contract states must be
+verifiable…") is extended to the Kit's consumer artifacts (decision 2026-08-05,
+D-2026-08-05-15): any absolute instruction (`MANDATORY`, "always", "never")
+written in a skill, prompt, AGENTS.md, or recipe must either be accompanied by
+a named mechanical control (validator C2 or Pi gate), or be recorded here as
+"guidance only, not enforced". This registry is read by the audit (dimension
+"absolute instructions", `.pi/prompts/kit-audit.md` phase C9).
 
-| Instruction absolue | Porteur | Contrôle mécanique | Statut (2026-08-05) |
+| Absolute instruction | Carrier | Mechanical control | Status (2026-08-05) |
 | --- | --- | --- | --- |
-| La skill `kit-resource-routing` exige l'appel de `search_kit_resources` « MANDATORY before technical work » (SKILL.md §When to search) | `KitV2/.pi/skills/kit-resource-routing/SKILL.md` | Aucun (outil appelable, non bloquant) | Guidance seule — porte Pi spécifiée (plan 2026-08-05-métaprojet, annexe B), implémentation en passe suivante ; audit C9 vérifie chaque audit |
+| The `kit-resource-routing` skill requires calling `search_kit_resources` "MANDATORY before technical work" (SKILL.md §When to search) | `KitV2/.pi/skills/kit-resource-routing/SKILL.md` | None (callable tool, non-blocking) | Guidance only — Pi gate specified (plan 2026-08-05-metaproject, annexe B), implementation next pass; audit C9 verifies each audit |

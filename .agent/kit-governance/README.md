@@ -1,49 +1,49 @@
-# Kit Governance — contrats de construction du Kit (MetaProjet)
+# Kit Governance — Kit construction contracts (Metaproject)
 
-Ce dossier est le **control-plane de gouvernance** du produit `KitV2/`. Chaque
-contrat définit la mission, le format, les règles, les patterns, les
-anti-patterns et les critères de validation d'une zone ou d'un composant du
-Kit. Un agent ou développeur doit lire le contrat de la zone **avant** d'y
-travailler.
+This directory is the **governance control plane** of the `KitV2/` product. Each
+contract defines the mission, format, rules, patterns, anti-patterns, and
+validation criteria of a zone or kit component. An agent or developer must
+read the zone contract **before** working there.
 
-Autorité : `KIT_CHARTER.md` (racine) > ces contrats > README de zone du Kit >
-contenu. Ces fichiers ne sont **jamais** installés dans le produit ; le
-produit reste autonome (Z9, N1).
+Authority: `KIT_CHARTER.md` (root) > these contracts > kit zone README >
+content. These files are **never** installed in the product; the product stays
+self-contained (Z9, N1).
 
 ## Index
 
-| Contrat | Portée | Statut |
+| Contract | Scope | Status |
 | --- | --- | --- |
-| [00-charte-d-application.md](00-charte-d-application.md) | Cycle de vie, semver, write-gate, fraîcheur, règles transverses (C0) | actif |
-| [01-manifest-capabilities.md](01-manifest-capabilities.md) | manifest.yaml + capabilities.yaml (C1) | actif |
-| [02-validation-gate.md](02-validation-gate.md) | validate-kitv2.py et la gate complète (C2) | actif |
-| [10-zone-rules.md](10-zone-rules.md) | `rules/` (Z1) | actif |
-| [11-zone-knowledge.md](11-zone-knowledge.md) | `knowledge/` (Z2) | actif |
-| [12-zone-recipes.md](12-zone-recipes.md) | `recipes/` (Z3) | actif |
-| [13-zone-snippets.md](13-zone-snippets.md) | `snippets/` (Z4) | actif |
-| [14-zone-templates.md](14-zone-templates.md) | `templates/` — politique MIT (Z5) | actif |
-| [15-zone-probes.md](15-zone-probes.md) | `probes/` (Z6) | actif |
-| [16-zone-tools.md](16-zone-tools.md) | `tools/` (Z7) | actif |
-| [17-zone-pi.md](17-zone-pi.md) | `.pi/` prompts/skills/settings (Z8) | actif |
-| [18-zone-agents.md](18-zone-agents.md) | `AGENTS.md` produit (Z9) | actif |
-| [19-registre-artefacts.md](19-registre-artefacts.md) | Gabarit de métadonnées + relations (Z10) | actif |
-| [20-auteur-modules.md](20-auteur-modules.md) | Écriture des SKILL.md (A1) | actif |
-| [21-zone-router.md](21-zone-router.md) | `router/` — index de routage sémantique (Z11) | actif |
-| [22-zone-spec-driven-dev.md](22-zone-spec-driven-dev.md) | Workflow spec-driven-dev + deep-discuss (Z12) | actif |
-| [30-conventions.md](30-conventions.md) | Nommage, formats, frontières (N1) | actif |
+| [00-charte-d-application.md](00-charte-d-application.md) | Lifecycle, semver, write-gate, freshness, cross-cutting rules (C0) | active |
+| [01-manifest-capabilities.md](01-manifest-capabilities.md) | manifest.yaml + capabilities.yaml (C1) | active |
+| [02-validation-gate.md](02-validation-gate.md) | validate-kitv2.py and the full gate (C2) | active |
+| [10-zone-rules.md](10-zone-rules.md) | `rules/` (Z1) | active |
+| [11-zone-knowledge.md](11-zone-knowledge.md) | `knowledge/` (Z2) | active |
+| [12-zone-recipes.md](12-zone-recipes.md) | `recipes/` (Z3) | active |
+| [13-zone-snippets.md](13-zone-snippets.md) | `snippets/` (Z4) | active |
+| [14-zone-templates.md](14-zone-templates.md) | `templates/` — MIT policy (Z5) | active |
+| [15-zone-probes.md](15-zone-probes.md) | `probes/` (Z6) | active |
+| [16-zone-tools.md](16-zone-tools.md) | `tools/` (Z7) | active |
+| [17-zone-pi.md](17-zone-pi.md) | `.pi/` prompts/skills/settings (Z8) | active |
+| [18-zone-agents.md](18-zone-agents.md) | product `AGENTS.md` (Z9) | active |
+| [19-registre-artefacts.md](19-registre-artefacts.md) | Metadata template + relations (Z10) | active |
+| [20-auteur-modules.md](20-auteur-modules.md) | SKILL.md writing (A1) | active |
+| [21-zone-router.md](21-zone-router.md) | `router/` — semantic routing index (Z11) | active |
+| [22-zone-spec-driven-dev.md](22-zone-spec-driven-dev.md) | spec-driven-dev + deep-discuss workflow (Z12) | active |
+| [30-conventions.md](30-conventions.md) | Naming, formats, boundaries (N1) | active |
 
-## Origine
+## Origin
 
-- Audit : `docs/research/2026-08-04-kit-audit-governance.md`.
-- Plan : `docs/plans/2026-08-04-kit-governance-phase2.md`.
-- Décisions : `.pi/memory/Decisions.md` (2026-08-04).
-- Évidence : `docs/evidence/2026-08-04/kit-governance-phase2/`.
+- Audit: `docs/research/2026-08-04-kit-audit-governance.md`.
+- Plan: `docs/plans/2026-08-04-kit-governance-phase2.md`.
+- Decisions: `.pi/memory/Decisions.md` (2026-08-04).
+- Evidence: `docs/evidence/2026-08-04/kit-governance-phase2/`.
 
-## Maintenance des contrats
+## Contract maintenance
 
-- Modifier un contrat = décision écrite si le périmètre change (nouvelle
-  règle, nouveau champ obligatoire) ; typo/reformulation = direct.
-- Toute règle nouvelle dans un contrat doit être formulée pour être vérifiable
-  par C2 (le validateur) — une règle non vérifiable est une hypothèse.
-- Chaque contrat a une section « Questions ouvertes » : résoudre une question
-  = décision dans `.pi/memory/Decisions.md` + mise à jour du contrat.
+- Modifying a contract = written decision if the scope changes (new rule, new
+  mandatory field); typo/rewording = direct.
+- Every new rule in a contract must be formulated to be verifiable by C2 (the
+  validator) — an unverifiable rule is a hypothesis.
+- Each contract has an "Open questions" section: resolving a question =
+  decision in `.pi/memory/Decisions.md` + contract update.
+- Language: English mandatory (fundamental rule D-2026-08-05-21).

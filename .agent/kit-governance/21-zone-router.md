@@ -1,78 +1,55 @@
-# Z11 — Zone `router/` (index de routage sémantique)
+# Z11 — Zone `router/` (semantic routing index)
 
-- **Contrat MetaProjet** — régit `KitV2/router/` (index + README de
-  consommation). Le builder vit dans le méta-projet (`.agent/router/`).
-- **Origine :** décisions utilisateur 2026-08-05 (BM25, JSON versionné,
-  recherche obligatoire, extension Pi native) — plan
-  `docs/plans/2026-08-05-resource-router.md`.
+- **Metaproject Contract** — governs `KitV2/router/` (index + consumption README). The builder lives in the metaproject (`.agent/router/`).
+- **Origin:** user decisions 2026-08-05 (BM25, versioned JSON, mandatory search, native Pi extension) — plan `docs/plans/2026-08-05-resource-router.md`.
 
 ## 1. Mission
 
-L'index de routage embarqué du kit : un **artefact généré** qui permet à un
-agent Pi de trouver les ressources pertinentes sans charger le kit dans le
-contexte. L'index route vers les fichiers sources ; il ne les remplace jamais.
+The kit's embedded routing index: a **generated artifact** that lets a Pi agent find relevant resources without loading the kit into context. The index routes to source files; it never replaces them.
 
-## 2. Rôles et frontières (inviolables)
+## 2. Roles and boundaries (inviolable)
 
-| Élément | Rôle | Propriétaire |
+| Element | Role | Owner |
 | --- | --- | --- |
-| `router/index.json` | Artefact généré : ressources (id, kind, path, description, tags, terms) | méta-projet (builder) |
-| `router/meta.json` | Version, sha256 de l'index, compteurs, stopwords | méta-projet (builder) |
-| `router/README.md` | Doc de consommation : lecture seule, jamais édité à la main | méta-projet (revue) |
-| `.agent/router/build_index.py` | Builder (build / --check) — hors kit | méta-projet |
-| `.pi/extensions/kit-resource-router.ts` | Outil Pi natif, lecture seule | kit (runtime) |
-| `.pi/skills/kit-resource-routing/SKILL.md` | Skill d'usage (quand/comment) | kit (runtime) |
+| `router/index.json` | Generated artifact: resources (id, kind, path, description, tags, terms) | metaproject (builder) |
+| `router/meta.json` | Version, index sha256, counts, stopwords | metaproject (builder) |
+| `router/README.md` | Consumption doc: read-only, never hand-edited | metaproject (review) |
+| `.agent/router/build_index.py` | Builder (build / --check) — outside the kit | metaproject |
+| `.pi/extensions/kit-resource-router.ts` | Native Pi tool, read-only | kit (runtime) |
+| `.pi/skills/kit-resource-routing/SKILL.md` | Usage skill (when/how) | kit (runtime) |
 
-## 3. Règles
+## 3. Rules
 
-1. **Artefact généré** : `index.json` et `meta.json` ne sont JAMAIS édités à la
-   main. Toute modification de ressource indexable (rules/, recipes/,
-   knowledge/, snippets/, .pi/prompts/, .pi/skills/) impose une régénération
-   par le builder puis la gate complète.
-2. **Read-only au runtime** : l'outil d'extension ne fait que lire l'index. Il
-   ne modifie ni l'index, ni le kit, ni l'environnement.
-3. **Index = routeur uniquement** : chaque entrée pointe vers un fichier réel ;
-   le contenu de vérité reste le fichier source.
-4. **Déterminisme** : builder stdlib Python, aucun réseau, sortie stable
-   (tri par id) ; `--check` compare et sort non-zéro en cas de dérive.
-5. **Volume borné** : descriptions courtes (source : frontmatter), terms
-   pré-calculés, index ~< 200 Ko. Le runtime ne charge jamais le contenu des
-   fichiers du kit, seulement l'index.
-6. **Protection du contexte** : top-K ≤ 5 (max 8), seuil de score, zéro
-   résultat propre plutôt que du bruit (règle « vide > bruit »).
+1. **Generated artifact**: `index.json` and `meta.json` are NEVER hand-edited. Any modification of an indexable resource (rules/, recipes/, knowledge/, snippets/, .pi/prompts/, .pi/skills/) requires a builder regeneration then the full gate.
+2. **Read-only at runtime**: the extension tool only reads the index. It modifies neither the index, nor the kit, nor the environment.
+3. **Index = router only**: every entry points to a real file; the truth content stays the source file.
+4. **Determinism**: stdlib Python builder, no network, stable output (sorted by id); `--check` compares and exits non-zero on drift.
+5. **Bounded volume**: short descriptions (source: frontmatter), precomputed terms, index ~< 200 KB. The runtime never loads kit file content, only the index.
+6. **Context protection**: top-K ≤ 5 (max 8), score threshold, clean zero result rather than noise ("empty > noise" rule).
 
 ## 4. Maintenance
 
-- **Ajouter une ressource indexable** : la gate (couverture) échouera tant que
-  l'index n'est pas régénéré → lancer `python3 .agent/router/build_index.py`
-  depuis la racine du méta-projet, vérifier `git diff` sur router/.
-- **Modifier le système** : builder (méta-projet, tests + README) OU runtime
-  (kit, scénario end-to-end) ; jamais les deux dans la même responsabilité.
-- **Tester** : fixtures du builder + scénarios end-to-end pi (évident, vague,
-  vide, multiples proches) + gate complète.
-- **Ne pas dégrader le routage** : toute nouvelle ressource doit avoir une
-  description frontmatter réelle (1..1024 caractères, vocabulaire technique) ;
-  pas de description générique (« utile pour Go »).
+- **Add an indexable resource**: the gate (coverage) will fail until the index is regenerated → run `python3 .agent/router/build_index.py` from the metaproject root, verify `git diff` on router/.
+- **Modify the system**: builder (metaproject, tests + README) OR runtime (kit, end-to-end scenario); never both in the same responsibility.
+- **Test**: builder fixtures + end-to-end pi scenarios (obvious, vague, empty, near-multiple) + full gate.
+- **Do not degrade routing**: every new resource must have a real frontmatter description (1..1024 characters, technical vocabulary); no generic description ("useful for Go").
 
 ## 5. Patterns
 
-- Builder déterministe + gate qui vérifie (même schéma que tools/offline).
-- Stopwords dans meta.json (source unique, pas de duplication builder/runtime).
-- Synonymes uniquement côté runtime (expansion de requête), jamais côté build.
+- Deterministic builder + verifying gate (same schema as tools/offline).
+- Stopwords in meta.json (single source, no builder/runtime duplication).
+- Synonyms only on the runtime side (query expansion), never on the build side.
 
 ## 6. Anti-patterns
 
-- Index édité à la main ; runtime qui écrit ; index qui contient le contenu des
-  fichiers (au lieu des descriptions) ; résultats non filtrés injectés dans le
-  contexte ; dépendances réseau dans le builder.
+- Hand-edited index; runtime that writes; index containing file content (instead of descriptions); unfiltered results injected into context; network dependencies in the builder.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] `validate-kitv2.py` : index.json valide, meta.sha256 conforme, couverture
-      complète des ressources indexables, chemins existants.
-- [ ] `python3 .agent/router/build_index.py --check` : sortie propre.
-- [ ] Scénarios end-to-end : 4 types, aucun faux positif dans les assertions.
+- [ ] `validate-kitv2.py`: valid index.json, conforming meta.sha256, complete coverage of indexable resources, existing paths.
+- [ ] `python3 .agent/router/build_index.py --check`: clean output.
+- [ ] End-to-end scenarios: 4 types, no false positive in the assertions.
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Aucune : le périmètre a été arbitré avec l'utilisateur (2026-08-05).
+- None: the scope was arbitrated with the user (2026-08-05).

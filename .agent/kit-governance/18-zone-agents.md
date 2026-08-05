@@ -1,63 +1,47 @@
-# Z9 — Zone `AGENTS.md` produit (point d'entrée)
+# Z9 — Zone `AGENTS.md` product (entry point)
 
-- **Contrat MetaProjet** — régit `KitV2/AGENTS.md`.
-- **Rapport d'audit :** §2.10.
+- **Metaproject Contract** — governs `KitV2/AGENTS.md`.
+- **Audit report:** §2.10.
 
 ## 1. Mission
 
-Le **point d'entrée unique** du produit pour un agent consommateur : qu'est-ce
-que ce Kit, où vit chaque zone, comment travailler, comment vérifier. Il
-**route** vers les contrats et artefacts ; il ne les duplique jamais.
+The product's **single entry point** for a consumer agent: what this Kit is, where each zone lives, how to work, how to verify. It **routes** to contracts and artifacts; it never duplicates them.
 
-## 2. Contenu obligatoire
+## 2. Mandatory content
 
-1. **Carte des zones** : tableau zone → mission en une ligne → pointeur
-   (README de zone / fichiers canoniques).
-2. **Source of truth** : où vit chaque vérité (règles, connaissance, recettes,
-   snippets, templates, probes, outils, `.pi/`).
-3. **Workflow** : les prompts natifs à utiliser dans l'ordre pour un travail
-   non trivial (clarifier → planifier → tâches → implémenter → vérifier).
-4. **Validation** : la gate complète et non ambiguë — toutes les commandes
-   (validateur, gofmt, vet, lint, tests, gosec, govulncheck, probes) et la
-   règle PARTIAL quand un outil manque.
-5. **Limits** : ce que le Kit ne prétend pas couvrir (Wails, TUI, Pi discovery).
+1. **Zone map**: table zone → one-line mission → pointer (zone README / canonical files).
+2. **Source of truth**: where each truth lives (rules, knowledge, recipes, snippets, templates, probes, tools, `.pi/`).
+3. **Workflow**: the native resources to use for non-trivial work — the `spec-driven-dev` skill for large-scale transformations, `workflow-memory` for memory, `checklist-*` prompts for reviews (updated 2026-08-05: the former `workflow-clarify → plan → tasks → implement → verify` prompt chain is removed, D-2026-08-05-16).
+4. **Validation**: the complete, unambiguous gate — all commands (validator, gofmt, vet, lint, tests, gosec, govulncheck, probes) and the PARTIAL rule when a tool is missing.
+5. **Limits**: what the Kit does not claim to cover (Wails, TUI, Pi discovery).
 
-## 3. Règles
+## 3. Rules
 
-1. **Routage, pas duplication** : AGENTS.md ne contient ni corps de contrat ni
-   corps de règle ; chaque zone est décrite en une ligne + pointeur.
-2. **Autonomie produit** : AGENTS.md ne référence **jamais** le metaprojet
-   (`.agent/`, `docs/`, chemins `../`). Les contrats de gouvernance sont pour
-   les contributeurs, via le metaprojet.
-3. Toute création de zone ou de contrat met à jour la carte dans le même
-   commit.
-4. La gate listée est exacte : toutes les commandes, ou explicitement
-   « PARTIAL si outil absent ».
+1. **Routing, not duplication**: AGENTS.md contains neither contract bodies nor rule bodies; each zone is described in one line + pointer.
+2. **Product autonomy**: AGENTS.md **never** references the metaproject (`.agent/`, `docs/`, `../` paths). Governance contracts are for contributors, via the metaproject.
+3. Any zone or contract creation updates the map in the same commit.
+4. The listed gate is exact: all commands, or explicitly "PARTIAL if a tool is missing".
 
 ## 4. Maintenance
 
-- Mise à jour synchrone avec : changements de zones, contrats, gate, prompts.
-- Revue fraîcheur annuelle (déclencheur : audit de fraîcheur C0).
+- Synchronous update with: zone changes, contracts, gate, prompts.
+- Annual freshness review (trigger: C0 freshness audit).
 
 ## 5. Patterns
 
-- Carte + routage : l'agent trouve la zone puis le README de zone, jamais un
-  manuel de 300 lignes.
-- « If two files answer the same question, keep one » (déjà présent — le
-  préserver).
+- Map + routing: the agent finds the zone then the zone README, never a 300-line manual.
+- "If two files answer the same question, keep one" (already present — preserve it).
 
 ## 6. Anti-patterns
 
-- AGENTS.md qui grossit en manuel ; duplication de la charte ou des contrats ;
-- chemin metaprojet dans le produit ; gate partielle non documentée.
+- AGENTS.md growing into a manual; duplication of the charter or contracts;
+- metaproject path in the product; undocumented partial gate.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] C2 : AGENTS.md existe (déjà vérifié) et les zones référencées existent.
-- [ ] C2 (étendu) : aucune référence `../` ou `.agent/` dans AGENTS.md.
+- [ ] C2: AGENTS.md exists (already verified) and referenced zones exist.
+- [ ] C2 (extended): no `../` or `.agent/` reference in AGENTS.md.
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Doit-on y ajouter un lien vers le registre d'artefacts (généré, Z7) ?
-  (proposition : oui, une ligne — « le registre des artefacts est généré et
-  référencé dans la carte ».)
+- Should a link to the artifact registry (generated, Z7) be added? (proposal: yes, one line — "the artifact registry is generated and referenced in the map".)

@@ -1,127 +1,78 @@
-# Z5 — Zone `templates/` (templates sourcés MIT)
+# Z5 — Zone `templates/` (sourced MIT templates)
 
-- **Contrat MetaProjet** — régit `KitV2/templates/`.
-- **Rapport d'audit :** §2.6. **Directive propriétaire (2026-08-04, majeure) :**
-  les templates ne sont **jamais écrits par un agent** ; ce sont des copies de
-  projets open source réels, fiables, fonctionnels, sous licence MIT,
-  réutilisables directement avec des adaptations minimales documentées.
+- **Metaproject Contract** — governs `KitV2/templates/`.
+- **Audit report:** §2.6. **Owner directive (2026-08-04, major):** templates are **never written by an agent**; they are copies of real, reliable, functional open-source projects under MIT license, directly reusable with minimal documented adaptations.
 
 ## 1. Mission
 
-Fournir des **bases de projet reproductibles et sourcées** : un agent ou un
-développeur démarre une application à partir d'un projet réel éprouvé, pas
-d'un squelette maison. La qualité vient de la communauté, pas de l'agent.
+Provide **reproducible, sourced project bases**: an agent or developer starts an application from a real, proven project, not a home-made skeleton. Quality comes from the community, not the agent.
 
-## 2. Politique (obligations absolues)
+## 2. Policy (absolute obligations)
 
-1. **Jamais de template écrit par l'agent** from scratch. L'agent documente,
-   épingle, adapte minimalement et vérifie ; il ne développe pas.
-2. **Licence MIT obligatoire** (totalement ouverte). Un projet sous licence
-   restrictive (GPL/AGPL, licence propriétaire, « no commercial use ») est
-   rejeté, quelle que soit sa qualité.
-3. **Source réelle, fiable** : projet maintenu (commits/releases récents), testé,
-   CI, communauté active, **une responsabilité unique**, conforme aux règles du
-   Kit (idiomatique, stdlib-first, pas de framework imposé).
-4. **Ultra-spécifique et minimal** (critère de sélection élevé) : le projet
-   implémente **presque exclusivement** la technologie du template — une seule
-   stack, un seul domaine, aucune technologie annexe hors périmètre (auth,
-   observabilité, K8s, ORM, CI lourde…). Le codebase est **petit et parcourable
-   de bout en bout** : pas de méga-dépôt, pas d'arbre vendored/généré, pas de
-   dépendances lourdes. La structure est **claire, bien organisée et
-   modulaire** : chaque composant est isolé et remplaçable, de sorte que
-   l'intégration dans un projet quelconque se fait par copie de modules bien
-   délimités, et la modification reste simple.
-   **Application réelle obligatoire (2026-08-05, D-2026-08-05-14)** : la source
-   doit être une application réelle à responsabilité unique, **pas un
-   starter/template tiers ni un recueil d'exemples de démonstration** — un
-   dépôt nommé template/starter/example, ou une collection de démos, ne
-   satisfait pas la politique même sous MIT (leçon recherche 2026-08-05
-   desktop-app : aucun candidat Wails conforme).
-5. **Fonctionnel obligatoire** : compile et passe ses tests dans le Kit. Un
-   template non fonctionnel est interdit, quelle que soit la source.
-6. **Réutilisable directement** : très peu de modifications pour l'adopter ;
-   les modifications nécessaires sont simples et documentées.
-7. **Adaptations minimales documentées** : chaque écart par rapport à la source
-   est listé dans `ATTRIBUTION.md` avec sa raison.
-8. **Moins de templates, très qualitatifs** : il n'y a pas d'objectif de
-   quantité ; une shape sans template sourcé MIT reste une roadmap.
+1. **Never an agent-written template** from scratch. The agent documents, pins, minimally adapts, and verifies; it does not develop.
+2. **MIT license mandatory** (fully open). A project under a restrictive license (GPL/AGPL, proprietary, "no commercial use") is rejected whatever its quality.
+3. **Real, reliable source**: maintained project (recent commits/releases), tested, CI, active community, **single responsibility**, conformant to the kit rules (idiomatic, stdlib-first, no imposed framework).
+4. **Ultra-specific and minimal** (high selection bar): the project implements **almost exclusively** the template's technology — one stack, one domain, no out-of-scope ancillary technology (auth, observability, K8s, ORM, heavy CI…). The codebase is **small and browsable end-to-end**: no mega-repo, no vendored/generated tree, no heavy dependencies. The structure is **clear, well-organized, and modular**: each component is isolated and replaceable, so integration into any project happens by copying well-delimited modules, and modification stays simple.
+   **Real application mandatory (2026-08-05, D-2026-08-05-14)**: the source must be a real single-responsibility application, **not a third-party starter/template nor a collection of demonstration examples** — a repository named template/starter/example, or a demo collection, does not satisfy the policy even under MIT (lesson of the 2026-08-05 desktop-app research: no conforming Wails candidate).
+5. **Functional mandatory**: compiles and passes its tests in the Kit. A non-functional template is forbidden, whatever the source.
+6. **Directly reusable**: very few modifications to adopt; necessary modifications are simple and documented.
+7. **Minimal documented adaptations**: every deviation from the source is listed in `ATTRIBUTION.md` with its reason.
+8. **Fewer templates, very high quality**: there is no quantity goal; a shape without a sourced MIT template remains a roadmap.
 
-## 3. Structure d'un template
+## 3. Template structure
 
 ```text
 templates/<shape>/
-├── <projet source>…     # code du projet épingle, fonctionnel
-├── LICENSE              # MIT (copie de la licence du projet)
-├── ATTRIBUTION.md       # source, version épinglée (commit/release), licence,
-│                        # adaptations (diff + raisons)
-├── README.md            # statut, source, scénario observable, modifications,
-│                        # structure du projet et justification (D-2026-08-05-13)
+├── <source project>…     # pinned, functional project code
+├── LICENSE              # MIT (copy of the project's license)
+├── ATTRIBUTION.md       # source, pinned version (commit/release), license,
+│                        # adaptations (diff + reasons)
+├── README.md            # status, source, observable scenario, modifications,
+│                        # project structure and justification (D-2026-08-05-13)
 └── template.yaml        # name, status, purpose, source, validation
 ```
 
-## 4. Statuts
+## 4. Statuses
 
-| Statut | Signification | Condition d'entrée |
+| Status | Meaning | Entry condition |
 | --- | --- | --- |
-| `planned` | shape en roadmap, aucun template | décision + ligne roadmap |
-| `sourced` | template sourcé MIT, fonctionnel, vérifié | politique §2 complète |
-| `legacy` | scaffold agent-généré hérité, candidat au remplacement | existant au 2026-08-04 ; aucun nouveau scaffold accepté |
-| `deprecated` | retiré ou remplacé | décision écrite + migration |
+| `planned` | shape on roadmap, no template | decision + roadmap line |
+| `sourced` | sourced MIT template, functional, verified | complete §2 policy |
+| `legacy` | inherited agent-generated scaffold, replacement candidate | existing as of 2026-08-04; no new scaffold accepted |
+| `deprecated` | removed or replaced | written decision + migration |
 
-Les scaffolds `legacy` actuels (rest-api, grpc, cli, worker, microservice,
-monolith, cloud-service) restent en place jusqu'à leur remplacement par un
-template sourcé — ils ne sont **jamais** présentés comme des templates
-conformes à la politique.
+The current `legacy` scaffolds (rest-api, grpc, cli, worker, microservice, monolith, cloud-service) stay in place until replaced by a sourced template — they are **never** presented as policy-conformant templates.
 
 ## 5. Maintenance
 
-- **Admission** : projet identifié (source + version) → licence MIT vérifiée →
-  **périmètre technique vérifié** (une seule technologie, pas de technologie
-  annexe, taille parcourable — preuve écrite dans `ATTRIBUTION.md`) → copie +
-  LICENSE + ATTRIBUTION.md → adaptations minimales → compile + tests +
-  scénario observable exécuté (`PASS`/`PARTIAL`/`BLOCKED`) → statut `sourced` →
-  mise à jour de `TEMPLATES.md` et du validateur.
-- **Mise à jour (suivi communautaire)** : bump de version épinglée, diff des
-  adaptations re-vérifié, tests + scénario re-exécutés, `last_verified` bump —
-  la mise à jour est un événement, pas une corvée annuelle.
-- **Retrait** : décision écrite (project abandonné, licence changée, qualité
-  dégradée) + migration des consommateurs.
+- **Admission**: project identified (source + version) → MIT license verified → **technical scope verified** (one technology, no ancillary technology, browsable size — written evidence in `ATTRIBUTION.md`) → copy + LICENSE + ATTRIBUTION.md → minimal adaptations → compile + tests + executed observable scenario (`PASS`/`PARTIAL`/`BLOCKED`) → `sourced` status → update of `TEMPLATES.md` and the validator.
+- **Update (community tracking)**: bump pinned version, re-verify the adaptations diff, re-run tests + scenario, bump `last_verified` — the update is an event, not an annual chore.
+- **Removal**: written decision (abandoned project, changed license, degraded quality) + consumer migration.
 
 ## 6. Patterns
 
-- ATTRIBUTION.md comme mémoire du diff : « pourquoi ce template diffère de sa
-  source » — c'est ce qui rend les adaptations simples à reproduire.
-- Le suivi des releases de la source est la maintenance naturelle : la
-  communauté améliore, le Kit suit.
+- ATTRIBUTION.md as the diff memory: "why this template differs from its source" — this is what makes adaptations simple to reproduce.
+- Tracking the source's releases is the natural maintenance: the community improves, the Kit follows.
 
 ## 7. Anti-patterns
 
-- Template écrit par l'agent (le cas des scaffolds legacy — acceptés
-  transitoirement, plus jamais admis).
-- **Template fourre-tout** : une stack large (router + ORM + auth + K8s + CI…)
-  au lieu d'une seule technologie — rejeté quel que soit le projet source.
-- Licence non-MIT ; projet non maintenu ; template non fonctionnel.
-- Clone sans attribution ni version épinglée ; adaptations non documentées.
-- Template « starter » qui impose une architecture (leçon ardanlabs :
-  extract-only, jamais copié tel quel).
-- Placeholder de shape sans roadmap.
+- Agent-written template (the legacy scaffolds case — accepted transitively, never admitted again).
+- **Grab-bag template**: a broad stack (router + ORM + auth + K8s + CI…) instead of a single technology — rejected whatever the source project.
+- Non-MIT license; unmaintained project; non-functional template.
+- Clone without attribution or pinned version; undocumented adaptations.
+- "Starter" template imposing an architecture (ardanlabs lesson: extract-only, never copied as-is).
+- Shape placeholder without roadmap.
 
-## 8. Critères de validation (C2)
+## 8. Validation criteria (C2)
 
-- [ ] Tout template non-legacy : `LICENSE` (MIT) + `ATTRIBUTION.md` (source,
-      version, adaptations, **périmètre technique**) + `README.md` +
-      `template.yaml` présents.
-- [ ] `ATTRIBUTION.md` atteste une seule technologie et l'absence de technologie
-      annexe (contrôle de revue ; C2 vérifie la présence de la section).
-- [ ] Borne de taille respectée (nb de fichiers source et de lignes bornés, pas
-      d'arbre vendored/généré lourd) — C2.
-- [ ] Compile + tests + scénario observable tracé.
-- [ ] `TEMPLATES.md` cohérent avec l'arborescence (statuts à jour).
-- [ ] Aucun nouveau scaffold (statut legacy figé au 2026-08-04).
+- [ ] Every non-legacy template: `LICENSE` (MIT) + `ATTRIBUTION.md` (source, version, adaptations, **technical scope**) + `README.md` + `template.yaml` present.
+- [ ] `ATTRIBUTION.md` attests a single technology and the absence of ancillary technology (review control; C2 verifies the section presence).
+- [ ] Size bound respected (bounded source file/line count, no heavy vendored/generated tree) — C2.
+- [ ] Compile + tests + traced observable scenario.
+- [ ] `TEMPLATES.md` coherent with the tree (statuses up to date).
+- [ ] No new scaffold (legacy status frozen at 2026-08-04).
 
-## 9. Questions ouvertes
+## 9. Open questions
 
-- Sources candidates pour les 7 shapes legacy (recherche à lancer : projets
-  MIT Go REST/gRPC/CLI/worker/service/monolith/cloud réels, éprouvés).
-- Faut-il un gabarit `ATTRIBUTION.md` type dans le Kit (au niveau
-  `templates/`) ? (proposition : oui, en phase 3 lors du premier remplacement.)
+- Candidate sources for the 7 legacy shapes (research to launch: real, proven MIT Go REST/gRPC/CLI/worker/service/monolith/cloud projects).
+- Should there be a type `ATTRIBUTION.md` template in the Kit (at `templates/` level)? (proposal: yes, in phase 3 at the first replacement.)

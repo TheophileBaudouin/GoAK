@@ -1,59 +1,59 @@
-# Debugging — domaine de connaissance
+# Debugging — knowledge domain
 
-Ce dossier est le domaine « debugging » du graphe de connaissance du Kit. Il
-répond à une question unique :
+This directory is the "debugging" domain of the Kit's knowledge graph. It
+answers one unique question:
 
-> Comment diagnostiquer un échec Go observé (panique, blocage, course, fuite,
-> lenteur, corruption) ?
+> How to diagnose an observed Go failure (panic, deadlock, race, leak,
+> slowness, corruption)?
 
-C'est un domaine **d'échec observé** (charte : « Observed production failure »),
-pas un domaine de bonnes pratiques générales : une procédure n'entre ici que si
-elle résout un symptôme concret et reproductible, vérifié contre une source ou
-une expérience documentée.
+It is an **observed-failure** domain (charter: "Observed production
+failure"), not a general best-practices domain: a procedure enters here only
+if it solves a concrete, reproducible symptom, verified against a source or
+documented experience.
 
-## Format des artefacts
+## Artifact format
 
-- Un artefact par échec : fichier YAML-graphe `kind: Source` (ou `Pattern` pour
-  une procédure de diagnostic réutilisable), id stable
-  (`source:go:debugging:<slug>` ou `pattern:go:debugging:<slug>`), métadonnées
-  complètes (id, title, kind, version, status, owner, tags, go_version,
-  dependencies, last_verified) et `relationships.references` pointant vers la
-  source primaire (docs officielles, issue Go, article vérifié).
-- Sections obligatoires selon le schéma de la catégorie (voir
-  `../patterns/` et `../anti-patterns/` pour les modèles existants).
-- Le corps n'est **jamais** copié depuis une source : le YAML route, explique la
-  décision et cite ; la source vit hors du Kit (résolue via `tools/offline/` ou
-  le lien `references`).
+- One artifact per failure: graph-YAML file `kind: Source` (or `Pattern` for
+  a reusable diagnostic procedure), stable id
+  (`source:go:debugging:<slug>` or `pattern:go:debugging:<slug>`), complete
+  metadata (id, title, kind, version, status, owner, tags, go_version,
+  dependencies, last_verified) and `relationships.references` pointing to the
+  primary source (official docs, Go issue, verified article).
+- Mandatory sections per the category schema (see `../patterns/` and
+  `../anti-patterns/` for existing models).
+- The body is **never** copied from a source: the YAML routes, explains the
+  decision, and cites; the source lives outside the Kit (resolved via
+  `tools/offline/` or the `references` link).
 
-## Critères d'admission
+## Admission criteria
 
-1. Un échec précis et reproductible est décrit (symptôme + détection).
-2. Une cause racine vérifiée est établie (source primaire ou reproduction
-   documentée) — pas d'hypothèse non étiquetée.
-3. La procédure de diagnostic est actionnable (commandes, étapes, sorties
-   attendues) et ne duplique aucune règle ou recette existante.
-4. `last_verified` ≤ 12 mois (sinon warning, 18 mois → déprécié).
+1. A precise, reproducible failure is described (symptom + detection).
+2. A verified root cause is established (primary source or documented
+   reproduction) — no unlabeled hypothesis.
+3. The diagnostic procedure is actionable (commands, steps, expected outputs)
+   and does not duplicate any existing rule or recipe.
+4. `last_verified` ≤ 12 months (otherwise warning, 18 months → deprecated).
 
-## Contenu interdit
+## Forbidden content
 
-- Conseils généraux « deboguer en Go » sans échec concret (→ hors périmètre).
-- Corps de documentation copié ; sorties brutes d'évidence conservées hors du
-  produit, dans le journal de maintenance du metaprojet.
-- Duplication d'un pattern/anti-pattern existant (`../patterns/`,
-  `../anti-patterns/`) ou d'une règle (`../../rules/`) — pointer, ne pas
-  dupliquer.
-- Hypothèse non vérifiée présentée comme fait.
+- General "debugging in Go" advice without a concrete failure (→ out of
+  scope).
+- Copied documentation bodies; raw evidence outputs kept outside the product,
+  in the metaproject maintenance journal.
+- Duplication of an existing pattern/anti-pattern (`../patterns/`,
+  `../anti-patterns/`) or rule (`../../rules/`) — point, do not duplicate.
+- Unverified hypothesis presented as fact.
 
 ## Roadmap
 
-Ce dossier est vide volontairement : il ne se remplit que sur échec observé et
-vérifié. Candidats typiques (à admettre un par un, avec source) :
+This directory is intentionally empty: it fills only on observed and verified
+failure. Typical candidates (to admit one by one, with source):
 
-- fuite de goroutine / `go test -race` — corrélation avec
-  `anti-patterns/go-goroutine-leak.yaml` ;
-- course détectée tardivement (flaky CI) ;
-- blocage / deadlock (pprof goroutine dump) ;
-- lenteur mesurée (pprof CPU) — corrélation avec `performance/`.
+- goroutine leak / `go test -race` — correlation with
+  `anti-patterns/go-goroutine-leak.yaml`;
+- race detected late (flaky CI);
+- deadlock (pprof goroutine dump);
+- measured slowness (pprof CPU) — correlation with `performance/`.
 
-Un dossier de domaine ne vit que s'il a ≥ 1 artefact actif ; tant qu'il est
-vide, ce README est le contrat et la roadmap.
+A domain directory lives only if it has ≥ 1 active artifact; as long as it is
+empty, this README is the contract and the roadmap.

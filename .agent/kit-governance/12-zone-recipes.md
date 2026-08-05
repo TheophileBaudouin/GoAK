@@ -1,100 +1,69 @@
-# Z3 — Zone `recipes/` (recettes runnables)
+# Z3 — Zone `recipes/` (runnable recipes)
 
-- **Contrat MetaProjet** — régit `KitV2/recipes/`.
-- **Rapport d'audit :** §2.4. **Décision :** module Go unique (2026-08-04).
+- **Metaproject Contract** — governs `KitV2/recipes/`.
+- **Audit report:** §2.4. **Decision:** single Go module (2026-08-04).
 
 ## 1. Mission
 
-La couche « comment exécuter cette tâche » : des procédures **ordonnées,
-runnables et testées**. Une recette répond à « comment faire X proprement dans
-Go » et se termine par un **scénario observable exécuté** — jamais par une
-simple compilation.
+The "how to execute this task" layer: **ordered, runnable, tested** procedures. A recipe answers "how to do X properly in Go" and ends with an **executed observable scenario** — never a mere compilation.
 
-## 2. Structure d'une recette
+## 2. Recipe structure
 
 ```text
-recipe-<domaine>-<sujet>/
-├── SKILL.md          # frontmatter Pi + corps (progressive disclosure)
-├── <code>.go         # package importable (module go-agent-kit-v2)
-├── <code>_test.go    # tests ciblés
-└── (éventuels fichiers : schema.sql, sqlc.yaml…)
+recipe-<domain>-<subject>/
+├── SKILL.md          # Pi frontmatter + body (progressive disclosure)
+├── <code>.go         # importable package (module go-agent-kit-v2)
+├── <code>_test.go    # targeted tests
+└── (possible files: schema.sql, sqlc.yaml…)
 ```
 
-## 3. Corps obligatoire de la SKILL.md (modèle : `recipe-worker-pool`)
+## 3. Mandatory SKILL.md body (model: `recipe-worker-pool`)
 
-1. **Problem** — la tâche en une phrase.
-2. **Solution** — code minimal qui marche (stdlib ou bibliothèque vétée).
-3. **Why not the alternatives** — au moins deux alternatives écartées avec
-   verdict (dont la stdlib quand elle suffit).
-4. **Verify the behavior (observable)** — commande à exécuter, sorties
-   attendues, ce que l'observation prouve.
-5. **Run the tests** — la commande de test ; le test ne remplace pas le
-   scénario.
-6. **Limits** — frontière d'application.
-7. **Sources** — primaires.
-8. **Structure (pourquoi cette disposition)** — obligatoire pour toute recette
-   qui produit ou recommande une disposition de projet (création d'application,
-   service, CLI, worker, desktop…) : explique en quelques lignes pourquoi
-   l'arbre choisi est le bon pour cette tâche, afin que la raison vive toujours
-   au même endroit (décision Marie 2026-08-05, D-2026-08-05-13). Les recettes
-   sans disposition en jeu le marquent `N/A` (un `N/A` explicite est du
-   contenu, pas une section artificielle — A1 §1.9). Contrôle de revue : audit
-   kit-audit C1 (conformité au contrat de zone) + critère Z3 §8.
+1. **Problem** — the task in one sentence.
+2. **Solution** — minimal working code (stdlib or vetted library).
+3. **Why not the alternatives** — at least two rejected alternatives with verdict (including stdlib when it suffices).
+4. **Verify the behavior (observable)** — command to run, expected outputs, what the observation proves.
+5. **Run the tests** — the test command; the test does not replace the scenario.
+6. **Limits** — scope boundary.
+7. **Sources** — primary.
+8. **Structure (why this layout)** — mandatory for every recipe that produces or recommends a project layout (application creation, service, CLI, worker, desktop…): explain in a few lines why the chosen tree is right for this task, so the reason always lives in the same place (owner decision 2026-08-05, D-2026-08-05-13). Recipes with no layout involved mark it `N/A` (an explicit `N/A` is content, not an artificial section — A1 §1.9). Review control: kit-audit C1 (zone-contract conformity) + criterion Z3 §8.
 
-## 4. Règles
+## 4. Rules
 
-1. **Aucun placeholder** : une recette planifiée est une ligne de roadmap dans
-   `recipes/README.md` (avec critères), pas un dossier `.gitkeep`.
-2. Nommage : `recipe-<domaine>-<sujet>`, kebab-case ASCII (N1). La recette
-   interactive est publiée sous `recipe-cli-interactive` depuis la correction
-   post-audit du 2026-08-05.
-3. Toute dépendance utilisée par une recette doit être **vétée** dans
-   `catalogs/libraries/` (admission 9 critères) — C2 vérifie la correspondance.
-4. Une recette référence les patterns/snippets qu'elle utilise (`uses`) et sa
-   bibliothèque ; elle ne duplique pas leur code.
-5. Les recettes vivent dans le module unique `go-agent-kit-v2` (décision
-   2026-08-04) ; une recette à module isolé exige une décision écrite
-   (dépendance lourde).
-6. Toute recette « cœur » est exercée par une probe (`probes/`) — relation
-   `validated_by` (Z6).
+1. **No placeholder**: a planned recipe is a roadmap line in `recipes/README.md` (with criteria), not a `.gitkeep` directory.
+2. Naming: `recipe-<domain>-<subject>`, ASCII kebab-case (N1). The interactive recipe is published as `recipe-cli-interactive` since the 2026-08-05 post-audit correction.
+3. Every dependency used by a recipe must be **vetted** in `catalogs/libraries/` (9-criteria admission) — C2 verifies the correspondence.
+4. A recipe references the patterns/snippets it uses (`uses`) and its library; it does not duplicate their code.
+5. Recipes live in the single module `go-agent-kit-v2` (decision 2026-08-04); an isolated-module recipe requires a written decision (heavy dependency).
+6. Every "core" recipe is exercised by a probe (`probes/`) — `validated_by` relation (Z6).
 
 ## 5. Maintenance
 
-- **Ajout** : code compilant + test + scénario exécuté avec verdict
-  (`PASS`/`PARTIAL`/`BLOCKED`) + limites + sources + relations résolues.
-- **Modification** : re-run test + scénario ; re-run des probes qui importent la
-  recette ; bump `last_verified`/`version` si comportement changé ;
-  re-vérifier les dépendants déclarés (snippets `source:` → recette, probes
-  `validated_by` → recette) et bump leur `last_verified` dans le même
-  changement — contrôle inter-fichiers C2 (D-2026-08-05-11).
+- **Addition**: compiling code + test + executed scenario with verdict (`PASS`/`PARTIAL`/`BLOCKED`) + limits + sources + resolved relations.
+- **Modification**: re-run test + scenario; re-run the probes that import the recipe; bump `last_verified`/`version` if behavior changed; re-verify the declared dependents (snippets `source:` → recipe, probes `validated_by` → recipe) and bump their `last_verified` in the same change — cross-file C2 check (D-2026-08-05-11).
 
 ## 6. Patterns
 
-- « Verify the behavior » : le scénario est la preuve, pas la compilation.
-- Recette ↔ probe : composition (la probe importe la recette), pas duplication.
-- Stdlib d'abord : la section « why not » élimine les frameworks quand la
-  stdlib suffit.
+- "Verify the behavior": the scenario is the proof, not compilation.
+- Recipe ↔ probe: composition (the probe imports the recipe), not duplication.
+- Stdlib first: the "why not" section eliminates frameworks when stdlib suffices.
 
 ## 7. Anti-patterns
 
-- Recette écrite sans avoir été exécutée ; verdict affirmé sans exécution.
-- Recette qui duplique une autre ou un snippet.
-- Dépendance non vétée ; framework choisi pour le confort.
-- Placeholder vide qui attend.
+- Recipe written without being executed; verdict asserted without execution.
+- Recipe duplicating another or a snippet.
+- Unvetted dependency; framework chosen for comfort.
+- Empty placeholder waiting.
 
-## 8. Critères de validation
+## 8. Validation criteria
 
-- [ ] C2 : SKILL.md complète (Problem, Solution, alternatives, scénario,
-      limites, sources) et ≤ 500 lignes.
-- [ ] C2 : `go test` ciblé + scénario exécuté tracé (verdict explicite).
-- [ ] C2 : dépendances ⊆ bibliothèques vétées.
-- [ ] Fraîcheur 12/18 mois.
-- [ ] Revu (audit kit-audit C1) : section Structure §3.8 présente ou `N/A`
-      justifié (D-2026-08-05-13).
+- [ ] C2: complete SKILL.md (Problem, Solution, alternatives, scenario, limits, sources) and ≤ 500 lines.
+- [ ] C2: targeted `go test` + executed scenario traced (explicit verdict).
+- [ ] C2: dependencies ⊆ vetted libraries.
+- [ ] Freshness 12/18 months.
+- [ ] Reviewed (kit-audit C1): Structure section §3.8 present or `N/A` justified (D-2026-08-05-13).
 
-## 9. Questions ouvertes
+## 9. Open questions
 
-- Faut-il des « recettes de forme » (shape) distinctes des recettes de tâche ?
-  (aujourd'hui les templates sourcés MIT prendront ce rôle — voir Z5.)
-- Le renommage `recipe-cli-interactif` → `recipe-cli-interactive` a été
-  réalisé le 2026-08-05 ; les références produit et le router sont alignés.
+- Should there be "shape recipes" distinct from task recipes? (today the sourced MIT templates will take this role — see Z5.)
+- The rename `recipe-cli-interactif` → `recipe-cli-interactive` was done on 2026-08-05; product references and the router are aligned.

@@ -1,201 +1,113 @@
-# Protocole d'exécution parallèle
+# Parallel Execution Protocol
 
-Ce protocole définit quand et comment l'orchestrateur dispatche des
-sous-agents pendant le travail de développement, et comment les résultats
-revus sont intégrés. Les tâches sont des unités de travail ; les lots de
-livraison sont des unités d'intégration et de validation. Il s'applique à
-toute l'implémentation, pas à une phase spécifique.
+This protocol defines when and how the orchestrator dispatches sub-agents during development work, and how reviewed results are integrated. Tasks are work units; delivery batches are integration and validation units. It applies throughout the implementation, not to a specific phase.
 
 ---
 
-## Admission au dispatch (exécution tiercée)
+## Dispatch Admission (Tiered Execution)
 
-Le dispatch de sous-agents est une décision économique, pas un défaut. Un
-sous-agent paie un coût de démarrage à froid (il relit les tâches, les
-fichiers et les règles que tu détiens déjà) et une surcharge d'orchestration
-(worktrees, handoffs, intégration). Ne dispatche que quand le gain de
-parallélisme et la valeur d'isolation de contexte dépassent ce coût.
+Sub-agent dispatch is an economic decision, not a default. A sub-agent pays a cold-start tax (it re-reads tasks, files, and rules you already hold) and an orchestration overhead (worktrees, handoffs, integration). Dispatch only when parallelism gain and context-isolation value exceed that cost.
 
-Choisis par lot de livraison :
+Choose per delivery batch:
 
-- **Tier 0 — orchestrateur-direct (défaut)** : tâches d'effort S/M, ≤ 3
-  fichiers touchés, contexte déjà en main, ou acceptation vérifiable par
-  machine. Exécute directement sur la branche d'intégration du lot. Pas de
-  sous-agents, pas de worktrees.
-- **Tier 1 — un seul codeur** : lots de tâches L/XL, lecture exploratoire
-  lourde, ou sorties assez longues pour polluer ton contexte. Délègue le lot
-  complet à un sous-agent `worker`.
-- **Tier 2 — lanes parallèles** : seulement si TOUT tient — ensembles de
-  fichiers de lanes disjoints, chaque lane ≥ L d'effort, chaque lane
-  vérifiable indépendamment, et ≤ 4 lanes. Lance un `worker` par lane prête
-  dans des worktrees isolés.
+- **Tier 0 — orchestrator-direct (default)**: tasks are S/M effort, touch ≤ 3 files, you already hold the context, or acceptance is machine-verifiable. Execute directly on the batch integration branch. No sub-agents, no worktrees.
+- **Tier 1 — single coder**: L/XL task bundles, heavy exploratory reading, or outputs long enough to pollute your context. Delegate the complete batch to a `worker` sub-agent.
+- **Tier 2 — parallel lanes**: only when ALL hold — lane file sets are disjoint, each lane is ≥ L effort, each lane is independently verifiable, and there are ≤ 4 lanes. Launch one `worker` per dependency-ready lane in isolated worktrees.
 
-Si la plateforme ne supporte pas les sous-agents, exécute toutes les tâches
-séquentiellement toi-même (Tier 0).
+If the platform does not support sub-agents, execute all tasks sequentially yourself (Tier 0).
 
 ---
 
-## Admission à la revue (revue tiercée)
+## Review Admission (Tiered Review)
 
-Applique le niveau de revue le moins coûteux qui correspond au risque :
+Apply the cheapest review level that matches the risk:
 
-- **L1 — validation machine (toujours)** : checks d'acceptation ciblés plus
-  validation combinée du lot.
-- **L2 — revue du diff par l'orchestrateur (défaut)** : tu lis le diff
-  intégré contre les critères d'acceptation de chaque tâche.
-- **L3 — reviewer indépendant (réservé)** : un reviewer par lane (skill
-  `go-code-review`). Obligatoire pour chaque lane Tier 2 et pour tout travail
-  à haut risque : changements de contrats/formats de portage, code logique,
-  invariants sémantiques transverses.
+- **L1 — machine validation (always)**: targeted acceptance checks plus the batch's combined validation.
+- **L2 — orchestrator diff review (default)**: you read the integrated diff against every task's acceptance criteria.
+- **L3 — independent reviewer (reserved)**: one reviewer per lane (skill `go-code-review`). Mandatory for every Tier 2 lane and for any high-risk work: contract/port format changes, logic code, or cross-surface semantic invariants.
 
-Modèle writer (voir `behavioral-rules.md` règles 18-19) :
+Writer model (see `behavioral-rules.md` rules 18-19):
 
-- Chaque lane Tier 2 reçoit exactement un `worker` (codeur), puis exactement
-  un reviewer, dans le même worktree sur la même branche de lane.
-- Le reviewer vérifie le diff de la lane contre les critères d'acceptation
-  par tâche et commite des corrections directement sur la branche de lane —
-  commits `fix:` append-only qui référencent mais ne ferment jamais de tâches.
-- Les reviewers n'écrivent jamais MASTER.md, ni l'état de dérive/adaptatif, ni
-  les surfaces d'instructions ou de mémoire ; leurs rapports de revue
-  reviennent à toi.
-- Tu n'intègres que les lanes dont le verdict est APPROVED ou FIXED ;
-  ESCALATE est résolu par toi (avec l'utilisateur si besoin). Tu restes
-  l'autorité de vérification des critères d'acceptation et le seul writer des
-  états partagés.
+- Each Tier 2 lane gets exactly one `worker` (coder), then exactly one reviewer, in the same worktree on the same lane branch.
+- The reviewer verifies the lane's diff against the per-task acceptance criteria and commits fixes directly to the lane branch — append-only `fix:` commits that reference but never close tasks.
+- Reviewers never write MASTER.md, nor drift/adaptive state, nor instruction or memory surfaces; their Review Reports return to you.
+- You integrate only lanes whose verdict is APPROVED or FIXED; ESCALATE is resolved by you (with the user when needed). You remain the acceptance-verification authority and the single writer for all shared state.
 
 ---
 
-## Quand paralléliser
+## When to Parallelize
 
-Au début de chaque phase de développement, lis chaque tâche ouverte de la
-phase et consulte `docs/plan/task-breakdown.md` pour les lots de livraison et
-les assignations de lanes. Revalide le regroupement planifié contre les
-dépendances actuelles, le chevauchenent de fichiers, les tests partagés, le
-périmètre de revue, les frontières de rollback et les critères d'admission au
-dispatch ci-dessus avant d'éditer.
+At the start of each development phase, read every open task in that phase and consult `docs/plan/task-breakdown.md` for delivery batches and parallel lane assignments. Revalidate the planned grouping against current dependencies, file overlap, shared tests, review scope, rollback boundaries, and the dispatch admission criteria above before editing.
 
-- Traite les lots de livraison dans l'ordre des dépendances ; ne considère
-  pas un lot comme terminé dès qu'une tâche est implémentée.
-- Un lot ne qualifie pour le Tier 2 que via les critères d'admission. S'il
-  qualifie, dérive des vagues d'exécution prêtes pour les dépendances,
-  intègre chaque vague, puis branche la vague suivante sur la base
-  d'intégration mise à jour. Chaque lane reçoit le contexte complet du lot
-  plus son sous-ensemble de tâches assigné.
-- Sinon, exécute au Tier 0 ou Tier 1 — ne force pas le parallélisme.
+- Process delivery batches in dependency order; do not consider a batch done as soon as one task is implemented.
+- A batch qualifies for Tier 2 only via the admission criteria. If it qualifies, derive dependency-ready execution waves, integrate each wave, then branch the next wave from the updated integration base. Each lane receives the complete batch context plus its assigned task subset.
+- Otherwise execute at Tier 0 or Tier 1 — do not force parallelism.
 
 ---
 
-## Comment lancer des exécuteurs de tâches parallèles
+## How to Launch Parallel Task Executors
 
-Pour chaque lane parallèle de la vague prête pour les dépendances :
+For each parallel lane in the current dependency-ready wave:
 
-1. Prépare l'entrée de chaque `worker` :
-   - ID du lot de livraison, but, justification, validation combinée, et
-     ensemble ordonné complet des tâches ;
-   - ID de lane assigné plus ses IDs et descriptions de tâches du plan ;
-   - Critères d'acceptation par tâche, attentes de test et justifications
-     explicites de non-test, si présentes ;
-   - Impact mémoire/gouvernance par tâche et mises à jour de surface
-     attendues, si présentes ;
-   - Chemins des fichiers sources pertinents (depuis
-     `docs/analysis/module-inventory.md`) ;
-   - Standards de codage et contexte de gouvernance projet résolus.
-2. Lance tous les agents de lane prêts **dans un seul message** (c'est ainsi
-   que les plateformes atteignent le vrai parallélisme). Chaque agent travaille
-   dans un worktree isolé pour prévenir les conflits de fichiers. Ne lance pas
-   une lane en aval tant que ses commits prérequis ne sont pas intégrés.
-   - Suis la convention de branche du dépôt ; sinon chaque lane utilise
-     `work/{batch_id}-{lane_id}-{slug}`. Les agents de lane committent leur
-     travail et renvoient des références de branche/commits, mais ne créent
-     pas d'états partagés.
-3. Quand un codeur revient DONE, dispatche un reviewer pour la lane (revue
-   L3) avec : l'ID de lane, son sous-ensemble de tâches et les critères
-   d'acceptation par tâche (la checklist du reviewer), le rapport de handoff
-   du codeur, la branche + chemin du worktree et les commandes de validation
-   de lane. Le reviewer vérifie le diff, commite des corrections sur la
-   branche de lane, et renvoie un rapport de revue (verdict APPROVED | FIXED |
-   ESCALATE). Résous ESCALATE avant d'intégrer cette lane.
-4. Quand toutes les lanes portent un verdict APPROVED ou FIXED, consolide
-   leurs résultats :
-   - Vérifie le rapport de revue de chaque lane et re-vérifie toi-même les
-     critères d'acceptation (L2) ;
-   - Consolide les commits de lane sur la branche d'intégration du lot
-     (`batch/{batch_id}-{slug}` sauf convention du dépôt) ; règle les conflits
-     là ;
-   - Exécute les checks ciblés de chaque tâche plus la validation combinée du
-     lot pour vérifier la cohérence de l'intégration ;
-   - Vérifie les critères d'acceptation de chaque tâche terminée et poste sa
-     télémetry par tâche (y compris la télémetry du reviewer, enregistrée une
-     fois ici). Dans les runs parallèles, l'orchestrateur est le seul writer
-     de la dérive cumulée, de MASTER.md et de l'état adaptatif ;
-   - Vérifie que les mises à jour de surfaces d'instructions ou de mémoire
-     signalées sont cohérentes et ne créent pas de sources de vérité
-     concurrentes.
+1. Prepare the input for each `worker`:
+   - Delivery Batch ID, batch goal, rationale, combined validation, and complete ordered task set;
+   - Assigned lane ID plus its task IDs and descriptions from the plan;
+   - Per-task acceptance criteria, test expectations, and explicit no-test rationales, if any;
+   - Per-task memory/governance impact and expected surface updates, if any;
+   - Relevant source file paths (from `docs/analysis/module-inventory.md`);
+   - Coding standards and resolved project governance context.
+2. Launch all ready lane agents **in a single message** (this is how platforms achieve true parallelism). Each agent works in an isolated worktree to prevent file conflicts. Do not launch a downstream lane until its prerequisite commits are integrated.
+   - Follow the repository branch convention; otherwise each lane uses `work/{batch_id}-{lane_id}-{slug}`. Lane agents commit their work and return branch/commit references, but do not create shared state.
+3. When a coder returns DONE, dispatch one reviewer for the lane (L3 review) with: the lane ID, its assigned task subset, and the per-task acceptance criteria (the reviewer's checklist), the coder's handoff report, the lane branch + worktree path and the lane-level validation commands. The reviewer verifies the diff, commits fixes to the lane branch, and returns a Review Report (verdict APPROVED | FIXED | ESCALATE). Resolve ESCALATE before integrating that lane.
+4. When all lanes carry verdict APPROVED or FIXED, consolidate their results:
+   - Verify each lane's Review Report and re-verify the acceptance criteria yourself (L2);
+   - Consolidate lane commits onto the batch integration branch (`batch/{batch_id}-{slug}` unless the repository requires another convention); resolve conflicts there;
+   - Run every task's targeted checks plus the batch's combined validation to verify the integrated changes are coherent;
+   - Verify each completed task's acceptance criteria and post its per-task telemetry (including reviewer telemetry, recorded once here). In parallel runs, the orchestrator is the single writer for cumulative drift, MASTER.md, and adaptive state;
+   - Verify any reported instruction or memory surface updates are consistent and do not create competing sources of truth.
 
 ---
 
-## Synchronisation de la progression
+## Progress Synchronization
 
-Après que l'orchestrateur a consolidé un lot de livraison :
+After the orchestrator consolidates a delivery batch:
 
-- Applique les rapports de complétion des lanes au fichier de progression de
-  la phase une fois ; les agents de lane n'écrivent pas l'état partagé.
-- Mets à jour MASTER.md avec les compteurs de complétion finaux précis.
-- Mets à jour l'outil de suivi natif de la plateforme pour refléter toutes les
-  tâches terminées.
-- Réconcilie les mises à jour de surface mémoire des agents parallèles avant
-  de continuer.
-- Garde les surfaces d'instructions résolues alignées si une lane a changé
-  les instructions d'agent au niveau projet.
+- Apply lane completion reports to the phase progress file once; lane agents do not write shared progress state.
+- Update MASTER.md with the final accurate completion counts.
+- Update the platform's native task tool to reflect all completed tasks.
+- Reconcile memory surface updates from parallel agents before moving on.
+- Keep resolved instruction surfaces aligned if any lane changed project-level agent instructions.
 
 ---
 
-## Atténuation du risque de fusion
+## Merge Risk Mitigation
 
-`task-breakdown.md` inclut des évaluations de risque de fusion pour les lanes
-parallèles. Applique ces gardes :
+The `task-breakdown.md` includes merge risk ratings for parallel lanes. Apply these safeguards:
 
-- **Risque faible** : fusionne librement — les lanes touchent des fichiers
-  différents.
-- **Risque moyen** : fusionne séquentiellement, exécute les tests entre chaque
-  fusion.
-- **Risque élevé** : envisage d'exécuter ces tâches séquentiellement au lieu
-  d'en parallèle, ou utilise l'isolation par worktree avec résolution de
-  conflits soigneuse.
+- **Low risk**: Merge freely — lanes touch different files.
+- **Medium risk**: Merge sequentially, run tests between each merge.
+- **High risk**: Consider running these tasks sequentially instead of in parallel, or use worktree isolation with careful conflict resolution.
 
 ---
 
-## Validation d'architecture post-intégration
+## Post-Integration Architecture Validation
 
-Après que la suite de tests passe sur les résultats parallèles intégrés,
-effectue ces contrôles au niveau architecture. Ils vont au-delà de la
-correction fonctionnelle pour vérifier l'intégrité structurelle entre les
-frontières de lanes.
+After the test suite passes on integrated parallel results, perform these architecture-level checks. They go beyond functional correctness to verify structural integrity across lane boundaries.
 
-### Conformité S.U.P.E.R inter-lanes
+### Cross-Lane S.U.P.E.R Compliance
 
-Vérifie que l'exécution parallèle n'a pas introduit de violations
-inter-lanes :
+Verify that parallel execution did not introduce cross-lane violations:
 
-- **S (Rôle unique)** : aucun module n'a gagné de responsabilités depuis
-  plusieurs lanes.
-- **U (Flux unidirectionnel)** : aucune dépendance circulaire introduite entre
-  du code touché par des lanes différentes.
-- **P (Ports)** : les contrats d'interface aux frontières de lanes restent
-  intacts — si la lane A a changé l'API d'un module, l'usage de la lane B s'y
-  conforme toujours.
-- **R (Remplaçable)** : aucune lane n'a créé de couplage implicite rendant les
-  modules d'une autre lane plus difficiles à remplacer.
+- **S (Single Purpose)**: No module gained responsibilities from multiple lanes.
+- **U (Unidirectional Flow)**: No circular dependencies introduced between code touched by different lanes.
+- **P (Ports)**: Interface contracts at lane boundaries remain intact — if Lane A changed a module's API, Lane B's usage still conforms.
+- **R (Replaceable)**: No lane created implicit coupling that makes another lane's modules harder to replace.
 
-### Télémetry agrégée
+### Aggregate Telemetry
 
-Après avoir consolidé les résultats parallèles d'un lot de livraison,
-agrège la télémetry du contrôle adaptatif :
+After consolidating a delivery batch's parallel results, aggregate the adaptive control telemetry:
 
-1. Somme uniquement les contributions `task_drift` renvoyées par les agents de
-   lane et pas encore enregistrées.
-2. Ajoute cette somme au `drift_score` cumulé une fois dans MASTER.md.
-3. Évalue les seuils contre le nouveau score cumulé.
-4. Si un seuil est dépassé → déclenche la réponse appropriée (voir
-   `references/adaptive-control.md` § « Actions de réponse automatiques »)
-   AVANT de démarrer le lot de livraison suivant.
+1. Sum only the `task_drift` contributions returned by lane agents and not already recorded.
+2. Add that sum to cumulative `drift_score` once in MASTER.md.
+3. Evaluate thresholds against the new cumulative score.
+4. If any threshold is exceeded → trigger the appropriate response (see `references/adaptive-control.md` § "Automatic Response Actions") BEFORE starting the next delivery batch.

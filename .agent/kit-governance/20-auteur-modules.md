@@ -1,89 +1,59 @@
-# A1 — Auteur de modules (contrat d'écriture des SKILL.md)
+# A1 — Module author (SKILL.md writing contract)
 
-- **Contrat MetaProjet** — régit l'écriture de tout module SKILL.md du Kit
-  (rules, recipes, catalogs, .pi/skills). Le document de travail produit
-  `KitV2/templates/_kit-skill-authoring.md` reste une aide autonome du
-  contributeur **dans le produit** ; le présent contrat est l'**autorité** du
-  metaprojet. Il n'est pas copié dans le produit (autonomie, N1) : la version
-  produit peut diverger tant qu'elle ne contredit pas les règles ici.
-- **Rapport d'audit :** §4.3. **Sources :** spec agentskills.io, best-practices
-  Claude, Red Hat ACE, Google Agent Skills.
+- **Metaproject Contract** — governs the writing of every kit SKILL.md module (rules, recipes, catalogs, .pi/skills). The working document `KitV2/templates/_kit-skill-authoring.md` remains a self-contained contributor aid **in the product**; this contract is the metaproject **authority**. It is not copied into the product (autonomy, N1): the product version may diverge as long as it does not contradict the rules here.
+- **Audit report:** §4.3. **Sources:** agentskills.io spec, Claude best-practices, Red Hat ACE, Google Agent Skills.
 
-## 1. Invariants communs (tous les modules)
+## 1. Common invariants (all modules)
 
-1. **Frontmatter immuable** : `name`, `description`, `category`, `tags`,
-   `last-verified`. Aucun champ nouveau sans migration globale ; `name` =
-   dossier parent.
-2. **Recherche fraîche** : toute écriture ou mise à jour d'un catalogue est
-   précédée d'une recherche web actuelle sur des sources primaires. Chaque
-   source utilisée est datée dans `Sources vérifiées` ; la date `last-verified`
-   est celle de la relecture complète.
-3. **Une information, un emplacement** : une fiche ne répète pas une limite,
-   une alerte ou une décision dans une autre langue ou section. Une section
-   optionnelle sans contenu nouveau est supprimée.
-4. **Exemple vérifiable** : tout bloc Go présenté comme minimal/runnable traite
-   les retours et ressources selon les rules applicables. Un extrait abrégé
-   porte la mention `illustrative` et n'est pas présenté comme compilable.
-5. **Progressive disclosure** : L1 description (seule chose en contexte
-   permanent) ; L2 corps ≤ 500 lignes ; L3 détails en fichiers référencés
-   (un niveau de profondeur) — jamais dans le corps.
-6. **Description = quoi + quand + contraintes négatives** : c'est le goulot de
-   découvrabilité (Red Hat : « écrivez vos L1 comme des abstracts optimisés
-   pour la recherche »). « Extracts text from PDFs. Use when working with PDF
-   documents. Not for images. » — jamais « Helps with PDFs ».
-7. **Chemins relatifs** au module ; références croisées taggées (ids stables),
-   jamais de lien en prose qui pourrit.
-8. **Sources primaires** pour tout fait ; une synthèse est un point de départ,
-   jamais la seule base.
-9. **Pas de sections artificielles** : une section n'existe que si elle a du
-   contenu ; aucun gabarit universel de corps.
+1. **Immutable frontmatter**: `name`, `description`, `category`, `tags`, `last-verified`. No new field without a global migration; `name` = parent directory.
+2. **Fresh research**: any catalog writing or update is preceded by current web research on primary sources. Each used source is dated in `Sources vérifiées`; the `last-verified` date is the date of the full re-read.
+3. **One piece of information, one location**: a fiche does not repeat a limit, alert, or decision in another language or section. An optional section without new content is removed.
+4. **Verifiable example**: every Go block presented as minimal/runnable handles returns and resources according to the applicable rules. An abbreviated excerpt carries the `illustrative` marker and is not presented as compilable.
+5. **Progressive disclosure**: L1 description (the only thing in permanent context); L2 body ≤ 500 lines; L3 details in referenced files (one depth level) — never in the body.
+6. **Description = what + when + negative constraints**: this is the discoverability bottleneck (Red Hat: "write your L1s like abstracts optimized for search"). "Extracts text from PDFs. Use when working with PDF documents. Not for images." — never "Helps with PDFs".
+7. **Module-relative paths**; tagged cross-references (stable ids), never a rot-prone prose link.
+8. **Primary sources** for every fact; a synthesis is a starting point, never the only basis.
+9. **No artificial sections**: a section exists only if it has content; no universal body template.
 
-## 2. Matrice par catégorie
+## 2. Per-category matrix
 
-| Catégorie | Activation | Sections obligatoires | Validation minimale | Anti-patterns spécifiques |
+| Category | Activation | Mandatory sections | Minimal validation | Specific anti-patterns |
 | --- | --- | --- | --- | --- |
-| **recipe** | « Use when a consumer project matches this shape » | Problem · Solution (code minimal) · Why not alternatives · Runnable example + test · Observable scenario (actions + sorties attendues) · Limits · Sources | Compile ; tests ; scénario exécuté avec verdict `PASS`/`PARTIAL`/`BLOCKED` — jamais `PASS` sans exécution | Code non runnable ; scénario affirmé au lieu d'exécuté ; framework quand stdlib suffit |
-| **rule** | « Load when writing code in this area » | Impératif · Quand appliquer · Frontière (ne couvre PAS) · Contre-exemples · Vérification · Sources | Mécanique verte ; frontière explicite ; sources | Instruction vague ; opinion sans source ; règle sans frontière ; contradiction avec une autre règle |
-| **library** | « Use when choosing a library for this responsibility » | Sélection (version + raison d'admission, pas les étoiles) · Admission 9 critères · Alternatives avec verdicts · Minimal use · **Format fiche (N1 §4 : Utiliser/Ne pas utiliser quand, Avantages, Inconvénients, Pièges, Sources vérifiées)** · Sources | Admission répondue avec évidence ; minimal use compile ; alternatives rejetées enregistrées ; fiche complète (6 sections N1 §4) | Étoiles comme raison ; alternative rejetée manquante ; recommandation sans lire les issues ; fiche incomplète |
-| **reference-project** | « Use when designing a shape this project demonstrates » | Extract-only : ce que l'on PEUT extraire · ce que l'on ne doit JAMAIS copier · Vérification · Sources | Chaque pattern extrait trace vers le repo ; aucun code/arbre copié ; admission appliquée | Clonage de l'arbre ; architecture imposée du projet ; admission par popularité |
-| **core** (rules/core) | « Chargée chaque session » | Principe · Frontière · Exemples courts · Sources | Budget compacité (≤ 6 modules, ≤ 300 lignes) ; pas de référence registry | Contenu de domaine ; croissance « just this once » ; duplication |
-| **workflow** (`.pi/skills/`) | « Chargée quand le processus s'applique » | Procédure · Frontière avec modules · Références | Frontmatter complet ; pas de connaissance de domaine | Skill de workflow contenant du domaine ; duplication avec un prompt |
+| **recipe** | "Use when a consumer project matches this shape" | Problem · Solution (minimal code) · Why not alternatives · Runnable example + test · Observable scenario (actions + expected outputs) · Limits · Sources | Compiles; tests; executed scenario with `PASS`/`PARTIAL`/`BLOCKED` verdict — never `PASS` without execution | Non-runnable code; asserted instead of executed scenario; framework when stdlib suffices |
+| **rule** | "Load when writing code in this area" | Imperative · When to apply · Boundary (does NOT cover) · Counter-examples · Verification · Sources | Green mechanics; explicit boundary; sources | Vague instruction; opinion without source; rule without boundary; contradiction with another rule |
+| **library** | "Use when choosing a library for this responsibility" | Selection (version + admission reason, not stars) · Admission 9 criteria · Alternatives with verdicts · Minimal use · **Fiche format (N1 §4: When to use / When NOT to use, Advantages, Disadvantages, Pitfalls, Verified sources)** · Sources | Admission answered with evidence; minimal use compiles; rejected alternatives recorded; complete fiche (6 N1 §4 sections) | Stars as reason; missing rejected alternative; recommendation without reading issues; incomplete fiche |
+| **reference-project** | "Use when designing a shape this project demonstrates" | Extract-only: what CAN be extracted · what must NEVER be copied · Verification · Sources | Every extracted pattern traces to the repo; no copied code/tree; admission applied | Tree cloning; project-imposed architecture; admission by popularity |
+| **core** (rules/core) | "Loaded every session" | Principle · Boundary · Short examples · Sources | Compactness budget (≤ 6 modules, ≤ 300 lines); no registry reference | Domain content; "just this once" growth; duplication |
+| **workflow** (`.pi/skills/`) | "Loaded when the process applies" | Procedure · Boundary with modules · References | Complete frontmatter; no domain knowledge | Workflow skill containing domain; duplication with a prompt |
 
-## 3. Budget de lignes et de tokens (Red Hat/Claude)
+## 3. Line and token budget (Red Hat/Claude)
 
-- L1 : 1–2 phrases, spécifiques, avec contraintes négatives.
-- L2 : ≤ 500 lignes ; au-delà → déplacer vers L3 (fichiers référencés).
-- L3 : **gated** — ne charger que ce qui est nécessaire à l'invocation ; un
-  fichier L3 massif non gated est le plus gros puits de tokens.
+- L1: 1–2 sentences, specific, with negative constraints.
+- L2: ≤ 500 lines; beyond → move to L3 (referenced files).
+- L3: **gated** — load only what is needed for the invocation; a massive ungated L3 file is the biggest token sink.
 
-## 4. Cycle d'écriture (Google : skills as products)
+## 4. Writing cycle (Google: skills as products)
 
-1. Recherche et sources primaires vérifiées (liens 200, contenu lu).
-2. Rédaction selon la matrice ; auto-vérification : la description L1
-   déclenche-t-elle le bon chargement ? le corps répond-il à la question ?
-3. Éval minimale de la catégorie exécutée (recette : scénario ; library :
-   admission + compile).
-4. Revue fresh-context (subagent) avant admission.
-5. Enregistrement : métadonnées complètes, fraîcheur, relations.
+1. Research and verified primary sources (200 links, content read).
+2. Writing per the matrix; self-check: does the L1 description trigger the right loading? does the body answer the question?
+3. Minimal category eval executed (recipe: scenario; library: admission + compile).
+4. Fresh-context review (sub-agent) before admission.
+5. Recording: complete metadata, freshness, relations.
 
-## 5. Anti-patterns généraux (rejeter à vue)
+## 5. General anti-patterns (reject on sight)
 
-- Description vague (« Helps with … ») ; corps = documentation exhaustive ;
-- sections vides ; placeholder ; duplication d'un module existant ;
-- un fait sans source ; une URL morte ; `last_verified` bumpé sans re-vérifier.
+- Vague description ("Helps with …"); body = exhaustive documentation;
+- empty sections; placeholder; duplication of an existing module;
+- a fact without source; a dead URL; `last-verified` bumped without re-verifying.
 
-## 6. Critères de validation
+## 6. Validation criteria
 
-- [ ] C2 : frontmatter complet, name == dossier, ≤ 500 lignes, description avec
-      activation + contraintes négatives.
-- [ ] Sections obligatoires de la catégorie présentes (C2 par catégorie).
-- [ ] Sources présentes ; liens vérifiés à l'admission.
-- [ ] Éval minimale exécutée et tracée.
+- [ ] C2: complete frontmatter, name == directory, ≤ 500 lines, description with activation + negative constraints.
+- [ ] Category mandatory sections present (per-category C2).
+- [ ] Sources present; links verified at admission.
+- [ ] Minimal eval executed and traced.
 
-## 7. Questions ouvertes
+## 7. Open questions
 
-- Aucune : la relation avec `_kit-skill-authoring.md` est tranchée ci-dessus
-  (autorité metaprojet vs aide produit autonome).
-- Catégorie `workflow` (`.pi/skills/`) : extension de schéma enregistrée dans
-  `.pi/memory/Decisions.md` — les catégories de la matrice ci-dessus restent
-  le jeu des modules (A1).
+- None: the relationship with `_kit-skill-authoring.md` is settled above (metaproject authority vs self-contained product aid).
+- `workflow` category (`.pi/skills/`): schema extension recorded in `.pi/memory/Decisions.md` — the matrix categories above remain the module set (A1).

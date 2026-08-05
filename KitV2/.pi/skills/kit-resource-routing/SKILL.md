@@ -50,10 +50,9 @@ do not call the tool.
 - The output ends with the index coverage (how many resources of each kind
   exist) — useful to know whether a kind is absent from the kit.
 - When you present the answer, use this shape per relevant resource:
-  `ressource` (id), `description` (courte), `raison` (termes matchés /
-  pertinence), `chemin` (path du résultat), `action recommandée` (ce qu'il
-  faut lire ou exécuter ensuite — pour une recette : SKILL.md puis l'exemple
-  et son test).
+  `path` (the result's file path), `matched terms` (matched terms /
+  relevance), `description` (short), `recommended action` (what to read or
+  run next — for a recipe: SKILL.md then the example and its test).
 
 ## When to read the source files
 

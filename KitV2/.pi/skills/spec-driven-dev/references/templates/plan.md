@@ -1,7 +1,6 @@
-# Templates des documents de plan
+# Plan Document Templates
 
-Templates des trois documents générés en phase 3 (Décomposition de la
-tâche). Sortie vers `docs/plan/`.
+Templates for the three documents generated in Phase 3 (Task Decomposition). Output to `docs/plan/`.
 
 ---
 
@@ -10,113 +9,66 @@ tâche). Sortie vers `docs/plan/`.
 ```markdown
 # Task Breakdown
 
-## Vue d'ensemble
-- **Total des phases** : N
-- **Total des tâches** : N
-- **Lots de livraison planifiés** : N
-- **Effort total estimé** : S/M/L/XL
+## Overview
+- **Total Phases**: N
+- **Total Tasks**: N
+- **Planned Delivery Batches**: N
+- **Estimated Total Effort**: S/M/L/XL
 
-## Contraintes de design S.U.P.E.R
+## S.U.P.E.R Design Constraints
 
-> Toutes les tâches de ce plan doivent produire du code conforme aux
-> principes d'architecture S.U.P.E.R. Les contraintes suivantes s'appliquent
-> globalement — en cas de conflit, les règles sourcées du kit priment
-> (rules/core/philosophy, rules/core/universal) :
+> All tasks in this plan must produce code that conforms to S.U.P.E.R architecture principles. The following constraints apply globally — in case of conflict, the kit's sourced rules win (rules/core/philosophy, rules/core/universal):
 
-- **S (Rôle unique)** : chaque nouveau module/fichier/fonction résout
-  exactement un problème. Si une tâche couvre plusieurs responsabilités,
-  décompose-la davantage.
-- **U (Flux unidirectionnel)** : les données circulent entrée → traitement →
-  sortie. Les dépendances pointent vers l'intérieur. Pas d'imports
-  circulaires.
-- **P (Ports sur l'implémentation)** : définis les contrats d'interface
-  (schémas, types) avant l'implémentation. Tout l'I/O inter-modules doit être
-  sérialisable.
-- **E (Indépendant de l'environnement)** : pas de config codée en dur. Toutes
-  les valeurs spécifiques à l'environnement viennent de variables
-  d'environnement ou de fichiers de config.
-- **R (Parties remplaçables)** : chaque composant doit être remplaçable sans
-  changements en cascade. Valide avec le test de remplacement : « Puis-je
-  échanger ceci avec une autre implémentation en ne touchant que ce module ? »
+- **S (Single Purpose)**: Each new module/file/function solves exactly one problem. If a task spans multiple responsibilities, decompose it further.
+- **U (Unidirectional Flow)**: Data flows input → processing → output. Dependencies point inward. No circular imports.
+- **P (Ports over Implementation)**: Define interface contracts (schemas, types) before implementation. All cross-module I/O must be serializable.
+- **E (Environment-Agnostic)**: No hardcoded config. All env-specific values from environment variables or config files.
+- **R (Replaceable Parts)**: Each component must be replaceable without cascading changes. Validate with the replacement test: "Can I swap this with a different implementation by only touching this module?"
 
-## Contraintes de test et de gouvernance
+## Testing and Governance Constraints
 
-> Ces contraintes s'appliquent à chaque tâche sauf si la tâche déclare
-> explicitement pourquoi elles ne sont pas applicables.
+> These constraints apply to every task unless the task explicitly states why they are not applicable.
 
-- **Tests par défaut** : le travail de fonctionnalité, les changements de
-  comportement, les changements d'API/schéma/migration, le parsing, le
-  routage, les permissions, le cache et la persistance doivent ajouter ou
-  mettre à jour des tests automatisés pertinents.
-- **Exemption de test explicite** : les tâches de pure documentation/config
-  peuvent marquer les tests comme non applicables, mais les critères
-  d'acceptation doivent expliquer pourquoi et nommer la commande de validation
-  la plus proche à exécuter.
-- **Mises à jour d'instructions d'agent** : si une tâche change la façon dont
-  les futurs agents doivent travailler dans le dépôt, mets à jour les surfaces
-  d'instructions résolues telles que `AGENTS.md` ou les fichiers de règles
-  plateforme existants.
-- **Mises à jour mémoire** : si une tâche introduit une règle durable, un
-  invariant, un gotcha récurrent, une commande ou une convention de projet,
-  mets à jour la surface mémoire native résolue (`.pi/memory/`) ou le fallback
-  explicitement choisi.
-- **Séparation tâches/lots** : les tâches sont des enregistrements atomiques
-  de travail et de télémetry. Les lots de livraison sont des unités
-  d'implémentation, de validation d'intégration. Défaut : un lot cohérent par
-  phase ; chaque division et chaque lot à tâche unique doivent avoir une
-  justification enregistrée sauf si la phase ne contient qu'une seule tâche.
+- **Tests by default**: Feature work, behavior changes, API/schema/migration changes, parsing, routing, permissions, caching, and persistence changes must add or update relevant automated tests.
+- **Explicit test exemption**: Pure documentation/config tasks may mark tests as not applicable, but the acceptance criteria must explain why and name the closest validation command to run.
+- **Agent instruction updates**: If a task changes how future agents must work in the repository, update the resolved instruction surfaces such as `AGENTS.md` or existing platform rule files.
+- **Memory updates**: If a task introduces a durable rule, invariant, recurring gotcha, command, or project convention, update the resolved native memory surface (`.pi/memory/`) or the explicitly chosen fallback.
+- **Task/batch separation**: Tasks are atomic work and telemetry records. Delivery batches are implementation, integration-validation units. Default to one coherent batch per phase; every split and every single-task batch must have a recorded rationale unless the phase contains only one task.
 
-## Phase 1 : <Nom de la phase>
-**But** : ce que cette phase atteint
-**Prérequis** : ce qui doit être fait avant cette phase
-**Focus S.U.P.E.R** : quels principes S.U.P.E.R sont les plus pertinents pour
-cette phase (ex. « P — définir les contrats d'interface avant d'implémenter
-les modules »)
+## Phase 1: <Phase Name>
+**Goal**: What this phase achieves
+**Prerequisite**: What must be done before this phase
+**S.U.P.E.R Focus**: Which S.U.P.E.R principles are most relevant to this phase (e.g., "P — defining interface contracts before implementing modules")
 
-| # | Tâche | Priorité | Effort | Dépend de | Lane | Lot | S.U.P.E.R | Attente de test | Impact mémoire | Critères d'acceptation |
-|:--|:------|:--------|:-------|:----------|:-----|:----|:----------|:----------------|:---------------|:-----------------------|
-| 1 |       | P0      | M      | —         | A    | P1-B1 | S, P | Ajouter/mettre à jour des tests | Mettre à jour la surface mémoire résolue si un nouvel invariant émerge | |
-| 2 |       | P1      | S      | —         | B    | P1-B1 | U, E | Non applicable : docs uniquement | Aucun | |
-| 3 |       | P1      | S      | 1         | A    | P1-B1 | R | Ajouter/mettre à jour des tests de régression | Mettre à jour les surfaces d'instructions résolues si une règle de workflow change | |
+| # | Task | Priority | Effort | Depends On | Lane | Batch | S.U.P.E.R | Test Expectation | Memory Impact | Acceptance Criteria |
+|:--|:-----|:---------|:-------|:-----------|:-----|:------|:----------|:-----------------|:--------------|:--------------------|
+| 1 |      | P0       | M      | —          | A    | P1-B1 | S, P | Add/update tests | Update resolved memory surface if new invariant emerges |                     |
+| 2 |      | P1       | S      | —          | B    | P1-B1 | U, E | Not applicable: docs-only | None |                     |
+| 3 |      | P1       | S      | 1          | A    | P1-B1 | R | Add/update regression tests | Update resolved instruction surfaces if workflow rule changes |                     |
 
-> **Colonne S.U.P.E.R** : liste les principes S.U.P.E.R qui sont les drivers
-> de design principaux de cette tâche. L'agent implémentant la tâche doit
-> porter une attention particulière à ces principes. Les critères
-> d'acceptation de chaque tâche incluent implicitement : « Passe le S.U.P.E.R
-> Quick Check pour les principes listés. »
-> **Colonne Attente de test** : doit nommer le travail de test attendu ou la
-> justification explicite de non-test plus la commande de validation la plus
-> proche.
-> **Colonne Impact mémoire** : doit indiquer si la tâche peut affecter la
-> surface mémoire résolue ou toute surface d'instructions résolue.
-> **Colonne Lot** : chaque tâche appartient à exactement un lot planifié.
+> **S.U.P.E.R column**: Lists which S.U.P.E.R principles are the primary design drivers for this task. The agent implementing this task must pay special attention to these principles. Every task's acceptance criteria implicitly includes: "Passes the S.U.P.E.R Quick Check for the listed principles."
+> **Test Expectation column**: Must name the expected test work or the explicit no-test rationale plus closest validation command.
+> **Memory Impact column**: Must state whether the task can affect the resolved memory surface or any resolved instruction surface.
+> **Batch column**: Every task belongs to exactly one planned batch.
 
-### Lanes parallèles
-| Lane | Tâches | Effort combiné | Risque de fusion | Fichiers clés |
-|:-----|:-------|:---------------|:-----------------|:--------------|
-| A    | 1, 3   | M              | Faible           |               |
-| B    | 2      | S              | Faible           |               |
+### Parallel Lanes
+| Lane | Tasks | Combined Effort | Merge Risk | Key Files |
+|:-----|:------|:----------------|:-----------|:----------|
+| A    | 1, 3  | M               | Low        |           |
+| B    | 2     | S               | Low        |           |
 
-> Les tâches de lanes différentes n'ont aucune dépendance mutuelle et peuvent
-> être exécutées simultanément par des sous-agents séparés. Les agents de lane
-> renvoient des commits ; ils ne créent pas d'états partagés. Le risque de
-> fusion indique la probabilité de conflits de fichiers avant l'intégration
-> dans la branche du lot.
+> Tasks in different lanes have no mutual dependencies and can be executed simultaneously by separate sub-agents. Lane agents return commits; they do not create shared state. Merge risk indicates the likelihood of file conflicts before integration into the batch branch.
 
-### Lots de livraison
+### Delivery Batches
 
-| Lot | Tâches | Vagues d'exécution | But et justification du regroupement | Branche d'intégration | Validation combinée | Dépend de | Justification de division / lot unique |
-|:----|:-------|:-------------------|:-------------------------------------|:----------------------|:--------------------|:----------|:--------------------------------------|
-| P1-B1 | 1, 2, 3 | V1 : Lane A (T1 → T3) + Lane B (T2) | Unité cohérente d'architecture et de revue | `batch/p1-b1-<slug>` | tests ciblés + build/smoke complet affecté | — | Lot par défaut au niveau phase |
+| Batch | Tasks | Execution Waves | Goal and Grouping Rationale | Integration Branch | Combined Validation | Depends On | Split / Single-Task Rationale |
+|:------|:------|:----------------|:----------------------------|:-------------------|:--------------------|:-----------|:------------------------------|
+| P1-B1 | 1, 2, 3 | W1: Lane A (T1 → T3) + Lane B (T2) | One coherent architecture and review unit | `batch/p1-b1-<slug>` | targeted tests + full affected build/smoke | — | Default phase-level batch |
 
-> Revois l'ensemble complet des tâches de la phase avant de définir les lots.
-> Préfère un lot validable au niveau phase. Ne divise que pour une frontière
-> concrète de revueabilité, de release/rollback indépendant, de propriété,
-> d'isolation de risque, de dépendance dure ou de politique dépôt/utilisateur ;
-> ne divise pas mécaniquement par nombre de tâches.
+> Review the complete phase task set before defining batches. Prefer one reviewable phase-level batch. Split only for a concrete reviewability, independent release/rollback, ownership, risk-isolation, hard dependency, or repository/user policy boundary; do not split mechanically by task count.
 
-## Phase 2 : <Nom de la phase>
-<!-- Même structure que la phase 1 -->
+## Phase 2: <Phase Name>
+<!-- Same structure as Phase 1 -->
 ```
 
 ---
@@ -124,7 +76,7 @@ les modules »)
 ## dependency-graph.md
 
 ````markdown
-# Graphe des dépendances de tâches
+# Task Dependency Graph
 
 ```mermaid
 graph TD
@@ -152,10 +104,10 @@ graph TD
 ## milestones.md
 
 ```markdown
-# Jalons
+# Milestones
 
-| # | Jalon | Phase cible | Critères | Statut |
-|:--|:------|:------------|:---------|:-------|
-| 1 |       | Après la phase 1 |          | En attente |
-| 2 |       | Après la phase 3 |          | En attente |
+| # | Milestone | Target Phase | Criteria | Status |
+|:--|:----------|:-------------|:---------|:-------|
+| 1 |           | After Phase 1|          | Pending |
+| 2 |           | After Phase 3|          | Pending |
 ```

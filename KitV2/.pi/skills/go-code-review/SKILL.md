@@ -13,50 +13,44 @@ instead of the files.
 
 ## Target modes (mutually exclusive)
 
-Trois cibles, résolues dans cet ordre de priorité : `branch` spécifié → mode
-branche ; sinon `since`/`until` → mode plage de commits ; sinon mode
-non-commité. `base` ne s'applique qu'au mode branche. Demandes vagues
-("review this") → mode non-commité ; "recent commits" sans dates → 3 derniers
-jours.
+Three targets, resolved in this order of priority: `branch` specified → branch
+mode; else `since`/`until` → commit-range mode; else uncommitted mode. `base`
+applies only to branch mode. Vague requests ("review this") → uncommitted mode;
+"recent commits" without dates → last 3 days.
 
-1. **Mode non-commité** (défaut) — working tree + changements stagés.
-2. **Mode plage de commits** — commits dans une plage de dates ; pas de plage
-   explicite → 3 derniers jours.
-3. **Mode branche / PR** — branche vs `origin/main`, `origin/master`, la
-   branche par défaut du remote, ou une `base` explicite.
+1. **Uncommitted mode** (default) — working tree + staged changes.
+2. **Commit-range mode** — commits in a date range; no explicit range → last 3 days.
+3. **Branch / PR mode** — branch vs `origin/main`, `origin/master`, the remote
+   default branch, or an explicit `base`.
 
-Collecte le contexte du diff avec git uniquement (ne juge jamais depuis un
-résumé) :
+Collect the diff context with git only (never judge from a summary):
 
 ```sh
 git status --short
-git diff --stat && git diff          # non-commité
-git log --since "3 days ago" --oneline && git diff HEAD~N  # plage de commits
-git diff origin/main...HEAD         # mode branche
+git diff --stat && git diff          # uncommitted
+git log --since "3 days ago" --oneline && git diff HEAD~N  # commit-range
+git diff origin/main...HEAD         # branch mode
 ```
 
-S'il n'y a aucun changement, arrête-toi et dis qu'il n'y a rien à revoir.
-N'invente pas de findings.
+If there are no changes, stop and say there is nothing to review. Do not invent
+findings.
 
 ## Review planning by size
 
-- **Small** (≤ 3 files, diff localisé) : couvrir Correctness + Tests.
-- **Medium** (plusieurs fichiers / comportement affecté) : ajouter
-  Regression/Compatibility.
-- **Large ou à haut risque** (changements larges, auth/permissions,
-  persistance, migrations, concurrence, cache, argent, sécurité, APIs
-  publiques, code généré, config/déploiement) : ajouter Security/Data Safety +
-  Performance/Concurrency.
+- **Small** (≤ 3 files, localized diff): cover Correctness + Tests.
+- **Medium** (multiple files / behavior-affecting): add Regression/Compatibility.
+- **Large or high-risk** (broad changes, auth/permissions, persistence,
+  migrations, concurrency, caching, money, security, public APIs, generated
+  code, config/deployment): add Security/Data Safety + Performance/Concurrency.
 
-Priorise le code de comportement, les contrats publics, la gestion de données,
-les chemins d'erreur, la configuration, la persistance, les tests. Dépriorise
-la documentation, les changements de formatage uniquement, les fichiers
-générés, le churn de lockfile sauf s'ils affectent le comportement runtime.
+Prioritize behavior code, public contracts, data handling, error paths,
+configuration, persistence, tests. Deprioritize docs, formatting-only changes,
+generated files, lockfile churn unless they affect runtime behavior.
 
 ## Focused reviewer dimensions
 
-Quand des sous-agents sont disponibles (ou séquentiellement sinon), répartis
-la revue en reviewers focalisés — un focus par sous-agent :
+When sub-agents are available (or sequentially otherwise), split the review
+into focused reviewers — one focus per sub-agent :
 
 - Correctness / Bug Risk
 - Regression / Compatibility
@@ -64,8 +58,8 @@ la revue en reviewers focalisés — un focus par sous-agent :
 - Security / Data Safety
 - Performance / Concurrency
 
-Chaque reviewer renvoie uniquement des findings candidats étayés par des
-preuves pour son propre focus. Contrat complet : `references/reviewer-focus.md`.
+Each reviewer returns only evidence-backed candidate findings for its own
+focus. Full contract: `references/reviewer-focus.md`.
 
 ## Procedure
 
@@ -79,9 +73,9 @@ preuves pour son propre focus. Contrat complet : `references/reviewer-focus.md`.
    compatibility, input validation, package ownership, tests, and documentation.
 4. Report findings with severity, exact file/line, violated contract or source,
    impact, and the smallest safe fix. Use `references/finding-template.md`.
-   Findings-first : présente les findings avant tout résumé ; ne jamais enterrer
-   un bug sous un résumé. Pas de findings → dis explicitement `No findings` et
-   liste les risques résiduels ou lacunes de test.
+   Findings-first: present findings before any summary; never bury a bug
+   under a summary. No findings → explicitly state `No findings` and list
+   residual risks or testing gaps.
 5. Reread every finding against the current source. Remove anything that cannot
    be justified by a concrete failure, contract, or primary source.
 6. Separate blockers from optional suggestions. Do not edit the worktree unless

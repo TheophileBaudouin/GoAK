@@ -1,83 +1,68 @@
-# Protocole de contrôle adaptatif
+# Adaptive Control Protocol
 
-Boucle fermée de contrôle pour le workflow Spec-Driven Develop : comment la
-télémetry d'exécution est collectée, comment la dérive plan-vs-réalité est
-mesurée, et quelles actions correctives automatiques se déclenchent quand la
-dérive dépasse les seuils.
+Closed-loop feedback control for the Spec-Driven Develop workflow: how execution telemetry is collected, how plan-vs-reality drift is measured, and what automatic corrective actions fire when drift exceeds thresholds.
 
 ---
 
-## Concepts centraux
+## Core Concepts
 
-| Concept de théorie du contrôle | Mapping workflow |
+| Control Theory Concept | Workflow Mapping |
 |:---|:---|
-| **Système** | Le codebase sous transformation |
-| **Point de consigne** | Définition de tâche confirmée (phase 2) + principes S.U.P.E.R |
-| **Contrôleur** | La skill workflow (phases 0-6) + ce protocole |
-| **Actionneur** | Exécuteurs de lots et workers de lanes |
-| **Capteur** | Collecte de télémetry post-tâche |
-| **Signal d'erreur** | `drift_score` — écart cumulé plan-vs-réalité |
+| **Plant** | The codebase under transformation |
+| **Set point** | Phase 2 confirmed task definition + S.U.P.E.R principles |
+| **Controller** | The SKILL workflow (Phases 0-6) + this protocol |
+| **Actuator** | Delivery batch executors and lane workers |
+| **Sensor** | Post-task telemetry collection |
+| **Error signal** | `drift_score` — cumulative plan-vs-reality deviation |
 
 ---
 
-## Collecte de télémetry
+## Telemetry Collection
 
-Après avoir terminé chaque tâche et AVANT de la marquer comme terminée,
-collecte trois signaux.
+After completing every task and BEFORE marking it as done, collect three signals.
 
-### Effort réel
+### Actual Effort
 
-Compare l'effort estimé (depuis `task-breakdown.md`) à l'effort réel :
+Compare estimated effort (from `task-breakdown.md`) against actual:
 
-| Niveau | Critères |
+| Level | Criteria |
 |:---|:---|
-| S | Terminé en < 30 minutes, aucun problème inattendu |
-| M | 30 min – 2 heures, surprises mineures |
-| L | 2 – 4 heures, ou complexité inattendue significative |
-| XL | > 4 heures, ou remise en cause fondamentale |
+| S | Completed in < 30 minutes, no unexpected issues |
+| M | 30 min – 2 hours, minor surprises |
+| L | 2 – 4 hours, or significant unexpected complexity |
+| XL | > 4 hours, or required fundamental re-thinking |
 
-Enregistre le **delta d'effort** en niveaux entre estimé et réel (estimé M /
-réel M → 0 ; S → L → +2 ; L → M → -1).
+Record the **effort delta** as levels between estimated and actual (estimated M / actual M → 0; S → L → +2; L → M → -1).
 
-### Delta de score S.U.P.E.R
+### S.U.P.E.R Score Delta
 
-Exécute la checklist en 10 points de `super-philosophy.md` § « Checklist de
-revue de code S.U.P.E.R ». Enregistre `super_score` (passes sur 10) et
-`super_delta` (variation vs l'état pré-tâche). Pas d'amélioration là où les
-drivers S.U.P.E.R de la tâche promettaient une amélioration → delta = 0 (compté
-comme écart) ; régression → négatif.
+Run the 10-check checklist in `super-philosophy.md` § "S.U.P.E.R Code Review Checklist (10 checks)". Record `super_score` (passes out of 10) and `super_delta` (change vs. pre-task state). No improvement where the task's S.U.P.E.R drivers promised improvement → delta = 0 (counts as deviation); regression → negative.
 
-### Dépendances imprévues
+### Unplanned Dependencies
 
-Compte les dépendances découvertes pendant l'exécution qui n'étaient PAS dans
-le champ « Dependencies » de la tâche : fichiers non listés modifiés, tâches
-prérequises non identifiées, bibliothèques/API externes ayant nécessité des
-changements.
+Count dependencies discovered during execution that were NOT in the task's "Dependencies" field: unlisted files modified, unidentified prerequisite tasks, external libraries/APIs that needed changes.
 
 ---
 
-## Calcul du score de dérive
+## Drift Score Calculation
 
-### Contribution de dérive par tâche
+### Per-Task Drift Contribution
 
 ```text
-task_drift = max(0, effort_delta) + (1 si super_delta <= 0 ET la tâche avait
-des drivers S.U.P.E.R sinon 0) + min(deps_imprevues, 2)
+task_drift = max(0, effort_delta) + (1 if super_delta <= 0 AND task had SUPER drivers else 0) + min(unplanned_deps, 2)
 ```
 
-Seuls les deltas d'effort positifs comptent. Les dépendances imprévues sont
-plafonnées à 2 par tâche.
+Only positive effort deltas count. Unplanned deps are capped at 2 per task.
 
-### Score de dérive cumulé
+### Cumulative Drift Score
 
 ```text
-drift_score = somme de tous les task_drift des tâches terminées
+drift_score = sum of all task_drift values for completed tasks
 ```
 
-### Seuils en pourcentage
+### Percentage-Based Thresholds
 
-Relatifs au **nombre total de tâches de la phase courante**, calculés une fois
-au début de la phase :
+Relative to the **total task count of the current phase**, computed once at phase start:
 
 ```text
 threshold_annotate = ceil(total_tasks * 0.20)
@@ -87,45 +72,39 @@ threshold_rescope  = ceil(total_tasks * 0.60)
 
 ---
 
-## Actions de réponse automatiques
+## Automatic Response Actions
 
-### Annoter (dérive ≥ threshold_annotate)
+### Annotate (drift ≥ threshold_annotate)
 
-Écart léger ; le plan reste viable. Automatiquement :
+Mild deviation; plan still viable. Automatically:
 
-1. Ajoute une ligne d'avertissement à l'entrée de la prochaine tâche dans le
-   fichier de phase (LOCAL_ONLY).
-2. Mets à jour l'état adaptatif (§ « Stockage de l'état adaptatif »).
+1. Add a warning line to the next task's entry in the phase file (LOCAL_ONLY).
+2. Update the adaptive state (§ "Adaptive State Storage").
 
-### Replanifier (dérive ≥ threshold_replan)
+### Replan (drift ≥ threshold_replan)
 
-Écart significatif ; la décomposition restante est probablement inexacte.
-Automatiquement :
+Significant deviation; remaining decomposition is likely inaccurate. Automatically:
 
-1. **HALTE** — ne démarre pas la tâche suivante.
-2. Annote le MASTER.md :
+1. **HALT** — do not start the next task.
+2. Annotate MASTER.md:
 
-```text
+   ```text
    🔄 Adaptive Control: Replanning triggered (drift_score={n}).
    Remaining tasks will be re-decomposed based on execution learnings.
    ```
 
-3. **Re-entre en phase 3** pour le périmètre restant uniquement, en utilisant
-   la télémetry des tâches terminées comme entrée d'estimation ; préserve les
-   tâches terminées ; crée de nouvelles tâches sous la même phase.
-4. Réinitialise `drift_score` à 0 pour le segment replanifié.
-5. LOCAL_ONLY : archive les anciennes entrées du fichier de phase et crée les
-   nouvelles.
+3. **Re-enter Phase 3** for the remaining scope only, using completed-task telemetry as estimation input; preserve completed tasks; create new tasks under the same phase.
+4. Reset `drift_score` to 0 for the re-planned segment.
+5. LOCAL_ONLY: archive old phase file entries and create new ones.
 
-### Ré-évaluer (dérive ≥ threshold_rescope)
+### Rescope (drift ≥ threshold_rescope)
 
-Écart sévère ; le périmètre ou la stratégie peut être fondamentalement faux.
-Automatiquement :
+Severe deviation; scope or strategy may be fundamentally wrong. Automatically:
 
-1. **HALTE**.
-2. Ajoute l'annotation de ré-évaluation dans MASTER.md :
+1. **HALT**.
+2. Add the scope re-evaluation annotation to MASTER.md:
 
-```text
+   ```text
    ## Adaptive Control: Scope Re-evaluation
 
    drift_score has reached {n}, exceeding the rescope threshold of {threshold}.
@@ -143,18 +122,15 @@ Automatiquement :
    Returning to Phase 2 for scope confirmation with the user.
    ```
 
-3. **Re-entre en phase 2** avec les données d'exécution accumulées comme
-   contexte.
-4. Après re-confirmation du périmètre par l'utilisateur, re-entre en phase 3
-   pour tout le travail restant.
-5. LOCAL_ONLY : même flux via les annotations de MASTER.md.
+3. **Re-enter Phase 2** with accumulated execution data as context.
+4. After user re-confirms scope, re-enter Phase 3 for all remaining work.
+5. LOCAL_ONLY: same flow using MASTER.md annotations.
 
 ---
 
-## Stockage de l'état adaptatif (LOCAL_ONLY)
+## Adaptive State Storage (LOCAL_ONLY)
 
-**Stockage principal** : `docs/progress/MASTER.md` — section « Adaptive
-Control State » :
+**Primary storage**: `docs/progress/MASTER.md` — "Adaptive Control State" section:
 
 ```markdown
 ## Adaptive Control State
@@ -174,60 +150,50 @@ Control State » :
 
 | Task ID | Est. | Actual | Δ Effort | SUPER Score | SUPER Δ | Unplanned Deps | Task Drift |
 |---------|------|--------|----------|-------------|---------|----------------|------------|
-```text
+```
 
 ---
 
-## Activation du contrôleur
+## Controller Activation
 
-### Début de session
+### Session Start
 
-Au début de chaque conversation, APRÈS la lecture de MASTER.md :
+At the start of every conversation, AFTER reading MASTER.md:
 
-1. Lis la section « Adaptive Control State » de MASTER.md.
-2. Parse `drift_score` et les seuils.
-3. Si `drift_score` dépasse déjà un seuil (d'une session précédente),
-   déclenche la réponse AVANT d'exécuter une nouvelle tâche.
-4. Rapporte l'état adaptatif dans le statut d'ouverture de la session.
+1. Read the "Adaptive Control State" section of MASTER.md.
+2. Parse `drift_score` and thresholds.
+3. If `drift_score` already exceeds a threshold (from a previous session), trigger the response BEFORE executing any new task.
+4. Report the adaptive state in the session's opening status.
 
-### Post-tâche
+### Post-Task
 
-Pour l'exécution séquentielle, après chaque tâche terminée :
+For sequential execution, after every task completion:
 
-1. Collecte la télémetry (§ « Collecte de télémetry »).
-2. Calcule la contribution de dérive de la tâche et le nouveau
-   `drift_score` cumulé (§ « Calcul du score de dérive »).
-3. Persiste l'état adaptatif mis à jour (§ « Stockage de l'état
-   adaptatif »).
-4. Écris la télémetry dans MASTER.md avec le score cumulé mis à jour.
-5. Si un seuil est dépassé → exécute la réponse AVANT la tâche suivante ;
-   sinon continue.
+1. Collect telemetry (§ "Telemetry Collection").
+2. Calculate task drift contribution and new cumulative `drift_score` (§ "Drift Score Calculation").
+3. Persist the updated adaptive state (§ "Adaptive State Storage").
+4. Write telemetry to MASTER.md using the updated cumulative score.
+5. If a threshold is exceeded → execute the response BEFORE the next task; otherwise proceed.
 
-Pour les lanes parallèles, les exécuteurs de lanes font les étapes 1-2 et
-renvoient leur télémetry par tâche, mais jamais les étapes 3-5 —
-l'orchestrateur enregistre et applique les contributions une fois par lot,
-empêchant les incréments dupliqués et les écritures concurrentes.
+For parallel lanes, lane executors perform steps 1-2 and return per-task telemetry, but never steps 3-5 — the orchestrator records and applies contributions once per batch, preventing duplicate increments and concurrent state writes.
 
-### Post-intégration de lot
+### Post-Delivery-Batch Integration
 
-Après avoir consolidé tout le travail d'un lot de livraison :
+After consolidating all work in a delivery batch:
 
-1. Collecte toute télémetry de lane pas encore enregistrée.
-2. Ajoute la somme des seules contributions non enregistrées à
-   `drift_score` une fois ; persiste.
-3. Écris la télémetry de chaque tâche non enregistrée dans MASTER.md avec le
-   score cumulé post-lot.
-4. Vérifie que la télémetry existe pour chaque tâche du lot.
-5. Si un seuil est dépassé → déclenche la réponse AVANT le lot de livraison
-   suivant.
+1. Collect any lane telemetry not yet recorded.
+2. Add the sum of only those unrecorded contributions to `drift_score` once; persist.
+3. Write each unrecorded task's telemetry to MASTER.md using the post-batch cumulative score.
+4. Verify telemetry exists for every task in the batch.
+5. If a threshold is exceeded → trigger the response BEFORE the next delivery batch.
 
 ---
 
-## Intégration au workflow
+## Workflow Integration
 
-| Phase du workflow | Intégration du contrôle adaptatif |
+| Workflow Phase | Adaptive Control Integration |
 |:---|:---|
-| Phase 3 (Décomposition) | Initialise l'état adaptatif ; calcule les seuils. |
-| Phase 4 (Suivi) | MASTER.md inclut la section télémetry et l'état adaptatif. |
-| Phase 5 (Exécution) | Chaque tâche terminée déclenche « Post-tâche » ; chaque intégration de lot déclenche « Post-intégration ». |
-| Phase 6 (Archive) | L'archive inclut le résumé de télémetry final et l'historique de dérive comme rétrospective. |
+| Phase 3 (Decomposition) | Initialize adaptive state; compute thresholds. |
+| Phase 4 (Progress Tracking) | MASTER.md includes the telemetry section and adaptive state. |
+| Phase 5 (Confirm & Execute) | Every task completion triggers "Post-Task"; every batch integration triggers "Post-Delivery-Batch Integration". |
+| Phase 6 (Archive) | Archive includes the final telemetry summary and drift history as retrospective. |

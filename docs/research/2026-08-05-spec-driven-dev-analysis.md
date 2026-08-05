@@ -1,153 +1,150 @@
-# Analyse en profondeur — zhu1090093659/spec_driven_develop
+# Deep analysis — zhu1090093659/spec_driven_develop
 
-Date : 2026-08-05. Méthode : clone lecture seule (commit `14f8c0f`, 57
-fichiers, 724K) hors du dépôt, lecture de chaque fichier, cartographie du
-recouvrement avec le kit. Licence : MIT (LICENSE vérifié). Ce document est la
-preuve d'analyse du plan d'intégration `docs/plans/2026-08-05-spec-driven-dev-
-integration.md` ; il ne copie pas les corps (traduction/adaptation dans le
-kit).
+Date: 2026-08-05. Method: read-only clone outside the repository (commit
+`14f8c0f`, 57 files, 724K), full file reading, overlap mapping with the kit.
+License: MIT (LICENSE verified). This document is the evidence of the
+integration plan `docs/plans/2026-08-05-spec-driven-dev-integration.md`; it
+does not copy the bodies (translation/adaptation in the kit).
 
-## 1. Structure du dépôt
+## 1. Repository structure
 
 ```text
 spec_driven_develop/
-├── AGENTS.md / CLAUDE.md              # instructions projet (agents)
-├── README.md / README.zh-CN.md        # documentation bilingue
-├── plugins/spec-driven-develop/       # plugin autonome
-│   ├── .claude-plugin/plugin.json     # manifest Claude Code
-│   ├── .codex-plugin/plugin.json      # manifest Codex
-│   ├── opencode-plugin.js             # entrée opencode
+├── AGENTS.md / CLAUDE.md              # project instructions (agents)
+├── README.md / README.zh-CN.md        # bilingual documentation
+├── plugins/spec-driven-develop/       # self-contained plugin
+│   ├── .claude-plugin/plugin.json     # Claude Code manifest
+│   ├── .codex-plugin/plugin.json      # Codex manifest
+│   ├── opencode-plugin.js             # opencode entrypoint
 │   ├── skills/
-│   │   ├── spec-driven-develop/       # CŒUR du workflow
+│   │   ├── spec-driven-develop/       # WORKFLOW CORE
 │   │   │   ├── SKILL.md               # 7 phases (0-6), v1.15.0
 │   │   │   └── references/
-│   │   │       ├── behavioral-rules.md    # 19 règles non négociables
+│   │   │       ├── behavioral-rules.md    # 19 non-negotiable rules
 │   │   │       ├── super-philosophy.md    # S.U.P.E.R
-│   │   │       ├── parallel-protocol.md   # dispatch/review tiercés
-│   │   │       ├── adaptive-control.md    # boucle fermée (drift)
+│   │   │       ├── parallel-protocol.md   # tiered dispatch/review
+│   │   │       ├── adaptive-control.md    # closed loop (drift)
 │   │   │       ├── github-integration.md  # Issues/Milestones/PRs
 │   │   │       └── templates/             # analysis, plan, progress,
 │   │   │                                  # governance, archive
-│   │   ├── deep-discuss/SKILL.md      # discussion structurée 7 phases (zh)
+│   │   ├── deep-discuss/SKILL.md      # structured 7-phase discussion (zh)
 │   │   └── review-spd/
-│   │       ├── SKILL.md               # review findings-first
+│   │       ├── SKILL.md               # findings-first review
 │   │       ├── references/ (output-format, reviewer-template)
 │   │       └── scripts/review-context.py
 │   └── agents/ (project-analyzer, task-architect, task-executor,
 │                code-reviewer)
 ├── scripts/ (install-*, validate.sh, export-progress.py, review-context.py)
-└── docs/archives/ (2 runs archivés : adaptive-control-layer,
+└── docs/archives/ (2 archived runs: adaptive-control-layer,
                     orchestrator-centric-execution-model)
 ```
 
-## 2. Le cœur : 7 phases (SKILL.md spec-driven-develop)
+## 2. The core: 7 phases (SKILL.md spec-driven-develop)
 
-| Phase | Nom | Sortie |
+| Phase | Name | Output |
 | --- | --- | --- |
-| 0 | Quick Intent Capture | énoncé de direction 1-2 phrases |
-| 1 | Deep Project Analysis | `docs/analysis/` (project-overview, module-inventory avec scores S.U.P.E.R, risk-assessment avec santé S.U.P.E.R) + pré-vol GitHub |
-| 2 | Intent Refinement | définition de tâche confirmée (questions ciblées) |
-| 3 | Task Decomposition | `docs/plan/` (task-breakdown, dependency-graph Mermaid, milestones) + delivery batches + états adaptatifs |
-| 4 | Progress Tracking | `docs/progress/MASTER.md` + phase files + résolution gouvernance/mémoire |
-| 5 | Confirm & Execute | exécution tiercée + review tiercée + batch PR (GitHub) + télémetry adaptative |
-| 6 | Archive | `docs/archives/<projet>/` + index |
+| 0 | Quick Intent Capture | 1-2 sentence direction statement |
+| 1 | Deep Project Analysis | `docs/analysis/` (project-overview, module-inventory with S.U.P.E.R scores, risk-assessment with S.U.P.E.R health) + GitHub pre-flight |
+| 2 | Intent Refinement | confirmed task definition (targeted questions) |
+| 3 | Task Decomposition | `docs/plan/` (task-breakdown, Mermaid dependency-graph, milestones) + delivery batches + adaptive states |
+| 4 | Progress Tracking | `docs/progress/MASTER.md` + phase files + governance/memory resolution |
+| 5 | Confirm & Execute | tiered execution + tiered review + batch PR (GitHub) + adaptive telemetry |
+| 6 | Archive | `docs/archives/<project>/` + index |
 
-Concepts structurants : **S.U.P.E.R** (S single purpose, U unidirectional
-flow, P ports over implementation, E environment-agnostic, R replaceable
-parts + checklist de revue 10 points, scoring 🟢🟡🔴) ; **contrôle adaptatif**
-(télémetry effort/SUPER/deps imprévues, drift_score cumulé, seuils 20/40/60 %
-→ annotate/replan/rescope) ; **dispatch tiercé** (Tier 0 orchestrateur direct,
-Tier 1 un coder, Tier 2 lanes parallèles ≤4 disjointes) ; **review tiercée**
-(L1 machine, L2 diff orchestrateur, L3 reviewer indépendant, verdicts
-APPROVED/FIXED/ESCALATE) ; **writer model** (orchestrateur = seul writer des
-états partagés ; reviewers commitent `fix:` sur la branche lane uniquement) ;
-**behavioral rules** (19, dont : jamais sauter de phase, confirmation à chaque
-frontière, dual-write des progress, MASTER.md en premier à chaque session,
-télémetry obligatoire post-tâche, résolution de gouvernance obligatoire, pas
-de truth source concurrente, tests par défaut, learnings durables → mémoire,
-sub-agents = décision économique).
+Structuring concepts: **S.U.P.E.R** (S single purpose, U unidirectional flow,
+P ports over implementation, E environment-agnostic, R replaceable parts +
+10-point review checklist, 🟢🟡🔴 scoring); **adaptive control** (telemetry
+effort/SUPER/unplanned deps, cumulative drift_score, 20/40/60 % thresholds →
+annotate/replan/rescope); **tiered dispatch** (Tier 0 orchestrator-direct,
+Tier 1 one coder, Tier 2 parallel lanes ≤ 4 disjoint); **tiered review** (L1
+machine, L2 orchestrator diff, L3 independent reviewer, verdicts
+APPROVED/FIXED/ESCALATE); **writer model** (orchestrator = single writer of
+shared state; reviewers commit `fix:` on the lane branch only); **behavioral
+rules** (19, incl.: never skip phases, confirmation at every boundary,
+dual-write progress, MASTER.md first each session, mandatory post-task
+telemetry, mandatory governance resolution, no competing truth sources, tests
+by default, durable learnings → memory, sub-agents = economic decision).
 
-## 3. Skills compagnons
+## 3. Companion skills
 
-- **deep-discuss** (chinois) : 7 phases de discussion structurée (recevoir,
-  audit du problème = quality gate, analyse profonde multi-angle avec
-  confiances, design 2-3 options, auto-review, revue finale, exécution
-  optionnelle « go »). Philosophie : « ne pas se précipiter vers la réponse ».
-- **review-spd** : review findings-first ; 3 cibles mutuellement exclusives
-  (uncommitted par défaut, date-range avec défaut 3 jours, branche vs main ou
-  base explicite) ; planning par taille (petit = Correctness+Tests, moyen = +
-  Regression, grand/risque = + Security/Performance) ; 5 focus de reviewers
-  (correctness, regression, tests, security, performance) ; format de sortie
-  findings-first par sévérité avec Impact/Evidence/Trigger/Fix/Test gap ;
-  « No findings » préféré aux findings faibles.
+- **deep-discuss** (Chinese): 7 structured discussion phases (receive,
+  problem audit = quality gate, deep multi-angle analysis with confidence
+  levels, 2-3 option design, self-review, final review, optional "go"
+  execution). Philosophy: "don't rush to answers — think the problem through
+  first."
+- **review-spd**: findings-first review; 3 mutually exclusive targets
+  (uncommitted by default, date-range with 3-day default, branch vs main or
+  explicit base); size-based planning (small = Correctness+Tests, medium = +
+  Regression, large/risky = + Security/Performance); 5 reviewer focuses
+  (correctness, regression, tests, security, performance); findings-first
+  output by severity with Impact/Evidence/Trigger/Fix/Test gap; "No findings"
+  preferred over weak findings.
 
-## 4. Agents (prompts de sous-agents Claude Code)
+## 4. Agents (Claude Code sub-agent prompts)
 
-- **project-analyzer** : analyse par focus (architecture & stack, inventaire
-  modules avec S.U.P.E.R, risques/tests/gouvernance) ; sortie alignée sur les
-  templates analysis.
-- **task-architect** : stratégie (bottom-up/top-down/strangler/big-bang),
-  phases, tâches (critères d'acceptation checkbox vérifiables indépendamment),
-  lanes, delivery batches, milestones, graphe Mermaid, chemin critique.
-- **task-executor** : exécute un batch complet ou une lane ; contrat d'entrée
-  (batch, tâches, critères, télémetry) ; isolation (pas de PR, pas de closing
-  keywords, pas d'états partagés) ; rapport de handoff structuré ; BLOCKED
-  explicite.
-- **code-reviewer** : reviewer indépendant d'une lane ; vérifie les critères
-  d'acceptation en exécutant lui-même les checks ; fixes `fix:` append-only ;
-  verdicts APPROVED/FIXED/ESCALATE ; interdictions (pas d'Issues/PRs, pas de
-  MASTER.md/drift/gouvernance).
+- **project-analyzer**: focus-based analysis (architecture & stack, module
+  inventory with S.U.P.E.R, risks/tests/governance); output aligned on the
+  analysis templates.
+- **task-architect**: strategy (bottom-up/top-down/strangler/big-bang),
+  phases, tasks (independently verifiable checkbox acceptance criteria),
+  lanes, delivery batches, milestones, Mermaid graph, critical path.
+- **task-executor**: executes a complete batch or one lane; input contract
+  (batch, tasks, criteria, telemetry); isolation (no PR, no closing keywords,
+  no shared state); structured handoff report; explicit BLOCKED.
+- **code-reviewer**: independent lane reviewer; verifies acceptance criteria
+  by running the checks itself; append-only `fix:` commits; verdicts
+  APPROVED/FIXED/ESCALATE; prohibitions (no Issues/PRs, no MASTER.md/drift/
+  governance).
 
 ## 5. Scripts
 
-- `validate.sh` : garde de cohérence (références résolues, parité manifest/
-  fichiers, version 4 sites, JSON, ESM, py_compile, smoke exporter) —
-  équivalent du rôle C2 dans le dépôt source.
-- `review-context.py` : collecteur de contexte git (uncommitted / --since/
-  --until / --branch --base) — script utilitaire de review-spd.
-- `export-progress.py` : export JSON des progress (Linear/Jira/Notion).
-- `install-*.sh` : installation multi-agents (Claude/Codex/opencode/Cursor).
+- `validate.sh`: consistency guard (resolved references, manifest/files
+  parity, 4-site version, JSON, ESM, py_compile, exporter smoke) — the C2-role
+  equivalent in the source repository.
+- `review-context.py`: git context collector (uncommitted / --since/--until /
+  --branch --base) — review-spd utility script.
+- `export-progress.py`: progress JSON export (Linear/Jira/Notion).
+- `install-*.sh`: multi-agent installation (Claude/Codex/opencode/Cursor).
 
-## 6. Leçons et pièges du dépôt (utiles à l'adaptation)
+## 6. Lessons and pitfalls of the repository (useful for the adaptation)
 
-- **Skills-only** : les workflows s'invoquent par skills, pas par slash
-  commands — le kit doit suivre (skill auto-déclenchée par la description).
-- **Single-sourcing** : chaque sujet a exactement un home canonique (une
-  référence par topic) ; les prompts ne ré-expliquent jamais, ils citent.
-- **Dual-write progress** : pas de point de défaillance unique pour l'état.
-- **Tests par défaut** : toute tâche de feature exige des tests, sinon
-  raison explicite + validation la plus proche.
-- **Gouvernance par défaut** : toute règle stable → surface mémoire résolue ;
-  jamais de truth source concurrente ; fallback fichier seulement si choisi.
-- **Sub-agents = décision économique** : cold-start tax vs gain de parallélisme.
-- **S.U.P.E.R est de la doctrine d'architecture** : Clean/Hexagonal/12-Factor
-  — en conflit potentiel avec la doctrine Go sourcée du kit (à borner).
+- **Skills-only**: workflows are invoked through skills, not slash commands —
+  the kit must follow (skill auto-triggered by the description).
+- **Single-sourcing**: each topic has exactly one canonical home (one
+  reference per topic); prompts never re-explain, they cite.
+- **Dual-write progress**: no single point of failure for state.
+- **Tests by default**: every feature task requires tests, otherwise an
+  explicit reason + the closest validation.
+- **Governance by default**: every stable rule → resolved memory surface;
+  never a competing truth source; file fallback only if chosen.
+- **Sub-agents = economic decision**: cold-start tax vs parallelism gain.
+- **S.U.P.E.R is architecture doctrine**: Clean/Hexagonal/12-Factor — in
+  potential conflict with the kit's sourced Go doctrine (to bound).
 
-## 7. Cartographie du recouvrement avec le kit (avant intégration)
+## 7. Overlap mapping with the kit (before integration)
 
-| spec-driven | Kit existant | Verdict |
+| spec-driven | Kit existing | Verdict |
 | --- | --- | --- |
-| Phase 0 intent | aucun | manquant → ajouter |
-| Phase 1 analyse profonde | scout/researcher (subagents) | manquant comme phase → ajouter |
-| Phase 2 refinement | workflow-clarify | recouvrement → remplacer |
-| Phase 3 décomposition | workflow-plan + workflow-tasks | recouvrement → remplacer |
-| Phase 4 progress/gouvernance | workflow-memory | recouvrement partiel → adapter |
-| Phase 5 exécution | workflow-implement + workflow-verify | recouvrement → remplacer |
-| Phase 6 archive | aucun | manquant → ajouter |
-| S.U.P.E.R | rules/core/philosophy, universal | conflit doctrinal → borner |
-| adaptive control | « 3 échecs → stop » | complémentaire → ajouter |
-| review-spd | go-code-review | doublon → fusionner |
-| deep-discuss | aucun | complémentaire → ajouter |
-| github-integration | aucun (LOCAL_ONLY décidé) | exclu (décision) |
-| 4 agents | subagent contracts Pi (scout/planner/worker/reviewer) | mapping documenté |
+| Phase 0 intent | none | missing → add |
+| Phase 1 deep analysis | scout/researcher (sub-agents) | missing as a phase → add |
+| Phase 2 refinement | workflow-clarify | overlap → replace |
+| Phase 3 decomposition | workflow-plan + workflow-tasks | overlap → replace |
+| Phase 4 progress/governance | workflow-memory | partial overlap → adapt |
+| Phase 5 execution | workflow-implement + workflow-verify | overlap → replace |
+| Phase 6 archive | none | missing → add |
+| S.U.P.E.R | rules/core/philosophy, universal | doctrinal conflict → bound |
+| adaptive control | "3 failures → stop" | complementary → add |
+| review-spd | go-code-review | duplicate → merge |
+| deep-discuss | none | complementary → add |
+| github-integration | none (LOCAL_ONLY decided) | excluded (decision) |
+| 4 agents | Pi sub-agent contracts (scout/planner/worker/reviewer) | documented mapping |
 
-Décisions d'intégration (utilisateur, 2026-08-05) : remplacer la chaîne
-workflow-* par les phases 0-6 ; français + frontmatter EN ; LOCAL_ONLY
-uniquement ; bornage par contrat Z12 + audit, sans toucher KIT_CHARTER.md.
+Integration decisions (user, 2026-08-05): replace the workflow-* chain with
+phases 0-6; English mandatory (D-2026-08-05-21); LOCAL_ONLY only; bounded by
+contract Z12 + audit, without touching KIT_CHARTER.md.
 
-## Confiance
+## Confidence
 
-Faits vérifiés par lecture directe des fichiers (chemins, numéros de phases,
-règles 1-19, checklist 10 points, seuils 20/40/60). Interprétations (leçon
-« S.U.P.E.R = doctrine en conflit potentiel », mapping des rôles) étiquetées
-comme telles.
+Facts verified by direct file reading (paths, phase numbers, rules 1-19,
+10-point checklist, 20/40/60 thresholds). Interpretations (the "S.U.P.E.R =
+doctrine in potential conflict" lesson, role mapping) are labeled as such.

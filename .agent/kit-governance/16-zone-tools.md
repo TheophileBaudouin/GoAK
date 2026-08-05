@@ -1,68 +1,52 @@
-# Z7 — Zone `tools/` (mécanique de construction et de gate)
+# Z7 — Zone `tools/` (build and gate mechanics)
 
-- **Contrat MetaProjet** — régit `KitV2/tools/`.
-- **Rapport d'audit :** §2.8. **Décision :** `analyzers/` supprimé (2026-08-04).
+- **Metaproject Contract** — governs `KitV2/tools/`.
+- **Audit report:** §2.8. **Decision:** `analyzers/` removed (2026-08-04).
 
 ## 1. Mission
 
-La **mécanique** du Kit — jamais du contenu de connaissance. Les outils
-construisent (génération), vérifient (validators), résolvent (offline). Un
-outil est testé, documenté, et exécuté par une gate ou en CI.
+The Kit's **mechanics** — never knowledge content. Tools build (generation), verify (validators), resolve (offline). A tool is tested, documented, and executed by a gate or in CI.
 
-## 2. Structure et rôles
+## 2. Structure and roles
 
-| Sous-zone | Rôle | État au 2026-08-04 |
+| Sub-zone | Role | State on 2026-08-04 |
 | --- | --- | --- |
-| `tools/validators/` | Portail de gouvernance exécutable (C2) | actif — à étendre |
-| `tools/generators/` | Génération déterministe des index/comptes (INDEX.md, registre, comptes C1) | à créer (premier : générateur d'index) |
-| `tools/offline/` | Résolution hors-ligne : manifest + bundle épinglé + attribution | actif, modèle de référence |
+| `tools/validators/` | Executable governance portal (C2) | active — to extend |
+| `tools/generators/` | Deterministic generation of indexes/counts (INDEX.md, registry, C1 counts) | to create (first: index generator) |
+| `tools/offline/` | Offline resolution: manifest + pinned bundle + attribution | active, reference model |
 
-`analyzers/` a été supprimé le 2026-08-04 (vide, sans contrat) : l'analyse de
-duplication est absorbée par le validateur étendu ; réintroduisible plus tard
-uniquement sur décision écrite.
+`analyzers/` was removed on 2026-08-04 (empty, without contract): duplication analysis is absorbed by the extended validator; reintroducible later only on written decision.
 
-## 3. Règles
+## 3. Rules
 
-1. **Chaque outil = dossier + README** (mission, entrées/sorties, gate qui
-   l'exécute) + test. Un outil sans README ni test n'existe pas.
-2. **Déterministe et hors-ligne en CI** : pas de dépendance réseau pour les
-   générateurs/validateurs.
-3. **Un générateur remplace tout index/compte manuel** (C1) : INDEX.md,
-   comptes de coverage, registre d'artefacts sont générés puis vérifiés par le
-   validateur — jamais écrits à la main.
-4. Le validateur reste le **seul** artefact qui peut faire échouer la gate
-   produit ; un outil qui mute sans test est une erreur.
-5. Aucune logique métier du Kit dans un outil ; un outil n'invente pas de
-   connaissance, il la vérifie ou la génère.
+1. **Every tool = directory + README** (mission, inputs/outputs, gate that runs it) + test. A tool without README or test does not exist.
+2. **Deterministic and offline in CI**: no network dependency for generators/validators.
+3. **A generator replaces every manual index/count** (C1): INDEX.md, coverage counts, artifact registry are generated then verified by the validator — never hand-written.
+4. The validator remains the **only** artifact that can fail the product gate; a tool that mutates without test is an error.
+5. No Kit business logic in a tool; a tool does not invent knowledge, it verifies or generates it.
 
 ## 4. Maintenance
 
-- **Ajout** : mission + test + intégration CI (ou exclusion documentée) +
-  mise à jour du README de zone.
-- **Modification du validateur** : chaque contrôle nouveau = cas positif +
-  cas négatif (tests) ; la sortie reste `PASS`/liste d'erreurs + exit code.
+- **Addition**: mission + test + CI integration (or documented exclusion) + zone README update.
+- **Validator modification**: each new check = positive case + negative case (tests); output stays `PASS`/error list + exit code.
 
 ## 5. Patterns
 
-- Un validateur par responsabilité (structure / fraîcheur / cohérence
-  manifest) — composables.
-- Sortie alignée sur probes : ligne `PASS` ou erreurs actionnables (chemin +
-  raison).
+- One validator per responsibility (structure / freshness / manifest coherence) — composable.
+- Output aligned on probes: `PASS` line or actionable errors (path + reason).
 
 ## 6. Anti-patterns
 
-- Outil « à voir plus tard » sans contrat (le cas analyzers — corrigé) ;
-- constantes de couverture en dur ; les comptes sont dérivés et vérifiés par C2 ;
-- index générés à la main ; outil non testé ; réseau en CI.
+- "See later" tool without contract (the analyzers case — fixed);
+- hardcoded coverage constants; counts are derived and verified by C2;
+- hand-generated indexes; untested tool; network in CI.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] Tout outil a README + test.
-- [ ] Les index/comptes du Kit sont générés (C2 vérifie l'absence de dérive).
-- [ ] Gate complète verte (ou PARTIAL documenté).
+- [ ] Every tool has README + test.
+- [ ] Kit indexes/counts are generated (C2 verifies the absence of drift).
+- [ ] Full gate green (or documented PARTIAL).
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Premier générateur : index knowledge ou registre complet d'artefacts ?
-  (proposition : registre complet — il alimente INDEX.md, les comptes C1 et la
-  vérification des relations.)
+- First generator: knowledge index or complete artifact registry? (proposal: complete registry — it feeds INDEX.md, C1 counts, and relation verification.)

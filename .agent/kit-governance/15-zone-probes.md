@@ -1,70 +1,52 @@
-# Z6 — Zone `probes/` (évaluations produit exécutables)
+# Z6 — Zone `probes/` (executable product evaluations)
 
-- **Contrat MetaProjet** — régit `KitV2/probes/`.
-- **Rapport d'audit :** §2.7.
+- **Metaproject Contract** — governs `KitV2/probes/`.
+- **Audit report:** §2.7.
 
 ## 1. Mission
 
-La couche « évaluations produit » de la charte (Layer 6) : des scénarios
-**exécutables, déterministes, sans LLM ni service externe**, qui prouvent que
-le Kit fait ce qu'il prétend. Chaque probe termine par un verdict observable
-et un exit code.
+The charter's "product evaluations" layer (Layer 6): **executable, deterministic, LLM-free and external-service-free** scenarios that prove the Kit does what it claims. Each probe ends with an observable verdict and an exit code.
 
-## 2. Structure d'une probe
+## 2. Probe structure
 
 ```text
-probes/<sujet>/
-└── main.go          # autonome, verdict final : fmt.Println("...: PASS") + exit 0/1
+probes/<subject>/
+└── main.go          # self-contained, final verdict: fmt.Println("...: PASS") + exit 0/1
 ```
 
-- `probes/run.sh` **découvre** les probes (glob `probes/*/main.go`) — la liste
-  codée en dur est interdite (régression détectée à l'audit).
-- `probes/README.md` = contrat de zone (comment ajouter, quand, critères).
+- `probes/run.sh` **discovers** probes (glob `probes/*/main.go`) — a hardcoded list is forbidden (regression detected at audit).
+- `probes/README.md` = zone contract (how to add, when, criteria).
 
-## 3. Règles
+## 3. Rules
 
-1. Une probe exerce une **recette cœur** (import, exécution) ou une **capacité**
-   produit (offline, outillage) — relation `validated_by` tracée.
-2. **Déterminisme** : pas de réseau externe, pas de timing flaky, pas d'état
-   partagé entre exécutions ; les ressources locales (port éphémère, base
-   temporaire) sont propres.
-3. **Verdict explicite** : la dernière ligne de sortie est `…: PASS` (ou un
-   échec clair + exit code non nul) ; une probe qui n'asserte rien est une
-   erreur.
-4. Toute nouvelle recette « cœur » est candidate à une probe (la gate C2
-   n'exige pas encore la couverture complète — l'ajout est encouragé à
-   l'admission de la recette).
-5. Les sorties brutes appartiennent à l'évidence du metaprojet
-   (`docs/evidence/`), jamais au produit.
+1. A probe exercises a **core recipe** (import, execution) or a **product capability** (offline, tooling) — traced `validated_by` relation.
+2. **Determinism**: no external network, no flaky timing, no shared state between executions; local resources (ephemeral port, temporary database) are cleaned up.
+3. **Explicit verdict**: the last output line is `…: PASS` (or a clear failure + non-zero exit code); a probe that asserts nothing is an error.
+4. Every new "core" recipe is a probe candidate (the C2 gate does not yet require full coverage — the addition is encouraged at recipe admission).
+5. Raw outputs belong to metaproject evidence (`docs/evidence/`), never to the product.
 
 ## 4. Maintenance
 
-- **Ajout** : scénario + assertion + découverte automatique + gate verte.
-- **Modification d'une recette référencée** : re-run des probes concernées
-  obligatoire.
-- Limites connues (Pi discovery, Wails, TUI) : restent déclarées dans
-  `capabilities.yaml` (`known_limits`) — une probe ne prétend pas les couvrir.
+- **Addition**: scenario + assertion + automatic discovery + green gate.
+- **Modification of a referenced recipe**: re-running the affected probes mandatory.
+- Known limits (Pi discovery, Wails, TUI): remain declared in `capabilities.yaml` (`known_limits`) — a probe does not claim to cover them.
 
 ## 5. Patterns
 
-- Probe = « recette exécutée dans un scénario consommateur » (composition, pas
-  duplication).
-- Une ligne `PASS` + exit code : sortie machine-lisible pour CI.
+- Probe = "recipe executed in a consumer scenario" (composition, not duplication).
+- One `PASS` line + exit code: machine-readable output for CI.
 
 ## 6. Anti-patterns
 
-- Probe qui passe sans asserter ; probe orpheline ; liste en dur dans run.sh ;
-- dépendance réseau/timing ; sortie brute non structurée.
+- Probe that passes without asserting; orphan probe; hardcoded list in run.sh;
+- network/timing dependency; unstructured raw output.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] C2 : run.sh découvre (pas de liste en dur).
-- [ ] Chaque probe a un verdict explicite et un exit code.
-- [ ] Les recettes « cœur » ont une probe (encouragé ; à rendre obligatoire
-      quand la couverture recettes↔probes sera suivie par C2).
+- [ ] C2: run.sh discovers (no hardcoded list).
+- [ ] Every probe has an explicit verdict and an exit code.
+- [ ] "Core" recipes have a probe (encouraged; to make mandatory when recipe↔probe coverage is tracked by C2).
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Comment sonder les 3 limites (Pi discovery, Wails, TUI) sans dépendance
-  d'harnais ? (proposition : probes « doc + smoke manuel » documentées comme
-  PARTIAL, jamais comme couvertes.)
+- How to probe the 3 limits (Pi discovery, Wails, TUI) without harness dependency? (proposal: "doc + manual smoke" probes documented as PARTIAL, never as covered.)

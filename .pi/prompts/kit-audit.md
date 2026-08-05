@@ -3,477 +3,465 @@ description: Audit the complete KitV2 product against KIT_CHARTER.md, rules, evi
 argument-hint: "[KitV2 zone]"
 ---
 
-# Audit permanent du produit KitV2
+# Permanent audit of the KitV2 product
 
-Tu exécutes un audit **diagnostique, non destructif et traçable**. Le produit
-à auditer est `KitV2/`, ou la zone `KitV2/<zone>` passée en argument. Le
-prompt lui-même est un outil de maintenance du méta-projet et ne fait jamais
-partie du produit livré.
+You are executing a **diagnostic, non-destructive, traceable** audit. The
+product to audit is `KitV2/`, or the zone `KitV2/<zone>` passed as argument.
+The prompt itself is a metaproject maintenance tool and is never part of the
+shipped product.
 
-## Contrat de sécurité
+## Safety contract
 
-- Ne modifie, ne crée et ne supprime aucun fichier du dépôt. Ne lance ni
-  formatter, ni fixer, ni générateur, ni `go mod tidy`, ni commande de
-  migration, ni commande Git qui change l'état.
-- N'applique aucune correction pendant l'inspection. Les recommandations sont
-  produites uniquement après la fin de l'inventaire et de l'inspection.
-- Ne transforme pas une absence de preuve en conformité. Un contrôle non
-  exécutable ou une source non vérifiable reçoit `À VÉRIFIER`, jamais `CONFORME`.
-- Ne traite pas le nom d'une règle, d'un dossier ou d'un linter comme une
-  preuve : lis le fichier et cite le chemin, la ligne ou la section exacte.
-- Lors de l'invocation, audite l'arbre réel et non un résumé ou un inventaire
-  fourni par l'utilisateur ; ce prompt ne remplace jamais l'inspection du dépôt.
+- Do not modify, create, or delete any file in the repository. Do not run a
+  formatter, fixer, generator, `go mod tidy`, migration command, or any Git
+  command that changes state.
+- Do not apply any correction during inspection. Recommendations are produced
+  only after the inventory and inspection are complete.
+- Do not turn absence of evidence into conformity. A non-executable check or
+  an unverifiable source receives `TO VERIFY`, never `CONFORM`.
+- Do not treat the name of a rule, directory, or linter as proof: read the
+  file and cite the exact path, line, or section.
+- When invoked, audit the real tree, not a summary or inventory provided by
+  the user; this prompt never replaces inspection of the repository.
 
-## 1. Cadrage et périmètre
+## 1. Framing and scope
 
-1. Lis d'abord `KIT_CHARTER.md`, puis les règles applicables de `AGENTS.md` et
-   les contrats de zone dans `.agent/kit-governance/`. Le charter est
-   l'autorité ; ne le réécris pas dans le rapport.
-2. Lis avant toute conclusion le code de ces deux validateurs méta-projet :
-   - `.agent/validators/validate-instructions.py` ;
+1. First read `KIT_CHARTER.md`, then the applicable rules of `AGENTS.md` and
+   the zone contracts in `.agent/kit-governance/`. The charter is the
+   authority; do not rewrite it in the report.
+2. Before any conclusion, read the code of these two metaproject validators:
+   - `.agent/validators/validate-instructions.py`;
    - `.agent/validators/validate-cognitive.py`.
-3. Détermine la cible :
-   - sans argument : `KitV2/` entier ;
-   - avec un argument `KitV2/<zone>` : cette zone, avec le contexte global du
-     charter, de l'installeur, des règles, des manifests et des relations ;
-   - toute cible hors de `KitV2/` est refusée comme hors périmètre.
-4. Distingue toujours :
-   - **fichiers audités** : ceux de la cible qui reçoivent un statut pour
-     chaque dimension applicable ;
-   - **fichiers de contexte** : charter, règles, validateurs, installeur,
-     manifests ou sources lus pour interpréter la cible, mais non comptés dans
-     l'inventaire de KitV2 ;
-   - **fichiers exclus** : uniquement les cas explicitement justifiés dans le
-     rapport ; ils restent comptés dans l'inventaire.
+3. Determine the target:
+   - without argument: the whole `KitV2/`;
+   - with a `KitV2/<zone>` argument: that zone, with the global context of the
+     charter, installer, rules, manifests, and relations;
+   - any target outside `KitV2/` is rejected as out of scope.
+4. Always distinguish:
+   - **audited files**: those of the target that receive a status for each
+     applicable dimension;
+   - **context files**: charter, rules, validators, installer, manifests, or
+     sources read to interpret the target, but not counted in the KitV2
+     inventory;
+   - **excluded files**: only the cases explicitly justified in the report;
+     they remain counted in the inventory.
 
-## 2. Inventaire complet — première étape obligatoire
+## 2. Complete inventory — first mandatory step
 
-L'inventaire doit précéder toute lecture interprétative. Enregistre un
-horodatage UTC (`YYYY-MM-DDTHH:MM:SSZ`), la cible absolue, l'argument reçu et,
-si disponible sans modifier le dépôt, le commit ou l'état Git observé.
+The inventory must precede any interpretive reading. Record a UTC timestamp
+(`YYYY-MM-DDTHH:MM:SSZ`), the absolute target, the received argument and, if
+available without modifying the repository, the observed commit or Git state.
 
-Construis une liste complète et triée de tous les fichiers réguliers et liens
-symboliques sous la cible, y compris les fichiers cachés, YAML, Markdown,
-JSON, Go, scripts, manifests, tests, probes, fichiers de configuration et
-fichiers binaires. N'utilise pas `head`, `tail`, une sortie tronquée ou une
-liste manuelle comme inventaire de référence. Une forme acceptable est :
+Build a complete, sorted list of all regular files and symbolic links under
+the target, including hidden files, YAML, Markdown, JSON, Go, scripts,
+manifests, tests, probes, configuration files, and binary files. Do not use
+`head`, `tail`, a truncated output, or a manual list as the reference
+inventory. An acceptable form is:
 
 ```sh
 find -P "$TARGET" \( -type f -o -type l \) -print | LC_ALL=C sort
 ```
 
-Conserve cette liste dans un fichier temporaire hors du dépôt si la sortie est
-trop grande pour le contexte. Ce fichier temporaire n'est pas un livrable et
-ne doit pas être confondu avec le produit.
+Keep this list in a temporary file outside the repository if the output is
+too large for context. This temporary file is not a deliverable and must not
+be confused with the product.
 
-Attribue immédiatement à chaque chemin un état de couverture dans un ledger
-interne : `À INSPECTER`, `INSPECTÉ`, `EXCLU (justification)`, ou `BLOQUÉ
-(cause)`. À la réconciliation, aucun chemin ne peut rester `À INSPECTER` :
-il doit devenir `INSPECTÉ`, `EXCLU` ou `BLOQUÉ`. Aucun chemin ne peut disparaître
-du ledger. Pour les fichiers illisibles, binaires ou liens non résolus,
-inspecte au moins le type, la cible et les métadonnées disponibles puis marque
-les dimensions impossibles `À VÉRIFIER` ; ne les saute pas silencieusement.
+Immediately assign each path a coverage state in an internal ledger:
+`TO INSPECT`, `INSPECTED`, `EXCLUDED (justification)`, or `BLOCKED (cause)`.
+At reconciliation, no path may remain `TO INSPECT`: it must become
+`INSPECTED`, `EXCLUDED`, or `BLOCKED`. No path may disappear from the ledger.
+For unreadable files, binaries, or unresolved links, inspect at least the
+type, target, and available metadata, then mark the impossible dimensions
+`TO VERIFY`; do not skip them silently.
 
-## 3. Inspection séparée du rapport
+## 3. Inspection separated from the report
 
-### Phase A — Construire le modèle de règles
+### Phase A — Build the rule model
 
-Après l'inventaire, établis une matrice des exigences, sans encore rédiger de
-recommandation :
+After the inventory, establish a requirements matrix, without yet writing any
+recommendation:
 
-- `§2/§3` : types d'objets et couches cognitives ;
-- `§4` : Single Source of Truth, duplication = défaut ;
-- `§5` : métadonnées minimales ;
-- `§6` : sources avant inclusion et sources enregistrées ;
-- `§7` : composition sans duplication entre les couches ;
-- `§8` : génération déterministe et absence d'hypothèses cachées ;
-- `§9` : validation des artefacts exécutables et comportement observable ;
-- `§10` : progression de la connaissance fondée sur les preuves ;
-- `§11` : indépendance de l'artefact et absence de contexte caché ;
-- `§12` : versionnement, migrations et dépréciation ;
-- `§13` : relations explicites ;
-- `§14` : Quality Gates ;
-- `§15` : Definition of Done ;
-- `§16` : principes fondamentaux du Kit ;
-- tout contrat de zone applicable dans `.agent/kit-governance/` ;
-- toute règle universelle ou spécialisée de `KitV2/rules/` applicable au
-  fichier.
+- `§2/§3`: object types and cognitive layers;
+- `§4`: Single Source of Truth, duplication = defect;
+- `§5`: minimal metadata;
+- `§6`: sources before inclusion and recorded sources;
+- `§7`: composition without duplication between layers;
+- `§8`: deterministic generation and absence of hidden assumptions;
+- `§9`: validation of executable artifacts and observable behavior;
+- `§10`: evidence-based knowledge progression;
+- `§11`: artifact independence and absence of hidden context;
+- `§12`: versioning, migrations, and deprecation;
+- `§13`: explicit relationships;
+- `§14`: Quality Gates;
+- `§15`: Definition of Done;
+- `§16`: fundamental Kit principles;
+- any applicable zone contract in `.agent/kit-governance/`;
+- any universal or specialized rule in `KitV2/rules/` applicable to the file.
 
-Ne transforme pas un conseil de style en violation de charte. Chaque finding
-ultérieur doit pointer vers la section normative exacte ou être étiqueté comme
-observation hors charte.
+Do not turn a style suggestion into a charter violation. Each subsequent
+finding must point to the exact normative section or be labeled as an
+off-charter observation.
 
-### Phase B — Typage dynamique, fichier par fichier
+### Phase B — Dynamic typing, file by file
 
-Pour chaque chemin de l'inventaire, détermine séparément :
+For each path of the inventory, determine separately:
 
-1. le rôle déclaré par ses métadonnées ou son contenu ;
-2. le type de charte le plus défendable parmi `Rule`, `Recipe`, `Pattern`,
+1. the role declared by its metadata or content;
+2. the most defensible charter type among `Rule`, `Recipe`, `Pattern`,
    `Snippet`, `Template`, `Capability`, `Evaluation`, `Decision Record`,
-   `Source`, `Memory` ;
-3. le rôle de support éventuel (`manifest`, `index`, test, probe, outil,
-   documentation, configuration) ;
-4. le dossier auquel il appartient réellement ;
-5. le type et le dossier attendus, s'ils sont déterminables.
+   `Source`, `Memory`;
+3. the possible supporting role (`manifest`, `index`, test, probe, tool,
+   documentation, configuration);
+4. the directory it actually belongs to;
+5. the expected type and directory, if determinable.
 
-Ne déduis jamais un type uniquement du nom du dossier. Un `category` Pi ou un
-nom de fichier n'est pas automatiquement le `kind` du charter. Si le type est
-absent, ambigu ou contradictoire, marque `À VÉRIFIER` et explique quelles
-métadonnées ou relations manquent.
+Never infer a type only from the directory name. A Pi `category` or a file
+name is not automatically the charter `kind`. If the type is absent, ambiguous,
+or contradictory, mark `TO VERIFY` and explain which metadata or relations are
+missing.
 
-Vérifie aussi le mismatch structurel :
+Also verify the structural mismatch:
 
-- un fichier déclare un type inconnu ou un type incompatible avec son rôle ;
-- un fichier réutilisable n'a aucun rattachement à un objet de charte ;
-- une couche du charter semble absente de `KitV2/`, ou est représentée par un
-  autre mécanisme (manifest, graphe, probe, outil) non documenté ;
-- pour toute capacité couverte par une recette ET une probe (ex. desktop-app),
-  vérifier qu'une ligne roadmap de template existe dans
-  `templates/TEMPLATES.md` ; une capacité couverte partout sauf au niveau
-  template, sans reconnaissance roadmap, est une catégorie de finding nommée
-  à part entière, pas un cas générique noyé dans la formulation actuelle
-  (D-2026-08-05-14) ;
-- un dossier existe mais mélange plusieurs responsabilités sans frontière
-  explicite.
+- a file declares an unknown type or a type incompatible with its role;
+- a reusable file has no attachment to a charter object;
+- a charter layer seems absent from `KitV2/`, or is represented by another
+  mechanism (manifest, graph, probe, tool) not documented;
+- for every capability covered by a recipe AND a probe (e.g. desktop-app),
+  check that a template roadmap line exists in `templates/TEMPLATES.md`; a
+  capability covered everywhere except the template level, without roadmap
+  recognition, is a named finding category of its own, not a generic case
+  buried in the current wording (D-2026-08-05-14);
+- a directory exists but mixes several responsibilities without an explicit
+  boundary.
 
-L'absence d'un dossier portant exactement le nom d'un type n'est pas à elle
-seule une erreur : rapporte-la comme `CONFORME`, `NON CONFORME` ou `À VÉRIFIER`
-selon la représentation déclarée et la preuve de conception.
+The absence of a directory bearing exactly the name of a type is not by
+itself an error: report it as `CONFORM`, `NON CONFORM`, or `TO VERIFY`
+according to the declared representation and the design evidence.
 
-### Phase C — Contrôles par fichier et par relation
+### Phase C — Per-file and per-relation checks
 
-Pour chaque fichier, évalue les dimensions suivantes. Utilise `N/A
-(justifié)` seulement lorsqu'une dimension est réellement inapplicable.
+For each file, evaluate the following dimensions. Use `N/A (justified)` only
+when a dimension is truly inapplicable.
 
-#### C1. Charte et contrat de zone
+#### C1. Charter and zone contract
 
-Vérifie la conformité aux sections pertinentes de `KIT_CHARTER.md` et au
-contrat de zone. Cite la section précise (`§4`, `§5`, etc.) et le chemin du
-contrat. Ne remplace pas le charter par une checklist inventée.
+Verify conformity to the relevant sections of `KIT_CHARTER.md` and to the
+zone contract. Cite the precise section (`§4`, `§5`, etc.) and the contract
+path. Do not replace the charter with an invented checklist.
 
-#### C2. Métadonnées et rattachement
+#### C2. Metadata and attachment
 
-Pour tout artefact réutilisable, vérifie la présence et la valeur utile de
-chaque champ §5 :
+For every reusable artifact, verify the presence and useful value of each §5
+field:
 
 ```text
 id, title, kind, version, status, owner, tags, go_version,
 dependencies, last_verified
 ```
 
-Vérifie aussi les relations explicites lorsque le type les exige :
+Also verify the explicit relations when the type requires them:
 `depends_on`, `uses`, `implements`, `extends`, `references`, `requires`,
-`supersedes`, `validated_by`, `generated_from`. Distingue une métadonnée Pi
-nécessaire à la découverte (`name`, `description`, etc.) des métadonnées du
-graphe de connaissance du charter : l'une ne remplace pas l'autre. Vérifie
-également §12 : version, statut de dépréciation, migration documentée pour les
-changements cassants et cohérence des évaluations dépendantes.
+`supersedes`, `validated_by`, `generated_from`. Distinguish Pi metadata
+needed for discovery (`name`, `description`, etc.) from the charter's
+knowledge-graph metadata: one does not replace the other. Also verify §12:
+version, deprecation status, documented migration for breaking changes, and
+consistency of dependent evaluations.
 
-#### C3. Sources et fraîcheur réelle
+#### C3. Sources and real freshness
 
-Vérifie que les sources sont enregistrées dans l'artefact ou dans le registre
-canonique prévu, qu'elles sont primaires ou justifiées par le charter, et que
-la version/date revendiquée correspond à la source. Si l'accès réseau n'est
-pas possible, garde la source et marque la vérification de fraîcheur `À
-VÉRIFIER`; ne te fie pas au seul champ `last_verified`. Signale les URL
-manquantes, mortes, non canoniques, vagues ou les affirmations sans preuve.
+Verify that sources are recorded in the artifact or in the canonical registry,
+that they are primary or justified by the charter, and that the claimed
+version/date matches the source. If network access is not possible, keep the
+source and mark the freshness check `TO VERIFY`; do not rely only on the
+`last_verified` field. Report missing, dead, non-canonical, vague URLs or
+unsupported claims.
 
-#### C4. Single Source of Truth et duplication
+#### C4. Single Source of Truth and duplication
 
-Recherche :
+Search for:
 
-- doublons exacts ou quasi exacts entre fichiers ;
-- même règle opérationnelle copiée dans plusieurs couches ;
-- recette qui recopie un pattern ou un snippet au lieu de le composer ;
-- catalogues, indexes, manifests ou README qui contredisent le corps
-  canonique ;
-- traduction ou seconde version linguistique qui répète le même contenu au
-  lieu de le référencer.
+- exact or near-exact duplicates between files;
+- the same operational rule copied across several layers;
+- a recipe that copies a pattern or snippet instead of composing it;
+- catalogs, indexes, manifests, or READMEs that contradict the canonical
+  body;
+- a translation or second language version that repeats the same content
+  instead of referencing it.
 
-Une similarité de vocabulaire ne suffit pas : cite les passages qui répondent
-à la même question. Si une duplication peut être détectée mécaniquement
-(hash, bloc identique, identifiant répété), indique-le séparément d'une
-duplication sémantique qui exige une revue humaine.
+Vocabulary similarity is not enough: cite the passages that answer the same
+question. If a duplication can be detected mechanically (hash, identical
+block, repeated identifier), state it separately from semantic duplication
+that requires human review.
 
-Échantillonne en outre explicitement les chaînes de pointeurs
-pattern↔recette↔snippet (D-2026-08-05-11) : pour chaque snippet, résoudre
-`source:` (SNIPPET.yaml) vers son artefact canonique et comparer la forme du
-code ; pour chaque recette, identifier les patterns/snippets référencés et
-vérifier qu'elle les compose sans les recopier. La dérive d'une chaîne
-(canonique modifié, snippet non re-vérifié) est un finding distinct de la
-duplication interne à une cible — indique pour chaque chaîne si elle est
-contrôlable mécaniquement par dates (`last_verified` dépendant >= canonique)
-ou seulement par revue.
+Additionally, explicitly sample the pattern↔recipe↔snippet pointer chains
+(D-2026-08-05-11): for each snippet, resolve `source:` (SNIPPET.yaml) to its
+canonical artifact and compare the code shape; for each recipe, identify the
+referenced patterns/snippets and verify that it composes them without copying
+them. Chain drift (canonical modified, snippet not re-verified) is a finding
+distinct from intra-target duplication — state for each chain whether it is
+mechanically checkable by dates (`last_verified` dependent >= canonical) or
+only by review.
 
-#### C5. Indépendance et dépendances cachées
+#### C5. Independence and hidden dependencies
 
-Un agent qui charge un seul artefact doit pouvoir comprendre son usage sans
-conversation antérieure ni mémoire du méta-projet. Vérifie les dépendances
-explicites, les cross-références résolubles et l'absence de chemins cachés
-vers `.agent/`, `.pi/memory/`, `docs/` ou d'autres fichiers non livrés. Un
-fichier KitV2 ne doit pas dépendre de `../.agent` ou d'une source disponible
-uniquement dans le méta-projet. Les relations déclarées vers des cibles
-manquantes, proposées ou non actives sont des findings distincts.
+An agent loading a single artifact must be able to understand its use without
+prior conversation or metaproject memory. Verify explicit dependencies,
+resolvable cross-references, and the absence of hidden paths to `.agent/`,
+`.pi/memory/`, `docs/`, or other unshipped files. A KitV2 file must not depend
+on `../.agent` or a source available only in the metaproject. Declared
+relations to missing, proposed, or inactive targets are distinct findings.
 
-#### C6. Validation §9 et preuve observable
+#### C6. Validation §9 and observable evidence
 
-Pour les recipes, snippets, templates, probes, outils ou tout autre artefact
-exécutable, localise les commandes, tests, scénarios et critères d'acceptation.
-Vérifie qu'ils couvrent le comportement central, les erreurs importantes et,
-si pertinent, race/security/vulnerability checks. Une compilation ou un test
-vert ne remplace pas un scénario observable ; une preuve non exécutée est
-`À VÉRIFIER`, jamais `CONFORME`. N'exécute que des commandes sans modification
-du dépôt et indique exactement ce qui a ou n'a pas été exécuté.
+For recipes, snippets, templates, probes, tools, or any other executable
+artifact, locate the commands, tests, scenarios, and acceptance criteria.
+Verify that they cover the central behavior, important errors and, if
+relevant, race/security/vulnerability checks. A green compilation or test does
+not replace an observable scenario; unexecuted evidence is `TO VERIFY`, never
+`CONFORM`. Run only commands that do not modify the repository and state
+exactly what was or was not executed.
 
-#### C7. Langue et cohérence éditoriale
+#### C7. Language and editorial coherence
 
-Détermine la langue dominante de chaque famille d'artefacts à partir du
-contenu réel. Signale :
+**The repository's explicit policy (fundamental rule D-2026-08-05-21) is:
+English is the mandatory language for every skill, instruction, and
+document.** Determine the dominant language of each artifact family from the
+actual content. Report:
 
-- un mélange de langues qui rend une même instruction incohérente ;
-- une traduction intégrale du même contenu dans un seul fichier ou dans deux
-  fichiers ;
-- des titres, métadonnées et sections qui changent de langue sans raison
-  explicite ;
-- une citation, un identifiant, un nom d'API ou un extrait source qui n'est
-  pas une violation linguistique.
+- a language mix that makes the same instruction incoherent;
+- a full translation of the same content in a single file or in two files;
+- titles, metadata, and sections that change language without an explicit
+  reason;
+- a citation, identifier, API name, or source excerpt that is not a language
+  violation.
 
-Ne décrète pas arbitrairement que l'anglais ou le français est la langue
-obligatoire. Le défaut est la cohérence d'une famille ; toute politique
-explicite du dépôt prime sur une préférence stylistique.
+French content in active instruction surfaces is `NON CONFORM` under the
+explicit policy, except the historical memory records (`.pi/memory/` history)
+which are grandfathered as a registry, not an instruction.
 
-#### C8. Exemples de code et règles universelles
+#### C8. Code examples and universal rules
 
-Pour chaque bloc Go d'une recipe, d'un snippet, d'un template ou d'un probe,
-lis les règles universelles pertinentes avant de conclure. Vérifie notamment
-les erreurs traitées une seule fois, le contexte et l'annulation, logging,
-validation aux frontières, interfaces consommateur, fermeture des ressources,
-concurrence, sécurité et commandes de validation. Cite le fichier de règle et
-la ligne du bloc. Si un contrôle exige une analyse que la lecture Markdown ne
-permet pas, marque-le `À VÉRIFIER` plutôt que d'inventer un verdict.
+For every Go block of a recipe, snippet, template, or probe, read the relevant
+universal rules before concluding. In particular verify errors handled once,
+context and cancellation, logging, boundary validation, consumer interfaces,
+resource closure, concurrency, security, and validation commands. Cite the
+rule file and the block line. If a check requires analysis that Markdown
+reading does not allow, mark it `TO VERIFY` rather than inventing a verdict.
 
-#### C9. Instructions absolues et portes mécaniques
+#### C9. Absolute instructions and mechanical gates
 
-Inventorie chaque instruction absolue du Kit (`MANDATORY`, « toujours »,
-« jamais ») dans les artefacts consommateurs (skills, prompts, AGENTS.md,
-recettes) et son statut d'application : contrôle mécanique nommé (validateur
-C2, porte Pi) ou « guidance seule, non appliquée » consignée dans le registre
-des lacunes d'automatisation (`.agent/instructions.md` §Enforcement). Une
-absolue sans contrôle ni consignation est un finding (D-2026-08-05-15) —
-n'évalue pas seulement la présence de la phrase, mais ce qui l'applique.
+Inventory every absolute instruction in the Kit (`MANDATORY`, « always »,
+« never ») in consumer artifacts (skills, prompts, AGENTS.md, recipes) and its
+enforcement status: named mechanical control (validator C2, Pi gate) or
+"guidance only, not enforced" recorded in the automation-gaps registry
+(`.agent/instructions.md` §Enforcement). An absolute without control or
+recording is a finding (D-2026-08-05-15) — evaluate not only the presence of
+the phrase, but what enforces it.
 
-#### C10. Workflow spec-driven-dev (contrat Z12)
+#### C10. spec-driven-dev workflow (contract Z12)
 
-Vérifie la zone `KitV2/.pi/skills/spec-driven-dev/` et `deep-discuss/`
-contre le contrat Z12 :
+Verify the `KitV2/.pi/skills/spec-driven-dev/` and `deep-discuss/` zones
+against contract Z12:
 
-- frontmatter complet (name == dossier, category: workflow, description EN,
-  tags, last-verified), SKILL.md ≤ 500 lignes, références `references/**`
-  présentes et liens relatifs résolus ;
-- pas de fuite GitHub (aucun `github-integration.md`, aucune référence gh/
-  Issue/PR dans la skill) — mode LOCAL_ONLY (D-2026-08-05-18) ;
-- S.U.P.E.R présent comme lentille de santé avec la frontière « les règles
-  sourcées du kit priment » (D-2026-08-05-16, Z12 §3.2) ;
-- contrôle adaptatif (télémetry, drift, seuils) et phase 6 archive présents ;
-- règle mémoire « vérifier les fichiers .pi/memory présents, Decisions.md peut
-  manquer » encodée (KitV2/AGENTS.md + workflow-memory.md) ;
-- **aucun prompt `workflow-{clarify,plan,tasks,implement,verify}` résiduel** :
-  un prompt résiduel de l'ancienne chaîne est une catégorie de finding nommée
-  à part entière (D-2026-08-05-16), pas un cas générique ;
-- `go-code-review` porte la discipline findings-first (cibles, focus, format)
-  sans dépasser 500 lignes ;
-- router indexé (skills spec-driven-dev, deep-discuss) et `--check` vert.
+- complete frontmatter (name == directory, category: workflow, English
+  description, tags, last-verified), SKILL.md ≤ 500 lines, `references/**`
+  present and relative links resolved;
+- no GitHub leakage (no `github-integration.md`, no gh/Issue/PR reference in
+  the skill) — LOCAL_ONLY mode (D-2026-08-05-18);
+- S.U.P.E.R present as a health lens with the "sourced kit rules win"
+  boundary (D-2026-08-05-16, Z12 §3.2);
+- adaptive control (telemetry, drift, thresholds) and Phase 6 archive present;
+- the memory rule "verify which .pi/memory files exist, Decisions.md may be
+  missing" encoded (KitV2/AGENTS.md + workflow-memory.md);
+- **no residual `workflow-{clarify,plan,tasks,implement,verify}` prompt**: a
+  residual prompt from the former chain is a named finding category of its
+  own (D-2026-08-05-16), not a generic case;
+- `go-code-review` carries the findings-first discipline (targets, focus,
+  format) without exceeding 500 lines;
+- router indexed (skills spec-driven-dev, deep-discuss) and `--check` green.
 
-### Phase D — Décider « méta-projet ou Kit ? »
+### Phase D — Decide "metaproject or Kit?"
 
-Cette dimension est obligatoire pour **chaque fichier**, y compris les fichiers
-de support. Le méta-projet crée, gouverne, audite et fait évoluer le Kit ; le
-Kit est le produit consommable dont l'unique objectif est d'aider un agent à
-générer du code Go propre et des applications Go sans friction.
+This dimension is mandatory for **every file**, including supporting files.
+The metaproject creates, governs, audits, and evolves the Kit; the Kit is the
+consumable product whose sole purpose is to help an agent generate clean Go
+code and frictionless Go applications.
 
-Classe chaque fichier selon la décision la mieux étayée :
+Classify each file according to the best-supported decision:
 
-- `KIT — consumer-facing` : connaissance, capacité, règle, recette, snippet,
-  template, source embarquée, probe ou outil dont le consommateur a besoin
-  pour utiliser, vérifier ou maintenir localement le produit installé ;
-- `META-PROJET — maintenance/gouvernance` : charter, contrat de construction,
-  mémoire du méta-projet, décision de fabrication, plan, recherche, évidence,
-  registre de sources de travail, audit, workflow de création/évolution,
-  validateur du méta-projet ou prompt de maintenance ;
-- `AMBIGU — décision à prendre` : valeur potentielle pour le consommateur et
-  le mainteneur non séparées, ou responsabilité partagée ;
-- `HORS PÉRIMÈTRE / EXCLU` : uniquement avec raison explicite et preuve.
+- `KIT — consumer-facing`: knowledge, capability, rule, recipe, snippet,
+  template, embedded source, probe, or tool the consumer needs to use,
+  verify, or maintain locally the installed product;
+- `META-PROJECT — maintenance/governance`: charter, construction contract,
+  metaproject memory, manufacturing decision, plan, research, evidence,
+  working source registry, audit, creation/evolution workflow, metaproject
+  validator, or maintenance prompt;
+- `AMBIGUOUS — decision to take`: consumer and maintainer value not
+  separated, or shared responsibility;
+- `OUT OF SCOPE / EXCLUDED`: only with explicit reason and evidence.
 
-Applique ces tests, dans l'ordre :
+Apply these tests, in order:
 
-1. Si le fichier disparaît du dépôt source mais que le Kit installé conserve
-   la même capacité consommateur, il est probablement méta-projet.
-2. Si un agent consommateur chargé uniquement du Kit doit le lire ou l'exécuter
-   pour générer/valider du Go, il est probablement Kit.
-3. Un fichier de fabrication, d'audit permanent, de preuve historique ou de
-   gouvernance n'est pas rendu produit par le simple fait qu'il parle de
-   `KitV2`.
-4. `KitV2/probes/`, `KitV2/tools/offline/` et `KitV2/.pi/` ne sont pas
-   automatiquement de la pollution : mesure leur contrat consommateur réel,
-   leur autonomie et leur présence dans l'installation.
-5. À l'inverse, un fichier de maintenance placé dans `KitV2/` est une
-   pollution potentielle même s'il compile. Mesure son utilité consommateur,
-   son coût de contexte et le risque de livrer l'historique ou le contrôle du
-   méta-projet.
+1. If the file disappears from the source repository but the installed Kit
+   keeps the same consumer capability, it is probably metaproject.
+2. If a consumer agent loaded only with the Kit must read or execute it to
+   generate/validate Go, it is probably Kit.
+3. A manufacturing, permanent-audit, historical-evidence, or governance file
+   is not made product by the mere fact that it talks about `KitV2`.
+4. `KitV2/probes/`, `KitV2/tools/offline/`, and `KitV2/.pi/` are not
+   automatically pollution: measure their real consumer contract, autonomy,
+   and presence in the installation.
+5. Conversely, a maintenance file placed in `KitV2/` is potential pollution
+   even if it compiles. Measure its consumer usefulness, context cost, and
+   the risk of shipping the metaproject's history or control plane.
 
-Pour toute décision `META-PROJET`, `AMBIGU` ou `NON CONFORME`, fournis la
-preuve de frontière : chemin, responsabilité, consommateur visé, et résultat
-de l'inventaire de l'installeur. Ne corrige jamais le déplacement dans cet
-audit.
+For every `META-PROJECT`, `AMBIGUOUS`, or `NON CONFORM` decision, provide the
+boundary evidence: path, responsibility, intended consumer, and installer
+inventory result. Never fix the move in this audit.
 
-## 4. Contrôle de couverture et des validateurs existants
+## 4. Coverage check and existing validators
 
-Après l'inspection seulement, réconcilie les résultats. Produis ces comptes,
-sans arrondir et sans compter les fichiers de contexte :
+After inspection only, reconcile the results. Produce these counts, without
+rounding and without counting context files:
 
 ```text
-trouvés = audités + exclus_justifiés + bloqués
+found = audited + excluded_justified + blocked
 ```
 
-- `trouvés` : nombre exact de chemins de l'inventaire ;
-- `audités` : chaque chemin ayant reçu un statut par dimension applicable ;
-- `exclus_justifiés` : chemins avec raison et catégorie explicites ;
-- `bloqués` : chemins non lisibles ou impossibles à évaluer, avec cause et
-  prochaine vérification.
+- `found`: exact number of inventory paths;
+- `audited`: every path that received a status per applicable dimension;
+- `excluded_justified`: paths with explicit reason and category;
+- `blocked`: paths unreadable or impossible to evaluate, with cause and next
+  verification.
 
-Si l'équation ne ferme pas, le verdict global du workflow est `FAIL —
-COUVERTURE INCOMPLÈTE`, même si les findings connus semblent mineurs. Signale
-les chemins non inspectés individuellement. Une cible de zone doit aussi
-indiquer combien de fichiers de contexte ont été lus mais exclus du calcul.
+If the equation does not close, the workflow's global verdict is `FAIL —
+INCOMPLETE COVERAGE`, even if the known findings seem minor. Report the
+uninspected paths individually. A zone target must also state how many
+context files were read but excluded from the calculation.
 
-Dans une section séparée, compare les contrôles observés avec les deux
-validateurs existants :
+In a separate section, compare the observed checks with the two existing
+validators:
 
-- indique précisément ce que `validate-instructions.py` couvre déjà (schéma
-  Pi des skills, liens relatifs, limite de taille, absence de mémoire
-  consommateur, description des prompts) ;
-- indique précisément ce que `validate-cognitive.py` couvre déjà (métadonnées
-  et relations des artefacts YAML pris en charge, statuts/cibles, unités de
-  sources, fuite de chemins méta-projet et bundle hors ligne) ;
-- ne reconstruis pas ces contrôles dans le rapport comme s'ils étaient absents ;
-- signale les trous réels : tous les types de fichiers non couverts, §5
-  complet, duplication sémantique, langue, fraîcheur effective des sources,
-  composition, indépendance et décision méta-projet/Kit ;
-- pour chaque trou, recommande le meilleur niveau de contrôle :
-  `validate-instructions.py` pour une contrainte déterministe du format Pi,
-  `validate-cognitive.py` pour le graphe/relations, un nouveau validateur
-  déterministe pour une propriété de structure indépendante, ou ce workflow
-  agent/revue pour une propriété sémantique. Ne modifie aucun validateur.
+- state precisely what `validate-instructions.py` already covers (Pi skill
+  schema, relative links, size limit, absence of consumer memory, prompt
+  descriptions);
+- state precisely what `validate-cognitive.py` already covers (metadata and
+  relations of supported YAML artifacts, statuses/targets, source units,
+  metaproject path leakage, and offline bundle);
+- do not rebuild these checks in the report as if they were absent;
+- report the real gaps: all uncovered file types, complete §5, semantic
+  duplication, language, effective source freshness, composition,
+  independence, and the metaproject/Kit decision;
+- for each gap, recommend the best control level:
+  `validate-instructions.py` for a deterministic Pi-format constraint,
+  `validate-cognitive.py` for the graph/relations, a new deterministic
+  validator for an independent structural property, or this agent/review
+  workflow for a semantic property. Do not modify any validator.
 
-Attention : n'étends pas automatiquement le schéma Pi publié avec les champs
-§5 du charter. Si ces contrats sont différents, recommande un contrôle séparé
-ou une décision de contrat explicite plutôt qu'un changement silencieux.
+Caution: do not automatically extend the published Pi schema with the
+charter's §5 fields. If these contracts differ, recommend a separate check or
+an explicit contract decision rather than a silent change.
 
-## 5. Rapport final — après l'inspection uniquement
+## 5. Final report — after inspection only
 
-Le rapport est compact mais complet. Il doit contenir, dans cet ordre :
+The report is compact but complete. It must contain, in this order:
 
-### A. En-tête
+### A. Header
 
-- `KitV2 Audit — <date UTC>` ;
-- cible exacte et argument ;
-- statut non destructif ;
-- commit/état observé si disponible ;
-- versions des validateurs et commandes réellement exécutées.
+- `KitV2 Audit — <UTC date>`;
+- exact target and argument;
+- non-destructive status;
+- observed commit/state if available;
+- validator versions and commands actually run.
 
-### B. Inventaire et réconciliation
+### B. Inventory and reconciliation
 
-Donne l'horodatage de l'inventaire, les quatre nombres `trouvés/audités/
-exclus/bloqués`, l'équation et le verdict de couverture. Fournis le ledger
-complet ou une table exhaustive par chemin ; une ligne peut regrouper plusieurs
-fichiers seulement si chaque fichier garde un statut individuel récupérable et
-si les chemins sont tous énumérés. Les fichiers de contexte sont listés à
-part séparément.
+Give the inventory timestamp, the four numbers `found/audited/
+excluded/blocked`, the equation, and the coverage verdict. Provide the
+complete ledger or an exhaustive per-path table; one line may group several
+files only if each file keeps a recoverable individual status and all paths
+are enumerated. Context files are listed separately.
 
-### C. Verdict par fichier et par dimension
+### C. Verdict per file and per dimension
 
-Chaque fichier de la cible doit apparaître dans une table ou un ledger avec au
-minimum :
+Every file of the target must appear in a table or ledger with at least:
 
 ```text
-path | rôle/kind | placement (KIT/META/AMBIGU) |
-charter | type/zone | metadata | sources/fraîcheur |
-SSOT/duplication | validation | indépendance |
-langue | cohérence code/règles | confiance | risque | verdict global
+path | role/kind | placement (KIT/META/AMBIGUOUS) |
+charter | type/zone | metadata | sources/freshness |
+SSOT/duplication | validation | independence |
+language | code/rules coherence | confidence | risk | global verdict
 ```
 
-Les valeurs autorisées sont `CONFORME`, `NON CONFORME`, `À VÉRIFIER` ou `N/A
-(justifié)`. Pour chaque `NON CONFORME` ou `À VÉRIFIER`, référence un finding
-stable et une preuve précise. Le verdict global ne peut pas être `CONFORME`
-si une dimension applicable est `NON CONFORME` ou `À VÉRIFIER`.
+Allowed values are `CONFORM`, `NON CONFORM`, `TO VERIFY`, or `N/A
+(justified)`. For each `NON CONFORM` or `TO VERIFY`, reference a stable
+finding and precise evidence. The global verdict cannot be `CONFORM` if an
+applicable dimension is `NON CONFORM` or `TO VERIFY`.
 
-### D. Findings classés
+### D. Classified findings
 
-Numérote les findings de manière stable (`KVA-001`, `KVA-002`, …) et utilise
-le format :
+Number findings stably (`KVA-001`, `KVA-002`, …) and use the format:
 
 ```text
-ID | catégorie | risque | confiance | fichier/ligne | preuve |
-section KIT_CHARTER ou contrat | impact | action recommandée (sans l'appliquer)
+ID | category | risk | confidence | file/line | evidence |
+KIT_CHARTER or contract section | impact | recommended action (without applying it)
 ```
 
-Sépare `risque` (`CRITIQUE`, `ÉLEVÉ`, `MOYEN`, `FAIBLE`) de `confiance`
-(`ÉLEVÉE`, `MOYENNE`, `FAIBLE`). Utilise notamment :
+Separate `risk` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) from `confidence`
+(`HIGH`, `MEDIUM`, `LOW`). In particular use:
 
-- `CRITIQUE` : violation §4/§5/§6/§11/§14/§15, fuite de contrôle du
-  méta-projet dans le Kit, source essentielle invérifiable, ou couverture non
-  fermée ;
-- `ÉLEVÉ` : type ou relation incohérente, métadonnées essentielles absentes,
-  artefact exécutable sans validation, duplication opérationnelle ;
-- `MOYEN` : dérive de langue, fraîcheur à confirmer, incohérence d'index ou
-  règle applicable non prouvée ;
-- `FAIBLE` : amélioration éditoriale qui ne change pas la capacité ni la
-  traçabilité.
+- `CRITICAL`: §4/§5/§6/§11/§14/§15 violation, metaproject control-plane
+  leakage into the Kit, unverifiable essential source, or unclosed coverage;
+- `HIGH`: inconsistent type or relation, missing essential metadata,
+  executable artifact without validation, operational duplication;
+- `MEDIUM`: language drift, freshness to confirm, index inconsistency, or
+  applicable rule not proven;
+- `LOW`: editorial improvement that changes neither capability nor
+  traceability.
 
-Une hypothèse non confirmée ne devient pas un finding à confiance élevée.
-Regroupe les findings identiques mais conserve tous les chemins concernés.
+An unconfirmed hypothesis does not become a high-confidence finding. Group
+identical findings but keep all affected paths.
 
-### E. Lacunes d'automatisation
+### E. Automation gaps
 
-Tableau séparé : `dimension | déjà couvert par | trou | contrôle conseillé |
-raison`. Indique clairement ce qui doit rester une analyse sémantique humaine
-ou agentique et ce qui peut devenir une assertion Python répétable.
+Separate table: `dimension | already covered by | gap | recommended check |
+reason`. Clearly state what must remain human or agentic semantic analysis and
+what can become a repeatable Python assertion.
 
-Le tableau contient au minimum, à chaque audit :
+The table contains at minimum, at each audit:
 
-- la ligne « dérive inter-fichiers » : chaînes pattern↔recette↔snippet
-  contrôlables par dates (`last_verified` dépendant >= canonique) vs revue
-  sémantique (D-2026-08-05-11) ;
-- la ligne « instructions absolues (MANDATORY) » : chaque occurrence
-  MANDATORY/« toujours »/« jamais » du Kit et son statut d'application
-  (contrôle mécanique nommé ou « guidance seule » — D-2026-08-05-15) ;
-- la ligne « workflow spec-driven-dev (Z12) » : conformité de la zone au
-  contrat Z12 — LOCAL_ONLY, frontière S.U.P.E.R, contrôle adaptatif, archive,
-  règle mémoire, absence de prompts workflow-* résiduels (D-2026-08-05-16).
+- the "cross-file drift" row: pattern↔recipe↔snippet chains checkable by
+  dates (`last_verified` dependent >= canonical) vs semantic review
+  (D-2026-08-05-11);
+- the "absolute instructions (MANDATORY)" row: every MANDATORY/"always"/
+  "never" occurrence in the Kit and its enforcement status (named mechanical
+  control or "guidance only" — D-2026-08-05-15);
+- the "spec-driven-dev workflow (Z12)" row: zone conformity to contract
+  Z12 — LOCAL_ONLY, S.U.P.E.R boundary, adaptive control, archive, memory
+  rule, absence of residual workflow-* prompts (D-2026-08-05-16).
 
-### F. Verdict et suites
+### F. Verdict and next steps
 
-Termine par :
+End with:
 
-- `Audit: PASS`, `PARTIAL`, `FAIL` ou `BLOCKED` ;
-- couverture exacte et résiduel de confiance ;
-- pollution méta-projet/Kit détectée, avec nombre et chemins ;
-- commandes non exécutées et pourquoi ;
-- prochaines actions proposées, sans les exécuter.
+- `Audit: PASS`, `PARTIAL`, `FAIL`, or `BLOCKED`;
+- exact coverage and residual confidence;
+- detected metaproject/Kit pollution, with count and paths;
+- commands not executed and why;
+- proposed next actions, without executing them.
 
-`PASS` exige une couverture fermée, aucun finding critique/élevé non résolu,
-et aucune dimension applicable `À VÉRIFIER`. Une source réseau indisponible,
-un scénario non exécuté ou un fichier illisible force au minimum `PARTIAL` ou
-`BLOCKED` selon son importance.
+`PASS` requires closed coverage, no unresolved critical/high finding, and no
+applicable dimension `TO VERIFY`. An unavailable network source, an unexecuted
+scenario, or an unreadable file forces at least `PARTIAL` or `BLOCKED`
+depending on its importance.
 
-## Rappel final
+## Final reminder
 
-Ce workflow répond à deux questions différentes et obligatoires :
+This workflow answers two different and mandatory questions:
 
-1. **Le fichier est-il conforme au charter et aux règles applicables ?**
-2. **Le fichier a-t-il sa place dans le produit consommable, ou pollue-t-il
-   KitV2 alors qu'il appartient au méta-projet qui le construit et le
-   maintient ?**
+1. **Is the file conformant to the charter and the applicable rules?**
+2. **Does the file belong in the consumable product, or does it pollute
+   KitV2 while belonging to the metaproject that builds and maintains it?**
 
-Ne fusionne jamais ces questions, ne corrige jamais pendant l'audit et ne
-présente jamais un résumé complaisant à la place du ledger de couverture.
+Never merge these questions, never fix during the audit, and never present a
+complacent summary in place of the coverage ledger.

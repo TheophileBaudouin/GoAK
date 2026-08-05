@@ -1,10 +1,10 @@
-# Templates d'archive
+# Archive Templates
 
-Templates pour la phase 6 (Archive). Sortie vers `docs/archives/`.
+Templates for Phase 6 (Archive). Output to `docs/archives/`.
 
 ---
 
-## docs/archives/README.md (index des archives)
+## docs/archives/README.md (Archive Index)
 
 ```markdown
 # Project Archives
@@ -15,18 +15,17 @@ its full analysis, plan, and progress history for future reference.
 
 | Project | Description | Period | Mode | Progress |
 |:--------|:------------|:-------|:-----|:---------|
-| [<nom-du-projet>](./<nom-du-projet>/progress/MASTER.md) | Description en une ligne | YYYY-MM-DD — YYYY-MM-DD | LOCAL_ONLY | Terminé |
+| [<project-name>](./<project-name>/progress/MASTER.md) | One-line description | YYYY-MM-DD — YYYY-MM-DD | LOCAL_ONLY | Complete |
 ```
 
-Quand tu mets à jour ce fichier, ajoute de nouvelles lignes au tableau. Ne
-supprime pas les entrées existantes.
+When updating this file, append new rows to the table. Do not remove existing entries.
 
 ---
 
-## Structure du répertoire d'archive
+## Archive Directory Structure
 
 ```text
-docs/archives/<nom-du-projet>/
+docs/archives/<project-name>/
 ├── analysis/
 │   ├── project-overview.md
 │   ├── module-inventory.md
@@ -37,15 +36,12 @@ docs/archives/<nom-du-projet>/
 │   └── milestones.md
 ├── progress/
 │   ├── MASTER.md
-│   ├── phase-1-<nom-court>.md
+│   ├── phase-1-<short-name>.md
 │   └── ...
 └── governance/
     ├── instruction-surfaces.md
-    ├── AGENTS.md              # si résolu et fichier-backé
-    └── memory-surface.md      # note d'export ou instantané du fallback, si disponible
+    ├── AGENTS.md              # if resolved and file-backed
+    └── memory-surface.md      # export note or fallback snapshot, if available
 ```
 
-Archive les surfaces de gouvernance comme instantanés ou notes d'export
-uniquement. Garde les surfaces d'instructions et de mémoire actives en place
-après l'archivage. Si la mémoire est native et ne peut pas être exportée,
-enregistre sa plateforme/nom et les décisions clés qui y ont été écrites.
+Archive governance surfaces as snapshots or export notes only. Keep active instruction and memory surfaces in place after archiving. If memory is native and cannot be exported, record its platform/name and the key decisions that were written there.

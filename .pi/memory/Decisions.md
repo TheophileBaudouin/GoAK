@@ -557,3 +557,24 @@ questions utilisateur.
   rules/core/philosophy (Clean/Hexagonal vs « plus petit design justifié,
   stdlib-first »), les règles sourcées du kit priment. Encodé dans
   `references/super-philosophy.md` + Z12 §3.2.
+
+## Mandatory language: English (2026-08-05, fundamental rule)
+
+- **D-2026-08-05-21 (mandatory language: English only)** : owner directive
+  (fundamental project rule) — English is the mandatory language for EVERY
+  skill, instruction, and document in this repository (kit and metaproject):
+  skills, prompts, contracts, plans, research, decisions, written artifacts.
+  The whole project lives on one single language. **SUPERSEDES
+  D-2026-08-05-17** ("FR bodies + EN frontmatter"): French bodies written
+  under D-17 (spec-driven-dev zone, contracts, kit-audit, plans/research)
+  must be translated to English. Any translation preserves technical terms
+  and intent; it is faithful to the original meaning and as close to it as
+  possible, without reformulation. Ids stay ASCII kebab-case; code, commands,
+  and technical identifiers are never translated. Governance impact: N1
+  (30-conventions.md) — the "French for patterns/anti-patterns, English for
+  Source pointers" convention is replaced by "English everywhere";
+  kit-audit C7 (language) — explicit repository policy: English mandatory.
+  Priority (owner clarification): the kit must respect the rule absolutely
+  (mandatory for standardization and unification); the metaproject is
+  secondary but the selected scope (active instruction surfaces) is
+  translated in the same pass.

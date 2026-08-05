@@ -1,92 +1,91 @@
-# Dossier d'admission — template desktop-app (Wails)
+# Admission dossier — desktop-app template (Wails)
 
-Date : 2026-08-05. Auteur : passe de durcissement gouvernance méta-projet
-(finding Rodin D), recherche déléguée Web-Research (subagent fresh-context,
-lecture seule). Statut : **préparation de dossier uniquement** — l'admission
-elle-même (copie, épinglage, attribution, gate) appartient à la passe suivante
-dans `KitV2/templates/`.
+Date: 2026-08-05. Author: metaproject governance-hardening pass (Rodin
+finding D), research delegated to Web-Research (fresh-context sub-agent,
+read-only). Status: **dossier preparation only** — admission itself (copy,
+pinning, attribution, gate) belongs to the next pass in `KitV2/templates/`.
 
-## 1. Contexte
+## 1. Context
 
-`recipes/recipe-desktop-app/SKILL.md` (Wails v3, rejette Tauri « Rust, hors
-périmètre d'un kit Go ») et `probes/desktop-app/main.go` existent. Le reste du
-graphe couvre donc la capacité desktop, mais `templates/TEMPLATES.md` ne liste
-desktop-app nulle part (roadmap = grpc, microservice, monolith, cloud-service).
-Selon la politique Z5 §2, un template doit être un projet open source réel,
-MIT, maintenu, testé, **ultra-spécifique** (quasi exclusivement la techno du
-template), petit, à responsabilité unique — jamais un scaffold agent-écrit.
+`recipes/recipe-desktop-app/SKILL.md` (Wails v3, rejects Tauri "Rust, out of
+scope of a Go kit") and `probes/desktop-app/main.go` exist. The rest of the
+graph therefore covers the desktop capability, but `templates/TEMPLATES.md`
+does not list desktop-app anywhere (roadmap = grpc, microservice, monolith,
+cloud-service). Per Z5 §2 policy, a template must be a real open-source
+project, MIT, maintained, tested, **ultra-specific** (almost exclusively the
+template's technology), small, single-responsibility — never an agent-written
+scaffold.
 
-## 2. État de l'écosystème Wails (vérifié 2026-08-05)
+## 2. Wails ecosystem state (verified 2026-08-05)
 
-| Version | Statut | Dernière | Install |
+| Version | Status | Latest | Install |
 | --- | --- | --- | --- |
 | v2 | stable | v2.13.0 (2026-07) | `go install github.com/wailsapp/wails/v2/cmd/wails@latest` |
-| v3 | beta (pré-release) | dernière pré-release au 2026-08-05 | `go install github.com/wailsapp/wails/v3/cmd/wails3@latest` |
+| v3 | beta (pre-release) | latest pre-release as of 2026-08-05 | `go install github.com/wailsapp/wails/v3/cmd/wails3@latest` |
 
-- Wails v3 est en alpha depuis janvier 2023, passé en beta mi-2026 : l'API
-  desktop est stable mais la release reste pré-release (vérifié via l'API
-  GitHub le 2026-08-05 : latest stable = v2.13.0, tags v3.0.0-beta.*). La
-  recette du Kit documente d'ailleurs « Beta-to-GA transition ».
-- Sources : <https://v3.wails.io/blog/wails-v3-beta/> et
-  <https://github.com/wailsapp/wails/releases> (vérifiés par le subagent et
-  confirmés en lecture seule par la revue fresh-context via l'API GitHub).
+- Wails v3 has been in alpha since January 2023, reached beta mid-2026: the
+  desktop API is stable but the release stays pre-release (verified via the
+  GitHub API on 2026-08-05: latest stable = v2.13.0, tags v3.0.0-beta.*). The
+  kit recipe documents "Beta-to-GA transition".
+- Sources: <https://v3.wails.io/blog/wails-v3-beta/> and
+  <https://github.com/wailsapp/wails/releases> (verified by the sub-agent and
+  confirmed read-only by the fresh-context review via the GitHub API).
 
-## 3. Candidats évalués contre Z5 §2 (aucun ne passe)
+## 3. Candidates evaluated against Z5 §2 (none passes)
 
-| Candidat | Licence | Activité | Stack annexe | Tests/CI | Verdict |
+| Candidate | License | Activity | Ancillary stack | Tests/CI | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| JinGongX/SuiDemo | MIT (vérifiée API) | push 2026-04-12, 86★ | Vue 3 + vue-i18n + SQLite + Tailwind | non | ÉCHEC — c'est un template/starter, pas une app ; stack lourde ; sans tests |
-| kazuph/obails | MIT (vérifiée) | push 2026-06-12, 2★ | TypeScript + Node.js | non | ÉCHEC — trop petit, mono-contributeur, sans tests/CI |
-| JessonChan/captain-api | MIT (vérifiée) | push 2025-10-20, 3★ | Vue 3 + TypeScript | non | ÉCHEC — trop petit, inactif 9+ mois, sans tests/CI |
-| ehsanpo/Fakering | — | 0★, abandonné | — | — | ÉCHEC |
-| gofurry/wails-v3-vue-starter | MIT | 4★ | Vue 3 | — | ÉCHEC — starter, pas une app |
+| JinGongX/SuiDemo | MIT (API-verified) | push 2026-04-12, 86★ | Vue 3 + vue-i18n + SQLite + Tailwind | no | FAIL — a template/starter, not an app; heavy stack; no tests |
+| kazuph/obails | MIT (verified) | push 2026-06-12, 2★ | TypeScript + Node.js | no | FAIL — too small, single contributor, no tests/CI |
+| JessonChan/captain-api | MIT (verified) | push 2025-10-20, 3★ | Vue 3 + TypeScript | no | FAIL — too small, inactive 9+ months, no tests/CI |
+| ehsanpo/Fakering | — | 0★, abandoned | — | — | FAIL |
+| gofurry/wails-v3-vue-starter | MIT | 4★ | Vue 3 | — | FAIL — a starter, not an app |
 
-**Exemples officiels** (`wailsapp/examples`) : collection de projets de
-démonstration (file-association, updater, events, binding, systray-menu,
-drag-n-drop, window, wml) — des démos de fonctionnalités, pas une application
-réelle à responsabilité unique. Exclus (et désormais explicitement exclus par
-la politique Z5 §2, précision D-2026-08-05-14 : une source = application
-réelle, pas starter/démo).
+**Official examples** (`wailsapp/examples`): a collection of demonstration
+projects (file-association, updater, events, binding, systray-menu,
+drag-n-drop, window, wml) — feature demos, not a real single-responsibility
+application. Excluded (and now explicitly excluded by the Z5 §2 policy,
+precision D-2026-08-05-14: a source = real application, not starter/demo).
 
-## 4. Conclusion honnête
+## 4. Honest conclusion
 
-**Aucun candidat ne satisfait la politique Z5 §2 au 2026-08-05.** L'écosystème
-Wails v3 est trop jeune (beta) et trop petit pour produire un projet réel,
-MIT, mono-techno, testé et parcourable. On n'assouplit pas les critères pour
-trouver un candidat : la politique templates est un portail dur (Z5 §2), et
-admettre un starter ou une démo créerait exactement le défaut que Z5 §2.4
-interdit (fourre-tout, non fonctionnel au sens produit).
+**No candidate satisfies the Z5 §2 policy as of 2026-08-05.** The Wails v3
+ecosystem is too young (beta) and too small to produce a real, MIT,
+mono-technology, tested, browsable project. The criteria are not softened to
+find a candidate: the template policy is a hard portal (Z5 §2), and admitting
+a starter or a demo would create exactly the defect Z5 §2.4 forbids
+(grab-bag, not functional in the product sense).
 
-Conséquences :
+Consequences:
 
-1. **Ligne roadmap** desktop-app = `planned` avec note « aucune source MIT
-   conforme au 2026-08-05 » (texte prêt dans le plan méta-projet, annexe D ;
-   à appliquer dans `KitV2/templates/TEMPLATES.md` à la passe suivante) —
-   la capacité reste reconnue (recette + probe), le template attend une
-   source conforme.
-2. **Déclencheur de ré-évaluation** : la GA de Wails v3 (et la maturation de
-   son écosystème, ~6-12 mois) ; la ligne roadmap le mentionne.
-3. **Leçon transférable** : la politique Z5 §2 exclut désormais explicitement
-   les starters/templates tiers et les recueils de démos comme source
-   (D-2026-08-05-14) — évite de re-évaluer des faux candidats.
+1. **Roadmap line** desktop-app = `planned` with the note "no conforming MIT
+   source as of 2026-08-05" (text ready in the metaproject plan, annex D; to
+   apply in `KitV2/templates/TEMPLATES.md` at the next pass) — the capability
+   stays recognized (recipe + probe), the template waits for a conforming
+   source.
+2. **Re-evaluation trigger**: the Wails v3 GA (and its ecosystem maturation,
+   ~6-12 months); the roadmap line mentions it.
+3. **Transferable lesson**: the Z5 §2 policy now explicitly excludes
+   third-party starters/templates and demo collections as a source
+   (D-2026-08-05-14) — avoids re-evaluating false candidates.
 
-## 5. Commandes de vérification à exécuter au moment de l'admission réelle
+## 5. Verification commands to run at the real admission
 
-À relancer sur tout futur candidat (non exécutées en 2026-08-05 — aucun
-candidat n'a atteint ce stade) :
+To re-run on any future candidate (not executed in 2026-08-05 — no candidate
+reached this stage):
 
 ```sh
 git clone <repo-url> && cd <repo-dir>
-cat LICENSE | head -5                        # MIT obligatoire
+cat LICENSE | head -5                        # MIT mandatory
 go build ./... && go test ./... && go vet ./...
 test -z "$(gofmt -l .)"
-find . -name "*.go" | wc -l                  # petitesse
+find . -name "*.go" | wc -l                  # smallness
 find . -name "*.go" -exec wc -l {} + | tail -1
 grep -r "gorilla\|gorm\|echo\|gin\|chi\|sqlx\|zap\|logrus\|observ\|auth" go.mod 2>/dev/null \
   || echo "No auxiliary stack detected"
 ```
 
-La vérification finale comprend aussi : scénario observable exécuté
-(PASS/PARTIAL/BLOCKED documenté), ATTRIBUTION.md (source, version épinglée,
-adaptations, périmètre technique), template.yaml, README.md avec justification
-de structure (D-2026-08-05-13).
+The final verification also includes: executed observable scenario
+(document PASS/PARTIAL/BLOCKED), ATTRIBUTION.md (source, pinned version,
+adaptations, technical scope), template.yaml, README.md with structure
+justification (D-2026-08-05-13).

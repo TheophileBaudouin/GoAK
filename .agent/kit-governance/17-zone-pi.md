@@ -1,84 +1,55 @@
-# Z8 — Zone `.pi/` (settings, prompts, skills de workflow)
+# Z8 — Zone `.pi/` (settings, prompts, workflow skills)
 
-- **Contrat MetaProjet** — régit `KitV2/.pi/`.
-- **Rapport d'audit :** §2.11. **Décision :** les 5 skills de workflow restent
-  dans le produit (2026-08-04).
+- **Metaproject Contract** — governs `KitV2/.pi/`.
+- **Audit report:** §2.11. **Decision:** the 5 workflow skills stay in the product (2026-08-04).
 
 ## 1. Mission
 
-La couche d'exécution native Pi du produit : découverte (settings), invocation
-(prompts), procédures de workflow (skills). Trois rôles **disjoints**, zéro
-recouvrement.
+The product's native Pi execution layer: discovery (settings), invocation (prompts), workflow procedures (skills). Three **disjoint** roles, zero overlap.
 
-## 2. Les trois rôles (frontière inviolable)
+## 2. The three roles (inviolable boundary)
 
-| Surface | Rôle | Exemple |
+| Surface | Role | Example |
 | --- | --- | --- |
-| `.pi/prompts/*.md` | **Orchestrateurs** invoqués manuellement (`/checklist-api`) | workflow-memory, checklist-api, checklist-release |
-| `.pi/skills/*/SKILL.md` | **Procédures durables** chargées par contexte | spec-driven-dev, deep-discuss, go-code-review, go-idiomatic-implementation, go-implementation-plan, go-source-retrieval, go-testing-verification, kit-resource-routing |
-| modules `rules/`, `recipes/`, `knowledge/catalogs/` | **Contenu de connaissance** (découvrable par description) | recipe-worker-pool, chi, philosophy |
+| `.pi/prompts/*.md` | **Orchestrators** invoked manually (`/checklist-api`) | workflow-memory, checklist-api, checklist-release |
+| `.pi/skills/*/SKILL.md` | **Durable procedures** loaded by context | spec-driven-dev, deep-discuss, go-code-review, go-idiomatic-implementation, go-implementation-plan, go-source-retrieval, go-testing-verification, kit-resource-routing |
+| modules `rules/`, `recipes/`, `knowledge/catalogs/` | **Knowledge content** (discoverable by description) | recipe-worker-pool, chi, philosophy |
 
-Règle : si un prompt et une skill répondent à la même question, on en garde un
-et l'autre pointe (anti-duplication C0). Une skill de workflow ne contient pas
-de connaissance de domaine (celle-ci vit dans les modules). Depuis le
-2026-08-05 (D-2026-08-05-16), le workflow de référence des transformations à
-grande échelle est la skill `spec-driven-dev` (contrat Z12) ; l'ancienne
-chaîne de prompts `workflow-clarify → plan → tasks → implement → verify` a été
-supprimée et ne doit pas être recréée.
+Rule: if a prompt and a skill answer the same question, keep one and the other points (anti-duplication C0). A workflow skill does not contain domain knowledge (it lives in the modules). Since 2026-08-05 (D-2026-08-05-16), the reference workflow for large-scale transformations is the `spec-driven-dev` skill (contract Z12); the former `workflow-clarify → plan → tasks → implement → verify` prompt chain has been removed and must not be recreated.
 
-## 3. Règles
+## 3. Rules
 
-1. **Toute skill a un frontmatter complet** : `name`, `description` (activation
-   explicite), `category: workflow`, `tags`, `last-verified`. Une skill sans
-   `description` n'est pas chargée par Pi.
-2. **Tout prompt a une `description`** d'activation et suit la convention de
-   nommage `workflow-*` / `checklist-*`.
-3. `settings.json` charge les modules par chemins relatifs au produit
-   (`../rules`, `../recipes`, `../knowledge/catalogs`) — le contrat de chemins
-   est documenté dans `.pi/README.md` (à créer) et stable quelle que soit la
-   méthode d'installation.
-4. Une skill de workflow reste générique au processus (revue, plan, source,
-   vérification) : toute spécificité de domaine migre vers un module.
-5. `category: workflow` est une valeur kit-only (hors jeu validé des modules) :
-   elle ne s'applique qu'à `.pi/skills/` ; les modules gardent les catégories
-   A1.
-6. **Instruction absolue = contrôle nommé** (2026-08-05, D-2026-08-05-15) :
-   toute instruction `MANDATORY`/« toujours »/« jamais » portée par une skill
-   ou un prompt doit nommer un contrôle mécanique (validateur C2 ou porte Pi)
-   ou être étiquetée « guidance seule, non appliquée » et consignée dans le
-   registre des lacunes d'automatisation (`.agent/instructions.md`
-   §Enforcement).
+1. **Every skill has complete frontmatter**: `name`, `description` (explicit activation), `category: workflow`, `tags`, `last-verified`. A skill without `description` is not loaded by Pi.
+2. **Every prompt has a `description`** of activation and follows the `workflow-*` / `checklist-*` naming convention.
+3. `settings.json` loads modules by product-relative paths (`../rules`, `../recipes`, `../knowledge/catalogs`) — the path contract is documented in `.pi/README.md` and stable whatever the installation method.
+4. A workflow skill stays generic to the process (review, plan, source, verification): any domain specificity migrates to a module.
+5. `category: workflow` is a kit-only value (outside the validated module set): it applies only to `.pi/skills/`; modules keep the A1 categories.
+6. **Absolute instruction = named control** (2026-08-05, D-2026-08-05-15): any `MANDATORY`/"always"/"never" instruction carried by a skill or prompt must name a mechanical control (validator C2 or Pi gate) or be labeled "guidance only, not enforced" and recorded in the automation-gaps registry (`.agent/instructions.md` §Enforcement).
 
 ## 4. Maintenance
 
-- **Ajout d'un prompt** : nommage + description + référence à la skill/module
-  orchestré s'il existe.
-- **Ajout d'une skill** : contrat de zone + recherche d'absence de duplicat
-  (sémantique) + frontmatter complet.
-- **Modification** : bump `last-verified` ; vérifier la frontière rôle.
+- **Prompt addition**: naming + description + reference to the orchestrated skill/module if it exists.
+- **Skill addition**: zone contract + duplicate-absence research (semantic) + complete frontmatter.
+- **Modification**: bump `last-verified`; verify the role boundary.
 
 ## 5. Patterns
 
-- Prompts = courts, orchestrateurs ; skills = procédures ; modules = contenu.
-- Activation explicite : la description frontmatter nomme la condition
-  d'activation (« Use when … », « Use only after … ») — généraliser.
+- Prompts = short, orchestrators; skills = procedures; modules = content.
+- Explicit activation: the frontmatter description names the activation condition ("Use when …", "Use only after …") — generalize.
 
 ## 6. Anti-patterns
 
-- Skill de workflow qui contient des connaissances de domaine (dérive).
-- Prompt et skill qui se dupliquent (recouvrement de rôle).
-- Skill sans description ; prompt sans description.
-- Contenu metaprojet (décisions, mémoire) dans `.pi/` produit.
+- Workflow skill containing domain knowledge (drift).
+- Prompt and skill duplicating each other (role overlap).
+- Skill without description; prompt without description.
+- Metaproject content (decisions, memory) in product `.pi/`.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] Toutes les skills `.pi/skills/` ont le frontmatter complet §3.1.
-- [ ] Tous les prompts ont une description.
-- [ ] Aucun duplicat détecté prompts↔skills↔modules (contrôle manuel à la
-      revue ; C2 pourra grepper les titres).
+- [ ] All `.pi/skills/` skills have the complete §3.1 frontmatter.
+- [ ] All prompts have a description.
+- [ ] No detected duplicate prompts↔skills↔modules (manual check at review; C2 may grep titles).
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Aucune ouverte : le frontmatter des 5 skills `.pi/skills/` (category
-  `workflow`, tags, last-verified) a été complété le 2026-08-04 — l'extension
-  de schéma est enregistrée dans `.pi/memory/Decisions.md`.
+- None open: the frontmatter of the `.pi/skills/` skills (category `workflow`, tags, last-verified) was completed on 2026-08-04 — the schema extension is recorded in `.pi/memory/Decisions.md`.

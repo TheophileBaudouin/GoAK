@@ -1,102 +1,70 @@
-# Z1 — Zone `rules/` (règles)
+# Z1 — Zone `rules/` (rules)
 
-- **Contrat MetaProjet** — régit `KitV2/rules/`.
-- **Rapport d'audit :** §2.1. **Décision :** budget core ≤ 6 modules / ≤ 300
-  lignes approuvé (2026-08-04).
+- **Metaproject Contract** — governs `KitV2/rules/`.
+- **Audit report:** §2.1. **Decision:** core budget ≤ 6 modules / ≤ 300 lines approved (2026-08-04).
 
 ## 1. Mission
 
-La couche « doit toujours être vrai » du Kit (charte Layer 1). Les règles
-répondent à « qu'est-ce qui doit rester vrai pour tout code Go généré ou
-revu ? » — elles ne contiennent jamais d'implémentation.
+The "must always be true" layer of the Kit (charter Layer 1). Rules answer "what must stay true for any generated or reviewed Go code?" — they never contain implementation.
 
 ## 2. Structure
 
-- `rules/core/` — règles **universelles, chargées chaque session** (coût
-  permanent) : `philosophy`, `concurrency`, `errors`, `universal`,
-  `validation/{golangci-lint,gosec,govulncheck}`.
-- `rules/registry/` — règles de **domaine chargées à la demande** :
-  `doc-comments`, `logging`, `testing` (exemples).
+- `rules/core/` — **universal rules, loaded every session** (permanent cost): `philosophy`, `concurrency`, `errors`, `universal`, `validation/{golangci-lint,gosec,govulncheck}`.
+- `rules/registry/` — **domain rules loaded on demand**: `doc-comments`, `logging`, `testing` (examples).
 
-## 3. Règles de frontière (inviolables)
+## 3. Boundary rules (inviolable)
 
-1. **core ≠ registry** : une règle core ne référence jamais un module registry
-   (les universelles ne dépendent pas du chargé-à-la-demande).
-2. Une règle ne contient pas de code de production (charte §3) — au plus un
-   extrait minimal de démonstration lié à son impératif.
-3. Une règle ne duplique pas un pattern/anti-pattern de `knowledge/` — elle le
-   référence (relation explicite).
-4. Rien d'autre que des règles dans ce dossier : ni recettes, ni mémoire, ni
-   contrats.
+1. **core ≠ registry**: a core rule never references a registry module (universals do not depend on load-on-demand content).
+2. A rule does not contain production code (charter §3) — at most a minimal demonstration excerpt linked to its imperative.
+3. A rule does not duplicate a pattern/anti-pattern of `knowledge/` — it references it (explicit relation).
+4. Nothing but rules in this directory: no recipes, no memory, no contracts.
 
-## 4. Budget de compacité core (décision 2026-08-04)
+## 4. Core compactness budget (decision 2026-08-04)
 
-- **≤ 6 modules** dans `rules/core/` ; **≤ 300 lignes** par SKILL.md.
-- **Unité de compte : « module » = dossier top-level de `rules/core/`
-  contenant au moins une SKILL.md** (5 au 2026-08-04 : concurrency, errors,
-  philosophy, universal, validation — `validation/` compte pour 1 module même
-  s'il contient 3 SKILL.md).
-- Tout ajout core au-dessus du budget est **bloqué** : il exige une décision
-  écrite (Decisions.md) et le retrait/regroupement d'un module existant.
-- Contrôle C2 : décompte des modules (dossiers top-level) + taille max par
-  fichier.
+- **≤ 6 modules** in `rules/core/`; **≤ 300 lines** per SKILL.md.
+- **Counting unit: "module" = top-level directory of `rules/core/` containing at least one SKILL.md** (5 on 2026-08-04: concurrency, errors, philosophy, universal, validation — `validation/` counts as 1 module even with 3 SKILL.md).
+- Any core addition above the budget is **blocked**: it requires a written decision (Decisions.md) and the removal/merging of an existing module.
+- C2 check: module count (top-level directories) + max size per file.
 
-## 5. Schéma d'une règle (éléments sémantiques — cf. A1 §2 et §1.9)
+## 5. Rule schema (semantic elements — cf. A1 §2 and §1.9)
 
-Chaque règle porte les éléments sémantiques suivants, quelle que soit la forme
-(en-têtes libres ; A1 §1.9 : une section n'existe que si elle a du contenu —
-un énoncé dans le corps vaut un en-tête) :
+Each rule carries the following semantic elements, whatever the form (free headers; A1 §1.9: a section exists only if it has content — a statement in the body counts as a header):
 
-1. **Impératif** : la règle, en une phrase actionnable (obligatoire).
-2. **Quand appliquer** : périmètre d'application (obligatoire).
-3. **Frontière** : ce que la règle ne couvre PAS (obligatoire ; section
-   dédiée ou énoncé identifiable).
-4. **Contre-exemples** : cas où la règle semble s'appliquer mais non
-   (quand ils existent).
-5. **Vérification** : comment contrôler la conformité (commande, grep,
-   review) (obligatoire).
-6. **Sources** : primaires, vérifiées (obligatoire).
+1. **Imperative**: the rule, in one actionable sentence (mandatory).
+2. **When to apply**: scope of application (mandatory).
+3. **Boundary**: what the rule does NOT cover (mandatory; dedicated section or identifiable statement).
+4. **Counter-examples**: cases where the rule seems to apply but does not (when they exist).
+5. **Verification**: how to check conformity (command, grep, review) (mandatory).
+6. **Sources**: primary, verified (mandatory).
 
-Décision 2026-08-05 : le schéma en-têtes-fixes de l'ancien §5 n'était
-implémenté par aucune règle et contredisait A1 §1.9 ; il est remplacé par la
-forme sémantique ci-dessus (en-têtes libres). Le contrôle C2 correspondant
-reste une revue (voir §9).
+Decision 2026-08-05: the old fixed-headers schema of the former §5 was implemented by no rule and contradicted A1 §1.9; it is replaced by the semantic form above (free headers). The corresponding C2 check remains a review (see §9).
 
 ## 6. Maintenance
 
-- **Ajout core** : décision écrite + budget re-vérifié (C2 bloque au-delà).
-- **Ajout registry** : admission = source primaire + frontière + vérification
-  actionnable + absence de contradiction avec les règles existantes.
-- **Modification** : bump `version` (major si plus stricte) + `last_verified` +
-  vérification des artefacts qui référencent la règle (déclencheur de
-  re-vérification des dépendants — contrôle inter-fichiers C2,
-  D-2026-08-05-11).
+- **Core addition**: written decision + budget re-verified (C2 blocks beyond).
+- **Registry addition**: admission = primary source + boundary + actionable verification + no contradiction with existing rules.
+- **Modification**: bump `version` (major if stricter) + `last_verified` + verification of the artifacts that reference the rule (trigger for dependent re-verification — cross-file C2 check, D-2026-08-05-11).
 
 ## 7. Patterns
 
-- Une règle = un impératif vérifiable + un « ne couvre PAS ».
-- Les règles core citent les sources officielles (Effective Go, Code Review
-  Comments, Go Proverbs) et seulement les autres règles core.
+- A rule = a verifiable imperative + a "does NOT cover" boundary.
+- Core rules cite official sources (Effective Go, Code Review Comments, Go Proverbs) and only other core rules.
 
 ## 8. Anti-patterns
 
-- Règle vague (« use idiomatic Go ») sans frontière ni vérification.
-- Ajout « just this once » dans core (dérive du budget permanent).
-- Règle qui contient un corps de pattern (duplication knowledge/).
-- `.md` vides (régression déjà corrigée — C2 la détecte).
+- Vague rule ("use idiomatic Go") without boundary or verification.
+- "Just this once" addition in core (permanent budget drift).
+- Rule containing a pattern body (knowledge/ duplication).
+- Empty `.md` (regression already fixed — C2 detects it).
 
-## 9. Critères de validation
+## 9. Validation criteria
 
-- [ ] C2 : budget core (≤ 6 modules, ≤ 300 lignes) vérifié.
-- [ ] Schéma de règle (impératif, frontière, vérification, sources) : contrôle
-      de revue (en-têtes libres, A1 §1.9) — la fraîcheur des sources est
-      vérifiée par C2.
-- [ ] C2 : aucune référence core → registry.
-- [ ] Fraîcheur 12/18 mois (C0).
+- [ ] C2: core budget (≤ 6 modules, ≤ 300 lines) verified.
+- [ ] Rule schema (imperative, boundary, verification, sources): review control (free headers, A1 §1.9) — source freshness verified by C2.
+- [ ] C2: no core → registry reference.
+- [ ] Freshness 12/18 months (C0).
 
-## 10. Questions ouvertes
+## 10. Open questions
 
-- `universal` (renommé 2026-08-04) : vérifier que son contenu est bien core et
-  pas registry (revue au prochain audit).
-- Faut-il une règle core « budget de session » chiffrée autre que le nb de
-  modules ?
+- `universal` (renamed 2026-08-04): verify its content is really core and not registry (review at next audit).
+- Should there be a quantified "session budget" core rule other than the module count?

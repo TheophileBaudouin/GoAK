@@ -1,50 +1,49 @@
-# Templates des documents de progression
+# Progress Document Templates
 
-Templates des documents de suivi générés en phase 4 (Documentation du suivi
-de progression). Sortie vers `docs/progress/`.
+Templates for the tracking documents generated in Phase 4 (Progress Tracking Documentation). Output to `docs/progress/`.
 
 ---
 
-## MASTER.md (mode LOCAL_ONLY)
+## MASTER.md (LOCAL_ONLY mode)
 
 ```markdown
 # MASTER — Spec-Driven Develop Run
 
-## Tâche
+## Task
 
-**Nom** : <nom de la tâche (phase 2)>
-**Mode de suivi** : `LOCAL_ONLY`
-**Définition de tâche confirmée** : <lien ou résumé court>
+**Name**: <task name (Phase 2)>
+**Tracking mode**: `LOCAL_ONLY`
+**Confirmed task definition**: <link or short summary>
 
 ## Documents
 
-- Analyse : [project-overview.md](../analysis/project-overview.md) ·
+- Analysis: [project-overview.md](../analysis/project-overview.md) ·
   [module-inventory.md](../analysis/module-inventory.md) ·
   [risk-assessment.md](../analysis/risk-assessment.md)
-- Plan : [task-breakdown.md](../plan/task-breakdown.md) ·
+- Plan: [task-breakdown.md](../plan/task-breakdown.md) ·
   [dependency-graph.md](../plan/dependency-graph.md) ·
   [milestones.md](../plan/milestones.md)
 
 ## Phases
 
-- [ ] Phase 1: <nom> (0/N tâches) — [fichier de phase](phase-1-<nom>.md)
-- [ ] Phase 2: <nom> (0/N tâches) — [fichier de phase](phase-2-<nom>.md)
+- [ ] Phase 1: <name> (0/N tasks) — [phase file](phase-1-<name>.md)
+- [ ] Phase 2: <name> (0/N tasks) — [phase file](phase-2-<name>.md)
 
-## Gouvernance Status
+## Governance Status
 
-| Surface | Statut | Notes |
+| Surface | Status | Notes |
 |:--------|:-------|:------|
-| `AGENTS.md` | existant / créé / non utilisé | règles agent partagées |
-| `.pi/memory/` | vérifié — fichiers présents : | **vérifier quels fichiers existent réellement (Decisions.md peut manquer au bootstrap Pi)** |
-| Fallback mémoire | approuvé / non | jamais créé silencieusement |
+| `AGENTS.md` | existing / created / unused | shared agent rules |
+| `.pi/memory/` | verified — files present: | **verify which files actually exist (Decisions.md may be missing from the Pi bootstrap)** |
+| Memory fallback | approved / not | never created silently |
 
 ## Current Status
 
-<état actuel, mis à jour au début et à la fin de chaque session de travail>
+<current state, updated at the start and end of each work session>
 
 ## Next Steps
 
-<prochaine action exacte>
+<exact next action>
 
 ---
 
@@ -53,11 +52,11 @@ de progression). Sortie vers `docs/progress/`.
 | Field | Value |
 |-------|-------|
 | drift_score | 0 |
-| strategy | <stratégie> |
-| threshold_annotate | <calculé> |
-| threshold_replan | <calculé> |
-| threshold_rescope | <calculé> |
-| total_tasks | <compte> |
+| strategy | <strategy> |
+| threshold_annotate | <computed> |
+| threshold_replan | <computed> |
+| threshold_rescope | <computed> |
+| total_tasks | <count> |
 | completed_tasks | 0 |
 | last_updated | <ISO-8601> |
 
@@ -69,31 +68,31 @@ de progression). Sortie vers `docs/progress/`.
 
 ---
 
-## Fichier de phase (mode LOCAL_ONLY)
+## Phase file (LOCAL_ONLY mode)
 
-Un `docs/progress/phase-N-<nom-court>.md` par phase.
+One `docs/progress/phase-N-<short-name>.md` per phase.
 
 ```markdown
-# Phase N : <nom de la phase>
+# Phase N : <phase name>
 
-**But** : <but de la phase>
-**Prérequis** : <ce qui doit être fait avant>
+**Goal**: <phase goal>
+**Prerequisite**: <what must be done before>
 
-## Tâches
+## Tasks
 
 - [ ] **T1.1** — <description>
-  - **Priorité** : P0/P1/P2 | **Effort** : S/M/L/XL
-  - **Dépend de** : <IDs ou "Aucun">
-  - **Lane** : A/B/—
-  - **S.U.P.E.R** : <principes>
-  - **Critères d'acceptation** :
-    - [ ] <critère vérifiable>
-    - [ ] Passe le S.U.P.E.R Quick Check pour : <principes>
-    - [ ] Satisfait l'attente de test : <tests ou raison de non-test>
-    - [ ] Met à jour les surfaces mémoire/instructions résolues si la
-          connaissance durable ou les instructions d'agent ont changé
+  - **Priority**: P0/P1/P2 | **Effort**: S/M/L/XL
+  - **Depends on**: <IDs or "None">
+  - **Lane**: A/B/—
+  - **S.U.P.E.R**: <principles>
+  - **Acceptance criteria**:
+    - [ ] <verifiable criterion>
+    - [ ] Passes the S.U.P.E.R Quick Check for: <principles>
+    - [ ] Satisfies the test expectation: <tests or no-test reason>
+    - [ ] Updates the resolved memory/instruction surfaces if durable knowledge
+          or agent instructions changed
 
 ## Notes
 
-<!-- Décisions, conflits, contexte — règle 3 des règles comportementales -->
+<!-- Decisions, conflicts, context — behavioral rule 3 -->
 ```

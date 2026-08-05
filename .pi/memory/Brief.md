@@ -74,6 +74,7 @@ relationships (`extends` is declared but unused as of 2026-08-04).
 - **Charter compliance is mandatory:** For every addition or modification, check permanent-context minimality, single source of truth, source/evidence traceability, raw validation output, independent fresh-context approval, deterministic gates, probe-suite status, anti-duplication checklist, approval boundary, and the charter's Definition of Done. Never present code-quality judgment as a question to the owner.
 - **Charter maintenance:** Changes to `KIT_CHARTER.md` itself are structural and require explicit approval. Keep the charter as the process source of truth; record implementation decisions and audit findings in dated decision/plan artifacts rather than copying the charter into memory or other instruction files.
 - **Knowledge lifecycle:** Problem → Research → Decision → Pattern → Snippet → Recipe → Template → Evaluation. Do not promote unsupported knowledge into the product.
+- **Language (fundamental rule, 2026-08-05):** English is the mandatory language for every skill, instruction, and document in this repository — one unique language across the whole project (D-2026-08-05-21, supersedes D-2026-08-05-17). Translations preserve technical terms and intent, and stay as close to the original as possible.
 
 ## Module admission criteria (hard gate)
 

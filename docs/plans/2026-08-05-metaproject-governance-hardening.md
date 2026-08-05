@@ -1,261 +1,247 @@
-# Plan — Durcissement gouvernance méta-projet (fermeture de 5 findings Rodin)
+# Plan — Metaproject governance hardening (closing 5 Rodin findings)
 
 ## Goal
 
-Fermer les 5 findings identifiés par la critique auto-adversariale « Rodin »
-(duplication inter-fichiers non déclenchée, roadmap snippets prématurée,
-contradiction de philosophie Go, desktop-app sans template sourcé, instructions
-MANDATORY sans porte mécanique) **sans toucher à `KitV2/`** : contrats de
-gouvernance, `.pi/prompts/kit-audit.md`, `.agent/instructions.md`, décisions et
-recherches méta-projet seulement. La passe de correction produit (Marie,
-`.pi/prompts/kit-audit` puis corrections) suivra ; cette passe prépare ses
-actions en attente, écrites et prêtes, sans les appliquer.
+Close the 5 findings identified by the adversarial self-critique "Rodin"
+(non-triggered cross-file duplication, premature snippets roadmap, Go
+philosophy contradiction, desktop-app without sourced template, MANDATORY
+instructions without mechanical gate) **without touching `KitV2/`**:
+governance contracts, `.pi/prompts/kit-audit.md`, `.agent/instructions.md`,
+decisions, and metaproject research only. The product correction pass
+(owner, `.pi/prompts/kit-audit` then corrections) follows; this pass prepares
+its pending actions, written and ready, without applying them.
 
 ## Context
 
-- Critique Rodin vérifiée contre l'arbre réel avant rédaction (lecture des
-  fichiers cités, pas de confiance aveugle) — deux nuances de calibration
-  confirmées comme faits :
-  1. **Chantier A** : C2 §2 (02-validation-gate.md, bloc « Fraîcheur »)
-     déclare déjà « La duplication sémantique reste une revue humaine ». Le
-     problème est un **défaut de déclenchement** de cette revue entre deux
-     audits, pas une absence de conscience du risque.
-  2. **Chantier B** : `KitV2/snippets/` contient exactement 3 snippets réels
-     (bounded-worker, errors-once, http-json) ; les 7 lignes roadmap ne sont
-     qu'une table Markdown du README, mandatée par 13-zone-snippets.md §3 règle
-     3 et 00-charte-d-application.md §7, même patron que templates/TEMPLATES.md.
-- Points de couplage vérifiés directement (pas de scout dédié : la recon
-  directe des fichiers cités couvre le besoin de « localiser les points de
-  couplage réels avant de conclure ») :
+- Rodin critique verified against the real tree before drafting (reading the
+  cited files, no blind trust) — two calibration nuances confirmed as facts:
+  1. **Chantier A**: C2 §2 (02-validation-gate.md, "Freshness" block) already
+     declares "Semantic duplication remains a human review." The problem is a
+     **triggering defect** of this review between two audits, not an absence
+     of risk awareness.
+  2. **Chantier B**: `KitV2/snippets/` contains exactly 3 real snippets
+     (bounded-worker, errors-once, http-json); the 7 roadmap lines are only a
+     Markdown table of the README, mandated by 13-zone-snippets.md §3 rule 3
+     and 00-charte-d-application.md §7, same pattern as templates/TEMPLATES.md.
+- Coupling points verified directly (no dedicated scout: the direct reading
+  of the cited files covers the "locate real coupling points before
+  concluding" need):
   - `KitV2/tools/validators/validate-kitv2.py` `check_internal_duplicates`
-    (l.203) : comparaison de paragraphes **intra-fichier** uniquement ;
-    docstring : « leaving semantic review to humans ».
-  - SNIPPET.yaml déclarent tous une `source:` résolue (bounded-worker →
+    (l.203): intra-file paragraph comparison only; docstring: "leaving
+    semantic review to humans".
+  - SNIPPET.yaml all declare a resolved `source:` (bounded-worker →
     `recipes/recipe-worker-pool/SKILL.md`, errors-once →
     `rules/core/errors/SKILL.md`, http-json →
-    `recipes/recipe-rest-chi/SKILL.md`) — chaîne de pointeurs
-    pattern/recette/règle → snippet vérifiable mécaniquement.
-  - SNIPPET.yaml ne porte pas de `last_verified` (champ absent du modèle
-    `bounded-worker`) → la règle inter-fichiers doit ajouter ce champ (Z4 §3)
-    pour être vérifiable par date.
-  - `recipe-desktop-app/SKILL.md` (Wails v3, rejette Tauri « Rust, hors
-    périmètre d'un kit Go ») + `probes/desktop-app/main.go` existent ;
-    `templates/TEMPLATES.md` ne liste desktop-app nulle part (roadmap =
-    grpc, microservice, monolith, cloud-service seulement).
-  - `.pi/skills/kit-resource-routing/SKILL.md` dit « MANDATORY before
-    planning or implementing » pour `search_kit_resources` ; aucun mécanisme
-    ne l'applique. Doc Pi `docs/extensions.md` (vérifiée) : l'événement
-    `tool_call` **peut bloquer** (`{ block: true, reason }`),
-    `pi.setActiveTools()` active/désactive des outils, `before_agent_start`
-    injecte des messages, `pi.appendEntry()` persiste l'état de session →
-    une porte mécanique est réellement concevable.
-- Recherche Web-Research (chantier D) terminée : **aucun candidat Wails ne
-  qualifie** la politique Z5 §2 (Wails v3 en beta v3.0.0-beta.3, écosystème
-  trop jeune ; v2 stable mais aucun projet réel MIT mono-techno testé trouvé ;
-  `wailsapp/examples` = démos, exclus). Rapport :
+    `recipes/recipe-rest-chi/SKILL.md`) — a pattern/recipe/rule → snippet
+    pointer chain mechanically verifiable.
+  - SNIPPET.yaml does not carry `last_verified` (field absent from the
+    `bounded-worker` model) → the cross-file rule must add this field (Z4 §3)
+    to be date-verifiable.
+  - `recipe-desktop-app/SKILL.md` (Wails v3, rejects Tauri "Rust, out of
+    scope of a Go kit") + `probes/desktop-app/main.go` exist;
+    `templates/TEMPLATES.md` does not list desktop-app anywhere (roadmap =
+    grpc, microservice, monolith, cloud-service only).
+  - `.pi/skills/kit-resource-routing/SKILL.md` says "MANDATORY before
+    planning or implementing" for `search_kit_resources`; nothing mechanical
+    enforces it. Pi docs `docs/extensions.md` (verified): the `tool_call`
+    event **can block** (`{ block: true, reason }`), `pi.setActiveTools()`
+    enables/disables tools, `before_agent_start` injects messages,
+    `pi.appendEntry()` persists session state → a mechanical gate is really
+    conceivable.
+- Web-Research (Chantier D) done: **no Wails candidate qualifies** the Z5 §2
+  policy (Wails v3 in beta v3.0.0-beta, ecosystem too young; v2 stable but no
+  real MIT mono-technology tested project found; `wailsapp/examples` = demos,
+  excluded). Report:
   `docs/research/2026-08-05-desktop-app-template-candidates.md`.
 
 ## Constraints
 
-- **Périmètre méta-projet strict** : `KIT_CHARTER.md` (lecture prioritaire,
-  non modifié), `AGENTS.md` racine (non modifié sauf décision Marie sur C),
-  `.agent/` (contrats, instructions, validators, cognitive), `.pi/memory/`,
-  `.pi/prompts/kit-audit.md`, `docs/`. **Aucune édition sous `KitV2/`** —
-  toute correction produit est loggée comme finding ou écrite dans ce plan
-  comme action en attente pour la passe suivante. Ne jamais élargir la
-  frontière (AGENTS.md Modification policy).
-- Un seul writer sur le worktree ; la seule exécution parallèle est la
-  recherche en lecture (Web-Research chantier D, terminée).
-- Toute règle nouvelle d'un contrat doit être formulée pour être vérifiable
-  par C2 ou un contrôle de revue (README.md kit-governance) — sinon c'est une
-  hypothèse.
-- Pas de code dans `KitV2/tools/validators/validate-kitv2.py` : le contrat
-  exact des nouveaux contrôles est écrit dans ce plan (§ Annexes A/B/C), prêt
-  pour la passe d'implémentation.
-- Confiance documentée : une hypothèse non vérifiée n'est jamais une
-  affirmation ferme dans le rapport final.
-- Trois échecs identiques d'affilée → stop et rapport.
-- Gates méta-projet après éditions : `python3 .agent/validators/
+- **Strict metaproject scope**: `KIT_CHARTER.md` (priority read, not
+  modified), root `AGENTS.md` (not modified), `.agent/` (contracts,
+  instructions, validators, cognitive), `.pi/memory/`, `.pi/prompts/
+  kit-audit.md`, `docs/`. **No edit under `KitV2/`** — any product correction
+  is logged as a finding or written in this plan as a pending action for the
+  next pass. Never widen the boundary (AGENTS.md Modification policy).
+- One writer per worktree; the only parallel execution is read-only research
+  (Web-Research Chantier D, done).
+- Every new contract rule must be formulated to be verifiable by C2 or a
+  review control (kit-governance README) — otherwise it is a hypothesis.
+- No code in `KitV2/tools/validators/validate-kitv2.py`: the exact contract
+  of the new checks is written in this plan (§ Annexes A/B/C), ready for the
+  implementation pass.
+- Documented confidence: an unverified hypothesis is never a firm claim in
+  the final report.
+- Three identical failures → stop and report.
+- Metaproject gates after edits: `python3 .agent/validators/
   validate-instructions.py` + `python3 .agent/validators/
-  validate-cognitive.py` depuis la racine (pas de gate produit : aucun code
-  KitV2 modifié).
+  validate-cognitive.py` from the root (no product gate: no KitV2 code
+  modified).
 
 ## Done when
 
-- Plan écrit (ce fichier) avant toute édition ✓.
-- Chantier A : options a/b/c évaluées, décision prise, contrats C2/Z3/Z4/Z1
-  mis à jour avec la règle vérifiable, kit-audit phase C4 + §4-E évolués,
-  contrat du contrôle futur écrit (annexe A), aucun code KitV2 écrit.
-- Chantier B : comparaison 13-zone-snippets vs 14-zone-templates faite,
-  verdict fondé sur la preuve, Decision Record enregistré (aucun travail
-  fabriqué).
-- Chantier C : `docs/research/2026-08-05-philosophy-tension.md` rédigé avec
-  ≥ 3 options, question posée à Marie (bloquant : rien d'autre sur C avant
-  réponse) ; application après réponse (méta-projet → appliquer ; core →
-  action en attente).
-- Chantier D : dossier `docs/research/2026-08-05-desktop-app-template-
-  candidates.md` (aucun candidat conforme, honnête) ; précision Z5 §2 (source
-  réelle ≠ starter/démo) appliquée ; ligne roadmap TEMPLATES.md rédigée dans
-  le plan (non appliquée) ; kit-audit phase B évolué.
-- Chantier E : capacité réelle Pi documentée (porte mécanique existe), spec
-  exacte du mécanisme écrite dans le plan (annexe B), principe étendu dans
-  `.agent/instructions.md` (registre des lacunes d'automatisation), C2 + Z8
-  mis à jour, kit-audit dimension « instructions absolues » nommée.
-- Gates méta-projet vertes ; revue fresh-context obtenue avant déclaration de
-  fin ; Decisions.md (D-2026-08-05-11…15), Progress.md, Gotchas.md (si leçon
-  durable) mis à jour ; rapport final avec fichiers KitV2 non touchés.
+- Plan written (this file) before any edit ✓.
+- Chantier A: options a/b/c evaluated, decision taken, contracts C2/Z3/Z4/Z1
+  updated with the verifiable rule, kit-audit phases C4 + §5-E evolved, exact
+  check contract written (annex A), no KitV2 code written.
+- Chantier B: 13-zone-snippets vs 14-zone-templates comparison done,
+  evidence-based verdict, Decision Record recorded (no fabricated work).
+- Chantier C: `docs/research/2026-08-05-philosophy-tension.md` written with
+  ≥ 3 options, question asked to the owner (blocker: nothing else on C before
+  the answer); application after the answer (metaproject → apply; core →
+  pending action).
+- Chantier D: dossier `docs/research/2026-08-05-desktop-app-template-
+  candidates.md` (no conforming candidate, honest); Z5 §2 precision (real
+  source ≠ starter/demo) applied; TEMPLATES.md roadmap line written in the
+  plan (not applied); kit-audit phase B evolved.
+- Chantier E: real Pi capability documented (mechanical gate exists), exact
+  mechanism spec written in the plan (annex B), principle extended in
+  `.agent/instructions.md` (automation-gaps registry), C2 + Z8 updated,
+  kit-audit "absolute instructions" dimension named.
+- Metaproject gates green; fresh-context review obtained before declaring
+  completion; Decisions.md (D-2026-08-05-11…15), Progress.md, Gotchas.md (if
+  durable lesson) updated; final report with untouched KitV2 files.
 
-## Étapes
+## Steps
 
-1. (fait) Vérification des preuves contre l'arbre réel + recon des points de
-   couplage.
-2. (fait) Recherche Web-Research chantier D (subagent fresh-context,
-   read-only).
-3. Rédaction de ce plan + note philosophie
-   (`docs/research/2026-08-05-philosophy-tension.md`) + dossier desktop-app
+1. (done) Evidence verification against the real tree + coupling-point recon.
+2. (done) Web-Research Chantier D (fresh-context sub-agent, read-only).
+3. Writing this plan + philosophy note
+   (`docs/research/2026-08-05-philosophy-tension.md`) + desktop-app dossier
    (`docs/research/2026-08-05-desktop-app-template-candidates.md`).
-4. Question à Marie (chantier C) — ne pas avancer sur C avant réponse.
-5. Chantier A : décision D-2026-08-05-11 ; édits C2 §2 (règle inter-fichiers
-   - tripwire + instructions absolues), Z4 §3/§5, Z3 §5, Z1 §6 ; kit-audit
-   C4/§4-E.
-6. Chantier B : décision D-2026-08-05-12 (verdict : sain, sans édition
-   contractuelle).
-7. Chantier D : décision D-2026-08-05-14 ; précision Z5 §2 ; kit-audit phase
-   B ; ligne roadmap prête dans le plan (non appliquée).
-8. Chantier E : décision D-2026-08-05-15 ; `.agent/instructions.md` (principe
-   - registre) ; C2 §2 + Z8 §3 ; kit-audit dimension nommée.
-9. Chantier C post-réponse (si Marie répond pendant la passe) : appliquer si
-   méta-projet seulement ; sinon action en attente.
-10. Gates méta-projet : `validate-instructions.py`, `validate-cognitive.py`.
-11. Revue fresh-context (subagent read-only, C0 §6.3) — intégrer ou trancher
-    les remarques.
-12. Mémoire (Decisions.md D-2026-08-05-11…15, Progress.md, Gotchas.md si
-    nécessaire) + commit + rapport final.
+4. Question to the owner (Chantier C) — do not advance on C before the answer.
+5. Chantier A: decision D-2026-08-05-11; edits C2 §2 (cross-file rule +
+   tripwire + absolute instructions), Z4 §3/§5, Z3 §5, Z1 §6; kit-audit
+   C4/§5-E.
+6. Chantier B: decision D-2026-08-05-12 (verdict: sound, no contractual
+   edit).
+7. Chantier D: decision D-2026-08-05-14; Z5 §2 precision; kit-audit phase B;
+   roadmap line ready in the plan (not applied).
+8. Chantier E: decision D-2026-08-05-15; `.agent/instructions.md` (principle
+   - registry); C2 §2 + Z8 §3; kit-audit named dimension.
+9. Chantier C post-answer (if the owner answers during the pass): apply if
+   metaproject only; otherwise pending action.
+10. Metaproject gates: `validate-instructions.py`, `validate-cognitive.py`.
+11. Fresh-context review (read-only sub-agent, C0 §6.3) — integrate or settle
+    the remarks.
+12. Memory (Decisions.md D-2026-08-05-11…15, Progress.md, Gotchas.md if
+    needed) + commit + final report.
 
-## Décisions de la passe (résumé, détails dans Decisions.md)
+## Pass decisions (summary, details in Decisions.md)
 
-- **A (D-2026-08-05-11)** : combiner (b) mécanisée + (a) tripwire. Règle
-  vérifiable : dépendant déclaré re-vérifié quand le canonique change
-  (`last_verified(dépendant) >= last_verified(canonique)`, contrôlable par
-  date pour snippet `source:` et relations YAML-graphe) ; tripwire de
-  similarité exemple.go ↔ bloc canonique en warning (jamais erreur, vue
-  focalisée ≠ copie). Statu quo (c) seul écarté : n'ajoute aucun déclencheur.
-- **B (D-2026-08-05-12)** : le design roadmap snippets est sain — les 7 lignes
-  portent chacune un critère d'admission actionnable, plus précis par ligne
-  que le statut `planned` des templates (« décision + ligne »), et le patron
-  est mandaté par Z4 §3 + C0 §7 ; aucun changement de contrat. Fermeture sans
-  travail fabriqué.
-- **C (D-2026-08-05-13)** : tension documentée honnêtement (2 niveaux :
-  AGENTS.md racine « Go does not prescribe a universal project tree » +
-  rules/core/philosophy « no universal project layout » vs objectif personnel
-  de navigation identique partout) ; 3 options posées ; **réponse Marie
-  (2026-08-05) : Option 3 « naviguer par la raison »** — liberté de structure
-  conservée, mais toute recette qui produit/recommande une disposition doit
-  l'expliquer par écrit au même endroit (section « Structure » de la recette,
-  justification dans le README template). Aucune modification d'AGENTS.md
-  racine ni de rules/core/philosophy nécessaire (l'Option 3 est compatible
-  avec la doctrine sourcée) ; éditions des recettes/templates = passe
-  suivante (KitV2).
-- **D (D-2026-08-05-14)** : aucun candidat Wails conforme (v3 beta,
-  écosystème immature) ; précision Z5 §2 « source = application réelle, pas
-  starter/démo » (leçon transférable) ; ligne roadmap desktop-app = planned
-  avec note « aucune source conforme au 2026-08-05, ré-évaluer à la GA » ;
-  admission = passe suivante (KitV2).
-- **E (D-2026-08-05-15)** : Pi expose une vraie porte mécanique (`tool_call`
-  block, `setActiveTools`) — spec exacte d'une extension « reminder doux »
-  écrite (annexe B, implémentation passe suivante dans KitV2/.pi/) ; principe
-  étendu aux artefacts consommateurs (MANDATORY ⇒ contrôle mécanique OU
-  étiquette « guidance seule » dans le registre des lacunes
-  d'automatisation) ; pas de scan validateur dur (risque de faux positifs sur
-  des absolus légitimement appliqués par revue — documenté).
+- **A (D-2026-08-05-11)**: combine mechanized (b) + tripwire (a). Verifiable
+  rule: declared dependent re-verified when the canonical changes
+  (`last_verified(dependent) >= last_verified(canonical)`, date-checkable for
+  snippet `source:` and graph-YAML relations); similarity tripwire
+  example.go ↔ canonical block as warning (never error, focused view ≠ copy).
+  Status quo (c) alone rejected: adds no trigger.
+- **B (D-2026-08-05-12)**: the snippets roadmap design is sound — the 7 lines
+  each carry an actionable admission criterion, more precise per line than
+  the templates' `planned` status ("decision + line"), and the pattern is
+  mandated by Z4 §3 + C0 §7; no contract change. Closed without fabricated
+  work.
+- **C (D-2026-08-05-13)**: tension documented honestly (2 levels: root
+  AGENTS.md "Go does not prescribe a universal project tree" +
+  rules/core/philosophy "no universal project layout" vs personal goal of
+  identical navigation); 3 options posed; owner answer (2026-08-05): Option 3
+  "navigate by reason"; application subordinate to the answer.
+- **D (D-2026-08-05-14)**: no conforming Wails candidate (v3 beta, immature
+  ecosystem); Z5 §2 precision "source = real application, not starter/demo"
+  (transferable lesson); desktop-app roadmap line = planned with "no
+  conforming source as of 2026-08-05, re-evaluate at GA"; admission = next
+  pass (KitV2).
+- **E (D-2026-08-05-15)**: Pi exposes a real mechanical gate (`tool_call`
+  block, `setActiveTools`) — exact spec of a "soft reminder" extension
+  written (annex B, implementation next pass in KitV2/.pi/); principle
+  extended to consumer artifacts (MANDATORY ⇒ mechanical control OR "guidance
+  only" label in the automation-gaps registry); no hard validator scan
+  (false-positive risk on legitimately review-enforced absolutes —
+  documented).
 
-## Actions en attente pour la passe suivante (KitV2/ — ne PAS appliquer ici)
+## Pending actions for the next pass (KitV2/ — do NOT apply here)
 
-1. **Contrôle C2 « dérive inter-fichiers »** (validate-kitv2.py) : spec
-   complète en Annexe A — champ SNIPPET.yaml `last_verified` (recommandé),
-   comparaison de dates snippet↔source:, relation YAML-graphe
-   dépendant↔cible, tripwire de similarité (warning), tests +/−.
-2. **Porte Pi « search_kit_resources »** (KitV2/.pi/extensions/) : spec
-   complète en Annexe B — état de session, reminder doux sur `tool_call` des
-   outils d'écriture, dégradation sans UI, option hard-block.
-3. **TEMPLATES.md** : ajouter la ligne roadmap desktop-app (texte prêt en
-   Annexe D), statut `planned`, note « aucune source MIT conforme au
-   2026-08-05 (Wails v3 beta) — ré-évaluer à la GA ».
-4. **Alignement SNIPPET.yaml existants** : ajouter `last_verified` aux 3
-   snippets quand le contrôle sera implémenté.
-5. **Option 3 (D-2026-08-05-13) — KitV2** : ajouter la section « Structure
-   (pourquoi cette disposition) » aux recettes concernées par une disposition
-   de projet (création d'application/service/CLI/worker/desktop) et la
-   justification de structure au README des 3 templates sourcés (format Z5
-   §3).
-6. **C2 contrôle « instructions absolues »** (si décidé à l'implémentation) :
-   grepper MANDATORY/absolus dans les artefacts consommateurs et vérifier
-   contrôle ou étiquette — spec en Annexe C.
+1. **C2 check "cross-file drift"** (validate-kitv2.py): full spec in Annex A
+   — SNIPPET.yaml `last_verified` field (recommended), snippet↔source date
+   comparison, graph-YAML dependent↔target relation, similarity tripwire
+   (warning), +/− tests.
+2. **Pi gate "search_kit_resources"** (KitV2/.pi/extensions/): full spec in
+   Annex B — session state, soft reminder on `tool_call` of writing tools,
+   UI-less degradation, optional hard-block.
+3. **TEMPLATES.md**: add the desktop-app roadmap line (text ready in Annex
+   D), `planned` status, "no conforming MIT source as of 2026-08-05 (Wails v3
+   beta) — re-evaluate at GA" note.
+4. **Existing SNIPPET.yaml alignment**: add `last_verified` to the 3 snippets
+   when the check is implemented.
+5. **Option 3 (D-2026-08-05-13) — KitV2**: add the "Structure (why this
+   layout)" section to the recipes concerned by a project layout (application/
+   service/CLI/worker/desktop creation) and the structure justification to
+   the 3 sourced templates' README (Z5 §3 format).
+6. **C2 check "absolute instructions"** (if decided at implementation):
+   grep MANDATORY/absolutes in consumer artifacts and verify control or label
+   — spec in Annex C.
 
 ## Annexes
 
-### Annexe A — Contrat du contrôle C2 « dérive inter-fichiers » (à implémenter passe suivante)
+### Annex A — Contract of the C2 "cross-file drift" check (to implement next pass)
 
-- **Entrées** : `snippets/*/SNIPPET.yaml` (champ `source:` résolu),
-  `snippets/*/example.go`, `snippets/*/check.sh`, SKILL.md cibles,
-  `knowledge/**/*.yaml` (relations `references`/`uses`/`depends_on` vers des
-  artefacts datés).
-- **Règle pass/fail** :
-  - Snippet : si SNIPPET.yaml porte `last_verified` ET la cible `source:`
-    porte `last-verified` (frontmatter SKILL.md), alors
-    `last_verified(snippet) >= last_verified(cible)` — sinon **erreur**
-    (« snippet non re-vérifié après modification de sa source canonique »).
-  - YAML-graphe : pour toute relation vers une cible datée, `last_verified`
-    du dépendant >= celui de la cible — sinon **erreur**.
-  - Tripwire (warning, jamais erreur) : similarité de tokens
-    (Jaccard/containment normalisé, commentaires ignorés) entre
-    `example.go` et le bloc de code Go de la cible `source:` ; sous un seuil
-    calibré sur les 3 snippets existants → `warning: « drift suspect … »`.
-- **Faux positifs connus** : vue focalisée légitime d'un snippet (≠ copie) —
-  d'où warning et non erreur ; dates manquantes → contrôle ignoré (pas de
-  failure) ; cibles sans bloc Go → tripwire N/A.
-- **Tests** : + snippet ré-verifié (dates OK) ; − snippet obsolète (date
-  inférieure) ; − relation graphe obsolète ; +/− tripwire au seuil calibré.
+- **Inputs**: `snippets/*/SNIPPET.yaml` (resolved `source:` field),
+  `snippets/*/example.go`, `snippets/*/check.sh`, target SKILL.md,
+  `knowledge/**/*.yaml` (`references`/`uses`/`depends_on` relations to dated
+  artifacts).
+- **Pass/fail rule**:
+  - Snippet: if SNIPPET.yaml carries `last_verified` AND the `source:` target
+    carries `last-verified` (SKILL.md frontmatter), then
+    `last_verified(snippet) >= last_verified(target)` — otherwise **error**
+    ("snippet not re-verified after modification of its canonical source").
+  - Graph-YAML: for any relation to a dated target,
+    `last_verified`(dependent) >= target's — otherwise **error**.
+  - Tripwire (warning, never error): token similarity (Jaccard/normalized
+    containment, comments ignored) between `example.go` and the target
+    `source:` Go block; below a threshold calibrated on the 3 existing
+    snippets → `warning: "suspected drift …"`.
+- **Known false positives**: legitimate focused view of a snippet (≠ copy) —
+  hence warning and not error; missing dates → check ignored (no failure);
+  targets without a Go block → tripwire N/A.
+- **Tests**: + re-verified snippet (dates OK); − obsolete snippet (lower
+  date); − obsolete graph relation; +/− tripwire at the calibrated threshold.
 
-### Annexe B — Contrat de la porte Pi « search_kit_resources » (à implémenter passe suivante)
+### Annex B — Contract of the Pi "search_kit_resources" gate (to implement next pass)
 
-- **Mécanisme** : extension Pi dans `KitV2/.pi/extensions/` (fusionnée dans
-  kit-resource-router.ts ou fichier séparé) — état de session `searched`
-  (reset sur `session_start`, set sur `tool_call` de `search_kit_resources`),
-  hook `tool_call` sur les outils d'écriture (write/edit/apply_patch/bash) :
-  si `searched == false` et l'input ressemble à du travail technique
-  (extensions .go/.mod, commandes `go build|test|run|mod`, chemins sous
-  rules/recipes/knowledge/snippets/templates), injecter un rappel doux dans
-  `tool_result` (« kit-resource-routing : search_kit_resources n'a pas été
-  appelé cette session avant cette édition technique — le faire d'abord sauf
-  si travail non technique »).
-- **Dégradation** : mode sans UI (print/rpc) → rappel seulement (jamais de
-  confirm bloquant) ; `hard-block` optionnel par configuration (block +
-  reason) réservé aux sessions TUI, avec exemption explicite du cas « travail
-  non technique » (la skill elle-même l'exclut).
-- **Niveau de confiance honnête** : présence-session ≠ preuve que la *bonne*
-  recherche a précédé *cette* édition → la porte est un tripwire de rappel,
-  pas une preuve de conformité ; l'audit (dimension instructions absolues)
-  reste le juge.
-- **Tests** : smoke pi depuis une copie consommateur (rappel déclenché, pas de
-  rappel après search, pas de rappel sur édition non technique).
+- **Mechanism**: Pi extension in `KitV2/.pi/extensions/` (merged into
+  kit-resource-router.ts or a separate file) — session state `searched`
+  (reset on `session_start`, set on `tool_call` of `search_kit_resources`),
+  `tool_call` hook on writing tools (write/edit/apply_patch/bash): if
+  `searched == false` and the input looks like technical work (.go/.mod
+  extensions, `go build|test|run|mod` commands, paths under
+  rules/recipes/knowledge/snippets/templates), inject a soft reminder in
+  `tool_result` ("kit-resource-routing: search_kit_resources was not called
+  this session before this technical edit — do it first unless the work is
+  non-technical").
+- **Degradation**: UI-less mode (print/rpc) → reminder only (never a blocking
+  confirm); optional `hard-block` by configuration (block + reason) reserved
+  for TUI sessions, with an explicit exemption for the "non-technical work"
+  case (the skill itself excludes it).
+- **Honest confidence level**: session presence ≠ proof that the *right*
+  search preceded *this* edit → the gate is a reminder tripwire, not a
+  conformity proof; the audit (absolute-instructions dimension) remains the
+  judge.
+- **Tests**: pi smoke from a consumer copy (reminder triggered, no reminder
+  after search, no reminder on non-technical edit).
 
-### Annexe C — Contrat du contrôle « instructions absolues » (optionnel, passe suivante)
+### Annex C — Contract of the "absolute instructions" check (optional, next pass)
 
-- Grep déterministe des lexèmes MANDATORY / « must always » / « jamais » /
-  « toujours » dans les artefacts consommateurs (AGENTS.md, skills, prompts,
-  recipes) ; chaque occurrence doit être rattachée à un contrôle mécanique
-  nommé OU à une étiquette « guidance seule » dans le registre
-  d'.agent/instructions.md. Statut initial : warning (le registre existe),
-  passer en erreur quand le registre est complet.
+- Deterministic grep of MANDATORY / "must always" / "never" lexemes in
+  consumer artifacts (AGENTS.md, skills, prompts, recipes); each occurrence
+  must be attached to a named mechanical control OR a "guidance only" label
+  in the `.agent/instructions.md` registry. Initial status: warning (the
+  registry exists), error when the registry is complete.
 
-### Annexe D — Ligne roadmap TEMPLATES.md (texte prêt à coller, passe suivante)
+### Annex D — TEMPLATES.md roadmap line (ready to paste, next pass)
 
 ```markdown
-| desktop-app | planned | — (aucune source MIT conforme au 2026-08-05 : Wails v3 en beta, écosystème immature ; exemples officiels = démos) | Wails v3 — ré-évaluer à la GA (recherche 2026-08-05) |
+| desktop-app | planned | — (no conforming MIT source as of 2026-08-05: Wails v3 in beta, ecosystem immature; official examples = demos) | Wails v3 — re-evaluate at GA (research 2026-08-05) |
 ```
 
-(à insérer dans la table « Statut actuel » de `KitV2/templates/TEMPLATES.md`,
-et la phrase du catalogue : « Les shapes grpc, microservice, monolith,
-cloud-service **et desktop-app** restent une roadmap sans template
-opérationnel. »)
+(to insert in the "Statut actuel" table of `KitV2/templates/TEMPLATES.md`,
+and the catalog sentence: "The grpc, microservice, monolith, cloud-service
+**and desktop-app** shapes remain a roadmap without an operational
+template.")

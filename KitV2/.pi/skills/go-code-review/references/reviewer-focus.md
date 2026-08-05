@@ -1,51 +1,37 @@
-# Focus de reviewers (dimensions focalisées)
+# Reviewer Focus Areas (focused dimensions)
 
-Utilise ce contrat quand la skill `go-code-review` demande de créer des
-sous-agents focalisés, ou pour structurer une revue séquentielle en passes
-focalisées. Un sous-agent couvre exactement un focus ; chaque focus renvoie
-uniquement des findings candidats étayés par des preuves.
+Use this contract when the `go-code-review` skill asks you to create focused sub-agents, or to structure a sequential review into focused passes. One sub-agent covers exactly one focus; each focus returns only evidence-backed candidate findings.
 
 ## Mission
 
-Reviewer de code focalisé : revois uniquement la zone d'attention assignée et
-renvoie des findings candidats étayés par des preuves. Ton but est d'identifier
-les bugs, régressions et risques de comportement introduits par le diff revu.
+Focused code reviewer: review only the assigned focus area and return evidence-backed candidate findings. Your goal is to identify bugs, regressions, and behavior risks introduced by the reviewed diff.
 
-## Entrées
+## Inputs
 
-- Mode de revue : uncommitted, commit-range, ou branche / PR.
-- Contexte du diff (collecté par git, jamais un résumé).
-- Zone d'attention assignée.
-- Tous fichiers ou sections de diff spécifiques assignés par l'orchestrateur.
+- Review mode: uncommitted, commit-range, or branch / PR.
+- Diff context (collected by git, never a summary).
+- Assigned focus area.
+- Any specific files or diff sections assigned by the orchestrator.
 
-## Zones d'attention (un focus exact par sous-agent)
+## Focus Areas (exactly one focus per sub-agent)
 
-- **Correctness / Bug Risk** : erreurs de logique, cas limites, cohérence
-  d'état, chemins d'exception, hypothèses invalides.
-- **Regression / Compatibility** : contrats d'API modifiés, comportement de
-  config, formats de données, migrations, comportement CLI, compatibilité
-  ascendante.
-- **Tests / Verification** : tests manquants pour le comportement changé,
-  assertions faibles, tests obsolètes, modes d'échec non testés.
-- **Security / Data Safety** : autorisation, validation, injection, secrets,
-  opérations destructrices, perte de données, vie privée.
-- **Performance / Concurrency** : races asynchrones, erreurs de cache,
-  fuites de ressources, travail excessif, bugs d'ordre.
+- **Correctness / Bug Risk**: logic errors, edge cases, state consistency, exception paths, invalid assumptions.
+- **Regression / Compatibility**: changed API contracts, config behavior, data formats, migrations, CLI behavior, backward compatibility.
+- **Tests / Verification**: missing tests for changed behavior, weak assertions, stale tests, untested failure modes.
+- **Security / Data Safety**: authorization, validation, injection, secrets, destructive operations, data loss, privacy.
+- **Performance / Concurrency**: async races, caching errors, resource leaks, excessive work, ordering bugs.
 
-## Règles
+## Rules
 
-- Rapporte seulement les problèmes soutenus par le diff ou le code environnant
-  directement pertinent.
-- Inclut des références fichier:ligne quand c'est possible.
-- Explique la condition de déclenchement et l'impact utilisateur/runtime.
-- Ne rapporte pas les problèmes de style uniquement.
-- Ne duplique pas les findings d'un autre focus déjà connus ; affine
-  uniquement si tu ajoutes des preuves concrètes.
-- Si quelque chose est suspect mais non prouvé, mets-le sous `Questions` ou
-  `Residual Risks`, pas sous `Findings`.
-- Si tu ne trouves rien, dis `No findings for this focus area`.
+- Report only issues supported by the diff or directly relevant surrounding code.
+- Include file and line references whenever possible.
+- Explain the triggering condition and user/runtime impact.
+- Do not report style-only issues.
+- Do not duplicate findings from another focus area if already known; refine only if you add concrete evidence.
+- If something is suspicious but not proven, put it under `Questions` or `Residual Risks`, not `Findings`.
+- If you find nothing, say `No findings for this focus area`.
 
-## Contrat de sortie
+## Output Contract
 
 ```text
 ## Reviewer Focus
@@ -53,27 +39,23 @@ les bugs, régressions et risques de comportement introduits par le diff revu.
 
 ## Candidate Findings
 
-### [Sévérité] path/to/file.go:ligne Titre court
-Impact: [ce qui casse et qui est affecté]
-Evidence: [preuve diff/contexte]
-Trigger: [quand cela arrive]
-Suggested fix: [direction minimale]
-Test gap: [couverture manquante ou faible, si applicable]
+### [Severity] path/to/file.go:line Short title
+Impact: [what breaks and who/what is affected]
+Evidence: [diff/context evidence]
+Trigger: [when this happens]
+Suggested fix: [minimal direction]
+Test gap: [missing or weak coverage, if applicable]
 
 ## Questions
-- [seulement si nécessaire]
+- [only if needed]
 
 ## Residual Risks
-- [seulement si nécessaire]
+- [only if needed]
 
 ## Checked But Not Reported
-- [note brièvement les zones importantes revues sans finding]
+- [briefly note important areas reviewed with no finding]
 ```
 
-## Mapping des sévérités
+## Severity Mapping
 
-Les sévérités du kit restent la référence de sortie finale (`blocker` /
-`should-fix` / `nit` — voir `references/finding-template.md`). Pour un
-tri interne des reviewers : Critical ≈ blocker, High ≈ should-fix dans un
-chemin important, Medium ≈ should-fix de chemin secondaire ou lacune de
-test, Low ≈ nit. La consolidation finale traduit en sévérités du kit.
+The kit's severities remain the final output reference (`blocker` / `should-fix` / `nit` — see `references/finding-template.md`). For internal reviewer triage: Critical ≈ blocker, High ≈ should-fix on an important path, Medium ≈ should-fix on a secondary path or test gap, Low ≈ nit. The final consolidation translates into kit severities.

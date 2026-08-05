@@ -1,80 +1,59 @@
-# Z4 — Zone `snippets/` (vues vérifiées d'implémentation canonique)
+# Z4 — Zone `snippets/` (verified views of canonical implementation)
 
-- **Contrat MetaProjet** — régit `KitV2/snippets/`.
-- **Rapport d'audit :** §2.5.
+- **Metaproject Contract** — governs `KitV2/snippets/`.
+- **Audit report:** §2.5.
 
 ## 1. Mission
 
-Des fragments de code **métadonnés, vérifiés et liés à une source canonique**
-(recette, règle ou pattern). Un snippet n'est jamais une seconde implémentation :
-c'est une vue focalisée de code qui vit canoniquement ailleurs.
+**Metadata-bearing, verified code fragments linked to a canonical source** (recipe, rule, or pattern). A snippet is never a second implementation: it is a focused view of code that lives canonically elsewhere.
 
-## 2. Structure d'un snippet
+## 2. Snippet structure
 
 ```text
-<sujet>/
-├── SNIPPET.yaml   # métadonnées
-├── example.go     # fragment compilant, autonome
-└── check.sh       # vérification EXÉCUTANTE (compile + run/assertions)
+<subject>/
+├── SNIPPET.yaml   # metadata
+├── example.go     # compiling, self-contained fragment
+└── check.sh       # EXECUTING verification (compile + run/assertions)
 ```
 
-## 3. SNIPPET.yaml — champs obligatoires (modèle : `bounded-worker`)
+## 3. SNIPPET.yaml — mandatory fields (model: `bounded-worker`)
 
-`id`, `type` (domaine), `purpose`, `tags`, `go_version`, `dependencies`,
-`when_to_use`, `avoid_when`, `source` (**chemin relatif résolu** vers la
-recette/règle/pattern canonique), `complexity`, `files`, `tests`,
-`last_verified` (**recommandé** depuis 2026-08-05, D-2026-08-05-11 : sert au
-contrôle inter-fichiers C2 — le snippet doit être re-vérifié quand sa source
-canonique change).
+`id`, `type` (domain), `purpose`, `tags`, `go_version`, `dependencies`,
+`when_to_use`, `avoid_when`, `source` (**resolved relative path** to the
+canonical recipe/rule/pattern), `complexity`, `files`, `tests`,
+`last_verified` (**recommended** since 2026-08-05, D-2026-08-05-11: serves
+the cross-file C2 check — the snippet must be re-verified when its canonical
+source changes).
 
-## 4. Règles
+## 4. Rules
 
-1. **`source` obligatoire et résolue** : C2 vérifie que le chemin existe et
-   pointe vers un artefact canonique ; un snippet orphelin est un échec.
-2. **`check.sh` exécute réellement** : au minimum compilation + exécution du
-   fragment (ou assertions) — un check qui ne vérifie que `gofmt` est
-   insuffisant (régression détectée à l'audit : `errors-once/check.sh`).
-3. Les snippets ne remplacent pas la taxonomie : la catégorie = domaine du
-   graphe (concurrency, database, http, …). **Aucune catégorie vide** : les
-   catégories planifiées vivent en roadmap dans `snippets/README.md`.
-4. Un snippet n'introduit pas de nouvelle connaissance : s'il faut du nouveau
-   contenu, c'est une recette/pattern qui l'héberge, le snippet pointe.
-5. `go_version` = version minimale testée.
+1. **`source` mandatory and resolved**: C2 verifies that the path exists and points to a canonical artifact; an orphan snippet is a failure.
+2. **`check.sh` actually executes**: at minimum compilation + execution of the fragment (or assertions) — a check that only verifies `gofmt` is insufficient (regression detected at audit: `errors-once/check.sh`).
+3. Snippets do not replace the taxonomy: the category = graph domain (concurrency, database, http, …). **No empty category**: planned categories live in the roadmap in `snippets/README.md`.
+4. A snippet does not introduce new knowledge: if new content is needed, a recipe/pattern hosts it, the snippet points.
+5. `go_version` = minimum tested version.
 
 ## 5. Maintenance
 
-- **Ajout** : compil + check.sh exécutant vert + source canonique résolue +
-  métadonnées complètes + fraîcheur.
-- **Modification** : re-run check.sh ; vérifier que la source canonique n'a pas
-  changé de forme (sinon mettre à jour le snippet ou le retirer).
-- **Modification de la source canonique** : tout changement d'une
-  recette/règle/pattern référencé par un snippet `source:` déclenche la
-  re-vérification du snippet dans le même changement (bump `last_verified`,
-  mise à jour ou retrait) — contrôle inter-fichiers C2 par dates
-  (D-2026-08-05-11).
+- **Addition**: compile + executing check.sh green + resolved canonical source + complete metadata + freshness.
+- **Modification**: re-run check.sh; verify that the canonical source has not changed shape (otherwise update or remove the snippet).
+- **Canonical-source modification**: any change to a recipe/rule/pattern referenced by a snippet `source:` triggers the snippet's re-verification in the same change (bump `last_verified`, update, or removal) — cross-file C2 check by dates (D-2026-08-05-11).
 
 ## 6. Patterns
 
-- Un snippet = un point de vue sur un artefact existant, jamais un nouveau
-  corps de connaissance.
-- check.sh minimaliste mais réel : `go run` + assertions, ou `go test` d'un
-  package jetable.
+- A snippet = a point of view on an existing artifact, never a new knowledge body.
+- Minimal but real check.sh: `go run` + assertions, or `go test` of a throwaway package.
 
 ## 7. Anti-patterns
 
-- Snippet orphelin ; snippet qui devient la référence (dérive) ; check qui ne
-  vérifie rien ; catégorie vide qui attend ; code non compilant.
+- Orphan snippet; snippet that becomes the reference (drift); check that verifies nothing; empty waiting category; non-compiling code.
 
-## 8. Critères de validation
+## 8. Validation criteria
 
-- [ ] C2 : SNIPPET.yaml complet (champs §3 ; `last_verified` recommandé, non
-      exigé — le contrôle inter-fichiers ignore les dates manquantes, annexe A
-      du plan 2026-08-05-métaprojet).
-- [ ] C2 : `source` résolu ; `check.sh` compilant **et** exécutant.
-- [ ] Fraîcheur 12/18 mois.
+- [ ] C2: complete SNIPPET.yaml (§3 fields; `last_verified` recommended, not required — the cross-file check ignores missing dates, annexe A of the 2026-08-05-metaproject plan).
+- [ ] C2: `source` resolved; `check.sh` compiling **and** executing.
+- [ ] Freshness 12/18 months.
 
-## 9. Questions ouvertes
+## 9. Open questions
 
-- Frontière avec `knowledge/stdlib/` : stdlib = pointeurs de docs, snippets =
-  code exécutable. Une table de routage « question → snippet ou stdlib ? »
-  est-elle utile ? (proposition : non — la description L1 du snippet suffit.)
+- Boundary with `knowledge/stdlib/`: stdlib = doc pointers, snippets = executable code. Is a "question → snippet or stdlib?" routing table useful? (proposal: no — the snippet's L1 description suffices.)

@@ -1,109 +1,64 @@
-# C2 — Validation gate (portail de gouvernance exécutable)
+# C2 — Validation gate (executable governance portal)
 
-- **Contrat MetaProjet** — régit `KitV2/tools/validators/validate-kitv2.py` et
-  la gate du produit.
-- **Rapport d'audit :** §2.8, §1.3 (problème 6).
-- **Décisions :** seuil de fraîcheur 12/18 mois approuvé (2026-08-04).
+- **Metaproject Contract** — governs `KitV2/tools/validators/validate-kitv2.py` and the product gate.
+- **Audit report:** §2.8, §1.3 (problem 6).
+- **Decisions:** 12/18-month freshness threshold approved (2026-08-04).
 
 ## 1. Mission
 
-`validate-kitv2.py` est le **portail de gouvernance** : il transforme les
-règles des contrats (C0, C1, Z1–Z10, A1, N1) en contrôles exécutables. Un
-contenu qui viole un contrat doit faire échouer la gate. La charte cesse d'être
-déclarative : elle devient vérifiable.
+`validate-kitv2.py` is the **governance portal**: it turns the contract rules (C0, C1, Z1–Z10, A1, N1) into executable checks. Content that violates a contract must fail the gate. The charter stops being declarative: it becomes verifiable.
 
-## 2. Contrôles exigés (à implémenter progressivement ; chaque ajout a son test)
+## 2. Required checks (to be implemented progressively; each addition has its test)
 
-### Structure (existant, à étendre)
+### Structure (existing, to extend)
 
-- Fichiers racine obligatoires (manifest, capabilities, AGENTS.md, .pi/settings).
-- Absence des dossiers interdits (`.agent/`, `.pi/memory/`, `evaluations/`).
-- Frontmatter SKILL.md (name/description/category/tags/last-verified ; name ==
-  dossier parent ; ≤ 500 lignes) — existant.
-- Snippets (SNIPPET.yaml + example.go + check.sh) — existant.
-- Templates (forme attendue par shape) — existant.
-- Bundle offline (manifest, checksums, tailles, licences) — existant.
-- Aucun `.md` vide — existant.
+- Mandatory root files (manifest, capabilities, AGENTS.md, .pi/settings).
+- Absence of forbidden directories (`.agent/`, `.pi/memory/`, `evaluations/`).
+- SKILL.md frontmatter (name/description/category/tags/last-verified; name == parent directory; ≤ 500 lines) — existing.
+- Snippets (SNIPPET.yaml + example.go + check.sh) — existing.
+- Templates (expected shape form) — existing.
+- Offline bundle (manifest, checksums, sizes, licenses) — existing.
+- No empty `.md` — existing.
 
-### Cohérence (nouveau)
+### Coherence (new)
 
-- Chemins `canonical`/`source` de manifest+capabilities existants.
-- Vocabulaire manifest↔capabilities identique.
-- Comptes recalculés == comptes affichés (zéro compte en dur) — voir C1.
-- `run.sh` découvre les probes (glob `probes/*/main.go`) — la liste en dur est
-  un échec.
-- INDEX généré à jour (knowledge/INDEX.md == arborescence réelle ; aucun
-  domaine fantôme).
-- Relations des YAML-graphe résolues et jamais vers du `proposed`/inexistant
-  (existant, étendre au statut).
+- `canonical`/`source` paths of manifest+capabilities exist.
+- Identical manifest↔capabilities vocabulary.
+- Recomputed counts == displayed counts (zero hardcoded count) — see C1.
+- `run.sh` discovers probes (glob `probes/*/main.go`) — a hardcoded list is a failure.
+- Generated INDEX up to date (knowledge/INDEX.md == real tree; no phantom domain).
+- Graph-YAML relations resolved and never to `proposed`/nonexistent (existing, extend to status).
 
-### Fraîcheur (nouveau — décision 2026-08-04)
+### Freshness (new — decision 2026-08-04)
 
-- `last_verified` > 12 mois → warning ; > 18 mois → erreur (statut déprécié
-  proposé) pour tout artefact daté (SKILL.md, YAML-graphe, SNIPPET.yaml).
-- Catalogue strict opt-in : `KITV2_STRICT_CATALOG=1 python3
-  tools/validators/validate-kitv2.py` vérifie les catalogues : section
-  `Sources vérifiées` datée, âge (90 jours pour libraries, 180 jours pour
-  reference-projects), retours suspects dans les blocs Go et paragraphes
-  exactement dupliqués. La duplication sémantique reste une revue humaine.
-- **Fraîcheur inter-fichiers (nouveau — décision 2026-08-05, D-2026-08-05-11)** :
-  la revue sémantique inter-fichiers reste humaine (charte §4), mais son
-  déclenchement devient mécanique : toute modification d'un artefact canonique
-  (recette, règle, pattern) avec dépendants déclarés exige que chaque dépendant
-  soit re-vérifié dans le même changement. Forme vérifiable (contrôle à
-  implémenter, contrat exact : plan 2026-08-05-métaprojet, annexe A) :
-  `last_verified(dépendant) >= last_verified(canonique)` pour les chaînes
-  déclarées — snippet `source:` → SKILL.md cible, et relations YAML-graphe
-  (`references`/`uses`/`depends_on`) vers des artefacts datés ; champ
-  `last_verified` recommandé dans les SNIPPET.yaml (Z4 §3). En complément,
-  tripwire de similarité (warning, jamais erreur) entre
-  `snippets/*/example.go` et le bloc Go canonique de `source:` — détecte la
-  dérive littérale, ne remplace pas la revue sémantique.
+- `last_verified` > 12 months → warning; > 18 months → error (proposed deprecated status) for every dated artifact (SKILL.md, graph-YAML, SNIPPET.yaml).
+- Strict catalog opt-in: `KITV2_STRICT_CATALOG=1 python3 tools/validators/validate-kitv2.py` verifies catalogs: dated `Sources vérifiées` section, age (90 days for libraries, 180 days for reference-projects), suspicious returns in Go blocks and exactly duplicated paragraphs. Semantic duplication remains a human review.
+- **Cross-file freshness (new — decision 2026-08-05, D-2026-08-05-11)**: the semantic cross-file review stays human (cf. the preexisting sentence of this contract, Freshness block above), but its triggering becomes mechanical: any modification of a canonical artifact (recipe, rule, pattern) with declared dependents requires each dependent to be re-verified in the same change. Verifiable form (check to implement, exact contract: plan 2026-08-05-metaproject, annexe A): `last_verified(dependent) >= last_verified(canonical)` for declared chains — snippet `source:` → target SKILL.md, and graph-YAML relations (`references`/`uses`/`depends_on`) to dated artifacts; `last_verified` field recommended in SNIPPET.yaml (Z4 §3). In addition, a similarity tripwire (warning, never error) between `snippets/*/example.go` and the canonical Go block of `source:` — detects literal drift, does not replace semantic review.
 
-### Qualité des descriptions (nouveau)
+### Description quality (new)
 
-- `description` de chaque SKILL.md : contient l'activation (« Use when » /
-  « Load when » / équivalent) — une description sans condition d'activation
-  est un échec (goulot de découvrabilité, cf. Red Hat/Anthropic).
-- Description > 1024 caractères → échec (déjà contrôlé).
+- `description` of each SKILL.md: contains the activation ("Use when" / "Load when" / equivalent) — a description without activation condition is a failure (discoverability bottleneck, cf. Red Hat/Anthropic).
+- Description > 1024 characters → failure (already checked).
 
-### Instructions absolues (MANDATORY) — nouveau, décision D-2026-08-05-15
+### Absolute instructions (MANDATORY) — new, decision D-2026-08-05-15
 
-Extension assumée de `.agent/instructions.md` : toute instruction absolue
-(`MANDATORY`, « toujours », « jamais ») ajoutée dans un artefact consommateur
-(skills, prompts, AGENTS.md, recettes) doit soit s'accompagner d'un contrôle
-mécanique nommé (validateur C2 ou porte Pi), soit être consignée
-explicitement comme « guidance seule, non appliquée » dans le registre des
-lacunes d'automatisation (`.agent/instructions.md` §Enforcement). L'audit
-(dimension « instructions absolues », kit-audit phase C9) inventorie chaque
-occurrence et son statut d'application ; un contrôle C2 déterministe (grep des
-lexèmes + rattachement au registre) est planifié (annexe C du plan
-2026-08-05-métaprojet).
+Assumed extension of `.agent/instructions.md`: any absolute instruction (`MANDATORY`, "always", "never") added in a consumer artifact (skills, prompts, AGENTS.md, recipes) must either be accompanied by a named mechanical control (validator C2 or Pi gate), or be explicitly recorded as "guidance only, not enforced" in the automation-gaps registry (`.agent/instructions.md` §Enforcement). The audit (dimension "absolute instructions", kit-audit phase C9) inventories every occurrence and its enforcement status; a deterministic C2 check (lexeme grep + registry attachment) is planned (annexe C of the 2026-08-05-metaproject plan).
 
-### Par catégorie (nouveau — aligné sur A1)
+### Per category (new — aligned on A1)
 
-- Recette : présence d'une section de scénario observable et d'un test ; le
-  scénario porte un verdict explicite (`PASS`/`PARTIAL`/`BLOCKED`) — pas de
-  recette sans scénario.
-- Bibliothèque (module SKILL.md) : critères d'admission énoncés (admission
-  checklist) ; alternatives considérées présentes.
-- Template : `LICENSE` MIT + `ATTRIBUTION.md` (source, version, adaptations)
-  pour tout template non-legacy.
-- Rule : impératif + frontière (« ne couvre PAS ») + sources présents.
+- Recipe: presence of an observable scenario section and a test; the scenario carries an explicit verdict (`PASS`/`PARTIAL`/`BLOCKED`) — no recipe without a scenario.
+- Library (module SKILL.md): admission criteria stated (admission checklist); considered alternatives present.
+- Template: MIT `LICENSE` + `ATTRIBUTION.md` (source, version, adaptations) for every non-legacy template.
+- Rule: imperative + boundary ("does NOT cover") + sources present.
 
-## 3. Fonctionnement
+## 3. Operation
 
-- Sortie : liste d'erreurs sur stderr + exit code 1 si erreur ; sinon une ligne
-  `kitv2: PASS (…)`.
-- Chaque contrôle est une fonction isolée, testable, avec un cas positif et un
-  cas négatif (tests `test_validate_*.py` — la suite ruff fait partie de la
-  gate du metaprojet).
-- Les warnings (fraîcheur 12 mois, notes) ne font pas échouer mais sont
-  imprimés avec préfixe `warning:`.
-- CI (`.github/workflows/ci.yml`) exécute le validateur + la gate Go sur le
-  produit.
+- Output: error list on stderr + exit code 1 on error; otherwise one line `kitv2: PASS (…)`.
+- Each check is an isolated, testable function with a positive and a negative case (tests `test_validate_*.py` — the ruff suite is part of the metaproject gate).
+- Warnings (12-month freshness, notes) do not fail but are printed with `warning:` prefix.
+- CI (`.github/workflows/ci.yml`) runs the validator + the Go gate on the product.
 
-## 4. Gate Go complète (depuis `KitV2/`)
+## 4. Full Go gate (from `KitV2/`)
 
 ```sh
 python3 tools/validators/validate-kitv2.py
@@ -117,35 +72,28 @@ govulncheck ./...
 bash probes/run.sh
 ```
 
-Règles :
+Rules:
 
-- `PATH="$PATH:$(go env GOPATH)/bin"` avant les outils (golangci-lint, gosec,
-  govulncheck).
-- Outil manquant → gate **PARTIAL** documentée, jamais PASS.
-- Les checks mécaniques prouvent des propriétés du code ; le scénario
-  observable (probe/recette) prouve le comportement ; jamais l'un pour l'autre.
+- `PATH="$PATH:$(go env GOPATH)/bin"` before the tools (golangci-lint, gosec, govulncheck).
+- Missing tool → documented **PARTIAL** gate, never PASS.
+- Mechanical checks prove code properties; the observable scenario (probe/recipe) proves behavior; never one for the other.
 
 ## 5. Anti-patterns
 
-- Validateur qui mute sans test ; contrôle sans cas négatif.
-- Compte en dur dans le validateur : les comptes de couverture sont désormais
-  dérivés de l'arborescence et vérifiés contre `capabilities.yaml`.
-- Gate verte malgré un contrat violé.
-- Sortie illisible (erreurs sans chemin ni raison actionnable).
+- Validator that mutates without test; check without negative case.
+- Hardcoded count in the validator: coverage counts are now derived from the tree and verified against `capabilities.yaml`.
+- Green gate despite a violated contract.
+- Unreadable output (errors without path or actionable reason).
 
-## 6. Critères de validation du contrat
+## 6. Contract validation criteria
 
-- [ ] Chaque contrôle listé en §2 existe (ou est planifié avec issue).
-- [ ] Un jeu de tests négatifs couvre chaque contrôle.
-- [ ] La gate complète (structure + Go + probes) tourne en CI.
-- [ ] Les comptes dérivés remplacent les constantes en dur.
-- [ ] Fraîcheur 12/18 mois implémentée.
+- [ ] Every check listed in §2 exists (or is planned with an issue).
+- [ ] A negative test set covers each check.
+- [ ] The full gate (structure + Go + probes) runs in CI.
+- [ ] Derived counts replace hardcoded constants.
+- [ ] 12/18-month freshness implemented.
 
-## 7. Questions ouvertes
+## 7. Open questions
 
-- La décision est appliquée depuis le 2026-08-05 : dérivation depuis
-  l'arborescence, comparaison avec `capabilities.yaml`, tests positifs et
-  négatifs dans `tools/validators/test_validate_kitv2.py`.
-- Faut-il un mode `--strict` (warnings = erreurs) pour la CI ?
-itv2.py`.
-- Faut-il un mode `--strict` (warnings = erreurs) pour la CI ?
+- The decision applies since 2026-08-05: derivation from the tree, comparison with `capabilities.yaml`, positive and negative tests in `tools/validators/test_validate_kitv2.py`.
+- Should there be a `--strict` mode (warnings = errors) for CI?

@@ -1,141 +1,131 @@
-# Tension de philosophie : minimalisme Go vs prévisibilité personnelle
+# Philosophy tension: Go minimalism vs personal predictability
 
-Date : 2026-08-05. Auteur : passe de durcissement gouvernance méta-projet
-(finding Rodin C). Statut : note de décision — la décision appartient à Marie
-(choix de produit), pas à l'agent.
+Date: 2026-08-05. Author: metaproject governance-hardening pass (Rodin
+finding C). Status: decision note — the decision belongs to the owner
+(product choice), not the agent.
 
-## 1. La contradiction, sans édulcoration
+## 1. The contradiction, without softening
 
-Deux objectifs s'affrontent, et ils sont **incompatibles tels qu'énoncés** :
+Two objectives face each other, and they are **incompatible as stated**:
 
-**Objectif A — « le Kit reste idiomatique et sans structure imposée »**
-(doctrine sourcée, déjà normative) :
+**Objective A — "the Kit stays idiomatic and without imposed structure"**
+(sourced doctrine, already normative):
 
-- `AGENTS.md` (racine, section Evidence rules) : « Go does not prescribe a
+- `AGENTS.md` (root, Evidence rules section): "Go does not prescribe a
   universal project tree; use official package naming guidance and Go
-  Proverbs. »
-- `KitV2/rules/core/philosophy/SKILL.md` (section Boundary) : « it prescribes
+  Proverbs."
+- `KitV2/rules/core/philosophy/SKILL.md` (Boundary section): "it prescribes
   no universal project layout (the official module-layout examples are shapes
-  to choose from, not a standard). »
-- Sources citées : Effective Go, Go Proverbs, go.dev/doc/modules/layout
-  (« Organizing a Go module » — des formes, pas un standard).
-- Registre des sources : `golang-standards/project-layout` n'est pas une
-  autorité Go.
+  to choose from, not a standard)."
+- Cited sources: Effective Go, Go Proverbs, go.dev/doc/modules/layout
+  ("Organizing a Go module" — shapes, not a standard).
+- Source registry: `golang-standards/project-layout` is not Go authority.
 
-Ces deux textes sont **cohérents entre eux** (vérifié : ils disent la même
-chose). C'est l'objectif B qui les contredit.
+These two texts are **coherent with each other** (verified: they say the same
+thing). It is Objective B that contradicts them.
 
-**Objectif B — « je veux naviguer pareil dans n'importe quel projet produit
-par le Kit »** (besoin personnel déclaré de Marie) : une structure identique
-pour retrouver sans effort les mêmes choses au même endroit, quel que soit le
-projet.
+**Objective B — "I want to navigate the same way in any project produced by
+the Kit"** (owner's declared personal need): an identical structure to find
+the same things in the same place without effort, whatever the project.
 
-Si le Kit prescrit « choisis la plus petite structure justifiée à chaque
-fois », deux projets produits par le Kit peuvent légitimement avoir des
-arbres différents (l'un `main.go` racine, l'autre `cmd/` + `internal/` selon
-le besoin). La navigation personnelle n'est alors pas garantie identique.
-Inversement, si le Kit impose une disposition unique, il contredit la
-doctrine sourcée et cesse d'être « minimal justifié ».
+If the Kit prescribes "choose the smallest justified structure each time",
+two projects produced by the Kit can legitimately have different trees (one a
+root `main.go`, another `cmd/` + `internal/` depending on need). Personal
+navigation is then not guaranteed identical. Conversely, if the Kit imposes a
+single layout, it contradicts the sourced doctrine and stops being "minimal
+justified".
 
-Ce n'est pas un détail éditorial : c'est un choix de produit qui touche
-`KitV2/rules/core/` — zone dont la modification exige une approbation
-explicite (AGENTS.md Modification policy). L'agent ne tranche pas seul.
+This is not an editorial detail: it is a product choice touching
+`KitV2/rules/core/` — a zone whose modification requires explicit approval
+(AGENTS.md Modification policy). The agent does not decide alone.
 
-## 2. Options avec compromis
+## 2. Options with trade-offs
 
-### Option 1 — Garder le minimalisme, résoudre ailleurs (recommandée par défaut)
+### Option 1 — Keep minimalism, solve elsewhere
 
-Le Kit reste idiomatique et sans structure imposée (il doit aussi fonctionner
-pour d'autres usages que ceux de Marie). Le besoin personnel de navigation
-prévisible est satisfait par un **preset séparé**, clairement étiqueté
-« non-canonique », que Marie active volontairement sur ses projets (ex. une
-recette/checklist « structure fixe personnelle » ou un prompt qui applique sa
-disposition préférée).
+The Kit stays idiomatic and without imposed structure (it must also work for
+uses other than the owner's). The personal need for predictable navigation is
+met by a **separate preset**, clearly labeled "non-canonical", that the owner
+activates voluntarily on their projects (e.g. a "fixed personal structure"
+recipe/checklist or a prompt applying their preferred layout).
 
-- Avantages : ne contredit aucune source ; le cœur garde sa position
-  « sourcé, pas d'opinion inventée » ; le preset reste réversible et
-  personnel.
-- Coûts : le preset doit être maintenu à part ; un consommateur tiers du Kit
-  n'hérite pas de la prévisibilité de Marie (ce n'est pas son besoin).
-- Risque : si le preset dérive vers de la doctrine non sourcée, il faut le
-  garder étiqueté non-canonique — contrôlable à la revue.
+- Advantages: contradicts no source; the core keeps its "sourced, no invented
+  opinion" position; the preset stays reversible and personal.
+- Costs: the preset must be maintained separately; a third-party Kit consumer
+  does not inherit the owner's predictability (it is not their need).
+- Risk: if the preset drifts into unsourced doctrine, it must stay labeled
+  non-canonical — controllable at review.
 
-### Option 2 — Changer la philosophie du cœur
+### Option 2 — Change the philosophy of the core
 
-`rules/core/philosophy` prescrit une disposition unique, avec exceptions
-documentées au cas par cas.
+`rules/core/philosophy` prescribes a single layout, with documented
+case-by-case exceptions.
 
-- Avantages : prévisibilité maximale — l'arbre est identique partout.
-- Coûts : contredit frontalement Effective Go / Go Proverbs /
-  go.dev/doc/modules/layout cités en source ; affaiblit la position
-  « sourcé, pas d'opinion inventée » du Kit ; les règles du Kit devraient
-  alors documenter cette déviation assumée et ses justifications, ce qui est
-  un changement de doctrine majeur (version majeure, migration, décision
-  écrite).
-- Risque : un Kit qui impose une structure unique devient un framework de
-  formes — contraire à la vision « typed knowledge graph, pas framework »
-  (Brief.md).
+- Advantages: maximum predictability — the tree is identical everywhere.
+- Costs: contradicts frontally Effective Go / Go Proverbs /
+  go.dev/doc/modules/layout cited as sources; weakens the kit's "sourced, no
+  invented opinion" position; the kit rules would then have to document this
+  assumed deviation and its justifications, which is a major doctrine change
+  (major version, migration, written decision).
+- Risk: a kit imposing a single structure becomes a shape framework —
+  contrary to the "typed knowledge graph, not framework" vision (Brief.md).
 
-### Option 3 — Prévisibilité par documentation, pas par uniformité
+### Option 3 — Predictability by documentation, not by uniformity
 
-Garder la liberté de structure, mais rendre obligatoire qu'une recette
-produise systématiquement un artefact « pourquoi cette disposition ici » au
-même endroit (ex. section `Structure` dans chaque projet généré, ou
-`layout.md` racine produit par les recettes).
+Keep the structure freedom, but make it mandatory that a recipe systematically
+produces a "why this layout here" artifact in the same place (e.g. a
+`Structure` section in each generated project, or a root `layout.md` produced
+by the recipes).
 
-- Avantages : l'arbre reste libre et sourcé ; la navigation devient
-  prévisible parce que la **raison** est toujours au même endroit ; coût
-  faible en doctrine (une règle de forme des recettes, pas une règle de
-  structure Go).
-- Coûts : l'arbre réel peut quand même différer entre projets — la
-  prévisibilité est cognitive (on sait où chercher la raison), pas physique
-  (mêmes chemins) ; exige d'ajouter une obligation aux recettes de
-  production.
-- Risque : faible ; reste compatible avec les deux objectifs si Marie
-  accepte la prévisibilité par la raison plutôt que par l'uniformité.
+- Advantages: the tree stays free and sourced; navigation becomes predictable
+  because the **reason** is always in the same place; low doctrine cost (a
+  recipe-shape rule, not a Go structure rule).
+- Costs: the real tree can still differ between projects — predictability is
+  cognitive (you know where to find the reason), not physical (same paths);
+  requires adding an obligation to the production recipes.
+- Risk: low; remains compatible with both objectives if the owner accepts
+  predictability by reason rather than by uniformity.
 
-## 3. Ce que la décision implique
+## 3. What the decision implies
 
-- **Option 1 ou 3** : périmètre méta-projet possible (recette/prompt preset
-  pour 1 ; règle de forme des recettes pour 3 — mais attention : 3 touche
-  aussi les recettes de `KitV2/recipes/`, donc la passe suivante pour les
-  recettes existantes). Si Marie choisit 1 ou 3, l'agent applique ce qui est
-  méta-projet et écrit les éditions KitV2 comme actions en attente.
-- **Option 2** : touche `KitV2/rules/core/philosophy/SKILL.md` (zone
-  interdite cette passe) — l'édition exacte est écrite dans le plan
-  (docs/plans/2026-08-05-metaproject-governance-hardening.md, annexe à
-  compléter après réponse) comme action en attente, jamais appliquée ici.
+- **Option 1 or 3**: metaproject scope possible (preset recipe/prompt for 1;
+  recipe-shape rule for 3 — but 3 also touches `KitV2/recipes/`, so the next
+  pass for existing recipes). If the owner chooses 1 or 3, the agent applies
+  what is metaproject and writes the KitV2 edits as pending actions.
+- **Option 2**: touches `KitV2/rules/core/philosophy/SKILL.md` (forbidden
+  zone this pass) — the exact edit is written in the plan
+  (docs/plans/2026-08-05-metaproject-governance-hardening.md) as a pending
+  action, never applied here.
 
-## 4. Question posée à Marie
+## 4. Question asked to the owner
 
-Voir la question envoyée via l'outil de questions (gabarit : « Le Kit dit
-actuellement à l'agent : il n'y a pas une seule bonne structure de projet Go,
-choisis la plus petite qui convient à chaque fois. Toi, tu veux plutôt : je
-veux toujours pouvoir naviguer pareil, peu importe le projet. Ces deux règles
-se contredisent. Trois façons de trancher… »).
+See the question sent via the question tool (template: "The Kit currently
+tells the agent: there is no single good Go project structure, choose the
+smallest that fits each time. You, you want rather: I always want to navigate
+the same, whatever the project. These two rules contradict each other. Three
+ways to settle…").
 
-## 5. Décision de Marie (2026-08-05)
+## 5. Owner decision (2026-08-05)
 
-**Option 3 — naviguer par la raison.** On garde la liberté de structure, mais
-chaque projet produit par le Kit explique par écrit, toujours au même endroit,
-pourquoi il a choisi sa structure ; la navigation devient prévisible parce que
-la raison est toujours au même endroit.
+**Option 3 — navigate by reason.** Structure freedom is kept, but every
+project produced by the Kit explains in writing, always in the same place, why
+it chose its structure; navigation becomes predictable because the reason is
+always in the same place.
 
-Application :
+Application:
 
-- Méta-projet (appliqué dans cette passe) : Z3 §3 — nouvelle section
-  obligatoire « Structure (pourquoi cette disposition) » pour toute recette
-  qui produit/recommande une disposition de projet (N/A sinon) ; Z5 §3 — le
-  README template exige la structure et sa justification.
-- KitV2 (action en attente, passe suivante) : ajouter la section aux recettes
-  concernées ; ajouter la justification de structure aux README des 3
-  templates sourcés.
-- Aucune modification d'AGENTS.md racine ni de `rules/core/philosophy` :
-  l'Option 3 est compatible avec la doctrine sourcée (« no universal project
-  layout ») — elle ajoute une obligation de forme des recettes, pas une règle
-  de structure Go.
+- Metaproject (applied in this pass): Z3 §3 — new mandatory section
+  "Structure (why this layout)" for every recipe that produces/recommends a
+  project layout (N/A otherwise); Z5 §3 — the template README requires the
+  structure and its justification.
+- KitV2 (pending action, next pass): add the section to the concerned
+  recipes; add the structure justification to the 3 sourced templates'
+  READMEs.
+- No root AGENTS.md or `rules/core/philosophy` modification: Option 3 is
+  compatible with the sourced doctrine ("no universal project layout") — it
+  adds a recipe-shape obligation, not a Go structure rule.
 
-Confiance : les citations des deux textes sont vérifiées directement
-(AGENTS.md racine §Evidence rules ; philosophy SKILL.md §Boundary). Le
-caractère contradictoire est un jugement établi par lecture directe des deux
-passages ; la résolution est un choix de valeur qui appartient à Marie.
+Confidence: the citations of the two texts are verified directly (root
+AGENTS.md §Evidence rules; philosophy SKILL.md §Boundary). The contradictory
+character is a judgment established by direct reading of the two passages;
+the resolution is a value choice that belongs to the owner.

@@ -1,14 +1,10 @@
-# Templates de gouvernance du projet
+# Project Governance Templates
 
-Templates pour les surfaces d'instructions au niveau projet et la résolution
-de la surface mémoire générés en phase 4. Mets à jour les fichiers existants
-en place quand ils existent. Préfère la mémoire native `.pi/memory/` ; ne
-crée un fichier mémoire de secours repo-local que quand le projet en déclare
-déjà un ou que l'utilisateur le choisit explicitement.
+Templates for project-level instruction surfaces and memory surface resolution generated in Phase 4. Update existing files in place when they already exist. Prefer native memory `.pi/memory/`; create a repo-local fallback memory file only when the project already declares one or the user explicitly selects it.
 
 ---
 
-## AGENTS.md (projet)
+## AGENTS.md (project)
 
 ```markdown
 # Project Agent Instructions
@@ -19,8 +15,8 @@ These instructions apply to the whole repository.
 
 ## Truth Sources
 
-- `<chemin>` — <pourquoi ce fichier est autoritaire>
-- `<chemin>` — <pourquoi ce fichier est autoritaire>
+- `<path>` — <why this file is authoritative>
+- `<path>` — <why this file is authoritative>
 
 ## Development Rules
 
@@ -31,47 +27,46 @@ These instructions apply to the whole repository.
   validation and record the limitation.
 - Record durable project facts, commands, invariants, and recurring gotchas
   in the resolved native memory surface (` .pi/memory/` ) when available.
-- **Vérifie quels fichiers mémoire existent réellement** : le bootstrap Pi
-  peut ne créer que Brief/Progress/Gotchas/Agent, sans `Decisions.md`. Ne
-  suppose jamais l'ensemble standard ; crée les fichiers manquants au format
-  attendu, sans copier d'historique externe.
+- **Verify which memory files actually exist**: the Pi bootstrap may create
+  only Brief/Progress/Gotchas/Agent, without `Decisions.md`. Never assume the
+  standard set; create the missing files in the expected format, without
+  copying any external history.
 - Do not create a repo-local memory file unless the workflow explicitly
   records that fallback decision.
 ```
 
 ---
 
-## Résolution de la surface de gouvernance
+## Governance Surface Resolution
 
 ```markdown
-# Résolution de la surface de gouvernance
+# Governance Surface Resolution
 
-## Surfaces d'instructions
+## Instruction Surfaces
 
-| Surface | Statut | Rôle | Notes |
+| Surface | Status | Role | Notes |
 |:--------|:-------|:-----|:------|
-| `AGENTS.md` | existant / créé / non utilisé | Règles agent partagées | |
-| `.cursor/rules/` | existant / absent / non touché | Règles Cursor | |
-| `.windsurf/` | existant / absent / non touché | Règles Windsurf | |
-| `.clinerules*` | existant / absent / non touché | Règles Cline | |
-| `.codex/` | existant / absent / non touché | Fichiers projet Codex | |
+| `AGENTS.md` | existing / created / unused | Shared agent rules | |
+| `.cursor/rules/` | existing / absent / untouched | Cursor rules | |
+| `.windsurf/` | existing / absent / untouched | Windsurf rules | |
+| `.clinerules*` | existing / absent / untouched | Cline rules | |
+| `.codex/` | existing / absent / untouched | Codex-specific project files | |
 
-## Surface mémoire
+## Memory Surface
 
-| Champ | Valeur |
-|:------|:-------|
-| Mémoire native disponible | oui / non |
-| Surface mémoire résolue | `.pi/memory/` (fichiers vérifiés : Brief, Progress, Gotchas, Agent, Decisions — marquer ceux absents) / fichier existant / fallback explicite / indisponible |
-| Fallback repo approuvé | oui / non / non nécessaire |
-| Notes | comment les faits durables doivent être enregistrés |
+| Field | Value |
+|:------|:------|
+| Native memory available | yes / no |
+| Resolved memory surface | `.pi/memory/` (files verified: Brief, Progress, Gotchas, Agent, Decisions — mark those absent) / existing file / explicit fallback / unavailable |
+| Repo fallback approved | yes / no / not needed |
+| Notes | how durable facts should be recorded |
 ```
 
 ---
 
-## Fichier de secours mémoire repo-local (optionnel)
+## Optional Repo Fallback Memory File
 
-À utiliser seulement quand aucune surface mémoire native n'est disponible et
-que l'utilisateur choisit explicitement un fallback repo-local.
+Use this only when no native memory surface is available and the user explicitly selects a repo-local fallback.
 
 ```markdown
 # Project Memory
@@ -83,13 +78,13 @@ spec-driven run.
 
 ## Stable Project Facts
 
-- <fait>
+- <fact>
 
 ## Durable Engineering Rules
 
-- <règle>
+- <rule>
 
 ## Recurring Gotchas
 
-- <gotcha et atténuation>
+- <gotcha and mitigation>
 ```

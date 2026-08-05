@@ -1,60 +1,58 @@
 # Project template catalog
 
-## Politique (directive propriétaire, 2026-08-04)
+## Policy (owner directive, 2026-08-04)
 
-Les templates du Kit ne sont **jamais écrits par un agent**. Chaque template
-est une copie légèrement adaptée d'un **projet open source réel** :
+The Kit's templates are **never written by an agent**. Each template is a
+slightly adapted copy of a **real open-source project**:
 
-- licence **MIT** (totalement ouverte) — obligatoire ;
-- projet fiable : maintenu, testé, CI, communauté active ;
-- **ultra-spécifique et minimal** : presque exclusivement la technologie du
-  template — une seule stack, aucune technologie annexe hors périmètre ;
-  codebase petit, parcourable de bout en bout, structure claire et modulaire
-  (intégration par copie de modules bien délimités, modification simple) ;
-- **une responsabilité unique**, directement réutilisable avec très peu de
-  modifications ;
-- conforme aux règles du Kit (idiomatique, stdlib-first, pas de framework
-  imposé) ;
-- **fonctionnel** : compile et passe ses tests — un template non fonctionnel
-  est interdit ;
-- adaptations minimales au Kit **documentées** (diff + raisons) ;
-- attribution : source, version épinglée, licence, adaptations (dont le
-  périmètre technique : une seule technologie, aucune technologie annexe).
+- **MIT** license (fully open) — mandatory;
+- reliable project: maintained, tested, CI, active community;
+- **ultra-specific and minimal**: almost exclusively the template's
+  technology — one stack, no out-of-scope ancillary technology; small,
+  browsable-end-to-end codebase, clear and modular structure (integration by
+  copying well-delimited modules, simple modification);
+- **single responsibility**, directly reusable with very few modifications;
+- conformant to the Kit rules (idiomatic, stdlib-first, no imposed
+  framework);
+- **functional**: compiles and passes its tests — a non-functional template
+  is forbidden;
+- minimal Kit adaptations **documented** (diff + reasons);
+- attribution: source, pinned version, license, adaptations (including the
+  technical scope: one technology, no ancillary technology).
 
-L'agent documente et adapte ; il ne développe pas le template. Il vaut mieux
-**moins de templates, très qualitatifs**, améliorés par la communauté, que des
-squelettes maison.
+The agent documents and adapts; it does not develop the template. Better
+**fewer templates, very high quality**, improved by the community, than
+home-made skeletons.
 
-## Statut actuel
+## Current status
 
-Les scaffolds agent-générés hérités ont été retirés le 2026-08-05. Le catalogue
-ne conserve que trois projets réels, épinglés, sous MIT et vérifiés :
+The inherited agent-generated scaffolds were removed on 2026-08-05. The
+catalog keeps only three real, pinned, MIT, verified projects:
 
-| Template | Statut | Source | Périmètre |
+| Template | Status | Source | Scope |
 | --- | --- | --- | --- |
 | rest-api | sourced | leeprovoost/go-rest-api-template | HTTP REST stdlib-first |
-| cli | sourced | danjdewhurst/go-toc | CLI de génération de TOC Markdown |
-| worker | sourced | sangianpatrick/go-workerpool | pool de workers borné |
+| cli | sourced | danjdewhurst/go-toc | Markdown TOC generation CLI |
+| worker | sourced | sangianpatrick/go-workerpool | bounded worker pool |
 
-Les shapes `grpc`, `microservice`, `monolith` et `cloud-service` restent une
-roadmap sans template opérationnel. Aucun scaffold ne doit être recréé pour les
-représenter : une shape sans source MIT conforme reste planifiée.
+The `grpc`, `microservice`, `monolith`, and `cloud-service` shapes remain a
+roadmap without an operational template. No scaffold must be recreated to
+represent them: a shape without a conforming MIT source stays planned.
 
-## Admission d'un nouveau template (sourcé)
+## Admitting a new template (sourced)
 
-1. Identifier un projet open source MIT, fiable, **ultra-spécifique** (une
-   seule technologie, pas de stack annexe), **minimal** (codebase petit et
-   parcourable, structure claire et modulaire), à responsabilité unique,
-   conforme aux règles du Kit.
-2. Épinguer la version (commit/release) et vérifier la licence MIT.
-3. Copier le projet dans `templates/<shape>/` avec `LICENSE`, `ATTRIBUTION.md`
-   (source, version, adaptations) et `README.md` (statut, source, scénario
-   observable).
-4. Adapter **minimalement** au Kit ; chaque adaptation est documentée dans
-   `ATTRIBUTION.md` avec sa raison.
-5. Vérifier : compile, tests, scénario observable exécuté et enregistré
+1. Identify a real open-source MIT project, **ultra-specific** (one
+   technology, no ancillary stack), **minimal** (small, browsable, clear
+   modular structure), single-responsibility, conformant to the Kit rules.
+2. Pin the version (commit/release) and verify the MIT license.
+3. Copy the project into `templates/<shape>/` with `LICENSE`,
+   `ATTRIBUTION.md` (source, version, adaptations) and `README.md` (status,
+   source, observable scenario).
+4. Adapt **minimally** to the Kit; each adaptation is documented in
+   `ATTRIBUTION.md` with its reason.
+5. Verify: compile, tests, executed and recorded observable scenario
    (`PASS`/`PARTIAL`/`BLOCKED`).
-6. Mettre à jour ce catalogue et le validateur (forme attendue du template).
+6. Update this catalog and the validator (expected template shape).
 
-Les recettes existantes restent la preuve d'implémentation canonique pour les
-shapes qui ne disposent pas encore d'une source MIT conforme.
+The existing recipes remain the canonical implementation evidence for the
+shapes that do not yet have a conforming MIT source.

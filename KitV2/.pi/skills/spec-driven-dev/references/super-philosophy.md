@@ -1,193 +1,161 @@
-# Philosophie d'architecture S.U.P.E.R
+# S.U.P.E.R Architecture Philosophy
 
-> Écris du code comme on construit avec des LEGO — chaque brique a un seul
-> rôle, une interface standard, une direction claire, fonctionne n'importe où
-> et peut être échangée à volonté.
+> Write code like building with LEGO — each brick has a single job, a standard interface, a clear direction, runs anywhere, and can be swapped at will.
 
-Ce document définit les principes d'architecture qui guident tout le code
-écrit pendant les phases de développement d'un workflow Spec-Driven Develop.
-Chaque agent exécutant des tâches doit internaliser ces principes.
+This document defines the architectural principles that guide all code written during the development phases of a Spec-Driven Develop workflow. Every agent executing tasks should internalize these principles.
 
-## Frontière avec les règles du kit (obligatoire)
+## Boundary with the kit rules (mandatory)
 
-S.U.P.E.R est la **lentille d'évaluation de santé** du workflow (scoring par
-principe dans l'analyse, checklist de revue) — pas une doctrine de conception
-Go qui remplacerait les règles sourcées du kit. En cas de conflit, les règles
-du kit priment : `rules/core/philosophy` (plus petit design justifié,
-stdlib-first, pas de structure universelle), `rules/core/universal` (noms de
-packages, contextes, erreurs, interfaces consommateur), et toute règle de
-zone applicable. Les lectures compatibles :
+S.U.P.E.R is the workflow's **health evaluation lens** (per-principle scoring in the analysis, review checklist) — not a Go design doctrine that would replace the kit's sourced rules. In case of conflict, the kit rules win: `rules/core/philosophy` (smallest justified design, stdlib-first, no universal structure), `rules/core/universal` (package names, contexts, errors, consumer-owned interfaces), and any applicable zone rule. Compatible readings:
 
-| Principe S.U.P.E.R | Lecture kit (sourcée) |
+| S.U.P.E.R principle | Kit reading (sourced) |
 |:---|:---|
-| S — Single Purpose | Responsabilité unique (déjà doctrine kit) |
-| U — Unidirectional Flow | Dépendances consommateur-possédées, direction des imports (déjà doctrine kit) |
-| P — Ports over Implementation | Interfaces consommateur + contrats explicites, I/O sérialisable (déjà doctrine kit) |
-| E — Environment-Agnostic | Configuration par environnement, zéro chemin/clé codé en dur (déjà doctrine kit) |
-| R — Replaceable Parts | Remplaçabilité sans effet en cascade (déjà doctrine kit) |
+| S — Single Purpose | Single responsibility (already kit doctrine) |
+| U — Unidirectional Flow | Consumer-owned dependencies, import direction (already kit doctrine) |
+| P — Ports over Implementation | Consumer interfaces + explicit contracts, serializable I/O (already kit doctrine) |
+| E — Environment-Agnostic | Environment-driven configuration, no hardcoded path/key (already kit doctrine) |
+| R — Replaceable Parts | Replaceability without cascading effects (already kit doctrine) |
 
-Ce que S.U.P.E.R ajoute réellement au kit : le **scoring par principe
-(🟢🟡🔴)** dans l'analyse, la **checklist de revue en 10 points**, et
-l'identification des **hotspots de violation** comme priorités du plan.
+What S.U.P.E.R actually adds to the kit: the **per-principle scoring (🟢🟡🔴)** in the analysis, the **10-point review checklist**, and the identification of **violation hotspots** as plan priorities.
 
 ---
 
-## S — Single Purpose (Rôle unique)
+## S — Single Purpose
 
-De la philosophie Unix.
+From Unix philosophy.
 
-- Chaque module, fichier et fonction résout exactement un problème.
-- Préfère la décomposition ; la puissance vient de la composition.
-- Une skill fait une chose, un worker fait une chose, un script fait une
-  chose.
+- Each module, file, and function solves exactly one problem.
+- Prefer decomposition; power comes from composition.
+- One skill does one thing, one worker does one thing, one script does one thing.
 
-**Test décisif** : si tu ne peux pas décrire la responsabilité d'un module en
-une phrase, il faut le diviser.
+**Litmus test:** if you cannot describe a module's responsibility in a single sentence, it needs to be split.
 
-**Anti-pattern** : un script qui récupère des données, calcule des métriques,
-rend des graphiques et envoie des notifications.
+**Anti-pattern:** a script that fetches data, computes metrics, renders charts, and sends notifications.
 
-**Approche correcte** :
+**Correct approach:**
 
 ```text
-fetch_data.py  -> récupération uniquement, sort JSON
-compute.py     -> calcul uniquement, lit JSON écrit JSON
-render.py      -> rendu uniquement, lit JSON génère HTML
-notify.py      -> notification uniquement, lit JSON appelle un webhook
+fetch_data.py  -> data retrieval only, outputs JSON
+compute.py     -> computation only, reads JSON writes JSON
+render.py      -> rendering only, reads JSON generates HTML
+notify.py      -> notification only, reads JSON calls webhook
 ```
 
 ---
 
-## U — Flux unidirectionnel
+## U — Unidirectional Flow
 
-- Les données circulent toujours dans une direction : entrée -> traitement ->
-  sortie.
-- Les dépendances pointent toujours vers l'intérieur : les couches externes
-  dépendent des couches internes, jamais l'inverse.
-- Pas de dépendances inverses, pas d'appels circulaires.
+- Data always flows in one direction: input -> processing -> output.
+- Dependencies always point inward: outer layers depend on inner layers, inner layers know nothing about outer layers.
+- No reverse dependencies, no circular calls.
 
-**Modèle en couches** :
+**Layered model:**
 
 ```text
 +-------------------------------+
-|  Infrastructure (API, DB, UI) |  <- la plus externe, remplaçable à volonté
+|  Infrastructure (API, DB, UI) |  <- outermost, replaceable at will
 +-------------------------------+
 |  Adapters (transform, format) |
 +-------------------------------+
-|  Core business (logique pure) |  <- la plus interne, zéro dépendance externe
+|  Core business (pure logic)   |  <- innermost, zero external deps
 +-------------------------------+
 ```
 
-**Test décisif** : la logique centrale peut-elle passer des tests unitaires
-avec zéro service externe ? Si non, la direction des dépendances est fausse.
+**Litmus test:** can the core logic run unit tests with zero external services? If not, the dependency direction is wrong.
 
 ---
 
-## P — Ports sur l'implémentation
+## P — Ports over Implementation
 
-- Définis les contrats d'interface (structures de données, schémas) AVANT
-  d'écrire l'implémentation.
-- Utilise des formats intermédiaires (fichiers JSON, structures de données
-  standard) pour isoler l'amont de l'aval.
-- Changer une source de données, une couche de rendu ou un canal de
-  notification exige zéro modification de la logique centrale.
+- Define interface contracts (data structures, schemas) BEFORE writing implementation.
+- Use intermediate formats (JSON files, standard data structures) to isolate upstream from downstream.
+- Swapping a data source, a rendering layer, or a notification channel requires zero changes to core logic.
 
-**Pratiques** :
+**Practices:**
 
-1. Les entrées et sorties de chaque module doivent être des structures de
-   données sérialisables.
-2. Les frontières de modules communiquent via des fichiers JSON ou des
-   structures standard ; les objets typés en mémoire sont acceptables, mais
-   les interfaces inter-modules doivent être sérialisables.
-3. Définis des schémas explicites — pas « lis le code pour deviner le format ».
+1. Every module's input and output must be a serializable data structure.
+2. Module boundaries communicate via JSON files or standard data structures; in-process typed objects are fine, but cross-module interfaces must be serializable.
+3. Define explicit schemas — not "just read the code to figure out the format".
 
 ---
 
-## E — Indépendant de l'environnement
+## E — Environment-Agnostic
 
-- Configuration injectée via variables d'environnement ou fichiers de config,
-   jamais codée en dur.
-- Toutes les dépendances explicitement déclarées, pas de dépendance implicite
-   aux packages système globaux.
-- Processus sans état ; toute persistance déléguée au stockage externe.
-- Logs vers stdout, pas vers des fichiers.
+- Configuration injected via environment variables or config files, never hardcoded.
+- All dependencies explicitly declared, no implicit reliance on global system packages.
+- Processes are stateless; all persistence delegated to external storage.
+- Logs go to stdout, not to files.
 
-**Précédence de configuration (haute à basse)** :
+**Configuration precedence (high to low):**
 
 ```text
-Variables d'environnement > fichier .env > config.json > défauts en code
+Environment variables > .env file > config.json > in-code defaults
 ```
 
-**Checklist** :
+**Checklist:**
 
-- Toutes les clés d'API et URLs de webhooks lues depuis des variables
-  d'environnement ?
-- Toutes les dépendances explicitement déclarées dans un fichier de
-  dépendances ?
-- Aucune hypothèse de chemin de fichier codée en dur ?
-- Une autre machine peut-elle exécuter ce code avec zéro modification ?
+- All API keys and webhook URLs read from environment variables?
+- All dependencies explicitly declared in a dependency file?
+- No hardcoded file path assumptions?
+- Can a different machine run this code with zero modifications?
 
 ---
 
-## R — Parties remplaçables
+## R — Replaceable Parts
 
-La conséquence naturelle et le but ultime de S + U + P + E.
+The natural consequence and ultimate goal of S + U + P + E.
 
-- Toute couche peut être remplacée sans affecter les autres.
-- Le coût de remplacement est la métrique centrale de la qualité
-  d'architecture.
-- Si remplacer un composant déclenche des changements en cascade dans des
-  modules sans rapport, l'architecture est cassée.
+- Any layer can be replaced without affecting others.
+- Replacement cost is the core metric of architecture quality.
+- If replacing one component triggers cascading changes in unrelated modules, the architecture is broken.
 
-**Matrice de remplacement** :
+**Replacement matrix:**
 
-| Remplacement | Périmètre d'impact | Approche correcte |
-|:---|:---|:---|
-| API de source de données | Couche adaptateur seulement | Nouveau fetcher, même sortie JSON |
-| Rendu frontend | Couche rendu seulement | Lit le même JSON, échange l'implémentation |
-| Canal de notification | Couche notification | Échange l'adaptateur webhook |
-| Plateforme de déploiement | Config de déploiement seule | Change wrangler.toml ou Dockerfile |
-| Langage de programmation | Implémentation seule | Contrats JSON inchangés, réécriture dans n'importe quel langage |
+| Replacing          | Impact scope       | Correct approach                          |
+|:-------------------|:-------------------|:------------------------------------------|
+| Data source API    | Adapter layer only | Write new fetcher, output same JSON       |
+| Frontend renderer  | Render layer only  | Read same JSON, swap render implementation|
+| Notification channel| Notification layer | Swap webhook adapter                      |
+| Deployment platform| Deploy config only | Change wrangler.toml or Dockerfile        |
+| Programming language| Implementation only| JSON contracts unchanged, rewrite in any language |
 
 ---
 
-## Carte Quick Check
+## Quick Check Card
 
 ```text
 +------------------------------------------+
 |         S.U.P.E.R Quick Check            |
 |                                          |
-|  S  Ce module ne fait-il qu'une chose ?  |
-|  U  Le flux de données est-il unidirectionnel ? |
-|  P  Les entrées/sorties sont-elles schéma-définies ? |
-|  E  Peut-il fonctionner dans un autre environnement ? |
-|  R  Peut-on le remplacer sans effet de bord ? |
+|  S  Does this module do only one thing?  |
+|  U  Is the data flow unidirectional?     |
+|  P  Are inputs/outputs schema-defined?   |
+|  E  Can it run in a different env?       |
+|  R  Can you replace it without ripple?   |
 |                                          |
-|  Tout oui -> Architecture saine         |
-|  1-2 non  -> Refactorisation nécessaire |
-|  3+ non   -> Alerte de dette technique  |
+|  All Yes -> Architecture healthy         |
+|  1-2 No  -> Refactoring needed           |
+|  3+ No   -> Technical debt alert         |
 +------------------------------------------+
 ```
 
 ---
 
-## Checklist de revue de code S.U.P.E.R (10 points)
+## S.U.P.E.R Code Review Checklist (10 checks)
 
-Exécute cette checklist après chaque tâche avant de la marquer comme terminée.
-C'est la copie canonique de la checklist.
+Run this checklist after every task before marking it complete. This is the canonical copy of the checklist.
 
-| Check | Principe |
+| Check | Principle |
 |:---|:---|
-| Chaque nouveau module/fichier a exactement une responsabilité | S |
-| Aucune fonction ne fait plus d'une chose conceptuelle | S |
-| Les données circulent entrée → traitement → sortie, pas de dépendances inverses | U |
-| Aucun import circulaire introduit | U |
-| Les interfaces inter-modules sont schéma-définies | P |
-| L'I/O des modules est sérialisable | P |
-| Aucun chemin, URL, clé ou valeur de config codé en dur | E |
-| Toutes les nouvelles dépendances explicitement déclarées | E |
-| Les nouveaux modules peuvent être remplacés sans changer les autres | R |
-| Tous les tests passent après le changement | — |
+| Every new module/file has exactly one responsibility | S |
+| No function does more than one conceptual thing | S |
+| Data flows input → processing → output, no reverse deps | U |
+| No circular imports introduced | U |
+| Cross-module interfaces are schema-defined | P |
+| Module I/O is serializable | P |
+| No hardcoded paths, URLs, keys, or config values | E |
+| All new dependencies explicitly declared | E |
+| New modules can be replaced without changes to others | R |
+| All tests pass after the change | — |
 
-**Règle de score** : tout passe = continuer. 1-2 échecs = corriger avant de
-marquer terminé. 3+ échecs = stop et refactoriser.
+**Scoring rule:** All pass = proceed. 1-2 fail = fix before marking complete. 3+ fail = stop and refactor.

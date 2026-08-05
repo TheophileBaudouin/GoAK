@@ -116,6 +116,20 @@ criteria, and user-observable behavior are reported separately. A missing tool,
 unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
 `BLOCKED`, never `PASS`.
 
+## Language (fundamental rule, 2026-08-05, D-2026-08-05-21)
+
+- **English is the mandatory language for every skill, instruction, and
+  document in this repository** (kit and metaproject): skills, prompts,
+  contracts, plans, research, decisions, and all other written artifacts.
+  One unique language across the whole project. This rule supersedes the
+  earlier French-body decision (D-2026-08-05-17).
+- Any translation must preserve technical terms, the original intention, and
+  never transform or reformulate a statement: a translation is faithful to
+  the original meaning and as close to it as possible.
+- Ids stay ASCII kebab-case (unchanged); code, commands, and technical
+  identifiers are never translated.
+- This is a fundamental project rule — treat it as absolute.
+
 ## Boundaries
 
 - Ask before changing the charter, a published metadata contract, dependencies,

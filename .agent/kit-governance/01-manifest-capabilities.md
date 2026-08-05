@@ -1,68 +1,51 @@
-# C1 — Manifest et capabilities (contrat des deux fichiers racine)
+# C1 — Manifest and capabilities (contract of the two root files)
 
-- **Contrat MetaProjet** — régit `KitV2/manifest.yaml` et
-  `KitV2/capabilities.yaml`.
-- **Rapport d'audit :** §2.9.
+- **Metaproject Contract** — governs `KitV2/manifest.yaml` and `KitV2/capabilities.yaml`.
+- **Audit report:** §2.9.
 
 ## 1. Mission
 
-`manifest.yaml` et `capabilities.yaml` décrivent l'**identité** et les
-**capacités** du produit. Ce sont des métadonnées machine, **jamais** des
-entrées d'instructions pour l'agent consommateur (champ `metadata_role` déjà
-présent — il reste obligatoire). Ensemble, ils répondent à : « qu'est-ce que ce
-produit, quelle version, que sait-il faire, où vit chaque capacité, quelles
-sont ses limites connues ? »
+`manifest.yaml` and `capabilities.yaml` describe the product's **identity** and **capabilities**. They are machine metadata, **never** instruction entries for the consumer agent (`metadata_role` field already present — it stays mandatory). Together they answer: "what is this product, which version, what can it do, where does each capability live, what are its known limits?"
 
-## 2. Responsabilités (single source of truth par vérité)
+## 2. Responsibilities (single source of truth per truth)
 
-| Vérité | Un seul propriétaire | L'autre fichier |
+| Truth | Single owner | The other file |
 | --- | --- | --- |
-| Identité (name, version, schema_version, language, principles, avoid) | `manifest.yaml` | ne la répète pas |
-| Liste des capacités | `manifest.yaml` (`capabilities:`) | la décline avec source + status |
-| Mapping capacité → chemin (`canonical:`) | `manifest.yaml` | `capabilities.yaml` (source + status) — **vérifié cohérent** |
-| Comptes de couverture | **aucun fichier** — dérivés par `tools/generators/` (état cible : dossier à créer, Z7), vérifiés par C2 | jamais codés en dur |
-| Limites connues | `capabilities.yaml` (`known_limits`) — structure `id`/`impact`/`status` = **état cible** (actuellement prose, à migrer) | — |
+| Identity (name, version, schema_version, language, principles, avoid) | `manifest.yaml` | does not repeat it |
+| Capability list | `manifest.yaml` (`capabilities:`) | details it with source + status |
+| Capability → path mapping (`canonical:`) | `manifest.yaml` | `capabilities.yaml` (source + status) — **verified coherent** |
+| Coverage counts | **no file** — derived by `tools/generators/` (target state: directory to create, Z7), verified by C2 | never hardcoded |
+| Known limits | `capabilities.yaml` (`known_limits`) — `id`/`impact`/`status` structure = **target state** (currently prose, to migrate) | — |
 
-## 3. Règles actionnables
+## 3. Actionable rules
 
-1. Tout chemin déclaré (`canonical:`, `source:`) doit exister dans le Kit.
-2. `manifest.capabilities` et les clés de `capabilities.yaml` sont le même
-   vocabulaire : même nom, même séparateur (kebab-case), aucun alias.
-3. `coverage.*` est **interdit en dur** : le validateur le recalcule depuis
-   l'arborescence et compare (product_skills = SKILL.md de rules + recipes +
-   knowledge/catalogs ; rules = nb de modules rules ; recipes = nb de recettes ;
-   probes = nb de probes découvertes ; project_templates = nb de shapes).
-4. `known_limits` est une liste structurée (**état cible** : le fichier actuel
-   est encore en prose — migration planifiée) : chaque entrée a `id`,
-   `impact`, `status` (`open`/`resolved`/`accepted`) ; une limite `open` fait
-   passer la capacité correspondante en `partial`.
-5. Modifier un chemin canonique = modifier les deux fichiers **dans le même
-   commit** ; C2 vérifie la cohérence.
-6. `schema_version` incrémente à toute rupture de schéma des deux fichiers.
+1. Every declared path (`canonical:`, `source:`) must exist in the Kit.
+2. `manifest.capabilities` and the keys of `capabilities.yaml` are the same vocabulary: same name, same separator (kebab-case), no alias.
+3. `coverage.*` is **forbidden hardcoded**: the validator recomputes it from the tree and compares (product_skills = SKILL.md of rules + recipes + knowledge/catalogs; rules = number of rules modules; recipes = number of recipes; probes = number of discovered probes; project_templates = number of shapes).
+4. `known_limits` is a structured list (**target state**: the current file is still prose — planned migration): each entry has `id`, `impact`, `status` (`open`/`resolved`/`accepted`); an `open` limit downgrades the corresponding capability to `partial`.
+5. Modifying a canonical path = modifying both files **in the same commit**; C2 verifies coherence.
+6. `schema_version` increments on any schema break of the two files.
 
 ## 4. Patterns
 
-- `metadata_role` explicite (« product manifest, not a Pi instruction
-  entrypoint ») — conserver.
-- Status de capacité honnête : `complete` / `partial` / `proposed` — jamais
-  `complete` quand un scénario requis est manquant ou une limite connue ouverte.
+- Explicit `metadata_role` ("product manifest, not a Pi instruction entrypoint") — keep.
+- Honest capability status: `complete` / `partial` / `proposed` — never `complete` when a required scenario is missing or a known limit is open.
 
 ## 5. Anti-patterns
 
-- Comptes codés en dur (dérive mesurée : 33 vs 45 le 2026-08-04).
-- Deux fichiers qui décrivent le même mapping sans vérification croisée.
-- Capacité déclarée sans source de capacité ni critère de vérification.
-- `known_limits` en prose non structurée (non suivable).
+- Hardcoded counts (measured drift: 33 vs 45 on 2026-08-04).
+- Two files describing the same mapping without cross-check.
+- Capability declared without capability source or verification criterion.
+- `known_limits` as unstructured prose (not trackable).
 
-## 6. Critères de validation (C2)
+## 6. Validation criteria (C2)
 
-- [ ] Chemins déclarés existants.
-- [ ] Vocabulaire manifest↔capabilities identique.
-- [ ] Comptes recalculés == comptes affichés (zéro compte en dur).
-- [ ] Chaque capacité a `source` + `status` + critère de vérification.
-- [ ] `known_limits` structuré et cohérent avec les status.
+- [ ] Declared paths exist.
+- [ ] Identical manifest↔capabilities vocabulary.
+- [ ] Recomputed counts == displayed counts (zero hardcoded count).
+- [ ] Every capability has `source` + `status` + verification criterion.
+- [ ] `known_limits` structured and coherent with statuses.
 
-## 7. Questions ouvertes
+## 7. Open questions
 
-- Le `principles` de manifest doit-il être vérifié comme sous-ensemble des
-  règles core ? (proposition : oui, via Z1/C2.)
+- Should the manifest `principles` be verified as a subset of the core rules? (proposal: yes, via Z1/C2.)

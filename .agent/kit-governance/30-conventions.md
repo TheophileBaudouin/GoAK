@@ -1,105 +1,111 @@
-# N1 — Conventions (nommage, formats, frontières)
+# N1 — Conventions (naming, formats, boundaries)
 
-- **Contrat MetaProjet** — règles transverses applicables à tous les contrats
-  Z1–Z10 et A1.
+- **Metaproject Contract** — cross-cutting rules applying to all Z1–Z10 and A1 contracts.
 
-## 1. Nommage
+## 1. Naming
 
-| Objet | Règle | Exemple |
+| Object | Rule | Example |
 | --- | --- | --- |
-| id d'artefact | `<kind>:<domaine>:<slug>` kebab-case, ASCII | `pattern:go:concrete-returns` |
-| dossier de module SKILL.md | kebab-case anglais = `name` du frontmatter | `recipe-worker-pool/` |
-| fichier YAML-graphe | kebab-case, domaine préfixé | `anti-patterns/go-mutable-global-state.yaml` |
-| recette | `recipe-<domaine>-<sujet>` | `recipe-rest-chi` |
-| probe | `<shape>-<sujet>` (ou `<sujet>`) | `worker-shutdown` |
-| template shape | kebab-case, domaine | `rest-api` |
+| Artifact id | `<kind>:<domain>:<slug>` kebab-case, ASCII | `pattern:go:concrete-returns` |
+| SKILL.md module directory | English kebab-case = frontmatter `name` | `recipe-worker-pool/` |
+| Graph-YAML file | kebab-case, domain-prefixed | `anti-patterns/go-mutable-global-state.yaml` |
+| Recipe | `recipe-<domain>-<subject>` | `recipe-rest-chi` |
+| Probe | `<shape>-<subject>` (or `<subject>`) | `worker-shutdown` |
+| Template shape | kebab-case, domain | `rest-api` |
 
-Interdit : majuscules dans les ids/chemins, espaces, caractères non ASCII,
-français dans les ids (les descriptions restent en français — la langue du
-contenu est libre, l'identifiant est ASCII).
+Forbidden: uppercase in ids/paths, spaces, non-ASCII characters, French in
+ids. **Language rule (fundamental, D-2026-08-05-21): English is the mandatory
+language for every skill, instruction, and document in this repository** —
+the content language is English, the identifier stays ASCII kebab-case.
 
-## 2. Formats (règle de choix — une vérité, un format)
+## 2. Formats (choice rule — one truth, one format)
 
-| Type d'artefact | Format canonique | Justification |
+| Artifact type | Canonical format | Justification |
 | --- | --- | --- |
-| Règle, Recette, Bibliothèque vétée, Projet de référence, Template (via son README) | SKILL.md (frontmatter Pi + corps, progressive disclosure) | Découvrabilité Pi (description dans le system prompt), chargement à la demande |
-| Pattern, Anti-pattern, Source (pointeurs officiels), guidance de domaine (security/performance/observability/architecture/debugging), stdlib | YAML-graphe (`id`/`kind`/`relationships`) | Graphe machine-résoluble, relations vérifiées par C2 |
-| Snippet | SNIPPET.yaml + example.go + check.sh | Exécutable et lié à une source canonique |
-| Probe | main.go + verdict `PASS` + exit code | Évaluation exécutable |
-| Template sourcé | dossier projet MIT + LICENSE + ATTRIBUTION.md + README | Politique propriétaire (Z5) |
-| Prompt / skill de workflow | `.pi/prompts/*.md` / `.pi/skills/*/SKILL.md` | Rôles délimités par Z8 |
+| Rule, Recipe, vetted Library, Reference project, Template (via its README) | SKILL.md (Pi frontmatter + body, progressive disclosure) | Pi discoverability (description in the system prompt), load on demand |
+| Pattern, Anti-pattern, Source (official pointers), domain guidance (security/performance/observability/architecture/debugging), stdlib | Graph-YAML (`id`/`kind`/`relationships`) | Machine-resolvable graph, relations verified by C2 |
+| Snippet | SNIPPET.yaml + example.go + check.sh | Executable and linked to a canonical source |
+| Probe | main.go + `PASS` verdict + exit code | Executable evaluation |
+| Sourced template | MIT project directory + LICENSE + ATTRIBUTION.md + README | Owner policy (Z5) |
+| Prompt / workflow skill | `.pi/prompts/*.md` / `.pi/skills/*/SKILL.md` | Roles delimited by Z8 |
 
-Règle : **on ne mélange pas deux formats pour le même rôle sans contrat** ; tout
-format nouveau passe par une décision écrite (Decisions.md) et une mise à jour
-de ce tableau.
+Rule: **two formats are never mixed for the same role without a contract**;
+any new format requires a written decision (Decisions.md) and an update of
+this table.
 
-## 3. YAML-graphe — conventions d'écriture
+## 3. Graph-YAML — writing conventions
 
-- Métadonnées obligatoires (C0/Z10) : `id`, `title`, `kind`, `version`,
-  `status`, `owner`, `tags`, `go_version`, `dependencies`, `last_verified`.
-- Relations : `relationships.<relation>: [cibles]` ; les cibles sont des ids
-  stables ou des URLs (seulement pour `references`).
-- Corps : block scalars (`>-` / `|`) ; une idée par section ; pas de YAML
-  imbriqué libre.
-- `go_version` : la version minimale **testée** ; jamais une version future.
-- URLs canoniques : **jamais réécrites** pour satisfaire un lint de style.
-  Si une ligne `source:` dépasse ~80 caractères (linter YAML externe, non
-  configuré dans le repo), utiliser l'échappement
-  YAML valide `"...\<saut de ligne>  suite"` (double-quote + backslash :
-  résout en une chaîne sans espace — vérifier avec `yaml.safe_load`).
-- Langue : ids ASCII, contenu libre (N1 §1) ; convention du corpus — français
-  pour patterns/anti-patterns, anglais pour les pointeurs Source/guidance.
-- Post-écriture : tout YAML-graphe créé est re-lu (`yaml.safe_load`) et sa
-  fraîcheur/relations contrôlées avant validation ; les lignes > 80 ne sont
-  pas une gate projet (le corpus en contient déjà — URLs et contenu).
+- Mandatory metadata (C0/Z10): `id`, `title`, `kind`, `version`, `status`,
+  `owner`, `tags`, `go_version`, `dependencies`, `last_verified`.
+- Relations: `relationships.<relation>: [targets]`; targets are stable ids or
+  URLs (only for `references`).
+- Body: block scalars (`>-` / `|`); one idea per section; no free nested YAML.
+- `go_version`: the minimum **tested** version; never a future version.
+- Canonical URLs: **never rewritten** to satisfy a style linter. If a
+  `source:` line exceeds ~80 characters (external YAML linter, not configured
+  in the repo), use the valid YAML escape `"...\<line break>  continuation"`
+  (double-quote + backslash: resolves to a single string without space —
+  verify with `yaml.safe_load`).
+- Language: ids ASCII; content in **English** (D-2026-08-05-21) — mandatory
+  for all skills, instructions, and documents.
+- Post-write: every created graph-YAML is re-read (`yaml.safe_load`) and its
+  freshness/relations checked before validation; lines > 80 are not a project
+  gate (the corpus already contains them — URLs and content).
 
-## 4. SKILL.md — conventions (détaillées dans A1)
+## 4. SKILL.md — conventions (detailed in A1)
 
-- Frontmatter immuable : `name`, `description`, `category`, `tags`,
-  `last-verified` — aucun champ nouveau sans migration globale.
-- Progressive disclosure : description (L1) = quoi + quand + contraintes
-  négatives ; corps (L2) ≤ 500 lignes ; détails en fichiers référencés (L3).
-- Chemins relatifs au module ; jamais de lien en prose qui pourrit.
-- Corps des catalog `libraries/` : **format « fiche » canonique** — les
-  sections décisionnelles suivantes sont obligatoires pour toute bibliothèque
-  admise : `## Utiliser cette librairie quand`, `## Ne pas utiliser cette
-  librairie quand`, `## Avantages`, `## Inconvénients`, `## Pièges connus`,
-  `## Sources vérifiées` (URL + date + type de source ; critiques négatives
-  confirmées par ≥ 2 sources indépendantes, ou ≥ 1 issue/advisory officielle
-  du projet). Les sections
-  préexistantes (Selection, Admission checklist, Minimal use, Alternatives,
-  Notes) sont conservées telles quelles. En-têtes de fiche en français
-  (spécification utilisateur), contenu libre.
+- Immutable frontmatter: `name`, `description`, `category`, `tags`,
+  `last-verified` — no new field without a global migration.
+- Progressive disclosure: description (L1) = what + when + negative
+  constraints; body (L2) ≤ 500 lines; details in referenced files (L3).
+- Module-relative paths; never a rot-prone prose link.
+- Catalog `libraries/` body: **canonical "fiche" format** — the following
+  decision sections are mandatory for every admitted library:
+  `## When to use this library`, `## When NOT to use this library`,
+  `## Advantages`, `## Disadvantages`, `## Known pitfalls`,
+  `## Verified sources` (URL + date + source type; negative claims confirmed
+  by ≥ 2 independent sources, or ≥ 1 official project issue/advisory).
+  Preexisting sections (Selection, Admission checklist, Minimal use,
+  Alternatives, Notes) are kept as-is.
+- **Language migration note (D-2026-08-05-21)**: the kit is under a mandatory
+  English rule. The residual French in the kit is a tracked migration wave:
+  (a) catalog fiche headers (`Utiliser cette librairie quand` …) and their
+  `Sources vérifiées` field — to convert together with the `validate-kitv2.py`
+  check that requires the French header; (b) graph-YAML bodies of
+  `knowledge/patterns/` and `knowledge/anti-patterns/` (title/problem/
+  context/solution… in French) — a dedicated content wave, one domain at a
+  time. kit-audit C7 keeps flagging these as `NON CONFORM` until converted.
 
-## 5. Frontières Kit / MetaProjet (inviolables)
+## 5. Kit / Metaproject Boundaries (inviolable)
 
-| Ce qui entre dans `KitV2/` | Ce qui n'y entre JAMAIS |
+| What enters `KitV2/` | What NEVER enters it |
 | --- | --- |
-| Contenu de connaissance sourcé, modules, code runnable, probes, outils de gate | Mémoire (`.pi/memory/`), décisions, évaluations du metaprojet, évidence brute (`docs/evidence/`) |
-| `AGENTS.md` produit, `.pi/` natif | `.agent/` (control-plane), historique v1, références `../` vers la racine |
-| Contrats condensés (README de zone, carte AGENTS.md) | Corps complets des contrats MetaProjet (ils vivent dans `.agent/kit-governance/`) |
+| Sourced knowledge content, modules, runnable code, probes, gate tools | Memory (`.pi/memory/`), decisions, metaproject evaluations, raw evidence (`docs/evidence/`) |
+| Product `AGENTS.md`, native `.pi/` | `.agent/` (control plane), v1 history, `../` references to the root |
+| Condensed contracts (zone README, AGENTS.md map) | Full metaproject contract bodies (they live in `.agent/kit-governance/`) |
 
-Règle : le produit ne pointe jamais vers le metaprojet ; le metaprojet peut
-pointer vers le produit. Un consommateur qui installe `KitV2/` seul doit
-pouvoir l'utiliser sans la racine.
+Rule: the product never points to the metaproject; the metaproject may point
+to the product. A consumer installing only `KitV2/` must be able to use it
+without the root.
 
-## 6. Placeholders et roadmaps
+## 6. Placeholders and roadmaps
 
-- **Aucun dossier `.gitkeep` vide** : les zones planifiées vivent dans le
-  README de zone (tableau « roadmap » avec critères de remplissage).
-- Un dossier de domaine n'existe que s'il a ≥ 1 artefact actif (ou un README
-  contrat quand la décision est d'attendre l'évidence — cas `debugging/`).
-- Supprimer un placeholder = acte de gouvernance ordinaire, pas une décision.
+- **No empty `.gitkeep` directory**: planned zones live in the zone README
+  (roadmap table with fill criteria).
+- A domain directory exists only if it has ≥ 1 active artifact (or a contract
+  README when the decision is to wait for evidence — `debugging/` case).
+- Deleting a placeholder is ordinary governance, not a decision.
 
-## 7. Critères de validation
+## 7. Validation criteria
 
-- [ ] Ids ASCII kebab-case ; name == dossier parent (modules).
-- [ ] Un seul format par rôle (tableau §2 respecté).
-- [ ] Zéro placeholder vide ; chaque roadmap a des critères.
-- [ ] Le produit ne référence aucune racine metaprojet (C2 le vérifie déjà pour
-      les YAML ; étendre aux SKILL.md).
+- [ ] ASCII kebab-case ids; name == parent directory (modules).
+- [ ] One format per role (§2 table respected).
+- [ ] Zero empty placeholder; every roadmap has criteria.
+- [ ] The product references no metaproject root (C2 already verifies it for
+      YAML; extend to SKILL.md).
 
-## 8. Questions ouvertes
+## 8. Open questions
 
-- Langue des ids vs langue du contenu : confirmé (ids ASCII, contenu libre).
-- Faut-il un lint des frontières (grep `\.\./` dans les SKILL.md du produit) ?
+- Id language vs content language: confirmed (ids ASCII, content English,
+  D-2026-08-05-21).
+- Should there be a boundary lint (grep `../` in product SKILL.md)?

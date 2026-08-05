@@ -1,112 +1,108 @@
-# Z12 — Zone `spec-driven-dev` (workflow de transformation à grande échelle)
+# Z12 — Zone `spec-driven-dev` (large-scale transformation workflow)
 
-- **Contrat MetaProjet** — régit `KitV2/.pi/skills/spec-driven-dev/` et
-  `KitV2/.pi/skills/deep-discuss/` (skills de workflow), plus la discipline
-  de review findings-first fusionnée dans `KitV2/.pi/skills/go-code-review/`.
-- **Origine** : intégration de la logique du dépôt MIT
-  `zhu1090093659/spec_driven_develop` (v1.15.0) adaptée au kit et au harnais
-  Pi — décisions D-2026-08-05-16…20, analyse
+- **Metaproject Contract** — governs `KitV2/.pi/skills/spec-driven-dev/` and
+  `KitV2/.pi/skills/deep-discuss/` (workflow skills), plus the findings-first
+  review discipline merged into `KitV2/.pi/skills/go-code-review/`.
+- **Origin**: integration of the logic of the MIT repository
+  `zhu1090093659/spec_driven_develop` (v1.15.0) adapted to the kit and the Pi
+  harness — decisions D-2026-08-05-16…21, analysis
   `docs/research/2026-08-05-spec-driven-dev-analysis.md`, plan
   `docs/plans/2026-08-05-spec-driven-dev-integration.md`.
 
 ## 1. Mission
 
-Le workflow de référence du kit pour les **transformations à grande échelle**
-(rewrite, migration, overhaul, refactor de tout un projet) : pipeline en sept
-phases (0-6) — capture d'intention, analyse profonde avec santé S.U.P.E.R,
-raffinement ancré, décomposition avec lots de livraison, suivi inter-sessions
-(MASTER.md), exécution confirmée avec contrôle adaptatif, archive. Il remplace
-l'ancienne chaîne de prompts `workflow-clarify → plan → tasks → implement →
-verify` (supprimée le 2026-08-05) et compose les ressources restantes du kit
-(`workflow-memory`, `go-*`, `kit-resource-routing`, `go-code-review`) par
-cross-références — jamais par duplication.
+The kit's reference workflow for **large-scale transformations** (rewrite,
+migration, overhaul, whole-project refactor): a seven-phase pipeline (0-6) —
+intent capture, deep analysis with S.U.P.E.R health, grounded refinement,
+decomposition with delivery batches, cross-session tracking (MASTER.md),
+confirmed execution with adaptive control, archive. It replaces the former
+`workflow-clarify → plan → tasks → implement → verify` prompt chain (removed
+2026-08-05) and composes the remaining kit resources (`workflow-memory`,
+`go-*`, `kit-resource-routing`, `go-code-review`) by cross-references — never
+by duplication.
 
 ## 2. Format
 
 ```text
 KitV2/.pi/skills/spec-driven-dev/
-├── SKILL.md                    # phases 0-6, frontmatter complet (category: workflow)
+├── SKILL.md                    # phases 0-6, complete frontmatter (category: workflow)
 └── references/
-    ├── behavioral-rules.md     # 19 règles non négociables
-    ├── super-philosophy.md     # S.U.P.E.R + frontière avec les règles du kit
-    ├── adaptive-control.md     # télémetry, drift, seuils, réponses
-    ├── parallel-protocol.md    # dispatch/review tiercés, writer model
+    ├── behavioral-rules.md     # 19 non-negotiable rules
+    ├── super-philosophy.md     # S.U.P.E.R + boundary with the kit rules
+    ├── adaptive-control.md     # telemetry, drift, thresholds, responses
+    ├── parallel-protocol.md    # tiered dispatch/review, writer model
     └── templates/              # analysis, plan, progress, governance, archive
 ```
 
-`KitV2/.pi/skills/deep-discuss/SKILL.md` : discussion structurée 7 phases.
+`KitV2/.pi/skills/deep-discuss/SKILL.md`: structured 7-phase discussion.
 
-## 3. Règles
+## 3. Rules
 
-1. **Mode local uniquement** : pas de GitHub (Issues/Milestones/PRs/gh CLI) —
-   décision utilisateur D-2026-08-05-18. Le suivi vit dans
-   `docs/progress/` (MASTER.md + fichiers de phase) ; les lots de livraison
-   sont des unités locales d'intégration/validation, jamais des PR.
-2. **Frontière S.U.P.E.R** : S.U.P.E.R est une lentille d'évaluation de santé
-   et une checklist de revue, pas une doctrine de conception Go. En cas de
-   conflit, les règles sourcées du kit priment (`rules/core/philosophy`,
-   `rules/core/universal`) — encodé dans `references/super-philosophy.md` §
-   « Frontière avec les règles du kit ».
-3. **Contrôle adaptatif obligatoire** : télémetry post-tâche (effort, delta
-   S.U.P.E.R, dépendances imprévues), `drift_score` cumulé, seuils 20/40/60 %,
-   réponses automatiques annoter/replanifier/ré-évaluer. L'état adaptatif
-   persiste dans MASTER.md (jamais seulement en mémoire de conversation).
-4. **Archive obligatoire** : phase 6 toujours exécutée ; tous les artefacts
-   sous `docs/archives/<projet>/` avec index.
-5. **Règle mémoire** (kit, PAS méta-projet) : tout agent utilisant le kit
-   vérifie quels fichiers `.pi/memory/` existent réellement — le bootstrap Pi
-   ne crée pas `Decisions.md` par défaut. Ne jamais supposer l'ensemble
-   standard ; créer les fichiers manquants sans copier d'historique externe.
-   Encodé dans `KitV2/AGENTS.md` et `workflow-memory.md`.
-6. **Composition, pas duplication** : la skill compose les prompts/skills
-   existants (`workflow-memory`, `go-implementation-plan`, `go-code-review`,
-   `go-testing-verification`, `kit-resource-routing`) ; elle n'introduit pas
-   de second workflow qui répondrait à la même question.
-7. **Langue** : corps des skills/références en français, `description:`
-   frontmatter en anglais (découvrabilité Pi) — D-2026-08-05-17. Les corps
-   anglais pré-existants des skills `go-*` (avant 2026-08-05) restent en
-   l'état (grandfathered) ; les sections ajoutées par l'intégration
-   spec-driven sont en français — conversion complète des bases anglaises =
-   passe dédiée à part.
-8. **Sous-agents = décision économique** : dispatch tiercé (Tier 0 défaut,
-   Tier 1 un codeur, Tier 2 lanes ≤ 4 disjointes) mappé sur le mécanisme
-   natif Pi ; en absence de sous-agents, exécution séquentielle. Les rôles
-   spec-driven (project-analyzer, task-architect, task-executor,
-   code-reviewer) sont documentés en mapping, jamais livrés comme fichiers.
+1. **Local mode only**: no GitHub (Issues/Milestones/PRs/gh CLI) — user
+   decision D-2026-08-05-18. Tracking lives in `docs/progress/` (MASTER.md +
+   phase files); delivery batches are local integration/validation units,
+   never PRs.
+2. **S.U.P.E.R boundary**: S.U.P.E.R is a health evaluation lens and a review
+   checklist, not a Go design doctrine. In case of conflict, the kit's sourced
+   rules win (`rules/core/philosophy`, `rules/core/universal`) — encoded in
+   `references/super-philosophy.md` § "Boundary with the kit rules".
+3. **Adaptive control mandatory**: post-task telemetry (effort, S.U.P.E.R
+   delta, unplanned dependencies), cumulative `drift_score`, 20/40/60 %
+   thresholds, automatic annotate/replan/rescope responses. The adaptive
+   state persists in MASTER.md (never only in conversation memory).
+4. **Archive mandatory**: Phase 6 always executed; all artifacts under
+   `docs/archives/<project>/` with an index.
+5. **Memory rule** (kit, NOT metaproject): every agent using the kit verifies
+   which `.pi/memory/` files actually exist — the Pi bootstrap does not create
+   `Decisions.md` by default. Never assume the standard set; create the
+   missing files without copying external history. Encoded in
+   `KitV2/AGENTS.md` and `workflow-memory.md`.
+6. **Composition, not duplication**: the skill composes the existing
+   prompts/skills (`workflow-memory`, `go-implementation-plan`,
+   `go-code-review`, `go-testing-verification`, `kit-resource-routing`); it
+   does not introduce a second workflow answering the same question.
+7. **Language**: bodies in English (fundamental rule D-2026-08-05-21,
+   superseding D-2026-08-05-17); frontmatter `description` in English (Pi
+   discoverability).
+8. **Sub-agents = economic decision**: tiered dispatch (Tier 0 default,
+   Tier 1 one coder, Tier 2 lanes ≤ 4 disjoint) mapped onto the native Pi
+   mechanism; without sub-agents, sequential execution. The spec-driven roles
+   (project-analyzer, task-architect, task-executor, code-reviewer) are
+   documented as a mapping, never shipped as files.
 
 ## 4. Anti-patterns
 
-- Skill spec-driven sans S.U.P.E.R, sans contrôle adaptatif ou sans archive.
-- Réintroduction de GitHub/PR dans le workflow local.
-- Doublon avec l'ancienne chaîne workflow-* (prompts supprimés ; ne pas les
-  recréer).
-- S.U.P.E.R imposé comme doctrine de conception Go contre les règles sourcées.
-- `Decisions.md` supposé présent sans vérification.
-- Prompt ou skill qui ré-explique une référence canonique (single-sourcing).
+- Spec-driven skill without S.U.P.E.R, without adaptive control, or without
+  archive.
+- Reintroducing GitHub/PR into the local workflow.
+- Duplicating the former workflow-* chain (prompts removed; do not recreate
+  them).
+- S.U.P.E.R imposed as a Go design doctrine against the sourced rules.
+- `Decisions.md` assumed present without verification.
+- Prompt or skill that re-explains a canonical reference (single-sourcing).
 
-## 5. Critères de validation (C2 / audit)
+## 5. Validation criteria (C2 / audit)
 
-- [ ] Frontmatter complet (name == dossier, category: workflow, description EN
-      ≤ 1024, tags, last-verified) pour spec-driven-dev et deep-discuss.
-- [ ] SKILL.md ≤ 500 lignes ; références `references/**` présentes et liens
-      relatifs résolus.
-- [ ] Les 3 documents templates de la phase 1 (project-overview,
-      module-inventory, risk-assessment) sont couverts par
+- [ ] Complete frontmatter (name == directory, category: workflow, English
+      description ≤ 1024, tags, last-verified) for spec-driven-dev and
+      deep-discuss.
+- [ ] SKILL.md ≤ 500 lines; `references/**` present and relative links
+      resolved.
+- [ ] The three Phase-1 document templates (project-overview,
+      module-inventory, risk-assessment) are covered by
       `references/templates/analysis.md`.
-- [ ] Absence de `github-integration.md` ou de références gh/PR dans la skill.
-- [ ] `go-code-review` porte la discipline findings-first (cibles, focus,
-      format) sans dépasser 500 lignes.
-- [ ] Router indexé (skills : spec-driven-dev, deep-discuss) et
-      `--check` vert.
-- [ ] Aucun prompt `workflow-{clarify,plan,tasks,implement,verify}` résiduel
-      (vérifié par l'audit, catégorie de finding nommée).
+- [ ] Absence of `github-integration.md` or gh/PR references in the skill.
+- [ ] `go-code-review` carries the findings-first discipline (targets, focus,
+      format) without exceeding 500 lines.
+- [ ] Router indexed (skills: spec-driven-dev, deep-discuss) and
+      `--check` green.
+- [ ] No residual `workflow-{clarify,plan,tasks,implement,verify}` prompt
+      (verified by the audit, named finding category).
 
-## 6. Questions ouvertes
+## 6. Open questions
 
-- L'intégration GitHub (GITHUB_FULL/STANDARD) reste écartée par décision
-  utilisateur ; à réévaluer seulement si un consommateur en fait la demande
-  explicite.
-- Les scripts du dépôt source (export-progress.py, install-*.sh,
-  review-context.py) ne sont pas portés : pas de surface d'installation
-  multi-agent ni de besoin d'export externe dans le kit. À réévaluer avec la
-  future CLI `gak`.
+- GitHub integration (GITHUB_FULL/STANDARD) remains excluded by user decision;
+  re-evaluate only if a consumer explicitly requests it.
+- The source repository's scripts (export-progress.py, install-*.sh,
+  review-context.py) are not ported: no multi-agent installation surface and
+  no external export need in the kit. Re-evaluate with the future `gak` CLI.
