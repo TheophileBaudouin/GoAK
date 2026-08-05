@@ -52,11 +52,11 @@ source or reject the reference.
 
 - [Official go-starter repository](https://github.com/allaboutapps/go-starter) —
   template identity, license, and stack, checked 2026-08-05.
-- [Repository API metadata](https://api.github.com/repos/allaboutapps/go-starter)
+- [Repository API metadata](https://github.com/allaboutapps/go-starter)
   — activity/status, checked 2026-08-05.
-- [Commit history](https://api.github.com/repos/allaboutapps/go-starter/commits?per_page=10)
+- [Commit history](https://github.com/allaboutapps/go-starter/commits/master)
   — last code commit, checked 2026-08-05.
-- [Open issues](https://api.github.com/repos/allaboutapps/go-starter/issues?state=open&per_page=20)
+- [Open issues](https://github.com/allaboutapps/go-starter/issues)
   — maintenance signal, checked 2026-08-05.
 - [Changelog](https://raw.githubusercontent.com/allaboutapps/go-starter/master/CHANGELOG-go-starter.md)
   — release/tag convention, checked 2026-08-05.

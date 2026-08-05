@@ -94,7 +94,7 @@ namespace details, or internal values to an untrusted client.
   API, maintenance, license, checked 2026-08-05.
 - [validator v10 on pkg.go.dev](https://pkg.go.dev/github.com/go-playground/validator/v10)
   — current module and API, checked 2026-08-05.
-- [Latest release API](https://api.github.com/repos/go-playground/validator/releases/latest)
+- [Latest release API](https://github.com/go-playground/validator/releases)
   — v10.30.3/version date, checked 2026-08-05.
 - [Validator security page](https://github.com/go-playground/validator/security)
   — package-specific advisory status, checked 2026-08-05.

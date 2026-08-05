@@ -115,7 +115,7 @@ sqlc generates **static queries only**. Decide this boundary before adopting it:
   — current version and plugin changes, checked 2026-08-05.
 - [sqlc package on pkg.go.dev](https://pkg.go.dev/github.com/sqlc-dev/sqlc) —
   CLI/plugin API, checked 2026-08-05.
-- [sqlc documentation](https://docs.sqlc.dev/en/latest/overview/) — supported
+- [sqlc documentation](https://docs.sqlc.dev/en/latest/) — supported
   engines and workflow, checked 2026-08-05.
 - [SQLC issue tracker](https://github.com/sqlc-dev/sqlc/issues) — dynamic-query
   and generation boundaries, checked 2026-08-05.
