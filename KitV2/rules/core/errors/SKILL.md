@@ -18,8 +18,9 @@ last-verified: 2026-08-02
 - **Never swallow** an error you don't own: `_ = f()` is acceptable only with an
   inline justification (see `rules/core/validation/golangci-lint` on `//nolint:errcheck`).
 
-These are restated in `AGENTS.md` (Conventions); this module is the *decision
-rule* behind them.
+These are the *decision rules* behind the kit's one-line wrap/match/never-swallow
+conventions: this module answers *which* error shape to export and *where* to
+handle it.
 
 ## The decision rule — sentinel vs. type vs. opaque
 
@@ -82,8 +83,9 @@ func (s *Store) Get(ctx context.Context, id int) (Item, error) {
 
 The **boundary** (HTTP handler, CLI command, job entry) is where the error is
 finally handled: mapped to a status code / exit code / logged at `Error`. Below
-the boundary, wrap and return. (See `rules/logging` for level
-discipline — `Error` is for actual failures the boundary cannot recover from.)
+the boundary, wrap and return. Log-level discipline (`Error` for actual
+failures the boundary cannot recover from) is a logging concern, not an
+error-shape concern.
 
 ## Anti-patterns
 
@@ -95,7 +97,7 @@ discipline — `Error` is for actual failures the boundary cannot recover from.)
 
 ## Cross-references
 
-- `AGENTS.md` Conventions — the one-line wrap/match/never-swallow rule.
-- `rules/logging` — log levels; logging and error-handling must agree.
 - `rules/core/validation/golangci-lint` — `errcheck` makes unchecked returns a gate
   failure; wrapcheck-style discipline is enforced by the wrap-with-`%w` habit.
+- The handle-once rule and log-level discipline agree: below the boundary, wrap
+  and return; only the boundary layer logs at `Error`.

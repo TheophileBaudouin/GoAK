@@ -8,10 +8,10 @@
   "rule": 13,
   "skill": 6,
   "snippet": 3,
-  "source": 40,
+  "source": 41,
   "template": 3
  },
- "index_sha256": "dc5cd1fb617b734c0865ad6c31d07a2bc528d52fdaf71af632ebea4066fa5d21",
+ "index_sha256": "60e0dca670208cf1bd2c6850d8fbb5f710092f4927116d4fc976597edc0f8a6e",
  "schema": 1,
  "stopwords": [
   "a",
@@ -84,5 +84,5 @@
   "you",
   "your"
  ],
- "version": "2.4.0"
+ "version": "2.4.1"
 }

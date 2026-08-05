@@ -117,20 +117,21 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [ ] Placement analysis of the 26-technology catalog on the existing architecture (research only, no product change)
 - [ ] Admit catalog wave from technology KB: 5 libraries (fyne, go-git, mcp-go-sdk, ristretto, bleve) + 4 pre-1.0 pointers (eino, playwright-go, sqlite-vec, tree-sitter) + go/ast stdlib; registry sections 24-28; gate PASS
 
-## Completed maintenance
-
-- [x] Pi-native skill layer: four reusable skills added under `KitV2/.pi/skills/`.
-- [x] KIT_CHARTER correction wave: clarified the universal rules boundary,
-      added the approved four probes under `KitV2/probes/`, corrected root AGENTS.md
-      drift and duplication, added deterministic instruction validation, and captured
-      evidence. Remaining PARTIAL: no Git repository for VCS versioning and no
-      real non-probe consumer-project maturity evidence.
-
 ## Blocked
 
 - (none)
 
 ## Completed (this session)
+
+## Completed maintenance
+
+- [x] Pi-native skill layer: four reusable skills added under `KitV2/.pi/skills/`.
+- [x] KIT_CHARTER correction wave: clarified the universal rules boundary,
+- [x] Audit-fix wave KVA-001…KVA-011 (2026-08-05, produit 2.4.1)
+      added the approved four probes under `KitV2/probes/`, corrected root AGENTS.md
+      drift and duplication, added deterministic instruction validation, and captured
+      evidence. Remaining PARTIAL: no Git repository for VCS versioning and no
+      real non-probe consumer-project maturity evidence.
 
 ## KitV2 reference projects
 

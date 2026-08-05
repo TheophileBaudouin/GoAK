@@ -407,3 +407,32 @@ l'audit sont retraités, jamais recopiés.
   vérification de capabilities.coverage), (c) contrôles ajoutés : fraîcheur
   12/18 mois (warning/erreur), vocabulaire Z5 des template.yaml, découverte
   probes par glob (rejet liste en dur), check.sh réel (rejet gofmt-only).
+- **D-2026-08-05-08 (KVA-004, schéma de règle)** : aligner `10-zone-rules.md`
+  §5 sur A1 §1.9/§2 — les éléments sémantiques (impératif, quand appliquer,
+  frontière, contre-exemples, vérification, sources) restent obligatoires mais
+  les en-têtes sont libres (une section n'existe que si elle a du contenu).
+  L'ancien schéma en-têtes-fixes n'était implémenté par aucune des 13 règles et
+  contredisait A1 §1.9. Frontières manquantes ajoutées aux règles
+  (concurrency, philosophy, golangci-lint, gosec, govulncheck, doc-comments,
+  testing) ; universal avait déjà un énoncé de frontière. Z1 §9 passe le
+  schéma en contrôle de revue. Décision utilisateur : Option A.
+- **D-2026-08-05-09 (KVA-007, parallélisme config)** : les recettes
+  `recipe-config-koanf` et `recipe-config-viper` partagent une fonction
+  `validate()` de 6 lignes (byte-identique dans les packages séparés koanf.go /
+  viper.go et dans les deux SKILL.md). Décision : conserver la duplication Go
+  (packages distincts devant compiler séparément, module unique sans couplage
+  croisé inutile) mais la déclarer par cross-référence mutuelle dans les deux
+  fiches au lieu d'un doublon silencieux. Aucun nouvel artefact (une fonction
+  de 6 lignes ne justifie pas un snippet canonique).
+- **D-2026-08-05-10 (vague de correction d'audit KVA-001…011, produit 2.4.1)** :
+  (a) vocabulaire manifest↔capabilities unifié en kebab (11 capacités, clés
+  `knowledge`/`templates`/`product-verification`/`resource-routing` au lieu de
+  `knowledge-catalog`/`project-templates`/snake), chaque capacité porte
+  `criteria:` (C1 §6) ; (b) `golang.org/x/sync` admis comme pointeur stdlib
+  (`knowledge/stdlib/x-sync.yaml`) — Z3 §8 rendu vérifiable par
+  `check_recipe_dependencies` ; (c) gate : `check_template_build` (Z5 §8) et
+  `check_manifest_capabilities_coherence` (C1 §3.2) ajoutés à
+  validate-kitv2.py avec tests +/− ; (d) `rules/core/errors` ne référence plus
+  le registry ; (e) probes/README.md = contrat de zone Z6 à jour. Router
+  régénéré (256 ressources, meta version 2.4.1). Revue fresh-context :
+  APPROVE-WITH-NITS, nits intégrés.

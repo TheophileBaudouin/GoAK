@@ -44,51 +44,58 @@ Utiliser Koanf pour les nouvelles applications nécessitant une architecture mod
 package koanfconfig
 
 import (
-	"fmt"
-	"strings"
+ "fmt"
+ "strings"
 
-	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/v2"
+ "github.com/knadh/koanf/providers/confmap"
+ "github.com/knadh/koanf/v2"
 )
 
 type Config struct {
-	Host string `koanf:"host"`
-	Port int    `koanf:"port"`
+ Host string `koanf:"host"`
+ Port int    `koanf:"port"`
 }
 
 func Load(overrides map[string]any) (Config, error) {
-	k := koanf.New(".")
-	if err := k.Load(confmap.Provider(map[string]any{
-		"host": "127.0.0.1",
-		"port": 8080,
-	}, "."), nil); err != nil {
-		return Config{}, fmt.Errorf("load defaults: %w", err)
-	}
-	if len(overrides) > 0 {
-		if err := k.Load(confmap.Provider(overrides, "."), nil); err != nil {
-			return Config{}, fmt.Errorf("load overrides: %w", err)
-		}
-	}
-	var config Config
-	if err := k.Unmarshal("", &config); err != nil {
-		return Config{}, fmt.Errorf("unmarshal config: %w", err)
-	}
-	if err := validate(config); err != nil {
-		return Config{}, err
-	}
-	return config, nil
+ k := koanf.New(".")
+ if err := k.Load(confmap.Provider(map[string]any{
+  "host": "127.0.0.1",
+  "port": 8080,
+ }, "."), nil); err != nil {
+  return Config{}, fmt.Errorf("load defaults: %w", err)
+ }
+ if len(overrides) > 0 {
+  if err := k.Load(confmap.Provider(overrides, "."), nil); err != nil {
+   return Config{}, fmt.Errorf("load overrides: %w", err)
+  }
+ }
+ var config Config
+ if err := k.Unmarshal("", &config); err != nil {
+  return Config{}, fmt.Errorf("unmarshal config: %w", err)
+ }
+ if err := validate(config); err != nil {
+  return Config{}, err
+ }
+ return config, nil
 }
 
 func validate(config Config) error {
-	if strings.TrimSpace(config.Host) == "" {
-		return fmt.Errorf("validate config: host must not be empty")
-	}
-	if config.Port < 1 || config.Port > 65535 {
-		return fmt.Errorf("validate config: port must be between 1 and 65535")
-	}
-	return nil
+ if strings.TrimSpace(config.Host) == "" {
+  return fmt.Errorf("validate config: host must not be empty")
+ }
+ if config.Port < 1 || config.Port > 65535 {
+  return fmt.Errorf("validate config: port must be between 1 and 65535")
+ }
+ return nil
 }
 ```
+
+> La fonction `validate` est volontairement partagée avec
+> `recipe-config-viper` (packages distincts qui doivent compiler séparément ;
+> une copie Go indépendante est conservée dans chaque recette, décision
+> D-2026-08-05-09). Les deux recettes répondent à la même question de
+> validation d'entrées : consultez la fiche de l'autre bibliothèque pour la
+> comparaison koanf ↔ viper.
 
 ## Bonnes pratiques et pièges
 

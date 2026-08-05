@@ -51,3 +51,9 @@ it; name the rule.
 - In CI: fail the build on `Issues != 0`. Emit SARIF (`-fmt sarif`) for GitHub code scanning.
 - Redundant with `golangci-lint`'s built-in gosec — pick one surface to avoid double-noise;
   the kit runs gosec standalone for a dedicated security signal.
+
+## Boundary — what this rule does not cover
+
+- Vulnerability scanning of the dependency graph (`govulncheck` — separate
+  core gate rule).
+- Manual attack-path review and threat modeling, which gosec cannot perform.

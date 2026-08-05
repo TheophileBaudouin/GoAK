@@ -7,6 +7,8 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -274,6 +276,173 @@ def check_template_status() -> list[str]:
                 encoding="utf-8"
             ):
                 errors.append(f"{attribution}: missing Technical scope section")
+    return errors
+
+
+def check_manifest_capabilities_coherence(
+    warnings: list[str], root: Path = ROOT
+) -> list[str]:
+    """C1 §2/§3.2 — manifest.capabilities and capabilities.yaml share one
+    kebab-case vocabulary, every capability carries source+status+criteria,
+    and the canonical mapping agrees with capabilities.yaml sources.
+
+    Previously only coverage.* counts were checked, so aliased or missing
+    capability names (KVA-002) passed the gate.
+    """
+    errors: list[str] = []
+    try:
+        manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+        capabilities = yaml.safe_load(
+            (root / "capabilities.yaml").read_text(encoding="utf-8")
+        )
+    except (OSError, yaml.YAMLError) as error:
+        return [f"manifest/capabilities: unreadable: {error}"]
+    if not isinstance(manifest, dict) or not isinstance(capabilities, dict):
+        return ["manifest/capabilities: expected mappings"]
+    declared = manifest.get("capabilities")
+    canonical = manifest.get("canonical", {}) if isinstance(manifest, dict) else {}
+    if not isinstance(declared, list) or not all(
+        isinstance(item, str) and NAME_RE.fullmatch(item) for item in declared
+    ):
+        errors.append("manifest.yaml: capabilities must be a kebab-case list")
+    declared_set = set(declared) if isinstance(declared, list) else set()
+    entries = capabilities.get("capabilities", {})
+    if not isinstance(entries, dict):
+        return ["capabilities.yaml: capabilities must be a mapping"]
+    for key in entries:
+        entry = entries[key]
+        if not isinstance(entry, dict) or not {"source", "status"} <= set(entry):
+            errors.append(
+                f"capabilities.yaml: capability {key!r} must carry source and status"
+            )
+    capability_keys = {
+        key
+        for key, entry in entries.items()
+        if isinstance(entry, dict) and {"source", "status"} <= set(entry)
+    }
+    if declared_set != capability_keys:
+        errors.append(
+            "manifest.capabilities "
+            f"{sorted(declared_set)} != capabilities.yaml keys {sorted(capability_keys)}"
+        )
+    for key in sorted(capability_keys):
+        entry = entries[key]
+        if not NAME_RE.fullmatch(key):
+            errors.append(f"capabilities.yaml: non-kebab capability key {key!r}")
+        if not isinstance(entry.get("criteria"), str) or not entry["criteria"].strip():
+            errors.append(f"capabilities.yaml: {key} missing criteria (C1 §6)")
+        canonical_path = canonical.get(key)
+        if canonical_path is not None:
+            source = str(entry.get("source", "")).rstrip("/")
+            if source != str(canonical_path).rstrip("/"):
+                errors.append(
+                    f"capabilities.yaml: {key} source {source!r} != manifest "
+                    f"canonical {str(canonical_path)!r}"
+                )
+    for key in sorted(set(canonical) - capability_keys):
+        warnings.append(f"manifest canonical {key!r} has no capabilities.yaml entry")
+    return errors
+
+
+def check_recipe_dependencies(warnings: list[str], root: Path = ROOT) -> list[str]:
+    """Z3 §4.3/§8 — every direct dependency of the product module must be
+    vetted in the library catalog or a stdlib pointer.
+
+    Module paths are matched against the vetted corpus (catalog SKILL.md,
+    catalog YAML, stdlib pointers) by longest prefix (>= 2 segments), so
+    koanf's provider submodule resolves through the koanf fiche. Indirect
+    dependencies (the second require block) are exempt.
+    """
+    go_mod = root / "go.mod"
+    if not go_mod.exists():
+        return []
+    text = go_mod.read_text(encoding="utf-8")
+    match = re.search(r"require\s*\((.*?)\)", text, re.DOTALL)
+    deps: list[str] = []
+    if match:
+        deps = [
+            line.split()[0]
+            for line in match.group(1).splitlines()
+            if line.strip() and not line.strip().startswith("//")
+        ]
+    else:
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("require ") and "(" not in stripped:
+                fields = stripped.split()
+                if len(fields) >= 2:
+                    deps.append(fields[1])
+        if not deps:
+            warnings.append(
+                "go.mod: no parenthesized require block — dependency vetting "
+                "check skipped (PARTIAL)"
+            )
+            return []
+    corpus: list[str] = []
+    for pattern in ("catalogs/libraries", "stdlib"):
+        for path in (root / "knowledge" / pattern).rglob("*"):
+            if path.is_file() and path.suffix in {".md", ".yaml", ".yml"}:
+                try:
+                    corpus.append(path.read_text(encoding="utf-8"))
+                except OSError:
+                    continue
+    haystack = "\n".join(corpus)
+    errors: list[str] = []
+    for dep in deps:
+        parts = dep.split("/")
+        candidates = [
+            "/".join(parts[: index + 1]) for index in range(len(parts) - 1, 0, -1)
+        ]
+        if any(candidate in haystack for candidate in candidates):
+            continue
+        errors.append(
+            f"go.mod: dependency {dep!r} is not vetted in knowledge/catalogs "
+            "or knowledge/stdlib (Z3 §4.3)"
+        )
+    return errors
+
+
+def check_template_build(warnings: list[str], root: Path = ROOT) -> list[str]:
+    """Z5 §8 — sourced templates must compile.
+
+    Each template is a separate Go module that the root-module gate never
+    builds, so a template can ship broken (the KVA-001 regression: the
+    rest-api entry point was missing from the tracked tree). This check runs
+    `go build ./...` inside every sourced template directory. If `go` is
+    absent the check is skipped with a PARTIAL warning, mirroring the gate
+    rule for missing tools.
+    """
+    errors: list[str] = []
+    if shutil.which("go") is None:
+        warnings.append(
+            "templates: `go` not on PATH — template build check skipped (PARTIAL)"
+        )
+        return errors
+    for path in sorted((root / "templates").glob("*/template.yaml")):
+        try:
+            template = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError):
+            continue
+        if not isinstance(template, dict) or template.get("status") != "sourced":
+            continue
+        template_dir = path.parent
+        if not (template_dir / "go.mod").exists():
+            errors.append(f"{template_dir}: sourced template missing go.mod")
+            continue
+        try:
+            result = subprocess.run(
+                ["go", "build", "./..."],
+                cwd=template_dir,
+                capture_output=True,
+                text=True,
+                timeout=180,
+            )
+        except subprocess.TimeoutExpired as error:
+            errors.append(f"{template_dir}: template build timed out: {error}")
+            continue
+        if result.returncode != 0:
+            tail = "\n".join((result.stderr or result.stdout).splitlines()[-6:])
+            errors.append(f"{template_dir}: template does not compile:\n{tail}")
     return errors
 
 
@@ -565,6 +734,8 @@ def main() -> int:
         if strict_catalog and path.is_relative_to(ROOT / "recipes"):
             errors.extend(check_markdown_examples(path))
     errors.extend(check_coverage())
+    errors.extend(check_manifest_capabilities_coherence(warnings))
+    errors.extend(check_recipe_dependencies(warnings))
     for path in (ROOT / "snippets").glob("*/SNIPPET.yaml"):
         errors.extend(check_snippet(path))
         if (
@@ -585,6 +756,7 @@ def main() -> int:
     errors.extend(check_router())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())
+    errors.extend(check_template_build(warnings))
     errors.extend(check_bundle())
     if errors:
         print("\n".join(errors), file=sys.stderr)

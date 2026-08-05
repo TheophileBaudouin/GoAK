@@ -24,6 +24,13 @@ last-verified: 2026-08-02
   [`testing/synctest`](https://go.dev/doc/go1.25) can help test time-dependent
   concurrent behavior when the project declares Go 1.25 or newer.
 
+## Boundary — what this rule does not cover
+
+- Memory ordering, lock-free algorithms, and the fine details of the Go memory
+  model (see [The Go Memory Model](https://go.dev/ref/mem)).
+- Choosing a specific pool implementation or tuning performance: those are
+  recipe-level decisions, and this rule stays a universal constraint.
+
 Source: [Go Code Review Comments — Goroutine Lifetimes](https://go.dev/wiki/CodeReviewComments#goroutine-lifetimes),
 [Go Code Review Comments — Synchronous Functions](https://go.dev/wiki/CodeReviewComments#synchronous-functions),
 [testing/synctest](https://pkg.go.dev/testing/synctest), and

@@ -1,16 +1,24 @@
 from __future__ import annotations
 
 import importlib.util
+import shutil
 import tempfile
 import unittest
 from datetime import date, timedelta
 from pathlib import Path
+from unittest import mock
 
 VALIDATOR = Path(__file__).with_name("validate-kitv2.py")
 spec = importlib.util.spec_from_file_location("validate_kitv2", VALIDATOR)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
+
+
+def write(path: Path, content: str) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    return path
 
 
 class ValidatorTests(unittest.TestCase):
@@ -21,6 +29,8 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(module.check_coverage(), [])
         self.assertEqual(module.check_probe_runner(), [])
         self.assertEqual(module.check_template_status(), [])
+        self.assertEqual(module.check_recipe_dependencies([]), [])
+        self.assertEqual(module.check_manifest_capabilities_coherence([]), [])
 
     def test_skill_without_frontmatter_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -61,18 +71,98 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("must not mutate" in error for error in errors))
         self.assertTrue(any("go test or go run" in error for error in errors))
 
-    def test_coverage_detects_drift(self) -> None:
-        original = module.ROOT / "capabilities.yaml"
-        content = original.read_text(encoding="utf-8")
-        try:
-            original.write_text(
-                content.replace("product_skills: 71", "product_skills: 70"),
+    def test_coverage_detects_drift_without_writing_the_repo(self) -> None:
+        """KVA-011 — drift detection must not mutate the shipped file."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = module.ROOT / "capabilities.yaml"
+            target = root / "capabilities.yaml"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(
+                original.read_text(encoding="utf-8").replace(
+                    "product_skills: 71", "product_skills: 70"
+                ),
                 encoding="utf-8",
             )
-            errors = module.check_coverage()
-        finally:
-            original.write_text(content, encoding="utf-8")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_coverage()
         self.assertTrue(any("coverage.product_skills" in error for error in errors))
+        # The shipped file is untouched.
+        self.assertIn("product_skills: 71", original.read_text(encoding="utf-8"))
+
+    def test_template_build_fails_on_broken_template(self) -> None:
+        if shutil.which("go") is None:
+            self.skipTest("go not on PATH")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            template_dir = root / "templates" / "broken"
+            write(template_dir / "template.yaml", "name: broken\nstatus: sourced\n")
+            write(template_dir / "go.mod", "module broken\n\ngo 1.25\n")
+            write(template_dir / "main.go", "package main\nfunc main( {\n")
+            warnings: list[str] = []
+            errors = module.check_template_build(warnings, root=root)
+        self.assertTrue(
+            any("does not compile" in error for error in errors), errors
+        )
+
+    def test_template_build_passes_on_buildable_template(self) -> None:
+        if shutil.which("go") is None:
+            self.skipTest("go not on PATH")
+        warnings: list[str] = []
+        self.assertEqual(module.check_template_build(warnings, module.ROOT), [])
+
+    def test_manifest_capabilities_coherence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "manifest.yaml",
+                "capabilities: [alpha, beta]\ncanonical:\n  alpha: a/\n  beta: b/\n",
+            )
+            write(
+                root / "capabilities.yaml",
+                "capabilities:\n"
+                "  alpha:\n"
+                "    source: a/\n"
+                "    status: complete\n"
+                "    criteria: works\n"
+                "  beta:\n"
+                "    source: b/\n"
+                "    status: partial\n"
+                "    criteria: works\n",
+            )
+            self.assertEqual(module.check_manifest_capabilities_coherence([], root), [])
+
+            # Drift: manifest declares a capability the catalog does not.
+            write(
+                root / "manifest.yaml",
+                "capabilities: [alpha, beta, gamma]\ncanonical:\n  alpha: a/\n",
+            )
+            errors = module.check_manifest_capabilities_coherence([], root)
+        self.assertTrue(
+            any("!= capabilities.yaml keys" in error for error in errors), errors
+        )
+
+    def test_recipe_dependencies_reject_unvetted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "go.mod",
+                "module example.com/kit\n\ngo 1.25\n\n"
+                "require (\n"
+                "\texample.com/unvetted v1.0.0\n"
+                "\texample.com/vetted v1.0.0\n"
+                ")\n",
+            )
+            write(
+                root / "knowledge" / "catalogs" / "libraries" / "vetted" / "SKILL.md",
+                "---\nname: vetted\ndescription: example.com/vetted fiche\n"
+                "category: library\ntags: [x]\nlast-verified: 2026-08-05\n---\n",
+            )
+            errors = module.check_recipe_dependencies([], root=root)
+        self.assertTrue(
+            any("example.com/unvetted" in error for error in errors), errors
+        )
+        self.assertFalse(any("vetted" in error and "unvetted" not in error for error in errors))
 
 
 if __name__ == "__main__":

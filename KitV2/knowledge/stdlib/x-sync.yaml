@@ -1,0 +1,26 @@
+---
+id: source:go:x-sync
+title: golang.org/x/sync — errgroup and singleflight primitives
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, sync, errgroup, singleflight, concurrency]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-05
+source: https://pkg.go.dev/golang.org/x/sync
+selection: >-
+  Load when the standard library alone does not cover a synchronization
+  concern and an x/sync primitive applies: errgroup for bounded concurrent
+  fan-out with cancellation, singleflight for request deduplication. Used by
+  recipe-worker-pool and the bounded-worker snippet.
+limits: >-
+  Pointer only — not a copy of the documentation. errgroup.WithContext is a
+  bounded fan-out helper, not a general worker pool: memory is bounded only by
+  SetLimit, and it does not replace explicit goroutine-lifetime reasoning
+  (see rules/core/concurrency).
+relationships:
+  references:
+    - https://pkg.go.dev/golang.org/x/sync
+    - https://go.dev/blog/concurrency-patterns

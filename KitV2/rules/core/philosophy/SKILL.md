@@ -31,6 +31,12 @@ universal tree. See [Organizing a Go module](https://go.dev/doc/modules/layout).
 Never report the mechanical gate as proof of the behavioral result. Every recipe
 must provide an observable scenario with concrete actions and expected output.
 
+## Boundary — what this rule does not cover
+
+This rule orders decisions; it does not choose an architecture or a dependency
+for a project, and it prescribes no universal project layout (the official
+module-layout examples are shapes to choose from, not a standard).
+
 ## Sources
 
 - [Effective Go](https://go.dev/doc/effective_go) — idiomatic Go baseline.

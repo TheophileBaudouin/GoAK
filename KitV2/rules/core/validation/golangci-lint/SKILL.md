@@ -78,3 +78,10 @@ fixes through its explicit `gofmt -l` output gate, not silently.
   config silently misbehaves.
 - Runs against test files too — `_ = ln.Close()` in tests must be explicit.
 - First run downloads linters; CI should cache `~/.cache/golangci-lint`.
+
+## Boundary — what this rule does not cover
+
+- The standalone security scanners `gosec` and `govulncheck` (separate core
+  gate rules); golangci-lint's built-in gosec is deliberately not enabled here.
+- Style/complexity linters (`gocyclo`, `funlen`, `lll`) — opinionated, enabled
+  only with a stated threshold.

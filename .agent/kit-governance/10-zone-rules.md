@@ -41,14 +41,26 @@ revu ? » — elles ne contiennent jamais d'implémentation.
 - Contrôle C2 : décompte des modules (dossiers top-level) + taille max par
   fichier.
 
-## 5. Schéma d'une règle (obligatoire — cf. modèle `testing`)
+## 5. Schéma d'une règle (éléments sémantiques — cf. A1 §2 et §1.9)
 
-1. **Impératif** : la règle, en une phrase actionnable.
-2. **Quand appliquer** : périmètre d'application.
-3. **Frontière** : ce que la règle ne couvre PAS (explicite).
-4. **Contre-exemples** : cas où la règle semble s'appliquer mais non.
-5. **Vérification** : comment contrôler la conformité (commande, grep, review).
-6. **Sources** : primaires, vérifiées.
+Chaque règle porte les éléments sémantiques suivants, quelle que soit la forme
+(en-têtes libres ; A1 §1.9 : une section n'existe que si elle a du contenu —
+un énoncé dans le corps vaut un en-tête) :
+
+1. **Impératif** : la règle, en une phrase actionnable (obligatoire).
+2. **Quand appliquer** : périmètre d'application (obligatoire).
+3. **Frontière** : ce que la règle ne couvre PAS (obligatoire ; section
+   dédiée ou énoncé identifiable).
+4. **Contre-exemples** : cas où la règle semble s'appliquer mais non
+   (quand ils existent).
+5. **Vérification** : comment contrôler la conformité (commande, grep,
+   review) (obligatoire).
+6. **Sources** : primaires, vérifiées (obligatoire).
+
+Décision 2026-08-05 : le schéma en-têtes-fixes de l'ancien §5 n'était
+implémenté par aucune règle et contredisait A1 §1.9 ; il est remplacé par la
+forme sémantique ci-dessus (en-têtes libres). Le contrôle C2 correspondant
+reste une revue (voir §9).
 
 ## 6. Maintenance
 
@@ -74,8 +86,9 @@ revu ? » — elles ne contiennent jamais d'implémentation.
 ## 9. Critères de validation
 
 - [ ] C2 : budget core (≤ 6 modules, ≤ 300 lignes) vérifié.
-- [ ] C2 : schéma de règle complet (impératif, frontière, vérification,
-      sources).
+- [ ] Schéma de règle (impératif, frontière, vérification, sources) : contrôle
+      de revue (en-têtes libres, A1 §1.9) — la fraîcheur des sources est
+      vérifiée par C2.
 - [ ] C2 : aucune référence core → registry.
 - [ ] Fraîcheur 12/18 mois (C0).
 

@@ -65,6 +65,13 @@ fully judge; follow it for consistency with the recipes.
 - A comment starting with "This function..." — should start with the name.
 - Doc comments on unexported identifiers — noise; godoc ignores them.
 
+## Boundary — what this rule does not cover
+
+- Prose style, spelling, or markup conventions beyond the exported-API
+  requirement (first word = name, immediately preceding).
+- Which identifiers should be exported in the first place — that is a public
+  contract decision, not a doc-comment concern.
+
 ## Cross-references
 
 - `recipes/recipe-rest-chi` — a live example of the convention.

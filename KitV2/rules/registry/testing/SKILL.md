@@ -80,10 +80,12 @@ its channels / wait its WaitGroup / honour its context.
 
 ## 7. Coverage floor — 70%, enforced in CI
 
-The gate runs `go test -race -coverprofile=coverage.out ./...`. A **70%** floor
-catches a wholly-untested package without pressuring anyone to write hollow
-tests that touch a line without asserting anything meaningful. It is a floor,
-not a target — 100% is not the goal.
+The CI workflows (metaproject gate and the shipped `templates/_kit-ci-workflow.yml`)
+run `go test -race -coverprofile=coverage.out ./...` and fail when the aggregate
+drops below a **70%** floor. The local gate (`AGENTS.md`) checks `-race` without
+a coverage floor. A 70% floor catches a wholly-untested package without
+pressuring anyone to write hollow tests that touch a line without asserting
+anything meaningful. It is a floor, not a target — 100% is not the goal.
 
 CI fails when the aggregate total drops below 70%:
 
@@ -148,3 +150,10 @@ This is a **human opt-in**, not part of the blocking gate — it is slower than
 the unit suite and choosing to block on it is an infrastructure decision. TODO:
 evaluate gremlins in CI as a non-blocking report before promoting it. Do not
 enable it silently.
+
+## Boundary — what this rule does not cover
+
+- Benchmark methodology and micro-benchmark hygiene (see the `go-profiling`
+  source pointer for measured guidance).
+- Fuzzing setup and corpus management (see the `go-fuzzing` stdlib pointer).
+- Coverage tooling policy beyond the CI aggregate floor described in §7.

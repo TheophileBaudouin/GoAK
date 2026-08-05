@@ -2,7 +2,8 @@
 *.exe
 *.test
 *.prof
-api-service
+bin/
+/cmd/api-service/api-service
 
 # Build artifacts
 *.o

@@ -22,19 +22,26 @@ Use the native `.pi/prompts/` workflow templates in order for non-trivial work. 
 
 ## Validation
 
-From `KitV2/` run:
+From `KitV2/`, with `PATH="$PATH:$(go env GOPATH)/bin"` for the lint/security
+tools:
 
 ```sh
 python3 tools/validators/validate-kitv2.py
 KITV2_STRICT_CATALOG=1 python3 tools/validators/validate-kitv2.py  # required for catalog changes
-go test ./...
+go mod tidy && go mod verify
 test -z "$(gofmt -l .)"
 go vet ./...
+golangci-lint run ./...
+go test -race ./...
+gosec ./...
+govulncheck ./...
+bash probes/run.sh
 ```
 
-Run `bash probes/run.sh` separately. The local kit gate also runs
-`golangci-lint`, `gosec`, and `govulncheck`; if a consumer environment lacks a
-required tool, report the gate as `PARTIAL`, never as passing.
+If a consumer environment lacks a required tool, report the gate as `PARTIAL`,
+never as passing. The CI workflows (metaproject gate and
+`templates/_kit-ci-workflow.yml`) additionally enforce an aggregate coverage
+floor of 70%; the local gate does not.
 
 ## Limits
 

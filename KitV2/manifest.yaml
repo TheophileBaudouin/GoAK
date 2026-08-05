@@ -1,5 +1,5 @@
 name: go-agent-kit-v2
-version: 2.4.0
+version: 2.4.1
 schema_version: 1
 language:
   name: go
@@ -12,10 +12,10 @@ principles:
   - observable-verification
 capabilities:
   - rules
-  - knowledge-catalog
+  - knowledge
   - recipes
   - snippets
-  - project-templates
+  - templates
   - product-verification
   - pi-workflows
   - go-probes
@@ -28,8 +28,12 @@ canonical:
   recipes: recipes/
   snippets: snippets/
   templates: templates/
-  product_verification: probes/
-  resource_routing: router/
+  product-verification: probes/
+  pi-workflows: .pi/
+  go-probes: probes/
+  source-registry: knowledge/
+  offline-source-retrieval: tools/offline/
+  resource-routing: router/
 product_status: standalone
 metadata_role: product manifest, not a Pi instruction entrypoint
 avoid:

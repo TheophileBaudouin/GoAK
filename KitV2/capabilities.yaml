@@ -1,32 +1,66 @@
 ---
 name: go-agent-kit-v2
-version: 2.4.0
+version: 2.4.1
 status: standalone
 capabilities:
   rules:
     source: rules/
     status: complete
+    criteria: >-
+      13 rule modules, each with an imperative, an explicit boundary, a
+      verification path, and primary sources; frontmatter validated by the
+      gate.
   knowledge:
     source: knowledge/
     status: catalog-and-sources
+    criteria: every knowledge YAML carries full metadata (Z10) with resolved
+      relationships; stdlib entries are pointer-only and resolved offline.
   recipes:
     source: recipes/
     status: complete
+    criteria: 15 recipes with importable Go code, targeted tests, an executed
+      observable scenario with an explicit verdict, limits, and primary sources.
   snippets:
     source: snippets/
     status: complete-catalog
+    criteria: 3 snippets with a resolved canonical source and a check.sh that
+      compiles and executes; no snippet introduces new knowledge.
   templates:
     source: templates/
     status: sourced-mit-projects
-  product_verification:
+    criteria: 3 sourced MIT templates compile, pass their tests, and ship
+      LICENSE, ATTRIBUTION.md (source, version, adaptations, technical scope),
+      README, and template.yaml.
+  product-verification:
     source: probes/
     status: deterministic-probes-and-checks
+    criteria: 15 probes, each ending with an explicit PASS verdict and exit
+      code; run.sh discovers them by glob and never lists them by hand.
+  pi-workflows:
+    source: .pi/
+    status: native-workflow-surface
+    criteria: 8 prompts with an activation description and 6 workflow skills
+      with complete frontmatter; prompts and skills keep disjoint roles.
+  go-probes:
+    source: probes/
+    status: deterministic-probes-and-checks
+    criteria: probes import the recipes they verify (composition, not
+      duplication) and run without network or an LLM.
+  source-registry:
+    source: knowledge/
+    status: sourced-pointers-and-bundle
+    criteria: catalog pointers carry primary source URLs with dated evidence;
+      the offline bundle manifest and checksums are verified by the gate.
   offline-source-retrieval:
     source: tools/offline/
     status: self-contained-pinned-bundle-and-deterministic-resolver
+    criteria: the resolver verifies SHA-256 content, bounds excerpts, and
+      returns blocked instead of fabricating unavailable knowledge.
   resource-routing:
     source: router/
     status: generated-read-only-index-and-native-pi-tool
+    criteria: index.json matches meta.json checksum and covers every indexable
+      resource; the runtime tool is read-only.
 coverage:
   product_skills: 71
   rules: 13

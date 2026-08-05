@@ -1,5 +1,5 @@
 id: source:go:pkg-doc
-title: Offline Go package and symbol lookup
+title: Go package documentation — pkg.go.dev routing
 kind: Source
 version: 1
 status: active

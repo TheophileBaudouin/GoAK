@@ -29,6 +29,11 @@ there is no vendored or generated source tree.
   established domain name.
 - Replaced the upstream README with a Kit adaptation that explains adoption,
   boundaries, and the executed smoke scenario.
+- Corrected the upstream `.gitignore`: the bare `api-service` pattern (meant
+  for the binary built by `cmd/api-service/Makefile`) also matched the
+  `cmd/api-service/` source directory, so the entry point was absent from the
+  shipped copy. It now ignores `bin/` and the explicit binary path
+  `/cmd/api-service/api-service`, and the source directory is tracked.
 - The upstream module path remains in `go.mod` so the copied tree can be
   validated without rewriting source imports. When adopting it, replace the
   module path and run `go mod tidy`.

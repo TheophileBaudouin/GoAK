@@ -49,3 +49,10 @@ Note the exit-code asymmetry: text mode fails CI on findings; `json`/`sarif`/
   be missed. Treat "Package Results" as latent risk, not zero risk.
 - The Go vuln DB is curated; private/unlisted advisories won't appear. It is a
   signal, not a guarantee.
+
+## Boundary — what this rule does not cover
+
+- Static style and security analysis of the code itself (`golangci-lint`,
+  `gosec` — separate core gate rules).
+- License compliance or supply-chain attestation, which govulncheck does not
+  evaluate.
