@@ -3,7 +3,7 @@ name: recipe-rest-chi
 description: "Build a minimal idiomatic REST API with the chi v5 router — composable middleware, route groups, path parameters, and JSON in/out. Use when creating or reviewing a Go HTTP/REST service with chi."
 category: recipe
 tags: [rest, http, chi, router, middleware, json]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-rest-chi — REST API with chi
@@ -16,8 +16,8 @@ invents its own handler signatures.
 
 ## Solution
 
-[`github.com/go-chi/chi/v5`](https://github.com/go-chi/chi) — a lightweight,
-idiomatic router that is **100% compatible with `net/http`** (~1000 LOC, zero
+[`github.com/go-chi/chi/v5`](https://github.com/go-chi/chi) v5.3.1 — a
+lightweight router that is **100% compatible with `net/http`** (~1000 LOC, zero
 external dependencies). Handlers and middleware are plain
 `http.HandlerFunc` / `func(http.Handler) http.Handler`, so any community
 `net/http` middleware works unchanged.
@@ -30,7 +30,9 @@ r.Route("/items", func(r chi.Router) {
     r.Post("/", createItem)       // POST /items
     r.Get("/{id}", getItem)       // GET  /items/{id}
 })
-http.ListenAndServe(":3333", r)
+if err := http.ListenAndServe(":3333", r); err != nil {
+    return fmt.Errorf("serve REST API: %w", err)
+}
 ```
 
 Path params come from `chi.URLParam(r, "id")`; request bodies are decoded with

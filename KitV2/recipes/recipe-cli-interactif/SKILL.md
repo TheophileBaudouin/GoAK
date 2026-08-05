@@ -3,7 +3,7 @@ name: recipe-cli-interactif
 description: "Minimal testable interactive terminal UI with Bubble Tea v2 (The Elm Architecture: Model/Update/View). Use when building a TUI in Go and you want the MVU logic unit-testable without a real terminal."
 category: recipe
 tags: [tui, cli, bubbletea, mvu, elm-architecture]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-cli-interactif — Interactive TUI (Bubble Tea v2)
@@ -15,8 +15,8 @@ Build an interactive terminal UI (keys, cursor, state) — but keep the logic
 
 ## Solution
 
-Bubble Tea v2 (`charm.land/bubbletea/v2`, 44k★, in production at Azure, Cockroach
-Labs, NVIDIA, MinIO). It implements The Elm Architecture: **Model** (state),
+Bubble Tea v2 (`charm.land/bubbletea/v2`, v2.0.8) implements The Elm
+Architecture: **Model** (state),
 **Update** (state transitions from messages), **View** (render).
 
 The testability hinge: keep the state-transition logic in a pure function of a
@@ -48,8 +48,10 @@ See [`tui.go`](tui.go) for the runnable, tested model.
 
 ```go
 func main() {
-    p := tea.NewProgram(initialModel())
-    if _, err := p.Run(); err != nil { fmt.Println(err); os.Exit(1) }
+    if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1) // process boundary: no caller can handle the startup failure
+    }
 }
 ```
 
