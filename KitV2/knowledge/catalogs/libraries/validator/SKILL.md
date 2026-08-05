@@ -1,125 +1,102 @@
 ---
 name: validator
-description: "go-playground/validator — struct validation via tags (validate:\"required,email\"). Use when validating input structs at trust boundaries, registering custom rules, or producing structured field errors."
+description: "github.com/go-playground/validator/v10 v10.30.3 — struct and field validation with tags, cross-field rules, collection diving, and custom validators. Use at Go input boundaries; not as a sanitizer, authorization policy, or replacement for domain validation."
 category: library
-tags: [validation, struct, tags, input]
-last-verified: 2026-08-04
+tags: [validation, input, structs, security, api]
+last-verified: 2026-08-05
 ---
 
-# validator — struct validation
+# validator — validation de structures
 
 ## Selection
 
-`go-playground/validator` (20k★, pushed 2026-07, CI + coverage, default validator
-for the Gin framework — real-world adoption).
+[`github.com/go-playground/validator/v10`](https://github.com/go-playground/validator)
+v10.30.3, released 2026-05-29, validates Go structs/fields through tags,
+cross-field rules, collection diving, aliases, and custom functions. It is
+admitted for explicit input validation, active maintenance, tests, documentation,
+and broad Go use; use the versioned `/v10` import path for new projects.
 
-**Actual reason (not stars):** declarative, tag-driven struct validation that
-centralises input rules at the type boundary, with structured `FieldError`
-output you can translate into user-facing messages.
+## Admission checklist
 
-⚠ **Maintenance watch:** the README carries a "call for maintainers" note.
-Admission holds today (active, CI green), but re-verify at the kit's next
-`last-verified` cycle — flag this in Gotchas.
+- [x] Current stable v10.30.3 and active upstream maintenance.
+- [x] Single responsibility: struct/field validation.
+- [x] Built-in tags, custom validators, aliases, and collection traversal exist.
+- [x] Tests, CI, documentation, and recent security-relevant fixes exist.
+- [x] Validation is distinct from sanitization, authorization, and business rules.
 
-## Core usage
-
-```go
-type Signup struct {
-    Email    string `json:"email"    validate:"required,email"`
-    Password string `json:"password" validate:"required,min=8"`
-    Age      int    `json:"age"      validate:"gte=18"`
-}
-
-v := validator.New()
-err := v.Struct(signup) // nil or validator.ValidationErrors
-```
-
-Use `validator.New()` as a **singleton** — it caches parsed struct/tag metadata.
-It is goroutine-safe for `Validate`, NOT for `RegisterValidation` (register once
-at init).
-
-## Custom rules + structured errors
+## Minimal use
 
 ```go
-v.RegisterValidation("slug", func(fl validator.FieldLevel) bool {
-    s := fl.Field().String()
-    return slugRegexp.MatchString(s) // your check
-})
-
-// translate errors
-var errs validator.ValidationErrors
-if errors.As(err, &errs) {
-    for _, fe := range errs {
-        // fe.Field(), fe.Tag(), fe.Value(), fe.Namespace() — build the message YOU expose
+func validateSignup(input Signup) error {
+    if err := validate.Struct(input); err != nil {
+        return fmt.Errorf("invalid signup: %w", err)
     }
+    return nil
 }
 ```
 
-## Security note (don't leak internals)
-
-`FieldError.Namespace()` and `.Value()` can expose internal struct paths and the
-raw submitted value. Map to user-facing messages yourself; never echo
-`Value()`/`Namespace()` to an untrusted client (could leak field names or PII).
+Expose a stable application error shape rather than returning raw field names,
+namespace details, or internal values to an untrusted client.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| hand-rolled `if` checks | Correct for ≤2-3 fields; tag validation wins as rules multiply. |
-| `asaskevich/govalidator` | Older, string-based validators; validator's struct-tag model is cleaner. |
-| OpenAPI/protobuf-generated validation | If your schema is the source of truth, generate from it instead of hand-tagging. |
+| Manual validation | Prefer for a tiny type with one or two invariants; keep domain rules explicit. |
+| `ozzo-validation`/other validators | Evaluate when fluent rules or a different error model is required; pin and source independently. |
+| JSON Schema/OpenAPI validation | Prefer when the external schema is the source of truth; this package validates Go values. |
+| Sanitizer | Separate concern; validation must not be treated as HTML/SQL/path sanitization. |
 
 ## Utiliser cette librairie quand
 
-- Valider des structs à la frontière de confiance (payloads HTTP, args CLI,
-  appels d'outils) avec des règles déclaratives par tags.
-- Des règles custom (`RegisterValidation`) et des erreurs structurées
-  (`ValidationErrors` → messages utilisateur) sont nécessaires.
-- La validation se multiplie au-delà de 2-3 champs (les `if` manuels perdent).
+- HTTP, CLI, config, or message inputs map to Go structs with repeatable field
+  and cross-field constraints.
+- Tags/aliases and collection traversal improve readability without hiding the
+  domain policy.
+- The application converts validation errors into a stable public response.
 
 ## Ne pas utiliser cette librairie quand
 
-- Peu de champs (≤2-3) : des `if` manuels suffisent.
-- Le schéma est la source de vérité (OpenAPI/protobuf) : générer la
-  validation depuis le schéma plutôt que re-tagger à la main.
-- La stratégie de validation sémantique (métier, cross-champs) est le vrai
-  besoin : les tags sont syntaxiques (voir
-  `source:security:input-validation`).
+- Validation is a single trivial condition or a domain invariant that should be
+  visible in a constructor/service.
+- Input needs sanitization, canonicalization, authorization, or permission
+  checks instead of shape validation.
+- The raw validator namespace/value should be exposed to users.
 
 ## Avantages
 
-- Validation déclarative tag-driven, centralisée à la frontière de type.
-- Erreurs structurées (`FieldError`) traduisibles en messages utilisateur.
-- Adoption réelle (validator par défaut de Gin, 20k★).
-- Cache des métadonnées : `validator.New()` en singleton, goroutine-safe pour
-  `Validate`.
+- Large built-in tag set for common shape, network, identifier, and collection
+  constraints.
+- Custom field/struct validators and aliases support application-specific rules.
+- Works on ordinary Go values without imposing an HTTP framework.
 
 ## Inconvénients
 
-- **⚠ Maintenance watch** : appel à mainteneurs sur le README — re-vérifier au
-  prochain cycle `last-verified` (Gotcha).
-- Validation par réflexion : coût par champ à mesurer sur les chemins chauds.
-- Tags syntaxiques seulement : la sémantique métier reste du code manuel.
+- Reflection/tag strings can hide rules from ordinary code navigation.
+- Validation tags do not define authorization, normalization, or business policy.
+- Error translation and public-field mapping remain application responsibilities.
+- A broad tag set can encourage over-validation or unstable external contracts.
 
 ## Pièges connus
 
-- Singleton `validator.New()` (cache) ; `RegisterValidation` au init
-  uniquement (pas goroutine-safe).
-- Ne JAMAIS exposer `FieldError.Namespace()`/`.Value()` à un client non
-  fiable (fuite de noms de champs/PII) — mapper vous-même les messages.
-- Les slices/maps imbriquées ne sont PAS validées sans `dive` (issue #952).
-- Les CVE historiques signalées étaient des dépendances transitives
-  (golang.org/x/text, corrigées) — garder govulncheck dans la gate.
+- Validate at the trust boundary, then apply domain invariants again where state
+  changes; a tag is not proof of authorization.
+- Do not return `Field`, `Namespace`, or `Value` blindly when they reveal secrets
+  or internal struct layout.
+- Review hostname/FQDN/IP validator behavior and pin current releases; security-
+  relevant validation fixes are part of normal upgrades.
+- Register custom validators once in an explicit validator instance and test
+  them with table-driven cases.
 
 ## Sources vérifiées
 
-- [go-playground/validator (repo officiel)](https://github.com/go-playground/validator)
-  — vérifié 2026-08-02
-- [pkg.go.dev/github.com/go-playground/validator/v10](https://pkg.go.dev/github.com/go-playground/validator/v10)
-  — vérifié 2026-08-04
-- [Issue #952 — dive sur slices](https://github.com/go-playground/validator/issues/952)
-  — vérifié 2026-08-04 (issue officielle)
-- [Issue #899 — CVE-2021-38561 (x/text transitif)](https://github.com/go-playground/validator/issues/899)
-  et [PR #881 — fix x/text](https://github.com/go-playground/validator/pull/881)
-  — vérifiées 2026-08-04 (issues officielles)
-- Artefact interne : `source:security:input-validation` (stratégie frontière)
+- [Official validator repository](https://github.com/go-playground/validator) —
+  API, maintenance, license, checked 2026-08-05.
+- [validator v10 on pkg.go.dev](https://pkg.go.dev/github.com/go-playground/validator/v10)
+  — current module and API, checked 2026-08-05.
+- [Latest release API](https://api.github.com/repos/go-playground/validator/releases/latest)
+  — v10.30.3/version date, checked 2026-08-05.
+- [Validator security page](https://github.com/go-playground/validator/security)
+  — package-specific advisory status, checked 2026-08-05.
+- [Validator README](https://raw.githubusercontent.com/go-playground/validator/master/README.md)
+  — tags, custom validation, and support policy, checked 2026-08-05.
