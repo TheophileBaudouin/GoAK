@@ -101,9 +101,7 @@ class ValidatorTests(unittest.TestCase):
             write(template_dir / "main.go", "package main\nfunc main( {\n")
             warnings: list[str] = []
             errors = module.check_template_build(warnings, root=root)
-        self.assertTrue(
-            any("does not compile" in error for error in errors), errors
-        )
+        self.assertTrue(any("does not compile" in error for error in errors), errors)
 
     def test_template_build_passes_on_buildable_template(self) -> None:
         if shutil.which("go") is None:
@@ -162,7 +160,9 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(
             any("example.com/unvetted" in error for error in errors), errors
         )
-        self.assertFalse(any("vetted" in error and "unvetted" not in error for error in errors))
+        self.assertFalse(
+            any("vetted" in error and "unvetted" not in error for error in errors)
+        )
 
 
 if __name__ == "__main__":
