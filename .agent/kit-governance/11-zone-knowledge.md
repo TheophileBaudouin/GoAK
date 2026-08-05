@@ -18,8 +18,8 @@ règle/recette (charte §4) ni la mémoire du metaprojet.
 | `patterns/` | YAML-graphe | solutions réutilisables (schéma positif) |
 | `anti-patterns/` | YAML-graphe | échecs sourcés (schéma négatif) |
 | `stdlib/` | YAML-graphe | **pointeurs-only** vers sources officielles |
-| `catalogs/libraries/` | **SKILL.md** (vétées, admission 9 critères) | décisions de sélection |
-| `catalogs/libraries/pointers/` | YAML-graphe Source | pointeurs « à considérer » (prévu par décision 2026-08-04, non créé à ce jour) |
+| `catalogs/libraries/` | **SKILL.md** (vétées, admission 9 critères) + YAML-graphe Source Niveau B | décisions de sélection admises ; Niveau B = sources conditionnelles actives, non encore vétées |
+| `catalogs/libraries/pointers/` | YAML-graphe Source | pointeurs `status: proposed` « à considérer » (créé le 2026-08-05, 5 pointeurs) |
 | `catalogs/reference-projects/` | SKILL.md | projets **extract-only** |
 | `catalogs/*.yaml` (découverte) | YAML-graphe Source | index de découverte (awesome-go, …) |
 | `security/`, `performance/`, `observability/`, `architecture/`, `debugging/` | YAML-graphe | guidance sourcée par domaine |

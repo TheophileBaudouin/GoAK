@@ -45,7 +45,6 @@ GRAPH_ID_RE = re.compile(
     r"^(?:rule|recipe|pattern|snippet|template|capability|evaluation|decision-record|source|memory):[^:]+:.+$"
 )
 URL_RE = re.compile(r"^https?://")
-EXPECTED_PRODUCT_SKILLS = 65
 EXPECTED_TEMPLATES = {
     "rest-api",
     "grpc",
@@ -55,6 +54,7 @@ EXPECTED_TEMPLATES = {
     "monolith",
     "cloud-service",
 }
+TEMPLATE_STATUSES = {"planned", "sourced", "legacy", "deprecated"}
 CATALOG_MAX_AGE_DAYS = 90
 REFERENCE_MAX_AGE_DAYS = 180
 SOURCE_HEADING_RE = re.compile(
@@ -115,6 +115,27 @@ def check_skill(path: Path) -> list[str]:
     if len(path.read_text(encoding="utf-8").splitlines()) > 500:
         errors.append(f"{path}: exceeds 500 lines")
     return errors
+
+
+def check_freshness(path: Path, warnings: list[str]) -> list[str]:
+    """Apply the C0 12/18-month freshness thresholds to dated artifacts."""
+    try:
+        if path.name == "SKILL.md":
+            verified = parse_frontmatter(path).get("last-verified", "")
+        elif path.suffix in {".yaml", ".yml"}:
+            artifact = yaml.safe_load(path.read_text(encoding="utf-8"))
+            verified = artifact.get("last_verified", "") if isinstance(artifact, dict) else ""
+        else:
+            return []
+        verified_date = date.fromisoformat(str(verified))
+    except (OSError, ValueError, yaml.YAMLError):
+        return []
+    age = (date.today() - verified_date).days
+    if age > 548:
+        return [f"{path}: artifact evidence is {age} days old (limit 548 days)"]
+    if age > 365:
+        warnings.append(f"{path}: artifact evidence is {age} days old (warning at 365 days)")
+    return []
 
 
 def check_catalog_freshness(path: Path) -> list[str]:
@@ -205,7 +226,77 @@ def check_snippet(path: Path) -> list[str]:
         if ":" in line
     }
     missing = {"id:", "purpose:", "source:", "files:", "tests:"} - keys
-    return [f"{path}: missing {sorted(missing)}"] if missing else []
+    errors = [f"{path}: missing {sorted(missing)}"] if missing else []
+    check = path.parent / "check.sh"
+    if not check.exists():
+        return errors + [f"{check}: missing executable check"]
+    check_text = check.read_text(encoding="utf-8")
+    if "gofmt -w" in check_text:
+        errors.append(f"{check}: check must not mutate the snippet")
+    if not re.search(r"\bgo\s+(?:test|run)\b", check_text):
+        errors.append(f"{check}: check must compile and execute with go test or go run")
+    return errors
+
+
+def check_probe_runner() -> list[str]:
+    runner = ROOT / "probes" / "run.sh"
+    if not runner.exists():
+        return [f"{runner}: missing probe runner"]
+    text = runner.read_text(encoding="utf-8")
+    errors: list[str] = []
+    if not re.search(r"probes/\*/", text):
+        errors.append(f"{runner}: must discover probes with a glob")
+    if re.search(r"for\s+probe\s+in\s+(?:[a-z0-9-]+\s+){1,}[a-z0-9-]+", text):
+        errors.append(f"{runner}: hardcoded probe list is forbidden")
+    return errors
+
+
+def check_template_status() -> list[str]:
+    errors: list[str] = []
+    for name in EXPECTED_TEMPLATES:
+        path = ROOT / "templates" / name / "template.yaml"
+        try:
+            template = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as error:
+            errors.append(f"{path}: invalid template metadata: {error}")
+            continue
+        status = template.get("status") if isinstance(template, dict) else None
+        if status not in TEMPLATE_STATUSES:
+            errors.append(
+                f"{path}: invalid status {status!r}; expected {sorted(TEMPLATE_STATUSES)}"
+            )
+    return errors
+
+
+def coverage_counts() -> dict[str, int]:
+    rules = list((ROOT / "rules").rglob("SKILL.md"))
+    recipes = list((ROOT / "recipes").rglob("SKILL.md"))
+    catalogs = list((ROOT / "knowledge" / "catalogs").rglob("SKILL.md"))
+    probes = list((ROOT / "probes").glob("*/main.go"))
+    templates = list((ROOT / "templates").glob("*/template.yaml"))
+    return {
+        "product_skills": len(rules) + len(recipes) + len(catalogs),
+        "rules": len(rules),
+        "recipes": len(recipes),
+        "knowledge_catalogs": len(catalogs),
+        "probes": len(probes),
+        "project_templates": len(templates),
+    }
+
+
+def check_coverage() -> list[str]:
+    path = ROOT / "capabilities.yaml"
+    try:
+        capabilities = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as error:
+        return [f"{path}: invalid capabilities metadata: {error}"]
+    expected = coverage_counts()
+    actual = capabilities.get("coverage", {}) if isinstance(capabilities, dict) else {}
+    errors: list[str] = []
+    for key, value in expected.items():
+        if actual.get(key) != value:
+            errors.append(f"{path}: coverage.{key}={actual.get(key)!r}, expected {value}")
+    return errors
 
 
 def check_bundle() -> list[str]:
@@ -435,6 +526,7 @@ def check_router() -> list[str]:
 
 def main() -> int:
     errors: list[str] = []
+    warnings: list[str] = []
     for required in (
         "manifest.yaml",
         "capabilities.yaml",
@@ -454,16 +546,14 @@ def main() -> int:
     strict_catalog = os.environ.get("KITV2_STRICT_CATALOG") == "1"
     for path in skills:
         errors.extend(check_skill(path))
+        errors.extend(check_freshness(path, warnings))
         if strict_catalog and path.is_relative_to(ROOT / "knowledge" / "catalogs"):
             errors.extend(check_catalog_freshness(path))
             errors.extend(check_markdown_examples(path))
             errors.extend(check_internal_duplicates(path))
         if strict_catalog and path.is_relative_to(ROOT / "recipes"):
             errors.extend(check_markdown_examples(path))
-    if len(skills) != EXPECTED_PRODUCT_SKILLS:
-        errors.append(
-            f"skills: expected {EXPECTED_PRODUCT_SKILLS}, found {len(skills)}"
-        )
+    errors.extend(check_coverage())
     for path in (ROOT / "snippets").glob("*/SNIPPET.yaml"):
         errors.extend(check_snippet(path))
         if (
@@ -478,8 +568,12 @@ def main() -> int:
         except ValueError as error:
             errors.append(str(error))
     errors.extend(check_knowledge_metadata())
+    for path in sorted((ROOT / "knowledge").rglob("*.yaml")):
+        errors.extend(check_freshness(path, warnings))
     errors.extend(check_empty_markdown())
     errors.extend(check_router())
+    errors.extend(check_probe_runner())
+    errors.extend(check_template_status())
     for name in EXPECTED_TEMPLATES:
         for required in (
             "template.yaml",
@@ -494,6 +588,8 @@ def main() -> int:
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
+    for warning in warnings:
+        print(f"warning: {warning}")
     try:
         router_count = len(
             json.loads(

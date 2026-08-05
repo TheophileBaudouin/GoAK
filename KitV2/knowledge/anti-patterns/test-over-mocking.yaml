@@ -36,7 +36,7 @@ when_ok: >-
   attente ad hoc.
 relationships:
   references:
-    - http://xunitpatterns.com/MockObject.html
+    - http://xunitpatterns.com/Mock%20Object.html
     - https://testsmells.org/
   uses: []
   validated_by: []

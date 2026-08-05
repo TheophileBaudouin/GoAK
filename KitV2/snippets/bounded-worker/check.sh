@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")"
-gofmt -w example.go
-test -z "$(gofmt -l example.go)"
+test -z "$(gofmt -l example.go example_test.go)"
+go test ./...
 printf '%s\n' 'bounded-worker-cancellation: PASS'

@@ -70,8 +70,13 @@ Règles de résolution (C2) :
 1. Un artefact = **une responsabilité, une question** ; deux artefacts qui
    répondent à la même question = au moins un fautif (C0).
 2. Aucune duplication de corps : les relations remplacent la copie.
-3. Un artefact `proposed` est invisible pour les consommateurs ; il ne porte
-   pas de relations entrantes depuis de l'`active`.
+3. Un artefact `proposed` est invisible pour les consommateurs et ne porte
+   pas de relations entrantes depuis de l'`active`, **sauf** les pointeurs
+   Source explicitement livrés pour découvrabilité : les entrées de
+   `knowledge/catalogs/libraries/pointers/` et les artefacts d'architecture
+   proposés dont la livraison est actée dans `Decisions.md`. Ces exceptions
+   restent marquées `proposed` et doivent être filtrables par leur chemin et
+   leur statut dans le router.
 4. `last_verified` ≤ 12 mois (warning) / 18 (déprécié) — C0/C2.
 5. Chaque artefact `active` avec comportement observable est `validated_by` une
    évaluation (probe) ou un scénario exécuté.

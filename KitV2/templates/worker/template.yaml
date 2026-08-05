@@ -1,4 +1,4 @@
 name: go-template-worker
-status: partial
+status: legacy
 purpose: Minimal runnable scaffold for the worker project shape.
 validation: go test ./...

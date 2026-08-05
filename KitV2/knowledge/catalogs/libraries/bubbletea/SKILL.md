@@ -39,7 +39,7 @@ func run(model tea.Model) error {
 
 In v2, `View` returns a declarative `tea.View`, and key messages use the v2
 message types. Keep application logic in pure state transitions where possible;
-the kit's `recipe-cli-interactif` tests a `handleKey(string)` seam rather than
+the kit's `recipe-cli-interactive` tests a `handleKey(string)` seam rather than
 constructing framework message structs.
 
 ## Alternatives considered

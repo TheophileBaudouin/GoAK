@@ -306,3 +306,63 @@ de compacité core (≤ 6 modules, ≤ 300 lignes), nouvelles shapes de template
 - **Standard encodé** : N1 §4 (format fiche canonique du corps des catalog
   SKILL.md) + Z2 §9.2 (admission = fiche complète). Le router est inchangé
   (édition de corps uniquement, descriptions frontmatter intactes).
+
+## Correction post-audit KitV2 (2026-08-05, cycle KVA-001→017)
+
+Journal de décision du cycle de correction post-audit
+(`docs/plans/2026-08-05-kitv2-correction-plan.md`, rapport d'audit
+`docs/research/2026-08-05-kitv2-audit-report.md`). Chaque décision est
+enregistrée AVANT l'édition correspondante ; les items AMBIGU/À VÉRIFIER de
+l'audit sont retraités, jamais recopiés.
+
+- **D-2026-08-05-01 (KVA-005, placement 21 YAML Niveau B)** : contractualiser
+  le format au lieu de déplacer. `catalogs/libraries/*.yaml` devient un format
+  documenté de `knowledge/` : pointeurs Source actifs « Niveau B » (source
+  conditionnelle, non vétée, admission allégée : source primaire + question
+  distincte), distincts des SKILL.md vétées et des pointeurs `pointers/`
+  (`status: proposed`, « à considérer »). Justification : la pratique des kits
+  comparables sépare candidats/admis (recherche 05-placement-kits, 2026-08-05),
+  mais les 21 fichiers sont des artefacts actifs dont le déplacement casserait
+  la sémantique de statut et le graphe ; le contrat est la surface minimale qui
+  élimine le défaut « format non contractualisé ». Mise à jour : Z2 §2 (contrat
+  méta-projet, sortie de périmètre documentée). Aucun déplacement de fichier.
+- **D-2026-08-05-02 (KVA-006, statut templates)** : appliquer le vocabulaire
+  Z5 §4 (planned/sourced/legacy/deprecated) : les 7 `template.yaml` passent de
+  `status: partial` à `status: legacy`, les README des 7 shapes alignent leur
+  ligne de statut sur `LEGACY`, `capabilities.yaml` passe le statut de la
+  capacité templates à `legacy-scaffolds`. Justification : Z5 §4 définit 4
+  statuts ; TEMPLATES.md dit déjà `legacy` ; `partial` n'existe pas au
+  vocabulaire et crée une triple source de vérité contradictoire.
+- **D-2026-08-05-03 (KVA-011, pointeurs proposed livrés et indexés)** : les
+  pointeurs `status: proposed` (`catalogs/libraries/pointers/*.yaml` ×5 et
+  `knowledge/architecture/bootstrap-cli-runtime.yaml`) restent livrés et
+  indexés par le router PAR DÉCISION (découvrabilité « à considérer », pratique
+  B1 observée dans 05-placement-kits) ; Z10 §5.3 est amendé avec l'exception
+  documentée. Aucun changement de code ni de router.
+- **D-2026-08-05-04 (KVA-001, gate validate-cognitive)** : résoudre la gate
+  depuis la base de résolution contractée (le catalogue) : ajouter
+  `source:security:owasp-session-jwt-cheatsheets` à
+  `.agent/cognitive/source-catalog.yaml` avec `transformations.patterns` =
+  [pattern:security:auth-session-vs-jwt, pattern:security:secrets-management]
+  et `target_status` = active + materialized_by vers les 2 fichiers produits.
+  Justification : validate-cognitive résout CONTRE le catalogue par design
+  (Gotchas 2026-08-03 : « product Source entries remain pointer-only ») ;
+  l'arbre produit reste la vérité de validate-kitv2. Sortie de périmètre
+  `.agent/cognitive/` documentée (le finding l'exige).
+- **D-2026-08-05-05 (KVA-015, id français)** : renommer
+  `recipe-cli-interactif` → `recipe-cli-interactive` (N1 §1 interdit le
+  français dans les ids ; Z3 §4.2 acte le renommage) : git mv du dossier,
+  frontmatter `name`, titre et ligne `go test` du SKILL.md, références produit
+  (knowledge/patterns/testing-seam-injection ×2, cli-subcommands-conventions
+  ×1, anti-patterns/test-implementation-details ×1,
+  catalogs/libraries/bubbletea ×1), `.agent/cognitive/technology-documentation.yaml`
+  ×1 ; router régénéré ; documents historiques de docs/ NON modifiés.
+- **D-2026-08-05-06 (KVA-016, contrat Z2 stale)** : mettre à jour Z2 §2 —
+  `pointers/` existe depuis 2026-08-05 (5 pointeurs proposed « à considérer »).
+- **D-2026-08-05-07 (KVA-007/008, validateur)** : étendre validate-kitv2.py
+  avec (a) une suite de tests unittest `test_validate_kitv2.py` couvrant les
+  contrôles existants et nouveaux (cas +/−), (b) la dérivation des comptes
+  coverage depuis l'arbre (suppression de EXPECTED_PRODUCT_SKILLS en dur,
+  vérification de capabilities.coverage), (c) contrôles ajoutés : fraîcheur
+  12/18 mois (warning/erreur), vocabulaire Z5 des template.yaml, découverte
+  probes par glob (rejet liste en dur), check.sh réel (rejet gofmt-only).

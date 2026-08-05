@@ -3,7 +3,7 @@ name: recipe-desktop-app
 description: "Minimal testable Go side of a Wails v3 desktop app (Go + web frontend). The bound methods (frontend-callable) are plain, tested Go; the GUI wiring is documented. Use when building a desktop app with Wails and you want the service logic unit-testable."
 category: recipe
 tags: [desktop, wails, tauri-alternative, bindings, frontend]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-desktop-app — Wails v3 service (testable)
@@ -30,8 +30,10 @@ Wails v3 is still in **Beta-to-GA transition** (#5844 release tracker, #4904
 "v3 Setup Feedback" open). Implications for a kit consumer:
 
 - **Pin the exact `wails3` version** — the binding/CLI surface is still churning.
-- **Mobile is unsupported** — Android/iOS are the #1/#2 most-upvoted *unimplemented*
-  features (#1481, #1482). v3 is desktop-only.
+- **Mobile is experimental** — Android/iOS support is now documented as
+  experimental rather than unsupported. Keep the desktop boundary as the
+  stable recipe target; evaluate mobile guides and platform requirements per
+  exact release.
 - **Platform build pain** — WebKitGTK (Linux) URI handler issues (#4412), webview2
   (Windows) version mismatches; CGO is mandatory.
 - For production desktop where stability is critical today, v2 is the stable line

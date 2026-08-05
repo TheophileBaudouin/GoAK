@@ -102,8 +102,8 @@ Règles :
 ## 5. Anti-patterns
 
 - Validateur qui mute sans test ; contrôle sans cas négatif.
-- Compte en dur dans le validateur (EXPECTED_PRODUCT_SKILLS doit devenir dérivé
-  ou vérifié contre capabilities — actuellement 45 en dur : à dériver).
+- Compte en dur dans le validateur : les comptes de couverture sont désormais
+  dérivés de l'arborescence et vérifiés contre `capabilities.yaml`.
 - Gate verte malgré un contrat violé.
 - Sortie illisible (erreurs sans chemin ni raison actionnable).
 
@@ -117,6 +117,7 @@ Règles :
 
 ## 7. Questions ouvertes
 
-- EXPECTED_PRODUCT_SKILLS (45) : dériver depuis l'arborescence ou depuis
-  capabilities.yaml ? (proposition : arborescence, capabilities vérifié contre.)
+- La décision est appliquée depuis le 2026-08-05 : dérivation depuis
+  l'arborescence, comparaison avec `capabilities.yaml`, tests positifs et
+  négatifs dans `tools/validators/test_validate_kitv2.py`.
 - Faut-il un mode `--strict` (warnings = erreurs) pour la CI ?

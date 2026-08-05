@@ -33,7 +33,7 @@ when_ok: >-
   dans un test unitaire.
 relationships:
   references:
-    - http://xunitpatterns.com/Sleepy%20Test.html
+    - http://xunitpatterns.com/Slow%20Tests.html
     - https://go.dev/doc/go1.25
   uses: []
   validated_by: []

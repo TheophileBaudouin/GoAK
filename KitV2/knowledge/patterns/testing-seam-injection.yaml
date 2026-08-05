@@ -25,13 +25,13 @@ solution: >-
 benefits: >-
   Tests déterministes sans sleep ni terminal, refactors internes sans casser
   les tests (le contrat est le seam), et couverture des chemins d'erreur
-  simples (voir recipe-cli-interactif pour l'exemple canonique).
+  simples (voir recipe-cli-interactive pour l'exemple canonique).
 costs: >-
   Exige de concevoir les seams dès l'écriture ; un seam trop fin (tout pur)
   déplace la complexité dans le fil d'effets — garder le fil minimal et non
   testé.
 related: >-
-  Recette : recipe-cli-interactif (seam handleKey). Homologue négatif :
+  Recette : recipe-cli-interactive (seam handleKey). Homologue négatif :
   pattern:antipattern:test-sleep-based,
   pattern:antipattern:test-implementation-details.
 relationships:

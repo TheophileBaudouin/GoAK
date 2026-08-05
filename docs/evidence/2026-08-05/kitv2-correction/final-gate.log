@@ -1,0 +1,225 @@
+
+=== validate-instructions ===
+instruction-artifacts: PASS
+rc=0
+
+=== validate-cognitive ===
+cognitive: PASS (35 catalog objects)
+rc=0
+
+=== validate-kitv2 ===
+kitv2: PASS (65 product skills, 3 snippets, standalone, offline bundle, router index 254 resources)
+rc=0
+
+=== validate-kitv2-strict ===
+kitv2: PASS (65 product skills, 3 snippets, standalone, offline bundle, router index 254 resources)
+rc=0
+
+=== go-mod-verify ===
+all modules verified
+rc=0
+
+=== gofmt ===
+rc=0
+
+=== go-vet ===
+rc=0
+
+=== golangci-lint ===
+0 issues.
+rc=0
+
+=== go-test-race ===
+?   	go-agent-kit-v2/probes/cli-minimal	[no test files]
+?   	go-agent-kit-v2/probes/offline	[no test files]
+?   	go-agent-kit-v2/probes/rest-chi	[no test files]
+?   	go-agent-kit-v2/probes/sqlite-sqlc	[no test files]
+?   	go-agent-kit-v2/probes/worker-shutdown	[no test files]
+ok  	go-agent-kit-v2/recipes/recipe-cli-cobra	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-cli-interactive	1.412s
+ok  	go-agent-kit-v2/recipes/recipe-cli-minimal	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-config-koanf	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-config-viper	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-desktop-app	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-graceful-shutdown	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-rest-chi	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-sqlite-sqlc	(cached)
+ok  	go-agent-kit-v2/recipes/recipe-worker-pool	(cached)
+ok  	go-agent-kit-v2/snippets/bounded-worker	(cached)
+ok  	go-agent-kit-v2/snippets/errors-once	(cached)
+ok  	go-agent-kit-v2/snippets/http-json	(cached)
+ok  	go-agent-kit-v2/tools/offline	(cached)
+rc=0
+
+=== gosec ===
+[gosec] 2026/08/05 11:21:37 Including rules: default
+[gosec] 2026/08/05 11:21:37 Excluding rules: default
+[gosec] 2026/08/05 11:21:37 Including analyzers: default
+[gosec] 2026/08/05 11:21:37 Excluding analyzers: default
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-config-viper
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/rest-chi
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/microservice
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/bounded-worker
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-interactive
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/worker
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/errors-once
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-minimal
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/cli
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/offline
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/worker-shutdown
+[gosec] 2026/08/05 11:21:37 Checking package: snippet
+[gosec] 2026/08/05 11:21:37 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/errors-once/example.go
+[gosec] 2026/08/05 11:21:37 Checking package: snippet
+[gosec] 2026/08/05 11:21:37 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/bounded-worker/example.go
+[gosec] 2026/08/05 11:21:37 Checking package: cli
+[gosec] 2026/08/05 11:21:37 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-minimal/cli.go
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-desktop-app
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-rest-chi
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-sqlite-sqlc
+[gosec] 2026/08/05 11:21:37 Checking package: main
+[gosec] 2026/08/05 11:21:37 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/offline/main.go
+[gosec] 2026/08/05 11:21:37 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-worker-pool
+[gosec] 2026/08/05 11:21:38 Checking package: tui
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-interactive/tui.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/cloud-service
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/monolith
+[gosec] 2026/08/05 11:21:38 Checking package: desktop
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-desktop-app/app.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/sqlite-sqlc
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-cobra
+[gosec] 2026/08/05 11:21:38 Checking package: main
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/worker-shutdown/main.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-config-koanf
+[gosec] 2026/08/05 11:21:38 Checking package: viperconfig
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-config-viper/viper.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-graceful-shutdown
+[gosec] 2026/08/05 11:21:38 Checking package: pool
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-worker-pool/pool.go
+[gosec] 2026/08/05 11:21:38 Checking package: main
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/rest-chi/main.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/http-json
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/grpc
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/templates/rest-api
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline
+[gosec] 2026/08/05 11:21:38 Checking package: cobracli
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-cli-cobra/cobra.go
+[gosec] 2026/08/05 11:21:38 Import directory: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/cli-minimal
+[gosec] 2026/08/05 11:21:38 Checking package: koanfconfig
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-config-koanf/koanf.go
+[gosec] 2026/08/05 11:21:38 Checking package: restchi
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-rest-chi/server.go
+[gosec] 2026/08/05 11:21:38 Checking package: main
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/sqlite-sqlc/main.go
+[gosec] 2026/08/05 11:21:38 Checking package: sqlcsqlite
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-sqlite-sqlc/store.go
+[gosec] 2026/08/05 11:21:38 Checking package: shutdown
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/recipes/recipe-graceful-shutdown/shutdown.go
+[gosec] 2026/08/05 11:21:38 Checking package: snippet
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/snippets/http-json/example.go
+[gosec] 2026/08/05 11:21:38 Checking package: main
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/probes/cli-minimal/main.go
+[gosec] 2026/08/05 11:21:38 Checking package: offline
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/excerpt.go
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/manifest.go
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/offline.go
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/search.go
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/toolchain.go
+[gosec] 2026/08/05 11:21:38 Checking file: /Users/theophilebaudouin/Documents/devellopement/Go/KitV2/tools/offline/version.go
+Results:
+
+
+[1;36mSummary:[0m
+  Gosec  : dev
+  Files  : 24
+  Lines  : 1519
+  Nosec  : 5
+  Issues : [1;32m0[0m
+
+rc=0
+
+=== govulncheck ===
+No vulnerabilities found.
+rc=0
+
+=== probes ===
+--- probes/cli-minimal ---
+cli-minimal: PASS
+--- probes/offline ---
+offline: PASS
+--- probes/rest-chi ---
+2026/08/05 11:21:41 INFO item created id=1 name=probe
+2026/08/05 11:21:41 [MacBookAir.lan/YnCqLqWeGm-000001] "POST http://127.0.0.1:50020/items HTTP/1.1" from 127.0.0.1:50021 - 201 24B in 691.042µs
+rest-chi: PASS
+--- probes/sqlite-sqlc ---
+sqlite-sqlc: PASS
+--- probes/worker-shutdown ---
+worker-shutdown: PASS
+rc=0
+
+=== validator-unit-tests ===
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.013s
+
+OK
+rc=0
+
+=== validator-ruff-imports ===
+All checks passed!
+rc=0
+
+=== router-check ===
+router index: up to date (/Users/theophilebaudouin/Documents/devellopement/Go/KitV2/router)
+rc=0
+
+=== template-cli ===
+ok  	go-agent-template-cli	(cached)
+rc=0
+
+=== template-cloud-service ===
+ok  	go-agent-template-cloud-service	(cached)
+rc=0
+
+=== template-grpc ===
+ok  	go-agent-template-grpc	(cached)
+rc=0
+
+=== template-microservice ===
+ok  	go-agent-template-microservice	(cached)
+rc=0
+
+=== template-monolith ===
+ok  	go-agent-template-monolith	(cached)
+rc=0
+
+=== template-rest-api ===
+ok  	go-agent-template-rest-api	(cached)
+rc=0
+
+=== template-worker ===
+ok  	go-agent-template-worker	(cached)
+rc=0
+
+=== STATUS SUMMARY ===
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0
+rc=0

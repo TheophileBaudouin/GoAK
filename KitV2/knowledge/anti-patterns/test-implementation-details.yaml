@@ -25,7 +25,7 @@ problem: >-
   observable depuis l'extérieur.
 fix: >-
   Tester par le comportement : entrées publiques → sorties publiques (voir
-  recipe-cli-interactif : test du seam `handleKey(string)` et non du framework).
+  recipe-cli-interactive : test du seam `handleKey(string)` et non du framework).
   Pour les dépendances, utiliser des interfaces consommateur petites ou des
   fakes de données, pas des compteurs d'appels internes. Un refactor interne
   ne doit pas toucher les tests.

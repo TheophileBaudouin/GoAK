@@ -52,7 +52,7 @@ uniquement sur décision écrite.
 ## 6. Anti-patterns
 
 - Outil « à voir plus tard » sans contrat (le cas analyzers — corrigé) ;
-- constantes en dur qui dérivent (EXPECTED_PRODUCT_SKILLS=45 à dériver, cf. C2) ;
+- constantes de couverture en dur ; les comptes sont dérivés et vérifiés par C2 ;
 - index générés à la main ; outil non testé ; réseau en CI.
 
 ## 7. Critères de validation

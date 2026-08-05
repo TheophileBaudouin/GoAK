@@ -37,9 +37,9 @@ recipe-<domaine>-<sujet>/
 
 1. **Aucun placeholder** : une recette planifiée est une ligne de roadmap dans
    `recipes/README.md` (avec critères), pas un dossier `.gitkeep`.
-2. Nommage : `recipe-<domaine>-<sujet>`, kebab-case ASCII (N1) — corriger
-   `recipe-cli-interactif` → `recipe-cli-interactive` à la prochaine
-   modification.
+2. Nommage : `recipe-<domaine>-<sujet>`, kebab-case ASCII (N1). La recette
+   interactive est publiée sous `recipe-cli-interactive` depuis la correction
+   post-audit du 2026-08-05.
 3. Toute dépendance utilisée par une recette doit être **vétée** dans
    `catalogs/libraries/` (admission 9 critères) — C2 vérifie la correspondance.
 4. Une recette référence les patterns/snippets qu'elle utilise (`uses`) et sa
@@ -83,4 +83,5 @@ recipe-<domaine>-<sujet>/
 
 - Faut-il des « recettes de forme » (shape) distinctes des recettes de tâche ?
   (aujourd'hui les templates sourcés MIT prendront ce rôle — voir Z5.)
-- `recipe-cli-interactif` : renommage acté à la prochaine modification.
+- Le renommage `recipe-cli-interactif` → `recipe-cli-interactive` a été
+  réalisé le 2026-08-05 ; les références produit et le router sont alignés.

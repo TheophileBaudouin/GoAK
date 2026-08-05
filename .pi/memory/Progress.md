@@ -21,7 +21,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `recipe-sqlite-sqlc` — sqlc + modernc.org/sqlite (skill + test, suite green)
 - [x] `recipe-worker-pool` — errgroup.SetLimit (skill + test, suite green)
 - [x] `recipe-graceful-shutdown` — signal.NotifyContext + http.Server.Shutdown, signal wiring separated from orchestration for testability. Suite green.
-- [x] `recipe-cli-interactif` — bubbletea v2 MVU, testable via handleKey(string) seam (skill + test, suite green)
+- [x] `recipe-cli-interactive` — bubbletea v2 MVU, testable via handleKey(string) seam (skill + test, suite green)
 - [x] `recipe-desktop-app` — wails v3 service logic, testable pure Go (no wails import; wiring documented) (skill + test, suite green)
 
 ## KitV2 reference projects
@@ -34,14 +34,6 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 - [x] `testing` — idiomatic Go testing (from quii/learn-go-with-tests)
 - [x] logging (slog default, explicit-injection request-scoped pattern, Error=failure) + doc-comments (Go doc-comment convention, enforced via revive exported)
-
-## KitV2 Pi prompt-templates (.pi/prompts/ — slash commands)
-
-- [x] `/checklist-api` — REST API review checklist with evidence verdicts
-- [x] `/checklist-release` — release checklist separating mechanics and behavior
-- [x] `/workflow-memory` — initialize local consumer memory without inherited history
-- [x] `/workflow-clarify` → `/workflow-plan` → `/workflow-tasks` →
-      `/workflow-implement` → `/workflow-verify` — spec-driven workflow
 
 ## Deferred adapters (not implemented)
 
@@ -133,6 +125,15 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - (none)
 
 ## Completed (this session)
+
+## KitV2 Pi prompt-templates (.pi/prompts/ — slash commands)
+
+- [x] `/checklist-api` — REST API review checklist with evidence verdicts
+- [x] `/checklist-release` — release checklist separating mechanics and behavior
+- [x] `/workflow-memory` — initialize local consumer memory without inherited history
+- [x] `/workflow-clarify` → `/workflow-plan` → `/workflow-tasks` →
+      `/workflow-implement` → `/workflow-verify` — spec-driven workflow
+- [x] [2026-08-05] Add metaproject-only /kit-audit prompt: read-only complete KitV2 inventory, charter/type/source/duplication/language/validation checks, and meta-project-versus-Kit pollution classification; prompt not shipped by install.sh.
 
 - [x] Terminer l'audit d'intégration des 6 ressources Niveau B (GORM, Fiber, Kafka, RabbitMQ, Resty, Cookiecutter) + audit global du registre : 21 entrées Source conditionnelles ajoutées (6 Niveau B + 15 entrées non classées du corps), matrice de couverture 59/59, gate complète PASS, evidence docs/evidence/2026-08-03/b-resource-integration-audit.md, registre non modifié.
 - [x] Corriger les skill conflicts Pi du benchmark : suppression des 5 placeholders .md vides de rules/ (architecture, go-style, performance, security, testing), check validateur « aucun .md vide » dans validate-kitv2.py (test négatif vérifié), ruff I001 sur le validateur, gate PASS, push main 0399cdd, tag v2.1.0 déplacé sur le commit corrigé, tarball v2.1.0 vérifié sans .md vide.

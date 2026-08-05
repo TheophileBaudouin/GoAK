@@ -3,7 +3,7 @@ name: recipe-graceful-shutdown
 description: "Minimal testable graceful shutdown of a Go HTTP server using signal.NotifyContext + http.Server.Shutdown + a drain timeout (stdlib only). Use when building an HTTP service that must drain in-flight requests on SIGINT/SIGTERM, and to make the shutdown logic unit-testable."
 category: recipe
 tags: [shutdown, http, signal, context, stdlib]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-graceful-shutdown — Graceful HTTP server shutdown

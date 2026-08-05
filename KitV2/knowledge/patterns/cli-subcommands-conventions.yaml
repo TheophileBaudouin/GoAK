@@ -29,7 +29,7 @@ costs: >-
   Un outil à une seule action n'a pas besoin de sous-commandes (le minimal
   suffit) ; l'arborescence ajoute de la surface de doc à maintenir.
 related: >-
-  Recettes : recipe-cli-minimal, recipe-cli-cobra, recipe-cli-interactif.
+  Recettes : recipe-cli-minimal, recipe-cli-cobra, recipe-cli-interactive.
   Catalog : cobra. Homologue négatif :
   pattern:antipattern:cli-flag-and-convention-abuse.
 relationships:

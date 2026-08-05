@@ -8083,9 +8083,9 @@
   },
   {
    "description": "Minimal testable interactive terminal UI with Bubble Tea v2 (The Elm Architecture: Model/Update/View). Use when building a TUI in Go and you want the MVU logic unit-testable without a real terminal.",
-   "id": "recipe-cli-interactif",
+   "id": "recipe-cli-interactive",
    "kind": "recipe",
-   "path": "recipes/recipe-cli-interactif/SKILL.md",
+   "path": "recipes/recipe-cli-interactive/SKILL.md",
    "tags": [
     "tui",
     "cli",
@@ -8096,7 +8096,7 @@
    "terms": [
     "recipe",
     "cli",
-    "interactif",
+    "interactive",
     "minimal",
     "testable",
     "interactive",

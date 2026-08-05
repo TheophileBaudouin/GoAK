@@ -3,7 +3,7 @@ name: recipe-cli-minimal
 description: "Minimal testable Go CLI flag parsing using the standard library flag package (NewFlagSet + ContinueOnError + explicit args). Use when building a single-command CLI or parsing flags into a config struct, and to decide stdlib flag vs cobra."
 category: recipe
 tags: [cli, flag, stdlib, config, args]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-cli-minimal — Minimal CLI (stdlib flag)

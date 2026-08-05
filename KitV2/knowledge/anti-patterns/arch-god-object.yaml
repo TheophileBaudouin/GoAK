@@ -34,7 +34,7 @@ when_ok: >-
   rapport, pas la taille seule.
 relationships:
   references:
-    - https://refactoring.guru/refactoring/smells/large-class
+    - https://refactoring.guru/smells/large-class
     - https://en.wikipedia.org/wiki/List_of_software_anti-patterns
   uses: []
   validated_by: []

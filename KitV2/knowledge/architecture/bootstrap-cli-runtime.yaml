@@ -34,8 +34,8 @@ constraints:
     @latest is a convenience selector; reproducibility requires resolved
     versions and checksums in a project manifest.
   - >-
-    Root .agent/ remains metaproject governance and is never installed as a
-    competing consumer runtime.
+    The metaproject governance control plane remains outside the consumer
+    runtime and is never installed as a competing runtime.
   - "Only the selected agent adapter is installed."
   - >-
     Canonical artifact bodies are composed through graph relationships, not
@@ -53,4 +53,4 @@ notes: >-
   then, the root install.sh bootstrap installer materializes the standalone
   KitV2 product into a consumer directory and verifies it; it is the interim
   path for the first benchmarkable version and never installs metaproject
-  material (.agent/, memory, decisions, evaluations).
+  material (governance, memory, decisions, evaluations).

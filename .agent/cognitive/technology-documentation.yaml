@@ -51,7 +51,7 @@ technologies:
       - https://github.com/charmbracelet/bubbletea/releases/tag/v2.0.8
     license: MIT
     local_units:
-      - recipe:recipe-cli-interactif
+      - recipe:recipe-cli-interactive
       - source-cache:official:bubbletea-v2.0.8
     status: active
   - technology: chi

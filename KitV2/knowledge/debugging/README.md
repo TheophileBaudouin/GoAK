@@ -37,8 +37,8 @@ une expérience documentée.
 ## Contenu interdit
 
 - Conseils généraux « deboguer en Go » sans échec concret (→ hors périmètre).
-- Corps de documentation copié ; sorties brutes d'évidence (→ metaprojet
-  `docs/evidence/`).
+- Corps de documentation copié ; sorties brutes d'évidence conservées hors du
+  produit, dans le journal de maintenance du metaprojet.
 - Duplication d'un pattern/anti-pattern existant (`../patterns/`,
   `../anti-patterns/`) ou d'une règle (`../../rules/`) — pointer, ne pas
   dupliquer.

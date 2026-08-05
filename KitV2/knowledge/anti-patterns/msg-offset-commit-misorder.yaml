@@ -36,7 +36,7 @@ when_ok: >-
   un accident.
 relationships:
   references:
-    - https://docs.axonops.com/data-platforms/kafka/application-development/anti-patterns/
+    - https://docs.confluent.io/platform/current/clients/consumer.html
     - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/
   uses: []
   validated_by: []

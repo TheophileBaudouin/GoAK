@@ -99,7 +99,7 @@ wiring. Use `recipe-sqlite-sqlc` for a tested store shape and explicit cleanup.
   supported targets, and driver boundary, checked 2026-08-05.
 - [v1.56.0 go.mod](https://gitlab.com/cznic/sqlite/-/blob/v1.56.0/go.mod)
   — dependency pinning, checked 2026-08-05.
-- [sqlite issues](https://gitlab.com/cznic/sqlite/-/issues) — transaction,
+- [sqlite work items](https://gitlab.com/cznic/sqlite/-/work_items) — transaction,
   VFS, and platform limitations, checked 2026-08-05.
 - [sqlite CHANGELOG](https://gitlab.com/cznic/sqlite/-/blob/v1.56.0/CHANGELOG.md)
   — current engine/security changes, checked 2026-08-05.

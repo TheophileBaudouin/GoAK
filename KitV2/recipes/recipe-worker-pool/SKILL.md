@@ -3,7 +3,7 @@ name: recipe-worker-pool
 description: "Bounded concurrent fan-out in Go with first-error-cancel via errgroup.SetLimit (~5 lines). Use when processing N items concurrently with a concurrency cap, error propagation, or context cancellation."
 category: recipe
 tags: [concurrency, errgroup, worker-pool, goroutine, context]
-last-verified: 2025-07-31
+last-verified: 2026-08-05
 ---
 
 # recipe-worker-pool — Bounded Worker Pool

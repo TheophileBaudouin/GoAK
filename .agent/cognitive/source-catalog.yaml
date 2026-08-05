@@ -278,3 +278,37 @@ sources:
         - evaluation:go:format
         - evaluation:go:static-analysis
         - evaluation:go:tests
+
+  - id: source:security:owasp-session-jwt-cheatsheets
+    title: OWASP Cheat Sheets — session management, JWT, secrets
+    kind: Source
+    version: cheat-sheet-series
+    status: active
+    owner: go-agent-kit
+    tags: [security, owasp, sessions, jwt, secrets]
+    go_version: "1.25+"
+    dependencies: []
+    last_verified: 2026-08-05
+    retrieval_units: [cheat-sheet]
+    transformations:
+      patterns:
+        - pattern:security:auth-session-vs-jwt
+        - pattern:security:secrets-management
+      capabilities: []
+      recipes: []
+      snippets: []
+      evaluations: []
+    target_status:
+      pattern:security:auth-session-vs-jwt:
+        status: active
+        materialized_by:
+          - knowledge/patterns/auth-session-vs-jwt.yaml
+      pattern:security:secrets-management:
+        status: active
+        materialized_by:
+          - knowledge/patterns/security-secrets-management.yaml
+    relationships:
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+        - https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html
+      validated_by: []

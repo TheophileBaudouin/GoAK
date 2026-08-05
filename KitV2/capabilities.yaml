@@ -17,7 +17,7 @@ capabilities:
     status: complete-catalog
   templates:
     source: templates/
-    status: runnable-minimal-bases-and-explicit-partials
+    status: legacy-scaffolds
   product_verification:
     source: probes/
     status: deterministic-probes-and-checks
