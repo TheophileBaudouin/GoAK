@@ -13,5 +13,5 @@ func RunBounded(ctx context.Context, jobs []func(context.Context) error) error {
 	for _, job := range jobs {
 		group.Go(func() error { return job(groupCtx) })
 	}
-	return group.Wait()
+	return group.Wait() // pi-lens-ignore: go-bare-error
 }

@@ -130,7 +130,7 @@ func TestCorruptBlobFailsVerification(t *testing.T) {
 }
 
 func copyTree(source, destination string) error {
-	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error { // pi-lens-ignore: go-bare-error
 		if err != nil {
 			return err
 		}

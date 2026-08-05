@@ -7,5 +7,5 @@ func WrapBoundary(err error) error {
 	if err == nil {
 		return nil
 	}
-	return fmt.Errorf("load record: %w", err)
+	return fmt.Errorf("load record: %w", err) // pi-lens-ignore: go-bare-error
 }

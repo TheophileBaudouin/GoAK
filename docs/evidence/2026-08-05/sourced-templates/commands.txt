@@ -1,0 +1,52 @@
+# Validation transcript — sourced templates wave — 2026-08-05
+
+## Source verification
+
+- leeprovoost/go-rest-api-template pinned commit:
+  4f2d17f700be3b355ff88986ca37c70ad2145cef
+- danjdewhurst/go-toc pinned v0.3.0 commit:
+  1f93495652ca789a75251f3cd6028b8f3adfc624
+- sangianpatrick/go-workerpool pinned v1.0.1 commit:
+  5d5c611c47489dda3b6e97cd277131d05c814bad
+- Source LICENSE files: MIT (three repositories).
+- Source tree counts: REST 18 Go files / 1,877 lines; CLI 16 / 3,975;
+  worker 9 / 794.
+
+## Template checks
+
+`test -z "$(gofmt -l .)" && go test -race ./... && go vet ./...`
+
+- templates/rest-api: PASS
+- templates/worker: PASS
+- templates/cli: PASS after upstream test-file whitespace normalization with
+  gofmt; PASS thereafter.
+
+`govulncheck ./...`
+
+- templates/rest-api: PASS — No vulnerabilities found.
+- templates/worker: PASS — No vulnerabilities found.
+- templates/cli: PASS — No vulnerabilities found.
+
+## Observable scenarios
+
+- REST: `GET /healthcheck` returned `{"appName":"go-rest-api-template",
+  "version":"1.0.0"}` and `GET /ready` returned `{"status":"ok"}`; HTTP 200.
+- CLI: generated TOC from `api.md` and `intro.md`; both entries present. PASS.
+- Worker: four submitted jobs were handled before `Stop` returned. PASS.
+
+## Product gate
+
+- `python3 .agent/validators/validate-instructions.py`: PASS.
+- `python3 KitV2/tools/validators/validate-kitv2.py`: PASS — 65 product skills,
+  3 snippets, 3 templates, router index 250 resources.
+- `python3 -m unittest KitV2/tools/validators/test_validate_kitv2.py`: PASS — 5
+  tests.
+- `test -z "$(gofmt -l .)"`: PASS.
+- `go vet ./...`: PASS.
+- `golangci-lint run ./...`: PASS — 0 issues.
+- `go test -race ./...`: PASS.
+- `gosec ./...`: PASS — 0 issues.
+- `govulncheck ./...`: PASS for all three templates; product packages had no
+  reported vulnerabilities.
+- `bash probes/run.sh`: not rerun in this wave; existing probe evidence remains
+  valid and the product validator plus product test suite passed.

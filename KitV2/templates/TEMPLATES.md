@@ -27,20 +27,18 @@ squelettes maison.
 
 ## Statut actuel
 
-Les squelettes ci-dessous sont des **scaffolds agent-générés hérités de la
-v1** (runnable minimal bases). Ils ne satisfont pas la politique MIT/sourcing :
-ils sont marqués `legacy` et **candidats au remplacement** par des templates
-sourcés. Aucun nouveau scaffold n'est accepté.
+Les scaffolds agent-générés hérités ont été retirés le 2026-08-05. Le catalogue
+ne conserve que trois projets réels, épinglés, sous MIT et vérifiés :
 
-| Template | Statut | Promotion / remplacement |
-|---|---|---|
-| rest-api | legacy (scaffold) | remplacer par un projet open source MIT REST |
-| grpc | legacy (scaffold) | remplacer par un projet open source MIT gRPC |
-| cli | legacy (scaffold) | remplacer par un projet open source MIT CLI |
-| worker | legacy (scaffold) | remplacer par un projet open source MIT worker |
-| microservice | legacy (scaffold) | remplacer par un projet open source MIT service |
-| monolith | legacy (scaffold) | remplacer par un projet open source MIT monolith |
-| cloud-service | legacy (scaffold) | remplacer par un projet open source MIT déployable |
+| Template | Statut | Source | Périmètre |
+| --- | --- | --- | --- |
+| rest-api | sourced | leeprovoost/go-rest-api-template | HTTP REST stdlib-first |
+| cli | sourced | danjdewhurst/go-toc | CLI de génération de TOC Markdown |
+| worker | sourced | sangianpatrick/go-workerpool | pool de workers borné |
+
+Les shapes `grpc`, `microservice`, `monolith` et `cloud-service` restent une
+roadmap sans template opérationnel. Aucun scaffold ne doit être recréé pour les
+représenter : une shape sans source MIT conforme reste planifiée.
 
 ## Admission d'un nouveau template (sourcé)
 
@@ -58,5 +56,5 @@ sourcés. Aucun nouveau scaffold n'est accepté.
    (`PASS`/`PARTIAL`/`BLOCKED`).
 6. Mettre à jour ce catalogue et le validateur (forme attendue du template).
 
-Les recettes existantes restent la preuve d'implémentation canonique jusqu'au
-remplacement effectif d'un scaffold legacy.
+Les recettes existantes restent la preuve d'implémentation canonique pour les
+shapes qui ne disposent pas encore d'une source MIT conforme.

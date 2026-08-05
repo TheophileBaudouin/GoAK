@@ -1,4 +1,8 @@
 name: go-template-worker
-status: legacy
-purpose: Minimal runnable scaffold for the worker project shape.
-validation: go test ./...
+status: sourced
+purpose: MIT-sourced dependency-free bounded worker pool with graceful draining.
+source: >-
+  https://github.com/sangianpatrick/go-workerpool@5d5c611c47489dda3b6e97cd277131d05c814bad
+license: MIT
+validation: go test -race ./...; go vet ./...
+last_verified: 2026-08-05

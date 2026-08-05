@@ -9,9 +9,9 @@
   "skill": 6,
   "snippet": 3,
   "source": 40,
-  "template": 7
+  "template": 3
  },
- "index_sha256": "cbc9b1c4a202e194f916564ee8a202bc666827ae94bdb6969b908ae34d5bea76",
+ "index_sha256": "adbb64f4d0c57534157bb21b0ab23fc33938016ce971dd4a715478b7304d6894",
  "schema": 1,
  "stopwords": [
   "a",

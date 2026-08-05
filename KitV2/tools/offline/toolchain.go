@@ -65,6 +65,7 @@ func prerequisite(unit string, online bool) string {
 }
 
 func (r *Resolver) goOutput(ctx context.Context, args []string, online bool) ([]byte, error) {
+	// pi-lens-ignore: dangerous-exec-command -- executable and arguments are constrained by resolver paths.
 	cmd := exec.CommandContext(ctx, r.goBin, args...) // #nosec G204 -- goBin is configured by the trusted product and args are fixed resolver commands
 	cmd.Env = append([]string(nil), r.env...)
 	cmd.Env = append(cmd.Env, "GOTOOLCHAIN=local")

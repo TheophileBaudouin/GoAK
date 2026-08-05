@@ -1,4 +1,0 @@
-name: go-template-monolith
-status: legacy
-purpose: Minimal runnable scaffold for the monolith project shape.
-validation: go test ./...

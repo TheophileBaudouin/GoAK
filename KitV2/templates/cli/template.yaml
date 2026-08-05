@@ -1,4 +1,8 @@
 name: go-template-cli
-status: legacy
-purpose: Minimal runnable scaffold for the cli project shape.
-validation: go test ./...
+status: sourced
+purpose: MIT-sourced tested Markdown table-of-contents command-line application.
+source: >-
+  https://github.com/danjdewhurst/go-toc@1f93495652ca789a75251f3cd6028b8f3adfc624
+license: MIT
+validation: go test -race ./...; go vet ./...; go run . --help
+last_verified: 2026-08-05

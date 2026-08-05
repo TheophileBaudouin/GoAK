@@ -1426,7 +1426,7 @@
    ]
   },
   {
-   "description": "go-template-cli — Minimal runnable scaffold for the cli project shape.",
+   "description": "go-template-cli — MIT-sourced tested Markdown table-of-contents command-line application.",
    "id": "go-template-cli",
    "kind": "template",
    "path": "templates/cli/template.yaml",
@@ -1438,103 +1438,19 @@
     "go",
     "template",
     "cli",
-    "minimal",
-    "runnable",
-    "scaffold",
-    "cli",
-    "project",
-    "shape"
+    "mit",
+    "sourced",
+    "tested",
+    "markdown",
+    "table",
+    "contents",
+    "command",
+    "line",
+    "application"
    ]
   },
   {
-   "description": "go-template-cloud-service — Minimal runnable scaffold for the cloud-service project shape.",
-   "id": "go-template-cloud-service",
-   "kind": "template",
-   "path": "templates/cloud-service/template.yaml",
-   "tags": [],
-   "terms": [
-    "go",
-    "template",
-    "cloud",
-    "service",
-    "go",
-    "template",
-    "cloud",
-    "service",
-    "minimal",
-    "runnable",
-    "scaffold",
-    "cloud",
-    "service",
-    "project",
-    "shape"
-   ]
-  },
-  {
-   "description": "go-template-grpc — Minimal runnable scaffold for the grpc project shape.",
-   "id": "go-template-grpc",
-   "kind": "template",
-   "path": "templates/grpc/template.yaml",
-   "tags": [],
-   "terms": [
-    "go",
-    "template",
-    "grpc",
-    "go",
-    "template",
-    "grpc",
-    "minimal",
-    "runnable",
-    "scaffold",
-    "grpc",
-    "project",
-    "shape"
-   ]
-  },
-  {
-   "description": "go-template-microservice — Minimal runnable scaffold for the microservice project shape.",
-   "id": "go-template-microservice",
-   "kind": "template",
-   "path": "templates/microservice/template.yaml",
-   "tags": [],
-   "terms": [
-    "go",
-    "template",
-    "microservice",
-    "go",
-    "template",
-    "microservice",
-    "minimal",
-    "runnable",
-    "scaffold",
-    "microservice",
-    "project",
-    "shape"
-   ]
-  },
-  {
-   "description": "go-template-monolith — Minimal runnable scaffold for the monolith project shape.",
-   "id": "go-template-monolith",
-   "kind": "template",
-   "path": "templates/monolith/template.yaml",
-   "tags": [],
-   "terms": [
-    "go",
-    "template",
-    "monolith",
-    "go",
-    "template",
-    "monolith",
-    "minimal",
-    "runnable",
-    "scaffold",
-    "monolith",
-    "project",
-    "shape"
-   ]
-  },
-  {
-   "description": "go-template-rest-api — Minimal runnable scaffold for the rest-api project shape.",
+   "description": "go-template-rest-api — MIT-sourced standard-library-first HTTP REST service foundation.",
    "id": "go-template-rest-api",
    "kind": "template",
    "path": "templates/rest-api/template.yaml",
@@ -1548,17 +1464,19 @@
     "template",
     "rest",
     "api",
-    "minimal",
-    "runnable",
-    "scaffold",
+    "mit",
+    "sourced",
+    "standard",
+    "library",
+    "first",
+    "http",
     "rest",
-    "api",
-    "project",
-    "shape"
+    "service",
+    "foundation"
    ]
   },
   {
-   "description": "go-template-worker — Minimal runnable scaffold for the worker project shape.",
+   "description": "go-template-worker — MIT-sourced dependency-free bounded worker pool with graceful draining.",
    "id": "go-template-worker",
    "kind": "template",
    "path": "templates/worker/template.yaml",
@@ -1570,12 +1488,15 @@
     "go",
     "template",
     "worker",
-    "minimal",
-    "runnable",
-    "scaffold",
+    "mit",
+    "sourced",
+    "dependency",
+    "free",
+    "bounded",
     "worker",
-    "project",
-    "shape"
+    "pool",
+    "graceful",
+    "draining"
    ]
   },
   {

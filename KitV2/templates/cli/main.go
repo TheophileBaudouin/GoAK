@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/danjdewhurst/go-toc/cmd"
 
 func main() {
-	fmt.Println("go-template-cli: PARTIAL scaffold")
+	cmd.Execute()
 }

@@ -17,7 +17,7 @@ capabilities:
     status: complete-catalog
   templates:
     source: templates/
-    status: legacy-scaffolds
+    status: sourced-mit-projects
   product_verification:
     source: probes/
     status: deterministic-probes-and-checks
@@ -33,7 +33,7 @@ coverage:
   recipes: 10
   knowledge_catalogs: 42
   probes: 5
-  project_templates: 7
+  project_templates: 3
 metadata_role: product capability catalog, not an instruction entrypoint
 known_limits:
   - Pi discovery was smoke-tested from a trusted temporary consumer copy;

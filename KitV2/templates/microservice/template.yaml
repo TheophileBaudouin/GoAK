@@ -1,4 +1,0 @@
-name: go-template-microservice
-status: legacy
-purpose: Minimal runnable scaffold for the microservice project shape.
-validation: go test ./...

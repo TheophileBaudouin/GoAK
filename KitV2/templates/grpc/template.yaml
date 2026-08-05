@@ -1,4 +1,0 @@
-name: go-template-grpc
-status: legacy
-purpose: Minimal runnable scaffold for the grpc project shape.
-validation: go test ./...

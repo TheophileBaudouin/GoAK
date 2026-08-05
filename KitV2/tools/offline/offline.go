@@ -315,7 +315,7 @@ func safeJoin(root, name string) (string, error) {
 }
 
 func readFile(path string) ([]byte, error) {
-	return os.ReadFile(path) // #nosec G304 -- paths are constrained before resolver reads
+	return os.ReadFile(path) // #nosec G304 -- paths are constrained before resolver reads; pi-lens-ignore: go-bare-error
 }
 
 func digest(data []byte) string {

@@ -45,15 +45,6 @@ GRAPH_ID_RE = re.compile(
     r"^(?:rule|recipe|pattern|snippet|template|capability|evaluation|decision-record|source|memory):[^:]+:.+$"
 )
 URL_RE = re.compile(r"^https?://")
-EXPECTED_TEMPLATES = {
-    "rest-api",
-    "grpc",
-    "cli",
-    "worker",
-    "microservice",
-    "monolith",
-    "cloud-service",
-}
 TEMPLATE_STATUSES = {"planned", "sourced", "legacy", "deprecated"}
 CATALOG_MAX_AGE_DAYS = 90
 REFERENCE_MAX_AGE_DAYS = 180
@@ -124,7 +115,9 @@ def check_freshness(path: Path, warnings: list[str]) -> list[str]:
             verified = parse_frontmatter(path).get("last-verified", "")
         elif path.suffix in {".yaml", ".yml"}:
             artifact = yaml.safe_load(path.read_text(encoding="utf-8"))
-            verified = artifact.get("last_verified", "") if isinstance(artifact, dict) else ""
+            verified = (
+                artifact.get("last_verified", "") if isinstance(artifact, dict) else ""
+            )
         else:
             return []
         verified_date = date.fromisoformat(str(verified))
@@ -134,7 +127,9 @@ def check_freshness(path: Path, warnings: list[str]) -> list[str]:
     if age > 548:
         return [f"{path}: artifact evidence is {age} days old (limit 548 days)"]
     if age > 365:
-        warnings.append(f"{path}: artifact evidence is {age} days old (warning at 365 days)")
+        warnings.append(
+            f"{path}: artifact evidence is {age} days old (warning at 365 days)"
+        )
     return []
 
 
@@ -253,8 +248,8 @@ def check_probe_runner() -> list[str]:
 
 def check_template_status() -> list[str]:
     errors: list[str] = []
-    for name in EXPECTED_TEMPLATES:
-        path = ROOT / "templates" / name / "template.yaml"
+    template_paths = sorted((ROOT / "templates").glob("*/template.yaml"))
+    for path in template_paths:
         try:
             template = yaml.safe_load(path.read_text(encoding="utf-8"))
         except (OSError, yaml.YAMLError) as error:
@@ -265,6 +260,20 @@ def check_template_status() -> list[str]:
             errors.append(
                 f"{path}: invalid status {status!r}; expected {sorted(TEMPLATE_STATUSES)}"
             )
+        if status == "sourced":
+            for field in ("source", "license", "last_verified"):
+                if not template.get(field):
+                    errors.append(f"{path}: sourced template missing {field}")
+            if template.get("license") != "MIT":
+                errors.append(f"{path}: sourced template license must be MIT")
+            for required in ("LICENSE", "ATTRIBUTION.md", "README.md"):
+                if not path.parent.joinpath(required).exists():
+                    errors.append(f"{path.parent}: sourced template missing {required}")
+            attribution = path.parent / "ATTRIBUTION.md"
+            if attribution.exists() and "Technical scope" not in attribution.read_text(
+                encoding="utf-8"
+            ):
+                errors.append(f"{attribution}: missing Technical scope section")
     return errors
 
 
@@ -295,7 +304,9 @@ def check_coverage() -> list[str]:
     errors: list[str] = []
     for key, value in expected.items():
         if actual.get(key) != value:
-            errors.append(f"{path}: coverage.{key}={actual.get(key)!r}, expected {value}")
+            errors.append(
+                f"{path}: coverage.{key}={actual.get(key)!r}, expected {value}"
+            )
     return errors
 
 
@@ -574,16 +585,6 @@ def main() -> int:
     errors.extend(check_router())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())
-    for name in EXPECTED_TEMPLATES:
-        for required in (
-            "template.yaml",
-            "README.md",
-            "go.mod",
-            "main.go",
-            "main_test.go",
-        ):
-            if not (ROOT / "templates" / name / required).exists():
-                errors.append(f"templates/{name}: missing {required}")
     errors.extend(check_bundle())
     if errors:
         print("\n".join(errors), file=sys.stderr)

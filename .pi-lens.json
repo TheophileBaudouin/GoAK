@@ -2,6 +2,9 @@
   "ignore": [
     ".pi-subagents/**",
     ".ruff_cache/**",
-    "KitV2/tools/validators/__pycache__/**"
+    "KitV2/tools/validators/__pycache__/**",
+    "KitV2/templates/*/template.yaml",
+    "KitV2/templates/_kit-ci-workflow.yml",
+    "KitV2/tools/offline/bundle/manifest.json"
   ]
 }

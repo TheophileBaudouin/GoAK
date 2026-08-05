@@ -1,3 +1,3 @@
-module go-agent-template-worker
+module github.com/sangianpatrick/go-workerpool
 
-go 1.25.6
+go 1.23

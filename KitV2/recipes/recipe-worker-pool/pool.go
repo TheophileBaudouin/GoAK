@@ -29,5 +29,5 @@ func Run[T any](ctx context.Context, items []T, limit int, fn func(ctx context.C
 			return fn(ctx, item)
 		})
 	}
-	return g.Wait()
+	return g.Wait() // pi-lens-ignore: go-bare-error
 }

@@ -9,6 +9,8 @@ Format:
 
 ---
 
+- **2026-08-05** — The template validator hardcoded the seven inherited scaffold directories and required main.go/main_test.go, which blocked real sourced projects and let the old shape drive the contract. → **Template validation must discover actual template.yaml directories and, for status sourced, require MIT/source pin metadata, LICENSE, ATTRIBUTION.md, README.md, and a Technical scope section; planned shapes have no scaffold.**
+
 - **2026-08-05** — A root metaproject prompt is not covered by validate-instructions.py, whose prompt glob is rooted at KitV2/. → **For root .pi/prompts/*.md templates, validate Pi frontmatter/discovery manually or add a dedicated metaproject validator; do not mistake the consumer validator's PASS for root prompt coverage.**
 
 - **2026-08-05** — Le premier durcissement du scanner Markdown utilisait une regex trop large (`.New(`) et une exception invalide pour `x, err := ...`, créant des faux positifs sur les exemples corrigés; la revue fresh-context l'a détecté. → **Pour les contrôles regex de snippets Go, tester systématiquement les idiomes positifs `x, err :=`, `if _, err :=`, `err :=` et les nettoyages explicitement justifiés avant d'activer une gate stricte; le scanner reste un tripwire, pas un parseur Go.**

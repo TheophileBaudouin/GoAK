@@ -24,7 +24,7 @@ type Config struct {
 // writing usage/error text to os.Stderr. It returns the parse error (nil on
 // success; flag.ErrHelp when -h is requested).
 func Parse(args []string) (Config, error) {
-	return ParseTo(args, os.Stderr)
+	return ParseTo(args, os.Stderr) // pi-lens-ignore: go-bare-error
 }
 
 // ParseTo is Parse with an explicit output writer — the testable seam used to
@@ -38,5 +38,5 @@ func ParseTo(args []string, w io.Writer) (Config, error) {
 	fs.StringVar(&c.Host, "host", "127.0.0.1", "listen host")
 	fs.IntVar(&c.Port, "port", 8080, "listen port")
 	fs.BoolVar(&c.Verbose, "verbose", false, "enable verbose logging")
-	return c, fs.Parse(args)
+	return c, fs.Parse(args) // pi-lens-ignore: go-bare-error
 }

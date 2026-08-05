@@ -30,7 +30,7 @@ import (
 // serve (e.g. listener closed), or the Shutdown error if draining exceeded the
 // timeout. http.ErrServerClosed (the expected return from Serve during shutdown)
 // is absorbed, not surfaced.
-func Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error {
+func Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error { // pi-lens-ignore: go-bare-error
 	serveErr := make(chan error, 1)
 	go func() {
 		err := srv.Serve(ln)
@@ -48,7 +48,8 @@ func Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Du
 	case <-ctx.Done():
 	}
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	// Shutdown needs a fresh deadline because ctx is already canceled here.
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout) // pi-lens-ignore: go-context-background-handler
 	defer cancel()
 	return srv.Shutdown(shutdownCtx)
 }

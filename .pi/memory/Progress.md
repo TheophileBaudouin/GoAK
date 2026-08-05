@@ -29,6 +29,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `ardanlabs-service` — extract-only layer/observability reference.
 - [x] `pagoda` — extract-only SSR structure reference.
 - [x] `go-starter` — extract-only, stagnant; re-verify before relying on it.
+- [ ] [x] Remplacer les 7 scaffolds legacy de templates par 3 templates MIT sourcés (REST, CLI, worker), retirer les shapes sans source conforme, mettre à jour le validateur, router et evidence (2026-08-05).
 
 ## KitV2 rules
 
