@@ -104,6 +104,17 @@ the reason.
 ## Decisions
 
 2026-08-05 — **Metaprojet-only KitV2 audit workflow** : le prompt `.pi/prompts/kit-audit.md` vit à la racine du méta-projet et audite `KitV2/` sans modification. Il impose un inventaire complet daté et réconcilié fichier par fichier, des verdicts par dimension contre `KIT_CHARTER.md`, et une décision explicite `KIT` vs `META-PROJET` pour détecter la pollution du produit. `install.sh` n'extrait que `KitV2/`, donc ce prompt n'est pas livré au consommateur par construction.
+
+2026-08-05 — **Intégration spec-driven-dev (mise à jour majeure, D-16…20)** :
+le workflow de référence des transformations à grande échelle est la skill
+`spec-driven-dev` (phases 0-6, LOCAL_ONLY, FR/EN) + `deep-discuss` ; la
+chaîne `workflow-clarify → plan → tasks → implement → verify` est supprimée.
+`go-code-review` intègre la discipline findings-first (review-spd). Règle
+mémoire kit : vérifier les fichiers `.pi/memory/` présents (`Decisions.md`
+absent au bootstrap Pi). Bornage : contrat Z12, kit-audit dimension C10,
+S.U.P.E.R borné (les règles sourcées priment). Voir Decisions.md et le plan
+`docs/plans/2026-08-05-spec-driven-dev-integration.md`.
+
 ## Verification status
 
 The KitV2 gate and probes pass through the 2026-08-05 audit-fix wave (product 2.4.1): 71 product skills, 3 sourced MIT templates (REST, CLI, worker), router index 256 resources, strict catalog mode PASS, validator unit tests PASS (9/9), full Go gate PASS (gofmt, vet, lint 0, race, gosec 0, govulncheck 0), 15/15 probes PASS. Audit findings KVA-001…KVA-011 closed: rest-api cmd/api-service shipped (gitignore fixed to bin/ + explicit binary path, ATTRIBUTION updated, check_template_build added), manifest↔capabilities vocabulary unified kebab with criteria (check_manifest_capabilities_coherence), core/errors no longer references registry, Z1 §5 aligned on A1 (semantic elements, decision D-2026-08-05-08), probes/README.md rewritten as the Z6 zone contract, x/sync stdlib pointer added with check_recipe_dependencies, koanf↔viper duplication documented (D-2026-08-05-09), AGENTS.md gate aligned on C2 §4, stdlib title collision fixed, validator tests no longer mutate the repo. Evidence: docs/plans/2026-08-05-audit-fixes.md. Legacy agent-authored template scaffolds remain removed; grpc, microservice, monolith, and cloud-service stay roadmap-only. Pi-lens code findings are only marked false-positive when verified against actual code and contract; unresolved findings must be debugged or reported.

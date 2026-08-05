@@ -14,13 +14,17 @@ recouvrement.
 
 | Surface | Rôle | Exemple |
 | --- | --- | --- |
-| `.pi/prompts/*.md` | **Orchestrateurs** invoqués manuellement (`/workflow-plan`) | workflow-clarify, workflow-plan, workflow-implement, workflow-verify |
-| `.pi/skills/*/SKILL.md` | **Procédures durables** chargées par contexte | go-code-review, go-idiomatic-implementation, go-implementation-plan, go-source-retrieval, go-testing-verification |
+| `.pi/prompts/*.md` | **Orchestrateurs** invoqués manuellement (`/checklist-api`) | workflow-memory, checklist-api, checklist-release |
+| `.pi/skills/*/SKILL.md` | **Procédures durables** chargées par contexte | spec-driven-dev, deep-discuss, go-code-review, go-idiomatic-implementation, go-implementation-plan, go-source-retrieval, go-testing-verification, kit-resource-routing |
 | modules `rules/`, `recipes/`, `knowledge/catalogs/` | **Contenu de connaissance** (découvrable par description) | recipe-worker-pool, chi, philosophy |
 
 Règle : si un prompt et une skill répondent à la même question, on en garde un
 et l'autre pointe (anti-duplication C0). Une skill de workflow ne contient pas
-de connaissance de domaine (celle-ci vit dans les modules).
+de connaissance de domaine (celle-ci vit dans les modules). Depuis le
+2026-08-05 (D-2026-08-05-16), le workflow de référence des transformations à
+grande échelle est la skill `spec-driven-dev` (contrat Z12) ; l'ancienne
+chaîne de prompts `workflow-clarify → plan → tasks → implement → verify` a été
+supprimée et ne doit pas être recréée.
 
 ## 3. Règles
 
@@ -56,8 +60,8 @@ de connaissance de domaine (celle-ci vit dans les modules).
 ## 5. Patterns
 
 - Prompts = courts, orchestrateurs ; skills = procédures ; modules = contenu.
-- Activation explicite : « Use only after workflow-clarify … » (déjà en place —
-  généraliser).
+- Activation explicite : la description frontmatter nomme la condition
+  d'activation (« Use when … », « Use only after … ») — généraliser.
 
 ## 6. Anti-patterns
 

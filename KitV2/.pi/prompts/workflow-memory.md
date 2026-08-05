@@ -13,12 +13,17 @@ is trusted in Pi. In non-interactive sessions, approve for this run with
 project resources; it is not a sandbox and grants no permission isolation.
 
 1. Check whether `.pi/memory/` exists in the consumer project.
-2. If it does not exist, initialize the host's standard memory files before
-   coding. If the host provides a memory bootstrap command, use it; otherwise
-   create only the minimal files the host expects.
-3. Read the local memory before acting. Never copy the kit's source ledger,
+2. **Inventory the actual files present.** The Pi bootstrap initializes a
+   minimal default set — `Decisions.md` is NOT created by default. List the
+   real files under `.pi/memory/` (`Brief`, `Progress`, `Gotchas`, `Agent`,
+   `Decisions`) and never assume the standard set is present.
+3. Create the missing files in the host's expected format (use the host's
+   memory bootstrap command when it provides one; otherwise create only the
+   minimal files the host expects). Never copy kit or metaproject history
+   into them.
+4. Read the local memory before acting. Never copy the kit's source ledger,
    roadmap, research history, or metaproject tasks into it.
-4. Record the project's actual goal, stack, constraints, current progress, and
+5. Record the project's actual goal, stack, constraints, current progress, and
    known risks. Leave unknown details out until observed.
 
 ## What belongs in consumer memory
@@ -30,6 +35,8 @@ project resources; it is not a sandbox and grants no permission isolation.
 - `Gotchas`: concrete mistakes, failures, and durable corrections discovered in
   this project.
 - `Agent`: concise behavior rules explicitly established for this project.
+- `Decisions`: durable architecture decisions and their rationale — create it
+  explicitly; the Pi bootstrap does not create it by default.
 
 Use a decision/source ledger only when the project has enough research to need
 one. Keep it local and cite URLs or commands for durable claims.

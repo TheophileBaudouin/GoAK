@@ -18,7 +18,37 @@ If two files answer the same question, keep one canonical answer and replace the
 
 ## Workflow
 
-Use the native `.pi/prompts/` workflow templates in order for non-trivial work. Before planning or implementing technical work, call `search_kit_resources` (see the `kit-resource-routing` skill) to route to the relevant rules, recipes, and catalogs instead of scanning the kit tree.
+For ordinary non-trivial work, use the native skills and prompts of `.pi/`
+(checklist-* for reviews, `workflow-memory` for memory). For large-scale
+transformations (rewrite, migration, overhaul, whole-project refactor), use
+the `spec-driven-dev` skill: it runs the seven-phase pipeline (intent,
+deep analysis with S.U.P.E.R health, grounded refinement, decomposition with
+delivery batches, progress tracking via `docs/progress/MASTER.md`, confirmed
+execution with adaptive control, archive) and composes the other kit
+resources — it replaces the former `workflow-clarify → plan → tasks →
+implement → verify` prompt chain (removed 2026-08-05). The `deep-discuss`
+skill handles structured problem analysis and solution design.
+
+Before planning or implementing technical work, call `search_kit_resources`
+(see the `kit-resource-routing` skill) to route to the relevant rules,
+recipes, and catalogs instead of scanning the kit tree.
+
+## Memory (consumer projects)
+
+Pi initializes `.pi/memory/` with a minimal default set — `Decisions.md` is
+**not** created by the bootstrap. Any agent using this kit MUST verify which
+memory files actually exist before relying on them:
+
+- inventory the real files under `.pi/memory/` (`Brief`, `Progress`,
+  `Gotchas`, `Agent`, `Decisions`);
+- create the missing files in the host's expected format, without copying kit
+  or metaproject history;
+- never assume the standard set is present; never write to a file that does
+  not exist as if it did.
+
+Follow `workflow-memory` for initialization and updates. Durable rules,
+gotchas, and decisions discovered during a spec-driven run go into the
+resolved memory surface.
 
 ## Validation
 

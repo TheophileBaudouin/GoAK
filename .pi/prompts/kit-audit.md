@@ -262,6 +262,28 @@ des lacunes d'automatisation (`.agent/instructions.md` §Enforcement). Une
 absolue sans contrôle ni consignation est un finding (D-2026-08-05-15) —
 n'évalue pas seulement la présence de la phrase, mais ce qui l'applique.
 
+#### C10. Workflow spec-driven-dev (contrat Z12)
+
+Vérifie la zone `KitV2/.pi/skills/spec-driven-dev/` et `deep-discuss/`
+contre le contrat Z12 :
+
+- frontmatter complet (name == dossier, category: workflow, description EN,
+  tags, last-verified), SKILL.md ≤ 500 lignes, références `references/**`
+  présentes et liens relatifs résolus ;
+- pas de fuite GitHub (aucun `github-integration.md`, aucune référence gh/
+  Issue/PR dans la skill) — mode LOCAL_ONLY (D-2026-08-05-18) ;
+- S.U.P.E.R présent comme lentille de santé avec la frontière « les règles
+  sourcées du kit priment » (D-2026-08-05-16, Z12 §3.2) ;
+- contrôle adaptatif (télémetry, drift, seuils) et phase 6 archive présents ;
+- règle mémoire « vérifier les fichiers .pi/memory présents, Decisions.md peut
+  manquer » encodée (KitV2/AGENTS.md + workflow-memory.md) ;
+- **aucun prompt `workflow-{clarify,plan,tasks,implement,verify}` résiduel** :
+  un prompt résiduel de l'ancienne chaîne est une catégorie de finding nommée
+  à part entière (D-2026-08-05-16), pas un cas générique ;
+- `go-code-review` porte la discipline findings-first (cibles, focus, format)
+  sans dépasser 500 lignes ;
+- router indexé (skills spec-driven-dev, deep-discuss) et `--check` vert.
+
 ### Phase D — Décider « méta-projet ou Kit ? »
 
 Cette dimension est obligatoire pour **chaque fichier**, y compris les fichiers
@@ -424,7 +446,10 @@ Le tableau contient au minimum, à chaque audit :
   sémantique (D-2026-08-05-11) ;
 - la ligne « instructions absolues (MANDATORY) » : chaque occurrence
   MANDATORY/« toujours »/« jamais » du Kit et son statut d'application
-  (contrôle mécanique nommé ou « guidance seule » — D-2026-08-05-15).
+  (contrôle mécanique nommé ou « guidance seule » — D-2026-08-05-15) ;
+- la ligne « workflow spec-driven-dev (Z12) » : conformité de la zone au
+  contrat Z12 — LOCAL_ONLY, frontière S.U.P.E.R, contrôle adaptatif, archive,
+  règle mémoire, absence de prompts workflow-* résiduels (D-2026-08-05-16).
 
 ### F. Verdict et suites
 

@@ -3,15 +3,15 @@
   "anti-pattern": 54,
   "catalog": 74,
   "pattern": 39,
-  "prompt": 8,
+  "prompt": 3,
   "recipe": 15,
   "rule": 13,
-  "skill": 6,
+  "skill": 8,
   "snippet": 3,
   "source": 41,
   "template": 3
  },
- "index_sha256": "60e0dca670208cf1bd2c6850d8fbb5f710092f4927116d4fc976597edc0f8a6e",
+ "index_sha256": "2f324fc518a1ed437645e33844200297c2aaad2aca1fe203ae2426d7abdf215e",
  "schema": 1,
  "stopwords": [
   "a",

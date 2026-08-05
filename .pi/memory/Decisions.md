@@ -508,3 +508,52 @@ suivante).
   plan, annexe B — implémentation en passe suivante (KitV2/.pi/extensions/).
   Pas de scan validateur dur : risque de faux positifs sur des absolus
   légitimement appliqués par revue.
+
+## Intégration spec-driven-dev (2026-08-05, mise à jour majeure)
+
+Intégration de toute la logique du dépôt MIT `zhu1090093659/spec_driven_develop`
+(v1.15.0) dans le kit, adaptée au harnais Pi et bornée par le contrat Z12.
+Analyse : `docs/research/2026-08-05-spec-driven-dev-analysis.md` ; plan :
+`docs/plans/2026-08-05-spec-driven-dev-integration.md`. Décisions prises APRÈS
+questions utilisateur.
+
+- **D-2026-08-05-16 (stratégie : remplacer la chaîne workflow-*)** : le
+  workflow de référence des transformations à grande échelle devient la skill
+  `spec-driven-dev` (phases 0-6) ; les prompts
+  `workflow-{clarify,plan,tasks,implement,verify}` sont supprimés
+  (2026-08-05) et ne doivent pas être recréés. La skill compose les ressources
+  restantes (workflow-memory, go-*, kit-resource-routing, go-code-review) par
+  cross-références. Raison : la chaîne existante ≈ phases 2-5 ; spec-driven
+  apporte les phases 0-1, S.U.P.E.R, le contrôle adaptatif et l'archive —
+  deux workflows parallèles auraient été un doublon (charte §4).
+- **D-2026-08-05-17 (langue : FR + frontmatter EN)** : corps des
+  skills/références en français (style kit-audit), `description:` frontmatter
+  en anglais (découvrabilité Pi, format validate-instructions.py).
+- **D-2026-08-05-18 (périmètre : LOCAL_ONLY uniquement)** : pas de GitHub
+  (Issues/Milestones/PRs/gh CLI). Le suivi vit dans `docs/progress/` ;
+  les lots de livraison sont des unités locales d'intégration/validation.
+  Sous-agents : dispatch tiercé conservé, mappé sur le mécanisme natif Pi,
+  décision économique ; rôles spec-driven documentés en mapping (jamais
+  livrés comme fichiers).
+- **D-2026-08-05-19 (bornage : contrat Z12, sans toucher la charte)** :
+  nouveau contrat `.agent/kit-governance/22-zone-spec-driven-dev.md` + index
+  README, Z8 mis à jour (table des rôles), kit-audit dimension C10 + catégorie
+  de finding + §5-E. `KIT_CHARTER.md` inchangé : le workflow est un artefact
+  de zone (Z8/Z12), la charte reste l'autorité de processus.
+- **D-2026-08-05-20 (règle mémoire kit)** : règle AJOUTÉE DANS LE KIT (pas le
+  méta-projet) — tout agent utilisant le kit vérifie quels fichiers
+  `.pi/memory/` existent réellement : le bootstrap Pi ne crée pas
+  `Decisions.md` par défaut. Ne jamais supposer l'ensemble standard ; créer
+  les fichiers manquants sans copier d'historique externe. Encodé dans
+  `KitV2/AGENTS.md` + `workflow-memory.md` + templates governance.
+- **Fusion review-spd → go-code-review** : la discipline findings-first de
+  review-spd (3 cibles, planning par taille, 5 focus de reviewers, format de
+  sortie) est fusionnée dans la skill existante `go-code-review`
+  (references/reviewer-focus.md + SKILL.md augmenté) — une seule skill de
+  review (anti-doublon charte §4). Sévérités du kit conservées comme référence
+  de sortie.
+- **Frontière S.U.P.E.R** : S.U.P.E.R = lentille d'évaluation de santé +
+  checklist de revue, PAS une doctrine de conception Go. En conflit avec
+  rules/core/philosophy (Clean/Hexagonal vs « plus petit design justifié,
+  stdlib-first »), les règles sourcées du kit priment. Encodé dans
+  `references/super-philosophy.md` + Z12 §3.2.
