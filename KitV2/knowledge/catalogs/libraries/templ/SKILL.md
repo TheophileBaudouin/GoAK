@@ -1,119 +1,122 @@
 ---
 name: templ
-description: "a-h/templ — compiled, type-safe HTML templates for Go (alternative to html/template). Use when rendering HTML server-side and you want compile-time type safety and XSS-safe auto-escaping, with component composition."
+description: "github.com/a-h/templ v0.3.1020 — compiled, type-safe server-side HTML components for Go with automatic escaping. Use when SSR needs compile-time component/type checks; not for client-side React/Vue, runtime-only tiny templates, or unreviewed raw HTML."
 category: library
 tags: [html, template, type-safe, xss, components]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# templ — type-safe HTML templates
+# templ — composants HTML type-safe
 
 ## Selection
 
-`a-h/templ` (10.4k★, pushed 2026-07, CI with `ensure-generated`/`ensure-fmt`,
-goreleaser releases).
+[`github.com/a-h/templ`](https://github.com/a-h/templ) v0.3.1020,
+released 2026-05-10, compiles `.templ` files into Go functions returning
+`templ.Component`. It provides compile-time component/type checks, server-side
+rendering, HTML escaping, and an `io.Writer`/`http.ResponseWriter` boundary. It
+is admitted for this focused SSR generation workflow, active maintenance,
+tests, documentation, and production use; not for popularity.
 
-**Actual reason (not stars):** it compiles `.templ` files to real Go
-(`*_templ.go`) so the **compiler** catches type mismatches and bad signatures at
-build time — unlike `html/template`'s runtime evaluation. Dynamic content is
-auto-HTML-escaped by default (XSS-safe).
+## Admission checklist
+
+- [x] Current v0.3.1020 and Go 1.25+.
+- [x] Single responsibility: compiled Go HTML components.
+- [x] Generated code is ordinary Go and fits compiler/test tooling.
+- [x] Tests, CI, documentation, security guidance, and examples exist.
+- [x] The generation step and generated-file policy are explicit.
 
 ## Build integration
 
-`.templ` is NOT runnable Go — it must be generated first.
+`.templ` is source, not directly runnable Go. Generate before compiling:
 
 ```sh
-templ generate              # parses .templ → emits *_templ.go
-templ generate --watch      # dev: regenerate on change
-templ generate --proxy=:8080 --watch   # + live reload via SSE
+templ generate
+go generate ./...
 ```
 
-Wire `go:generate` so `go generate ./...` stays the single build entry point:
+Wire generation with:
 
 ```go
 //go:generate templ generate
 ```
 
+Keep generation deterministic in CI and choose whether generated files are
+versioned according to the project's source/build policy.
+
 ## Component composition
 
 ```templ
-templ Page(title string, children ...templ.Component) {
-    <html><head><title>{title}</title></head>
-    @children...
-    </html>
-}
 templ Greeting(name string) {
-    <p>Hello, {name}</p>
+    <p>Hello, { name }</p>
 }
 ```
 
-Compose via `@Component(...)`, pass children with `children...`, aggregate with
-`templ.Join`. Exported (capitalised) components are importable across packages.
-
-## Render to an http.ResponseWriter
-
-```go
-templ.Handler(Greeting("world)).ServeHTTP(w, r)
-// or, for control:
-comp := Greeting("world")
-comp.Render(ctx, w)
-```
+Components implement `Render(ctx context.Context, w io.Writer) error`; render
+errors must be returned and handled at the HTTP/application boundary. Dynamic
+content is escaped by default; URL, CSS, script, and nonce policies still need
+explicit security review.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| stdlib `html/template` | No dependency, runtime-evaluated (type errors at run time). Fine for small/dynamic templates. |
-| `gomarkup`/Jet/etc. | Other engines; templ's compiled-type-safety is its differentiator. |
-| Client-side React/Vue | Different deployment model; templ is server-side render only. |
+| stdlib `html/template` | Prefer for small templates or zero-dependency runtime evaluation. |
+| gomponents | Consider when Go-only component composition without code generation is preferred. |
+| React/Vue | Choose for a client-side/browser application rather than Go SSR. |
+| quicktemplate/pongo2 | Consider only when their performance/syntax trade-offs are an explicit requirement. |
 
 ## Utiliser cette librairie quand
 
-- Rendu HTML server-side avec sécurité de type à la compilation et
-  auto-escaping XSS par défaut.
-- La composition de composants (`@Component`, children, `templ.Join`) est
-  souhaitée.
-- Le chemin de rendu est chaud (SSR, streaming) : les templates compilés
-  exécutent du code Go, sans réflexion runtime (voir
-  `source:template:compiled-rendering`).
+- SSR needs compile-time type/signature checks and component composition.
+- HTML output should be generated as Go and tested with ordinary Go tooling.
+- Automatic escaping, CSP nonces, and controlled `SafeURL`/CSS boundaries fit
+  the application security model.
 
 ## Ne pas utiliser cette librairie quand
 
-- Un template petit/dynamique suffit : `html/template` (stdlib) est sans
-  dépendance, mais évalué au runtime.
-- Le rendu est client-side (React/Vue) : templ est server-side uniquement.
-- L'ajout d'une étape de génération (`templ generate`) au build est refusé.
+- A tiny runtime template is simpler with `html/template`.
+- The UI is client-rendered or requires a browser component framework.
+- The build cannot run or pin the `templ generate` tool.
+- The application needs raw HTML/script injection without a deliberate safe
+  boundary.
 
 ## Avantages
 
-- Compilé : le compilateur attrape les erreurs de type/signature au build.
-- Auto-escape HTML par défaut (XSS-safe) — comme html/template mais typé.
-- Composants composables et importables entre packages.
-- Rendu mesuré plus rapide qu'html/template (benchmarks officiels et
-  indépendants, voir `source:template:compiled-rendering`).
+- Compiled components catch type/signature errors before runtime.
+- HTML/attribute escaping and typed component composition reduce template bugs.
+- Components render to standard writers and integrate with `net/http`.
+- Generation, formatting, watch, and proxy workflows are explicit CLI steps.
 
 ## Inconvénients
 
-- `.templ` n'est pas du Go exécutable : étape de génération obligatoire au
-  build (`go:generate templ generate`).
-- Dépendance + toolchain : un écosystème en plus à maintenir.
-- Server-side seulement : pas de rendu client.
+- Adds a generator/toolchain step and generated-file lifecycle.
+- Large/unformatted `.templ` files can make generation memory/time expensive.
+- Server-side only; browser behavior and client security remain separate.
+- The v0.x tool/API requires pinning and generation tests.
 
 ## Pièges connus
 
-- Toujours câbler `go:generate templ generate` pour garder `go generate
-  ./...` comme point d'entrée unique du build.
-- Garder le code généré sous contrôle de version ou le régénérer de façon
-  déterministe (CI `ensure-generated`).
-- Le rendu type-safe ne dispense pas de valider les entrées à la frontière
-  (voir `source:security:input-validation`).
+- Run `templ generate` in CI and fail when generated output is stale; do not
+  assume opening a `.templ` file compiles it automatically.
+- Keep dynamic script/style values in the supported `ComponentScript`/safe APIs;
+  do not interpolate arbitrary strings into scripts or styles.
+- Validate URLs and use secure CSP nonces generated by the application.
+- Pin v0.3.1020 and track the transitive `x/net` security boundary.
+- Test large components and concurrent rendering after generator/runtime bumps.
 
 ## Sources vérifiées
 
-- [a-h/templ (repo officiel)](https://github.com/a-h/templ) — vérifié
-  2026-08-02
-- [templ.guide (docs officielles)](https://templ.guide/) — vérifié 2026-08-02
-- [a-h/templ benchmarks](https://github.com/a-h/templ/tree/main/benchmarks) —
-  vérifié 2026-08-04
-- Artefacts internes : `source:template:compiled-rendering`,
-  `source:go:html-template` (stdlib), `source:security:input-validation`
+- [Official templ repository](https://github.com/a-h/templ) — API,
+  maintenance, license, checked 2026-08-05.
+- [templ v0.3.1020 release](https://github.com/a-h/templ/releases/tag/v0.3.1020)
+  — exact version and changes, checked 2026-08-05.
+- [templ on pkg.go.dev](https://pkg.go.dev/github.com/a-h/templ) — module and
+  Component API, checked 2026-08-05.
+- [templ generation docs](https://templ.guide/llms.md) — CLI/generation workflow,
+  checked 2026-08-05.
+- [templ injection guidance](https://templ.guide/security/injection-attacks/)
+  — escaping, URL/script/CSS boundary, checked 2026-08-05.
+- [templ CSP guidance](https://templ.guide/security/content-security-policy/)
+  — nonce behavior, checked 2026-08-05.
+- [templ issue #1354](https://github.com/a-h/templ/issues/1354) — dependency
+  security boundary, checked 2026-08-05.

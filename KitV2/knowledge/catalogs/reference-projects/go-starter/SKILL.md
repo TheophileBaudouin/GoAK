@@ -1,56 +1,62 @@
 ---
 name: go-starter
-description: "allaboutapps/go-starter — Go + Docker + Postgres scaffolding starter (621★). EXTRACT-ONLY and STAGNANT (issue-mined: 6 open automated/dependabot issues; no recent human-maintenance signal after 2025-05; last push 2025-10): layout inspiration only, do not rely on it. Candidate for removal at next review."
+description: "allaboutapps/go-starter tag go-starter-2025-10-16 (25.10.0) — opinionated Go/Docker/PostgreSQL template. EXTRACT-ONLY and effectively stagnant: use only for layout inspiration, never as a maintained dependency or current default."
 category: reference-project
-tags: [starter, docker, postgres, extract-only]
-last-verified: 2026-08-02
+tags: [starter, docker, postgres, extract-only, stale]
+last-verified: 2026-08-05
 ---
 
-# go-starter (extract-only)
+# go-starter (extract-only, stagnant)
 
-> **extract-only: true** — and flagged for maintenance recency.
+> **extract-only: true** — this GitHub template is not an importable library and
+> its current maintenance status limits how much trust an agent should place in
+> it.
 
 ## The project
 
-`allaboutapps/go-starter` (621★, **last push 2025-10-16** — ~9 months ago, inside
-the <12mo window but at its edge; not archived). A scaffolding starter for Go +
-Docker + Postgres services.
+[`allaboutapps/go-starter`](https://github.com/allaboutapps/go-starter) is an
+opinionated Go REST service template around Docker, PostgreSQL, SQLBoiler,
+Swagger, and development containers. It is consumed as a GitHub template/fork,
+not as a Go module dependency.
 
-## Verification outcome (the "verify-first" candidate)
+## Verification outcome
 
-This was the candidate requiring reinforced verification. Result:
-
-- **Stars**: 621 — clears the ≥500 floor (narrowly).
-- **Activity**: last push 2025-10-16 — clears the <12mo rule today, but it is the
-  closest to the edge of all candidates. Re-verify at the next `last-verified`
-  cycle; if it crosses 12 months, demote/reject.
-- **CI/tests**: the repo's main README redirects to a generated project README,
-  signalling a scaffold generator more than a maintained library — treat with
-  caution.
+- Latest known tag/release convention: `go-starter-2025-10-16` / `25.10.0`.
+- Last code commit verified: 2025-10-16.
+- Open queue verified as dependency-bump work that has remained unresolved.
+- The repository is not archived, but absence of code activity since the last
+  release makes it a stale reference rather than an actively maintained base.
 
 ## What you MAY extract
 
-- **Project skeleton idea**: where config, migrations, handlers, and Docker
-  wiring sit relative to each other — as a layout reference, not a copy.
-- **Migration tooling placement** (adjacent to the DB layer).
+- Relative placement ideas for config, migrations, handlers, Docker wiring, and
+  generated SQL code.
+- A deployment concern to compare against the consumer's actual requirements.
 
 ## What you must NEVER copy
 
-- **The scaffold itself** (Dockerfile chain, Postgres bootstrapping, generator
-  scripts) — these encode one deployment opinion; the kit stays deployment-agnostic.
-- **Generated boilerplate** — the kit generates nothing; consumers' needs differ.
+- The Docker/PostgreSQL/SQLBoiler/Swagger stack as a bundle.
+- Generated boilerplate, CI assumptions, or a generator as if it were a kit
+  contract.
+- A dependency/version choice from this repository without fresh independent
+  verification.
 
 ## How an agent should use this
 
-Glance at it for layout inspiration only. Prefer the kit's own recipes
-(`recipe-rest-chi`, `recipe-sqlite-sqlc`) which give tested, minimal patterns
-without imposing Docker/Postgres or a generator.
+Use it only to inspect one layout question. Prefer the kit's tested recipes and
+current library catalogs for implementation choices. If a proposed design
+relies on this template's current behavior, stop and re-verify the specific
+source or reject the reference.
 
-## Verification
+## Sources vérifiées
 
-- 621★ (≥500 ✓, narrow). Last push 2025-10-16 (inside <12mo but the only recent
-  activity). **Issue-mined: 6 open automated/dependabot issues; no recent human-maintenance signal after 2025-05**
-  (#269 was the last human-initiated issue), nothing since → effectively
-  stagnant, not just borderline. Treat as
-  reference-only; candidate for removal at the next `last-verified` cycle if
-  still inactive.
+- [Official go-starter repository](https://github.com/allaboutapps/go-starter) —
+  template identity, license, and stack, checked 2026-08-05.
+- [Repository API metadata](https://api.github.com/repos/allaboutapps/go-starter)
+  — activity/status, checked 2026-08-05.
+- [Commit history](https://api.github.com/repos/allaboutapps/go-starter/commits?per_page=10)
+  — last code commit, checked 2026-08-05.
+- [Open issues](https://api.github.com/repos/allaboutapps/go-starter/issues?state=open&per_page=20)
+  — maintenance signal, checked 2026-08-05.
+- [Changelog](https://raw.githubusercontent.com/allaboutapps/go-starter/master/CHANGELOG-go-starter.md)
+  — release/tag convention, checked 2026-08-05.

@@ -1,49 +1,66 @@
 ---
 name: ardanlabs-service
-description: "ardanlabs/service — Go service starter (DDD/data-oriented, ~4.1k★). EXTRACT-ONLY: extract layer separation (business/app/foundation) + observability wiring; NEVER copy its Kubernetes-first architecture or integrated RBAC."
+description: "ardanlabs/service at commit 75942ce (2026-06-22) — Go service starter using business/app/foundation layering. EXTRACT-ONLY: borrow layer and observability shapes; never clone its Kubernetes/RBAC/deployment assumptions."
 category: reference-project
 tags: [service, ddd, observability, extract-only, kubernetes]
-last-verified: 2026-08-02
+last-verified: 2026-08-05
 ---
 
 # ardanlabs-service (extract-only)
 
-> **extract-only: true** — the kit is NOT a starter. Extract patterns; never clone
-> the tree or adopt its imposed architecture.
+> **extract-only: true** — this is a starter/template reference, not a Go
+> dependency or a universal architecture.
 
 ## The project
 
-`ardanlabs/service` (4.1k★, last verified commit 2026-06). It self-describes as a starter kit
-for writing services in Go on Kubernetes, using a Domain-Driven / Data-Oriented
-design.
+[`ardanlabs/service`](https://github.com/ardanlabs/service) is a maintained Go
+service starter using Domain-Driven/Data-Oriented ideas and a
+business/app/foundation separation. The documented workflow uses `gonew` to
+fork a project; it is not an importable library.
 
 ## What you MAY extract
 
-- **Layer separation**: `business/` (domain logic), `app/` (composition /
-  transport), `foundation/` (cross-cutting: logging, shutdown, web errors). This
-  three-layer split is a sound mental model for any non-trivial service.
-- **Observability wiring**: how logging/tracing/metrics are centralised in
-  `foundation/` and threaded via context, not scattered through handlers.
-- **Graceful shutdown + readiness**: the pattern of coordinating server + workers
-  - probes on a single context (compare `recipe-graceful-shutdown`).
+- `business/` for domain logic and strong domain types.
+- `app/` for composition and transport edges.
+- `foundation/` for cross-cutting logging, shutdown, web errors, and
+  observability wiring.
+- Conversion boundaries between API primitives, business types, and database
+  models.
+- Coordinated server/worker shutdown and readiness concepts when the consumer
+  actually has those processes.
 
 ## What you must NEVER copy
 
-- **The Kubernetes-first assumption** — readiness/liveness probes, RBAC, and
-  cluster-oriented defaults are NOT universal. A CLI tool or a desktop app does
-  not have them.
-- **Integrated RBAC / cluster auth** — imposes a security model on consumers who
-  may use a completely different one.
-- **The full tree / build pipeline** — it is a starter; cloning it turns the kit
-  into exactly the starter-kit the Prime Directive forbids.
+- Kubernetes-first readiness, RBAC, cluster authentication, or deployment
+  assumptions into a CLI, desktop app, or small service.
+- The full tree, vendor/build pipeline, or course-specific conventions without
+  evaluating the consumer's actual requirements.
+- Its architecture as a universal Go standard; it is one maintained reference
+  shape.
 
 ## How an agent should use this
 
-Read it to internalise the layer split and observability threading, then express
-those as the kit's own patterns in `rules/` (when the universal rules are authored), instantiated
-MINIMALLY for the consumer's actual project type. Do not reproduce the K8s shape.
+Read the relevant layer or conversion example, compare it with the consumer's
+service shape, and re-express only the justified boundary using the kit's own
+rules/recipes. Prefer the smallest number of layers that preserves the required
+behavior. Do not clone the repository wholesale.
 
 ## Verification
 
-- 4.1k★ (≥500 floor ✓), last verified commit 2026-06 (<12mo ✓), not archived.
-- Open issues: 1 — no recurring-issue mass to log as a Gotcha.
+- Latest verified commit: `75942ce8de8c8ba012e55507fb9c4f0c5912086f`, pushed
+  2026-06-22.
+- Starter/template workflow and project structure verified in the official
+  README/wiki; Apache-2.0; not an imported library.
+- Treat Go/toolchain and deployment choices as versioned source facts, not as
+  universal kit defaults.
+
+## Sources vérifiées
+
+- [Official ardanlabs/service repository](https://github.com/ardanlabs/service) —
+  project identity and README, checked 2026-08-05.
+- [Repository activity](https://github.com/ardanlabs/service/activity) —
+  verified commit/activity, checked 2026-08-05.
+- [Package metadata](https://pkg.go.dev/github.com/ardanlabs/service) — module,
+  license, and Go metadata, checked 2026-08-05.
+- [Project structure wiki](https://github.com/ardanlabs/service/wiki/Project-Structure)
+  — layer responsibilities, checked 2026-08-05.

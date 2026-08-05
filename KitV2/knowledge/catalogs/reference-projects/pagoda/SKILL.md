@@ -1,47 +1,64 @@
 ---
 name: pagoda
-description: "mikestefanello/pagoda — full-stack SSR web starter (Echo+Ent+HTMX, ~2.9k★). EXTRACT-ONLY: extract the SSR service structure (routes/services/templates); NEVER copy the imposed stack (Ent/Echo/Tailwind)."
+description: "mikestefanello/pagoda v0.27.0 — Go full-stack SSR starter using Echo, Ent, Gomponents, HTMX, and SQLite. EXTRACT-ONLY: borrow routes/services/templates layering; never copy its stack, admin panel, or deployment assumptions."
 category: reference-project
 tags: [ssr, web, starter, extract-only, echo, ent]
-last-verified: 2026-08-02
+last-verified: 2026-08-05
 ---
 
 # pagoda (extract-only)
 
-> **extract-only: true** — extract the structure, not the stack.
+> **extract-only: true** — Pagoda is a template/starter, not a library or the
+> default architecture for every Go web project.
 
 ## The project
 
-`mikestefanello/pagoda` (2.9k★, pushed 2026-07, CI functional). Self-described as
-a "starter kit and admin panel" full-stack web app built on Echo + Ent + HTMX +
-Tailwind.
+[`mikestefanello/pagoda`](https://github.com/mikestefanello/pagoda) v0.27.0 is a
+full-stack SSR starter with Echo, Ent, Gomponents, HTMX/Alpine/DaisyUI, and
+SQLite defaults. It includes a service container and a beta admin panel. The
+repository is consumed by cloning/forking, not importing as a reusable kit
+module.
 
 ## What you MAY extract
 
-- **SSR service structure**: the separation of routes → services → templates, and
-  how a request flows from router through a service to a rendered page. This shape
-  is stack-agnostic and transfers to any SSR app (chi, net/http, …).
-- **Page/component composition**: how page-level layout and partials are organised
-  under a templates layer.
-- **Session/auth wiring** as a concept (where it lives in the layering) — not the
-  specific implementation.
+- The routes → services → templates request shape.
+- Page/layout/partial composition and a service-container composition boundary.
+- The conceptual placement of session/auth wiring, after choosing an
+  independently vetted implementation.
+- Task/admin concerns only when the consumer actually needs them and accepts
+  their beta/product scope.
 
 ## What you must NEVER copy
 
-- **The imposed stack**: Ent (ORM), Echo (router), HTMX, Tailwind. These must be
-  evaluated and chosen INDEPENDENTLY — Echo is not in this kit's admitted set, and
-  the kit's REST default is chi (see `recipe-rest-chi`).
-- **The admin-panel surface** — it is product scope, not a universal pattern.
-- **The full scaffold** — again, the kit is not a starter.
+- Echo, Ent, HTMX, Alpine, DaisyUI, or SQLite as an imposed stack.
+- The admin-panel surface or its beta assumptions as a universal feature.
+- The full scaffold, generated Ent code, or deployment defaults.
+- A library choice from Pagoda without evaluating that component independently
+  against the kit's admission rules.
 
 ## How an agent should use this
 
-Borrow the *layering idea* (routes/services/templates) and re-express it over the
-consumer's chosen stack. If the consumer genuinely wants Ent or Echo, vet EACH
-component against the admission criteria as its own library sheet — do not pull
-the whole stack on pagoda's authority.
+Read it for one SSR layering question, then re-express the shape with the
+consumer's approved router, templates, database, and auth choices. Prefer the
+kit's own recipes for implementation and validation. Do not clone the complete
+project when only one structural idea is required.
 
 ## Verification
 
-- 2.9k★ (≥500 floor ✓), pushed 2026-07 (<12mo ✓), not archived.
-- Open issues: 2 — no recurring-issue mass to log.
+- Current tagged release verified: v0.27.0, published 2025-08-04.
+- Recent release history includes v0.26.0 and v0.25.0; current activity must be
+  rechecked before relying on it as a maintained base.
+- MIT template; Go 1.24-era metadata; admin panel explicitly beta.
+
+## Sources vérifiées
+
+- [Official Pagoda repository](https://github.com/mikestefanello/pagoda) — stack,
+  template identity, and architecture, checked 2026-08-05.
+- [Pagoda releases](https://github.com/mikestefanello/pagoda/releases) — current
+  v0.27.0 and release history, checked 2026-08-05.
+- [Pagoda issues](https://github.com/mikestefanello/pagoda/issues) — current
+  maintenance/limits, checked 2026-08-05.
+- [Pagoda package metadata](https://pkg.go.dev/github.com/mikestefanello/pagoda)
+  — module/Go metadata, checked 2026-08-05.
+- [Pagoda README](https://github.com/mikestefanello/pagoda/blob/main/README.md)
+  — template workflow and service stack, checked 2026-08-05.
