@@ -41,6 +41,11 @@ déclarative : elle devient vérifiable.
 
 - `last_verified` > 12 mois → warning ; > 18 mois → erreur (statut déprécié
   proposé) pour tout artefact daté (SKILL.md, YAML-graphe, SNIPPET.yaml).
+- Catalogue strict opt-in : `KITV2_STRICT_CATALOG=1 python3
+  tools/validators/validate-kitv2.py` vérifie les catalogues : section
+  `Sources vérifiées` datée, âge (90 jours pour libraries, 180 jours pour
+  reference-projects), retours suspects dans les blocs Go et paragraphes
+  exactement dupliqués. La duplication sémantique reste une revue humaine.
 
 ### Qualité des descriptions (nouveau)
 

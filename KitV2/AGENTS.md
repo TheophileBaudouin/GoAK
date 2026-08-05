@@ -26,6 +26,7 @@ From `KitV2/` run:
 
 ```sh
 python3 tools/validators/validate-kitv2.py
+KITV2_STRICT_CATALOG=1 python3 tools/validators/validate-kitv2.py  # required for catalog changes
 go test ./...
 test -z "$(gofmt -l .)"
 go vet ./...

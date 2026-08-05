@@ -1,6 +1,6 @@
 ---
 name: go-git
-description: "github.com/go-git/go-git/v5 v5.19.1 — pure-Go Git implementation with repository, plumbing, and porcelain APIs. Use when embedding Git operations without a git binary; not for concurrent access to one repository or v6-alpha API adoption."
+description: "github.com/go-git/go-git/v5 v5.19.2 — pure-Go Git implementation with repository, plumbing, and porcelain APIs. Use when embedding Git operations without a git binary; not for concurrent access to one repository or v6-alpha API adoption."
 category: library
 tags: [git, vcs, repository, pure-go, automation]
 last-verified: 2026-08-05
@@ -10,15 +10,15 @@ last-verified: 2026-08-05
 
 ## Selection
 
-[`github.com/go-git/go-git/v5`](https://github.com/go-git/go-git) v5.19.1,
-released 2026-05-18, provides Git plumbing and common repository operations in
+[`github.com/go-git/go-git/v5`](https://github.com/go-git/go-git) v5.19.2,
+released 2026-07-29, provides Git plumbing and common repository operations in
 pure Go. It is admitted for an embeddable Git boundary with active maintenance,
 tests, documentation, and real use, not for popularity. The v6 line remains an
 alpha migration target and is not the stable recommendation here.
 
 ## Admission checklist
 
-- [x] Current stable v5.19.1; v6 is explicitly pre-release.
+- [x] Current stable v5.19.2; v6 is explicitly pre-release.
 - [x] Single responsibility: Git repository and transport operations.
 - [x] Pure Go, no git binary required for the supported API.
 - [x] Tests, CI, documentation, examples, and regular upstream releases exist.
@@ -85,7 +85,7 @@ concurrency ownership at the application boundary.
   produce inconsistent state.
 - Treat HTTP redirects and credentials as a trust boundary; do not silently
   replay credentials across origins.
-- Pin v5.19.1 for stable code; v6 alpha APIs are subject to change.
+- Pin v5.19.2 for stable code; v6 alpha APIs are subject to change.
 - Use bounded repository paths and review filesystem behavior before accepting
   untrusted repository names.
 
@@ -93,7 +93,7 @@ concurrency ownership at the application boundary.
 
 - [Official go-git repository](https://github.com/go-git/go-git) — maintenance,
   API, license, checked 2026-08-05.
-- [go-git releases](https://github.com/go-git/go-git/releases) — stable v5.19.1
+- [go-git releases](https://github.com/go-git/go-git/releases) — stable v5.19.2
   and v6 alpha status, checked 2026-08-05.
 - [go-git documentation](https://go-git.github.io/docs/) — supported operations,
   checked 2026-08-05.

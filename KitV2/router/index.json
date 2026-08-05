@@ -1172,7 +1172,7 @@
    ]
   },
   {
-   "description": "github.com/go-git/go-git/v5 v5.19.1 — pure-Go Git implementation with repository, plumbing, and porcelain APIs. Use when embedding Git operations without a git binary; not for concurrent access to one repository or v6-alpha API adoption.",
+   "description": "github.com/go-git/go-git/v5 v5.19.2 — pure-Go Git implementation with repository, plumbing, and porcelain APIs. Use when embedding Git operations without a git binary; not for concurrent access to one repository or v6-alpha API adoption.",
    "id": "go-git",
    "kind": "catalog",
    "path": "knowledge/catalogs/libraries/go-git/SKILL.md",
@@ -12301,7 +12301,7 @@
    ]
   },
   {
-   "description": "sqlc v1.24.0 — compile-time type-safe code generation from static SQL for Go, Kotlin, Python, and TypeScript. Use when SQL remains the source of truth and query shapes are static; not for dynamic WHERE/ORDER/columns or an ORM abstraction.",
+   "description": "sqlc v1.31.1 — compile-time type-safe code generation from static SQL for Go, Kotlin, Python, and TypeScript. Use when SQL remains the source of truth and query shapes are static; not for dynamic WHERE/ORDER/columns or an ORM abstraction.",
    "id": "sqlc",
    "kind": "catalog",
    "path": "knowledge/catalogs/libraries/sqlc/SKILL.md",
@@ -12315,7 +12315,7 @@
     "sqlc",
     "sqlc",
     "v1",
-    "24",
+    "31",
     "compile",
     "time",
     "type",

@@ -1,6 +1,6 @@
 ---
 name: sqlc
-description: "sqlc v1.24.0 — compile-time type-safe code generation from static SQL for Go, Kotlin, Python, and TypeScript. Use when SQL remains the source of truth and query shapes are static; not for dynamic WHERE/ORDER/columns or an ORM abstraction."
+description: "sqlc v1.31.1 — compile-time type-safe code generation from static SQL for Go, Kotlin, Python, and TypeScript. Use when SQL remains the source of truth and query shapes are static; not for dynamic WHERE/ORDER/columns or an ORM abstraction."
 category: library
 tags: [database, sql, codegen, type-safety]
 last-verified: 2026-08-05
@@ -111,7 +111,7 @@ sqlc generates **static queries only**. Decide this boundary before adopting it:
 
 - [Official sqlc repository](https://github.com/sqlc-dev/sqlc) — API,
   maintenance, license, checked 2026-08-05.
-- [sqlc v1.24.0 release](https://github.com/sqlc-dev/sqlc/releases/tag/v1.24.0)
+- [sqlc v1.31.1 release](https://github.com/sqlc-dev/sqlc/releases/tag/v1.31.1)
   — current version and plugin changes, checked 2026-08-05.
 - [sqlc package on pkg.go.dev](https://pkg.go.dev/github.com/sqlc-dev/sqlc) —
   CLI/plugin API, checked 2026-08-05.
