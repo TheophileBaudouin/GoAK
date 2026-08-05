@@ -1,5 +1,11 @@
 # Gotchas — Go Engineering Kit
 
+## Recipes prioritaires 2.3.0 (2026-08-05)
+
+- Une recipe Testcontainers ne peut pas être déclarée couverte par un mock :
+  Docker/Podman doit être explicitement autorisé, disponible et réellement
+  exécuté avant toute activation. Les probes du kit restent sans service externe.
+
 Rejected approaches and rejected libraries/reference-projects (with reasons).
 Read before any module addition — apply known lessons directly.
 

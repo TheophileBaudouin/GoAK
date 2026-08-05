@@ -16,9 +16,9 @@ context: >-
   que deux environnements (dev, prod) doivent rester synchronisés.
 solution: >-
   Migrations versionnées (fichiers numérotés, appliqués une fois, suivis dans
-  le VCS) via un outil dédié — golang-migrate (catalog du kit) ou une lib
-  équivalente : up/down explicites, application ordonnée, état tracé dans une
-  table de versions. Les migrations font partie du déploiement.
+  le VCS) via la CLI golang-migrate admise : up/down explicites, application
+  ordonnée, état tracé dans une table de versions. Les migrations font partie
+  du déploiement et ne sont pas lancées au démarrage de chaque réplique.
 benefits: >-
   État de base reproductible et auditable, rollback possible, revue des
   changements de schéma comme du code, CI qui applique les migrations avant
@@ -28,7 +28,7 @@ costs: >-
   déploiement (backward-compatible d'abord) ; l'ordre et les conflits entre
   branches se gèrent comme pour le code.
 related: >-
-  Catalog : golang-migrate (knowledge/catalogs/libraries/golang-migrate.yaml).
+  Catalog : golang-migrate (knowledge/catalogs/libraries/golang-migrate/SKILL.md).
 relationships:
   references:
     - https://github.com/golang-migrate/migrate

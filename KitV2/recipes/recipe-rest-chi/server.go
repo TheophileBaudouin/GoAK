@@ -8,14 +8,19 @@ package restchi
 
 import (
 	"encoding/json"
+	"io"
 	"log/slog"
 	"net/http"
+	"sort"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
+
+const maxRequestBodyBytes = 8 << 10
 
 // Item is the API resource.
 type Item struct {
@@ -24,9 +29,8 @@ type Item struct {
 }
 
 // Store is a tiny thread-safe in-memory backing store for the example.
-// The logger is injected (see rules/registry/logging): slog is the kit default,
-// never fmt.Println. chi's middleware.Logger below is access-level; s.log
-// carries the structured business signal.
+// Its logger is supplied at construction so applications retain ownership of
+// log configuration and redaction policy.
 type Store struct {
 	mu     sync.RWMutex
 	nextID int
@@ -34,11 +38,19 @@ type Store struct {
 	log    *slog.Logger
 }
 
-// NewStore returns an empty Store ready to serve. It wires slog.Default() as
-// the logger; a constructor taking an explicit *slog.Logger keeps the logger
-// testable in real services (see rules/registry/logging).
+// NewStore returns an empty Store ready to serve using slog.Default().
 func NewStore() *Store {
-	return &Store{nextID: 1, items: make(map[int]Item), log: slog.Default()}
+	return NewStoreWithLogger(slog.Default())
+}
+
+// NewStoreWithLogger returns an empty Store using logger. A nil logger is
+// replaced with slog.Default so request handling remains safe for callers that
+// have not configured logging yet.
+func NewStoreWithLogger(logger *slog.Logger) *Store {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &Store{nextID: 1, items: make(map[int]Item), log: logger}
 }
 
 // Router builds the chi router with a canonical base middleware stack and the
@@ -46,7 +58,9 @@ func NewStore() *Store {
 // from chi internals — callers just http.ListenAndServe(":3333", s.Router()).
 func (s *Store) Router() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID, middleware.Logger, middleware.Recoverer)
+	// Access logging belongs to the observability recipe. Do not install chi's
+	// generic logger here: request URLs and bodies can contain client data.
+	r.Use(middleware.RequestID, middleware.Recoverer)
 
 	r.Route("/items", func(r chi.Router) {
 		r.Get("/", s.listItems)   // GET    /items
@@ -60,10 +74,19 @@ func (s *Store) createItem(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Name string `json:"name"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodyBytes)
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&in); err != nil {
 		writeJSON(w, http.StatusBadRequest, errResp("invalid JSON body"))
 		return
 	}
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		writeJSON(w, http.StatusBadRequest, errResp("invalid JSON body"))
+		return
+	}
+	in.Name = strings.TrimSpace(in.Name)
 	if in.Name == "" {
 		writeJSON(w, http.StatusBadRequest, errResp("name is required"))
 		return
@@ -76,7 +99,8 @@ func (s *Store) createItem(w http.ResponseWriter, r *http.Request) {
 	s.items[id] = item
 	s.mu.Unlock()
 
-	s.log.Info("item created", "id", id, "name", in.Name)
+	// ID is server-generated. Do not log request bodies or client-supplied names.
+	s.log.Info("item created", "item_id", id)
 	writeJSON(w, http.StatusCreated, item)
 }
 
@@ -87,6 +111,7 @@ func (s *Store) listItems(w http.ResponseWriter, _ *http.Request) {
 		out = append(out, it)
 	}
 	s.mu.RUnlock()
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
 	writeJSON(w, http.StatusOK, out)
 }
 
@@ -101,7 +126,6 @@ func (s *Store) getItem(w http.ResponseWriter, r *http.Request) {
 	item, ok := s.items[id]
 	s.mu.RUnlock()
 	if !ok {
-		s.log.Warn("item not found", "id", id)
 		writeJSON(w, http.StatusNotFound, errResp("item not found"))
 		return
 	}
@@ -112,11 +136,15 @@ func (s *Store) getItem(w http.ResponseWriter, r *http.Request) {
 // ignored: per net/http contract there is no useful recovery once the headers
 // are sent.
 func writeJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(v)
 }
 
-func errResp(msg string) map[string]string {
-	return map[string]string{"error": msg}
+func errResp(msg string) errorResponse {
+	return errorResponse{Error: msg}
+}
+
+type errorResponse struct {
+	Error string `json:"error"`
 }

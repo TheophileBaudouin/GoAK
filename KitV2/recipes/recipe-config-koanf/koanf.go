@@ -4,6 +4,7 @@ package koanfconfig
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/v2"
@@ -33,5 +34,18 @@ func Load(overrides map[string]any) (Config, error) {
 	if err := k.Unmarshal("", &config); err != nil {
 		return Config{}, fmt.Errorf("unmarshal config: %w", err)
 	}
+	if err := validate(config); err != nil {
+		return Config{}, err
+	}
 	return config, nil
+}
+
+func validate(config Config) error {
+	if strings.TrimSpace(config.Host) == "" {
+		return fmt.Errorf("validate config: host must not be empty")
+	}
+	if config.Port < 1 || config.Port > 65535 {
+		return fmt.Errorf("validate config: port must be between 1 and 65535")
+	}
+	return nil
 }

@@ -56,3 +56,16 @@ func TestParse_helpIsErrHelp(t *testing.T) {
 		t.Fatalf("err = %v, want flag.ErrHelp", err)
 	}
 }
+
+func TestParse_rejectsPositionalArguments(t *testing.T) {
+	_, err := ParseTo([]string{"Ada"}, io.Discard)
+	if err == nil {
+		t.Fatal("ParseTo() error = nil, want positional-argument error")
+	}
+}
+
+func TestParse_nilWriter(t *testing.T) {
+	if _, err := ParseTo(nil, nil); err != nil {
+		t.Fatalf("ParseTo(nil, nil) error = %v", err)
+	}
+}

@@ -9,6 +9,7 @@ package cli
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"os"
 )
@@ -33,10 +34,19 @@ func Parse(args []string) (Config, error) {
 // os.Args and from global flag state.
 func ParseTo(args []string, w io.Writer) (Config, error) {
 	var c Config
+	if w == nil {
+		w = io.Discard
+	}
 	fs := flag.NewFlagSet("app", flag.ContinueOnError)
 	fs.SetOutput(w)
 	fs.StringVar(&c.Host, "host", "127.0.0.1", "listen host")
 	fs.IntVar(&c.Port, "port", 8080, "listen port")
 	fs.BoolVar(&c.Verbose, "verbose", false, "enable verbose logging")
-	return c, fs.Parse(args) // pi-lens-ignore: go-bare-error
+	if err := fs.Parse(args); err != nil {
+		return c, err
+	}
+	if fs.NArg() != 0 {
+		return c, fmt.Errorf("unexpected positional arguments: %q", fs.Args())
+	}
+	return c, nil
 }

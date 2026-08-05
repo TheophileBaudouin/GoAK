@@ -1,0 +1,5 @@
+CREATE TABLE recipe_widgets (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL CHECK (length(name) <= 200),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

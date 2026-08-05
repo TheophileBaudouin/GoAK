@@ -4,14 +4,14 @@
   "catalog": 74,
   "pattern": 39,
   "prompt": 8,
-  "recipe": 10,
+  "recipe": 15,
   "rule": 13,
   "skill": 6,
   "snippet": 3,
   "source": 40,
   "template": 3
  },
- "index_sha256": "adbb64f4d0c57534157bb21b0ab23fc33938016ce971dd4a715478b7304d6894",
+ "index_sha256": "dc5cd1fb617b734c0865ad6c31d07a2bc528d52fdaf71af632ebea4066fa5d21",
  "schema": 1,
  "stopwords": [
   "a",
@@ -84,5 +84,5 @@
   "you",
   "your"
  ],
- "version": "2.2.1"
+ "version": "2.4.0"
 }

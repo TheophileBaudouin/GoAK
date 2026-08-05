@@ -10,8 +10,18 @@ package pool
 
 import (
 	"context"
+	"errors"
 
 	"golang.org/x/sync/errgroup"
+)
+
+var (
+	// ErrInvalidLimit reports a non-positive concurrency limit.
+	ErrInvalidLimit = errors.New("worker-pool: limit must be positive")
+	// ErrNilWorker reports a missing unit-of-work function.
+	ErrNilWorker = errors.New("worker-pool: worker function must not be nil")
+	// ErrNilContext reports an invalid nil context.
+	ErrNilContext = errors.New("worker-pool: context must not be nil")
 )
 
 // Run processes items with at most limit goroutines in flight at once. The
@@ -22,11 +32,29 @@ import (
 // Note: since Go 1.22 the loop variable is fresh per iteration, so the old
 // `item := item` capture trick is no longer needed.
 func Run[T any](ctx context.Context, items []T, limit int, fn func(ctx context.Context, item T) error) error {
-	g, ctx := errgroup.WithContext(ctx)
+	if ctx == nil {
+		return ErrNilContext
+	}
+	if limit < 1 {
+		return ErrInvalidLimit
+	}
+	if fn == nil {
+		return ErrNilWorker
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	g, workerCtx := errgroup.WithContext(ctx)
 	g.SetLimit(limit)
 	for _, item := range items {
+		if workerCtx.Err() != nil {
+			break
+		}
 		g.Go(func() error {
-			return fn(ctx, item)
+			if err := workerCtx.Err(); err != nil {
+				return nil
+			}
+			return fn(workerCtx, item)
 		})
 	}
 	return g.Wait() // pi-lens-ignore: go-bare-error

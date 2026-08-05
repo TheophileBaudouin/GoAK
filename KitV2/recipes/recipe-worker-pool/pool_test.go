@@ -92,3 +92,32 @@ func TestRun_firstErrorCancels(t *testing.T) {
 		t.Fatalf("expected cancellation to abort work, but %d/99 completed", completed)
 	}
 }
+
+func TestRunRejectsInvalidInputs(t *testing.T) {
+	if err := Run(context.Background(), []int{1}, 0, func(context.Context, int) error { return nil }); !errors.Is(err, ErrInvalidLimit) {
+		t.Fatalf("Run(limit 0) error = %v, want ErrInvalidLimit", err)
+	}
+	if err := Run[int](context.Background(), []int{1}, 1, nil); !errors.Is(err, ErrNilWorker) {
+		t.Fatalf("Run(nil worker) error = %v, want ErrNilWorker", err)
+	}
+	var nilCtx context.Context
+	if err := Run[int](nilCtx, []int{1}, 1, func(context.Context, int) error { return nil }); !errors.Is(err, ErrNilContext) {
+		t.Fatalf("Run(nil context) error = %v, want ErrNilContext", err)
+	}
+}
+
+func TestRunDoesNotStartWorkForCancelledContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	var calls int32
+	err := Run(ctx, []int{1, 2}, 1, func(context.Context, int) error {
+		atomic.AddInt32(&calls, 1)
+		return nil
+	})
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("Run() error = %v, want context.Canceled", err)
+	}
+	if calls != 0 {
+		t.Fatalf("worker calls = %d, want 0", calls)
+	}
+}

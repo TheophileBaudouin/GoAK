@@ -3,8 +3,11 @@ package restchi
 import (
 	"bytes"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+	"sync"
 	"testing"
 )
 
@@ -36,8 +39,8 @@ func TestCreateItem_success(t *testing.T) {
 	if got.ID != 1 || got.Name != "alpha" {
 		t.Fatalf("item = %+v, want {ID:1 Name:alpha}", got)
 	}
-	if ct := w.Header().Get("Content-Type"); ct != "application/json" {
-		t.Fatalf("Content-Type = %q, want application/json", ct)
+	if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+		t.Fatalf("Content-Type = %q, want JSON content type", ct)
 	}
 }
 
@@ -61,6 +64,22 @@ func TestCreateItem_validation(t *testing.T) {
 	}
 }
 
+func TestCreateItem_rejectsUnknownTrailingAndOversizedJSON(t *testing.T) {
+	for _, body := range []string{
+		`{"name":"alpha","unexpected":true}`,
+		`{"name":"alpha"} {}`,
+		`{"name":"` + strings.Repeat("x", maxRequestBodyBytes) + `"}`,
+	} {
+		s := NewStore()
+		r := httptest.NewRequest(http.MethodPost, "/items/", strings.NewReader(body))
+		w := httptest.NewRecorder()
+		s.Router().ServeHTTP(w, r)
+		if w.Code != http.StatusBadRequest {
+			t.Fatalf("body length %d: status = %d, want %d", len(body), w.Code, http.StatusBadRequest)
+		}
+	}
+}
+
 func TestListItems(t *testing.T) {
 	s := NewStore()
 	do(s, http.MethodPost, "/items", map[string]string{"name": "a"})
@@ -76,6 +95,38 @@ func TestListItems(t *testing.T) {
 	}
 	if len(got) != 2 {
 		t.Fatalf("len(items) = %d, want 2", len(got))
+	}
+	if got[0].ID != 1 || got[1].ID != 2 {
+		t.Fatalf("items = %+v, want ID order", got)
+	}
+}
+
+func TestStore_concurrentCreateAndNoClientDataInLogs(t *testing.T) {
+	var logs bytes.Buffer
+	s := NewStoreWithLogger(slog.New(slog.NewJSONHandler(&logs, nil)))
+	const requests = 20
+	var group sync.WaitGroup
+	for i := 0; i < requests; i++ {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			w := do(s, http.MethodPost, "/items", map[string]string{"name": "client-secret"})
+			if w.Code != http.StatusCreated {
+				t.Errorf("status = %d, want %d", w.Code, http.StatusCreated)
+			}
+		}()
+	}
+	group.Wait()
+	if strings.Contains(logs.String(), "client-secret") {
+		t.Fatalf("logs contain client data: %s", logs.String())
+	}
+	w := do(s, http.MethodGet, "/items", nil)
+	var items []Item
+	if err := json.NewDecoder(w.Body).Decode(&items); err != nil {
+		t.Fatalf("decode list: %v", err)
+	}
+	if len(items) != requests {
+		t.Fatalf("len(items) = %d, want %d", len(items), requests)
 	}
 }
 

@@ -1,94 +1,103 @@
 ---
 name: recipe-graceful-shutdown
-description: "Minimal testable graceful shutdown of a Go HTTP server using signal.NotifyContext + http.Server.Shutdown + a drain timeout (stdlib only). Use when building an HTTP service that must drain in-flight requests on SIGINT/SIGTERM, and to make the shutdown logic unit-testable."
+description: "Arrêt propre (graceful shutdown) testable d'un serveur HTTP en Go via signal.NotifyContext, http.Server.Shutdown et délai d'expiration (timeout). Utiliser pour tout service HTTP devant drainer les requêtes sur SIGINT/SIGTERM."
 category: recipe
 tags: [shutdown, http, signal, context, stdlib]
 last-verified: 2026-08-05
 ---
 
-# recipe-graceful-shutdown — Graceful HTTP server shutdown
+# recipe-graceful-shutdown — Arrêt propre de serveur HTTP (Graceful Shutdown)
 
-## Problem
+## Objectif et cas d'utilisation
 
-Stop an HTTP server cleanly on a termination signal: stop accepting new
-connections, let in-flight requests finish, enforce a hard deadline — and keep
-the logic **unit-testable**.
+Arrêter un serveur HTTP Go de manière propre lors de la réception d'un signal système (SIGINT, SIGTERM) : refuser les nouvelles connexions, laisser les requêtes en cours s'exécuter jusqu'à leur terme dans la limite d'un délai d'expiration (timeout), tout en gardant l'orchestration totalement testable au niveau unitaire.
 
-## Solution
+Utiliser cette recette pour tous les services Web exposés en production afin d'éviter la coupure abrupte des connexions clients lors de redéploiements ou d'arrêts de pods (ex. Kubernetes).
 
-Standard library only. `signal.NotifyContext` (Go 1.16+) derives a context that
-is cancelled on SIGINT/SIGTERM; `http.Server.Shutdown(ctx)` drains in-flight
-requests until they finish or the context expires. The testability trick:
-**keep the signal wiring separate from the shutdown orchestration** — `Run`
-takes a `context.Context`, so tests cancel it manually instead of sending OS
-signals.
+## Prérequis et architecture
+
+- Go 1.25+ (stdlib uniquement : `net/http`, `os/signal`, `context`)
+- Architecture testable :
+  - Séparer la capture des signaux OS (qui appartient au `main`) de l'orchestrateur d'arrêt `shutdown.Run(...)`.
+  - `Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error`
+  - `Run` écoute l'annulation du contexte transmis. En cas d'annulation, il déclenche `srv.Shutdown(shutdownCtx)` avec un nouveau contexte à délai d'expiration (`timeout`).
+  - L'erreur `http.ErrServerClosed` renvoyée par `Serve` lors d'un arrêt normal est absorbée et ne fait pas échouer `Run`.
+
+## Composants et choix
+
+- `signal.NotifyContext` (Go 1.16+) — API stdlib propre créant un contexte annulé lors de la réception d'un signal OS.
+- `http.Server.Shutdown` — méthode stdlib drainant les connexions HTTP.
+
+## Alternatives rejetées
+
+- Capturer les signaux directement dans l'orchestrateur : empêche de tester l'arrêt en mode unitaire sans envoyer de véritables signaux OS au processus de test.
+- `signal.Notify(chan os.Signal)` pré-1.16 : verbeux, réinvente la gestion du contexte.
+- Paquets tiers (`appleboy/graceful`, etc.) : sur-ingénierie apportant des dépendances inutiles pour une fonctionnalité native de la stdlib.
+
+## Exemple complet
 
 ```go
-// shutdown.Run — the orchestrator (this package)
-func Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error
+package shutdown
 
-// main — the wiring (your application)
-ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-defer stop()
-if err := shutdown.Run(ctx, srv, ln, 5*time.Second); err != nil {
-    log.Fatal(err)
+import (
+	"context"
+	"errors"
+	"net"
+	"net/http"
+	"time"
+)
+
+func Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error {
+	serveErr := make(chan error, 1)
+	go func() {
+		err := srv.Serve(ln)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serveErr <- err
+			return
+		}
+		serveErr <- nil
+	}()
+
+	select {
+	case err := <-serveErr:
+		return err
+	case <-ctx.Done():
+	}
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	return srv.Shutdown(shutdownCtx)
 }
 ```
 
-`http.Server.Serve` returns `http.ErrServerClosed` during a graceful shutdown;
-`Run` absorbs that sentinel and returns `nil` on a clean drain, the serve error
-if the server failed to start, or the Shutdown error if the drain exceeded the
-timeout.
+```go
+// Dans main.go :
+ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+defer stop()
+if err := shutdown.Run(ctx, srv, ln, 5*time.Second); err != nil {
+	log.Fatal(err)
+}
+```
 
-See [`shutdown.go`](shutdown.go) for the runnable, tested example.
+## Bonnes pratiques et pièges
 
-## Why this shape (and not the common inline version)
+- Assurer que le délai `timeout` est inférieur au délai de grâce de l'orchestrateur (ex. `terminationGracePeriodSeconds` dans Kubernetes).
+- Les handlers HTTP de longue durée doivent écouter `r.Context().Done()` pour s'interrompre si le timeout d'arrêt est dépassé.
 
-The Go standard-library example (`net/http/example_test.go`,
-`ExampleServer_Shutdown`) puts `signal.Notify` and `srv.Shutdown` in the same
-goroutine — fine for a demo, but the signal call is impossible to unit-test (you
-cannot send a real SIGINT deterministically inside a test). By taking a
-`context.Context`, `Run` is pure orchestration: tests cancel the context and
-assert the drain behaves. `signal.NotifyContext` belongs at the edge, in `main`,
-exactly where the OS signal is a real input.
+## Limites et extensions
 
-## The canonical pieces
+Pour éteindre simultanément d'autres composants (workers en arrière-plan, pools de connexions DB), combiner cette logique avec `golang.org/x/sync/errgroup`.
 
-| Piece | API | Role |
-|---|---|---|
-| Signal → context | `signal.NotifyContext(parent, os.Interrupt, syscall.SIGTERM)` | ctx is cancelled on signal |
-| Drain | `http.Server.Shutdown(ctx)` | stops new conns; waits for in-flight (or ctx expiry) |
-| Deadline | `context.WithTimeout(shutdownCtx, 5*time.Second)` | hard cap on drain time |
-| Expected sentinel | `http.ErrServerClosed` from `Serve`/`ListenAndServe` | normal graceful-exit signal |
-
-## Why not the alternatives
-
-| Alternative | Verdict |
-|---|---|
-| `signal.Notify(chan os.Signal)` + `select` | The pre-1.16 pattern. Verbose; reinvents `NotifyContext`. Use `NotifyContext`. |
-| `errgroup.WithContext` for multi-component shutdown | Good ADD-ON when you must also stop workers/DB together — but it is orchestration sugar on top of this pattern, not a replacement. |
-| `appleboy/graceful`, `enrichman/httpgrace`, etc. | Wrap `http.Server` with signal handling the stdlib already provides. Reinvents `NotifyContext` + `Shutdown`; adds a dependency for nothing. |
-| `http.Server.RegisterOnShutdown` callbacks | Useful for cleanup hooks (close a logger), orthogonal to the drain itself. |
-
-## Notes
-
-- Match `timeout` to your orchestrator's grace period (e.g. Kubernetes
-  `terminationGracePeriodSeconds` — set it a bit below that so Shutdown returns
-  before the kubelet hard-kills the pod).
-- `Shutdown` does NOT cancel long-running handlers for you — your handlers must
-  honour `r.Context()` and abort when it is cancelled. Wire that into handlers
-  that do slow work.
-
-## Verify the behavior (observable)
-
-Run the finished HTTP service, start a request that intentionally sleeps, then
-send `SIGTERM`. Observe that the request completes within the drain timeout and
-the process exits cleanly. Send `SIGTERM` with a handler that exceeds the
- timeout and observe a timeout error and process exit. Use the service's actual
-logs/output; tests alone do not prove signal wiring.
-
-## Run the tests
+## Scénario observable et vérification
 
 ```sh
 go test ./recipes/recipe-graceful-shutdown/...
+go run ./probes/graceful-shutdown
 ```
+
+La probe instancie un serveur HTTP, déclenche l'arrêt via l'annulation du contexte, vérifie l'absorption de `http.ErrServerClosed` et la fermeture propre, puis affiche `graceful-shutdown: PASS`.
+
+## Sources primaires
+
+- [net/http Server.Shutdown](https://pkg.go.dev/net/http#Server.Shutdown) — documentation stdlib.
+- [os/signal NotifyContext](https://pkg.go.dev/os/signal#NotifyContext) — documentation stdlib.

@@ -6,12 +6,16 @@ package cobracli
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 // NewCommand builds a small multi-command CLI with an explicit output writer.
 func NewCommand(out io.Writer) *cobra.Command {
+	if out == nil {
+		out = io.Discard
+	}
 	var name string
 	root := &cobra.Command{
 		Use:           "app",
@@ -22,12 +26,12 @@ func NewCommand(out io.Writer) *cobra.Command {
 	greet := &cobra.Command{
 		Use:   "greet",
 		Short: "Greet a name",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if name == "" {
+			if strings.TrimSpace(name) == "" {
 				return fmt.Errorf("name must not be empty")
 			}
-			_, err := fmt.Fprintf(out, "hello %s\n", args[0])
+			_, err := fmt.Fprintf(out, "hello %s\n", name)
 			return err
 		},
 	}

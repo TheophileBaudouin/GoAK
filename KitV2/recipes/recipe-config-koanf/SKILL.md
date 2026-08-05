@@ -1,51 +1,115 @@
 ---
 name: recipe-config-koanf
-description: "Explicit layered configuration with Koanf v2 providers and parsers. Use when an application combines defaults with file, environment, or flag sources and needs an explicit merge order."
+description: "Configuration en cascade explicite et typée avec Koanf v2, fusion de sources (valeurs par défaut, carte, environnement, fichier, drapeaux) et validation stricte. Utiliser pour tout service Go combinant plusieurs sources de configuration."
 category: recipe
-tags: [config, koanf, env, files, flags]
-last-verified: 2026-08-03
+tags: [config, koanf, cascade, env, flags, yaml]
+last-verified: 2026-08-05
 ---
 
-# recipe-config-koanf — explicit configuration cascade
+# recipe-config-koanf — Cascade de configuration explicite avec Koanf v2
 
-## Selection
+## Objectif et cas d'utilisation
 
-Use `github.com/knadh/koanf/v2` when configuration comes from multiple
-sources and the application should choose providers, parsers, and precedence
-explicitly. Koanf v2 keeps providers and parsers in separate modules; import
-only the modules the application needs.
+Charger et fusionner la configuration d'une application Go depuis plusieurs sources selon un ordre de précédence explicite (par exemple : valeurs par défaut < fichier de configuration < variables d'environnement < drapeaux CLI) et un-marchaler le résultat dans une structure typée et validée.
 
-For one value or a flat flag set, use the standard library instead. The
-canonical decision record is the `koanf` library catalog.
+Utiliser Koanf pour les nouvelles applications nécessitant une architecture modulaire et un contrôle total sur l'ordre de fusion des providers.
 
-## Canonical shape
+## Prérequis et architecture
 
-Load defaults first, then later sources override them. Keep the `*koanf.Koanf`
-instance local to the loading operation or protect it when reloading while
-other goroutines read it. Use `StrictMerge` when incompatible value types must
-fail instead of being replaced.
+- Go 1.25+
+- Dépendances :
+  - `github.com/knadh/koanf/v2 v2.3.6`
+  - `github.com/knadh/koanf/providers/confmap v1.0.0`
+- Architecture :
+  - Instancier `koanf.New(".")` localement dans une fonction `Load(overrides map[string]any) (Config, error)`.
+  - Éviter toute instance globale mutable.
+  - Charger d'abord les valeurs par défaut via `confmap.Provider`.
+  - Charger séquentiellement les surcharges (fichiers, env, map) ; chaque `Load` successif écrase les clés précédentes.
+  - Décoder via `k.Unmarshal("", &config)` puis exécuter une étape de validation métier explicite.
 
-The runnable example uses the official `confmap` provider and typed
-`Unmarshal`. File, environment, and flag providers are added by a consuming
-application as required.
+## Composants et choix
 
-## Limits
+- `github.com/knadh/koanf/v2` — bibliothèque moderne, légère et modulaire (~15x plus légère que Viper sans dépendances inutiles).
+- `confmap.Provider` — provider d'objets en mémoire idéal pour injecter des valeurs par défaut et des surcharges de test.
 
-- Koanf does not impose a source order; the recipe must define one.
-- Provider and parser modules add their own dependencies.
-- A provider watcher is not safe to combine with concurrent reads without
-  synchronization.
-- Do not switch an existing project from Viper to Koanf without a migration
-  decision; this recipe is for new configuration boundaries.
+## Alternatives rejetées
 
-## Verification
+- Standard library `os.Getenv` / `flag` seuls : suffisant pour 1 ou 2 variables, mais devient rapidement verbeux et sujet aux erreurs pour les cascades complexes.
+- `spf13/viper` : populaire mais monolithique, utilise des singletons globaux par défaut et convertit les clés en minuscules de manière irréversible.
+- `kelseyhightower/envconfig` : limité uniquement aux variables d'environnement ; ne permet pas la fusion multi-sources.
+
+## Exemple complet
+
+```go
+package koanfconfig
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/knadh/koanf/providers/confmap"
+	"github.com/knadh/koanf/v2"
+)
+
+type Config struct {
+	Host string `koanf:"host"`
+	Port int    `koanf:"port"`
+}
+
+func Load(overrides map[string]any) (Config, error) {
+	k := koanf.New(".")
+	if err := k.Load(confmap.Provider(map[string]any{
+		"host": "127.0.0.1",
+		"port": 8080,
+	}, "."), nil); err != nil {
+		return Config{}, fmt.Errorf("load defaults: %w", err)
+	}
+	if len(overrides) > 0 {
+		if err := k.Load(confmap.Provider(overrides, "."), nil); err != nil {
+			return Config{}, fmt.Errorf("load overrides: %w", err)
+		}
+	}
+	var config Config
+	if err := k.Unmarshal("", &config); err != nil {
+		return Config{}, fmt.Errorf("unmarshal config: %w", err)
+	}
+	if err := validate(config); err != nil {
+		return Config{}, err
+	}
+	return config, nil
+}
+
+func validate(config Config) error {
+	if strings.TrimSpace(config.Host) == "" {
+		return fmt.Errorf("validate config: host must not be empty")
+	}
+	if config.Port < 1 || config.Port > 65535 {
+		return fmt.Errorf("validate config: port must be between 1 and 65535")
+	}
+	return nil
+}
+```
+
+## Bonnes pratiques et pièges
+
+- Toujours valider la structure `Config` après le `Unmarshal` pour détecter les valeurs hors limites ou manquantes.
+- En cas de rechargement dynamique en cours d'exécution, protéger l'instance `*koanf.Koanf` avec un `sync.RWMutex`.
+- Ne pas conserver de secrets en clair dans les fichiers de configuration sous contrôle de version.
+
+## Limites et extensions
+
+Koanf ne définit pas d'ordre de cascade par défaut : le développeur doit orchestrer l'ordre des appels `k.Load(...)`. Les parsers (YAML, JSON, TOML) doivent être importés séparément.
+
+## Scénario observable et vérification
 
 ```sh
 go test ./recipes/recipe-config-koanf/...
+go run ./probes/config-koanf
 ```
 
-## Sources
+La probe charge la configuration avec surcharges, vérifie l'application des valeurs par défaut et des surcharges, puis affiche `config-koanf: PASS`.
 
-- <https://github.com/knadh/koanf>
-- <https://pkg.go.dev/github.com/knadh/koanf/v2>
-- <https://pkg.go.dev/github.com/knadh/koanf/providers/confmap>
+## Sources primaires
+
+- [knadh/koanf](https://github.com/knadh/koanf) — dépôt et documentation officielle de Koanf.
+- [pkg.go.dev/github.com/knadh/koanf/v2](https://pkg.go.dev/github.com/knadh/koanf/v2) — référence API v2.

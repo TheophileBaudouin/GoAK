@@ -1,6 +1,6 @@
 ---
 name: go-agent-kit-v2
-version: 2.2.1
+version: 2.4.0
 status: standalone
 capabilities:
   rules:
@@ -28,17 +28,18 @@ capabilities:
     source: router/
     status: generated-read-only-index-and-native-pi-tool
 coverage:
-  product_skills: 65
+  product_skills: 71
   rules: 13
-  recipes: 10
-  knowledge_catalogs: 42
-  probes: 5
+  recipes: 15
+  knowledge_catalogs: 43
+  probes: 15
   project_templates: 3
 metadata_role: product capability catalog, not an instruction entrypoint
 known_limits:
   - Pi discovery was smoke-tested from a trusted temporary consumer copy;
     individual skill invocation remains separate.
-  - Wails and interactive TUI host behavior remain outside the four probes.
+  - Wails and interactive TUI probes verify service/model boundaries; full GUI
+    webview and TTY host rendering remain external system tests.
   - Effective Go is pinned in the shipped bundle; pkg.go.dev and toolchain
     units resolve from the local pinned Go toolchain.
   - resource-routing: consumers never rebuild the router index; it is

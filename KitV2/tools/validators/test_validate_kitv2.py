@@ -66,7 +66,7 @@ class ValidatorTests(unittest.TestCase):
         content = original.read_text(encoding="utf-8")
         try:
             original.write_text(
-                content.replace("product_skills: 65", "product_skills: 64"),
+                content.replace("product_skills: 71", "product_skills: 70"),
                 encoding="utf-8",
             )
             errors = module.check_coverage()

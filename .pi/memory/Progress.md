@@ -16,6 +16,18 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## KitV2 recipes (Pi skills: SKILL.md + code)
 
+- [~] Reconstruction 2.4.0 des dix recipes historiques — contrats publics à
+      préserver, probes dédiées, génération sqlc réelle et sources fraîches ;
+      worktree 2.3.0 conservé sans reset.
+
+- [x] `recipe-auth-session-scs`, `recipe-auth-jwt`,
+      `recipe-observability-slog-expvar`, `recipe-openapi-validation` — lot
+      2.3.0 livré avec tests, probes et gate complète PASS.
+- [!] `recipe-postgres-pgx` — code, migrations et test réel tagué livrés ;
+      scénario PostgreSQL observé BLOCKED tant qu'une `DATABASE_URL` jetable
+      autorisée n'est pas fournie. Revue fresh-context également BLOCKED par la
+      limite de service du réviseur, sans validation fictive.
+
 - [x] `recipe-cli-minimal` — testable stdlib flag (NewFlagSet + ContinueOnError + explicit args); boundary vs cobra documented. Suite green.
 - [x] `recipe-rest-chi` — chi v5 REST API (skill + test, suite green)
 - [x] `recipe-sqlite-sqlc` — sqlc + modernc.org/sqlite (skill + test, suite green)

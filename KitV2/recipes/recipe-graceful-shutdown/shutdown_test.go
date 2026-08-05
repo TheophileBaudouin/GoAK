@@ -82,3 +82,50 @@ func TestRun_serveError(t *testing.T) {
 		t.Fatal("expected a serve error for a closed listener, got nil")
 	}
 }
+
+// TestRun_shutdownTimeout verifies that if in-flight requests exceed the drain
+// timeout, Run surfaces context.DeadlineExceeded error from Shutdown.
+func TestRun_shutdownTimeout(t *testing.T) {
+	block := make(chan struct{})
+	srv := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		<-block // never releases during the short timeout
+	})}
+
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("net.Listen: %v", err)
+	}
+	addr := "http://" + ln.Addr().String()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(func() {
+		cancel()
+		close(block)
+	})
+
+	runDone := make(chan error, 1)
+	go func() { runDone <- Run(ctx, srv, ln, 50*time.Millisecond) }()
+
+	// Send a request to block the handler
+	go func() {
+		resp, _ := http.Get(addr)
+		if resp != nil {
+			_ = resp.Body.Close()
+		}
+	}()
+
+	// Give request time to hit handler
+	time.Sleep(20 * time.Millisecond)
+
+	// Trigger shutdown
+	cancel()
+
+	select {
+	case err := <-runDone:
+		if err == nil {
+			t.Fatal("expected timeout error, got nil")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Run timed out without returning error")
+	}
+}

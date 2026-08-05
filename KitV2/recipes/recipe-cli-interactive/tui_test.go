@@ -109,3 +109,17 @@ func TestRender_containsChoicesCursorAndFooter(t *testing.T) {
 		t.Error("selected item not rendered with [x]")
 	}
 }
+
+func TestNewModel(t *testing.T) {
+	tm := NewModel()
+	if tm == nil {
+		t.Fatal("NewModel() returned nil")
+	}
+	if tm.Init() != nil {
+		t.Fatal("Init() should return nil")
+	}
+	v := tm.View()
+	if v.Content == "" {
+		t.Fatal("View() returned empty content")
+	}
+}

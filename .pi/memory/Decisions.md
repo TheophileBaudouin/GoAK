@@ -163,6 +163,47 @@ Rules in `KitV2/rules/` and `KitV2/knowledge/` are added only when a real source
 
 ## Charter compliance
 
+## Recipes prioritaires KitV2 (2026-08-05)
+
+- Le lot 2.3.0 comporte exactement cinq recipes : sessions navigateur `scs`,
+  JWT Bearer HS256, PostgreSQL `pgx` avec migrations externes, observabilité
+  `slog`/`expvar`, et validation OpenAPI de requête et de réponse. Il privilégie
+  deux frontières d'authentification explicites plutôt qu'une abstraction
+  commune ou un framework.
+- Les versions autorisées sont `scs/v2 v2.9.0`, `golang-jwt/jwt/v5 v5.3.1`,
+  `pgx/v5 v5.10.0` et `kin-openapi v0.146.0`. `golang-migrate/migrate/v4
+  v4.19.1` est admis comme CLI de déploiement après sa fiche dédiée, pas comme
+  dépendance runtime ni mécanisme de migration au démarrage.
+- Les métriques restent atomiques et exposées par `expvar` sur un listener
+  d'administration privé. Aucun logger ne passe par `context.Context`, et
+  OpenTelemetry/Prometheus ne sont pas ajoutés.
+- La validation OpenAPI utilise un adaptateur explicite afin de borner et
+  valider les réponses ; une fonction d'authentification non nulle est exigée.
+  Aucun fail-open ni `NoopAuthenticationFunc` n'est admis.
+- Testcontainers est différé : Docker/Podman est à la fois non autorisé et
+  indisponible dans cet environnement. Son admission future exige une
+  autorisation explicite, un runtime approuvé et l'exécution réelle du scénario
+  avant activation ; aucun substitut simulé ne peut le déclarer couvert.
+- Le compteur `product_skills` 2.3.0 est `71`, non `70` : le validateur dérive
+  `13 rules + 15 recipes + 43 catalogues`. La gouvernance C1/C2 (compteurs
+  dérivés et validés) prévaut sur le total incohérent de la demande.
+
+## Reconstruction recipes historiques 2.4.0 (2026-08-05)
+
+- Les dix recipes historiques sont reconstruites sans rupture de leurs chemins
+  ni API Go publiques. Les ajouts de façades restent non cassants ; la TUI peut
+  exposer `NewModel` car aucun symbole public précédent n'est retiré.
+- Chaque recipe cœur possède sa probe locale dédiée. La probe combinée
+  `worker-shutdown` est remplacée par `worker-pool` et `graceful-shutdown` :
+  une réussite ne doit plus masquer l'échec d'une frontière distincte.
+- Les seuls changements de dépendances autorisés sont l'alignement de versions
+  déjà admises (`koanf v2.3.6`, `modernc.org/sqlite v1.56.0`) après recherche
+  primaire et gate complète. `sqlc v1.31.1` est utilisé comme CLI ponctuelle,
+  sans ajout au module runtime.
+- Wails v3 reste une intégration alpha documentée et non compilée. Le package
+  Go de service, sans import runtime Wails, est le périmètre testable du kit ;
+  GUI, CGO et build Wails réel restent hors périmètre.
+
 - 2026-08-02 — The initial correction wave established deterministic probes, raw evidence, and instruction validation. Its historical v1 paths are preserved only in the external archive/evidence record; active KitV2 tooling uses the standalone product paths.
 - 2026-08-02 — `KIT_CHARTER.md` is process authority. Structural approvals are recorded in this file before implementation. The current product probe runner is `KitV2/probes/run.sh`; Pi discovery remains a separate runtime check.
 

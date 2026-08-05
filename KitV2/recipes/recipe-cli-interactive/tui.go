@@ -23,12 +23,17 @@ type model struct {
 	selected map[int]struct{}
 }
 
-// initialModel is the entry point a real program passes to tea.NewProgram.
+// initialModel is the internal constructor for default state.
 func initialModel() model {
 	return model{
 		choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
 		selected: make(map[int]struct{}),
 	}
+}
+
+// NewModel returns an initial tea.Model façade ready for use or testing without a real terminal.
+func NewModel() tea.Model {
+	return initialModel()
 }
 
 // Init satisfies tea.Model. No initial I/O, so no command.
