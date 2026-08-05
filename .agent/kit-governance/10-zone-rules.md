@@ -68,7 +68,9 @@ reste une revue (voir §9).
 - **Ajout registry** : admission = source primaire + frontière + vérification
   actionnable + absence de contradiction avec les règles existantes.
 - **Modification** : bump `version` (major si plus stricte) + `last_verified` +
-  vérification des artefacts qui référencent la règle.
+  vérification des artefacts qui référencent la règle (déclencheur de
+  re-vérification des dépendants — contrôle inter-fichiers C2,
+  D-2026-08-05-11).
 
 ## 7. Patterns
 

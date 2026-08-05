@@ -32,6 +32,14 @@ recipe-<domaine>-<sujet>/
    scénario.
 6. **Limits** — frontière d'application.
 7. **Sources** — primaires.
+8. **Structure (pourquoi cette disposition)** — obligatoire pour toute recette
+   qui produit ou recommande une disposition de projet (création d'application,
+   service, CLI, worker, desktop…) : explique en quelques lignes pourquoi
+   l'arbre choisi est le bon pour cette tâche, afin que la raison vive toujours
+   au même endroit (décision Marie 2026-08-05, D-2026-08-05-13). Les recettes
+   sans disposition en jeu le marquent `N/A` (un `N/A` explicite est du
+   contenu, pas une section artificielle — A1 §1.9). Contrôle de revue : audit
+   kit-audit C1 (conformité au contrat de zone) + critère Z3 §8.
 
 ## 4. Règles
 
@@ -55,7 +63,10 @@ recipe-<domaine>-<sujet>/
 - **Ajout** : code compilant + test + scénario exécuté avec verdict
   (`PASS`/`PARTIAL`/`BLOCKED`) + limites + sources + relations résolues.
 - **Modification** : re-run test + scénario ; re-run des probes qui importent la
-  recette ; bump `last_verified`/`version` si comportement changé.
+  recette ; bump `last_verified`/`version` si comportement changé ;
+  re-vérifier les dépendants déclarés (snippets `source:` → recette, probes
+  `validated_by` → recette) et bump leur `last_verified` dans le même
+  changement — contrôle inter-fichiers C2 (D-2026-08-05-11).
 
 ## 6. Patterns
 
@@ -78,6 +89,8 @@ recipe-<domaine>-<sujet>/
 - [ ] C2 : `go test` ciblé + scénario exécuté tracé (verdict explicite).
 - [ ] C2 : dépendances ⊆ bibliothèques vétées.
 - [ ] Fraîcheur 12/18 mois.
+- [ ] Revu (audit kit-audit C1) : section Structure §3.8 présente ou `N/A`
+      justifié (D-2026-08-05-13).
 
 ## 9. Questions ouvertes
 

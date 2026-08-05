@@ -22,7 +22,10 @@ c'est une vue focalisée de code qui vit canoniquement ailleurs.
 
 `id`, `type` (domaine), `purpose`, `tags`, `go_version`, `dependencies`,
 `when_to_use`, `avoid_when`, `source` (**chemin relatif résolu** vers la
-recette/règle/pattern canonique), `complexity`, `files`, `tests`.
+recette/règle/pattern canonique), `complexity`, `files`, `tests`,
+`last_verified` (**recommandé** depuis 2026-08-05, D-2026-08-05-11 : sert au
+contrôle inter-fichiers C2 — le snippet doit être re-vérifié quand sa source
+canonique change).
 
 ## 4. Règles
 
@@ -44,6 +47,11 @@ recette/règle/pattern canonique), `complexity`, `files`, `tests`.
   métadonnées complètes + fraîcheur.
 - **Modification** : re-run check.sh ; vérifier que la source canonique n'a pas
   changé de forme (sinon mettre à jour le snippet ou le retirer).
+- **Modification de la source canonique** : tout changement d'une
+  recette/règle/pattern référencé par un snippet `source:` déclenche la
+  re-vérification du snippet dans le même changement (bump `last_verified`,
+  mise à jour ou retrait) — contrôle inter-fichiers C2 par dates
+  (D-2026-08-05-11).
 
 ## 6. Patterns
 
@@ -59,7 +67,9 @@ recette/règle/pattern canonique), `complexity`, `files`, `tests`.
 
 ## 8. Critères de validation
 
-- [ ] C2 : SNIPPET.yaml complet (champs §3).
+- [ ] C2 : SNIPPET.yaml complet (champs §3 ; `last_verified` recommandé, non
+      exigé — le contrôle inter-fichiers ignore les dates manquantes, annexe A
+      du plan 2026-08-05-métaprojet).
 - [ ] C2 : `source` résolu ; `check.sh` compilant **et** exécutant.
 - [ ] Fraîcheur 12/18 mois.
 

@@ -436,3 +436,75 @@ l'audit sont retraités, jamais recopiés.
   le registry ; (e) probes/README.md = contrat de zone Z6 à jour. Router
   régénéré (256 ressources, meta version 2.4.1). Revue fresh-context :
   APPROVE-WITH-NITS, nits intégrés.
+
+## Durcissement gouvernance méta-projet (2026-08-05, findings Rodin)
+
+Passe méta-projet uniquement (aucune édition KitV2) fermant 5 findings de la
+critique « Rodin » — plan `docs/plans/2026-08-05-metaproject-governance-
+hardening.md`, revue fresh-context APPROVE-WITH-NITS (nits intégrés). Les
+5 décisions suivantes sont enregistrées AVANT la clôture de la passe ; les
+éditions produit correspondantes sont des actions en attente du plan (passe
+suivante).
+
+- **D-2026-08-05-11 (Chantier A, dérive inter-fichiers)** : la revue sémantique
+  inter-fichiers reste humaine (C2, bloc Fraîcheur), mais son déclenchement
+  devient mécanique — combinaison de (b) mécanisée et (a) tripwire. Règle
+  vérifiable : toute modification d'un artefact canonique (recette, règle,
+  pattern) avec dépendants déclarés exige leur re-vérification dans le même
+  changement, contrôlable par dates `last_verified(dépendant) >=
+  last_verified(canonique)` pour les chaînes déclarées (snippet `source:` →
+  SKILL.md cible ; relations YAML-graphe `references`/`uses`/`depends_on`).
+  Champ `last_verified` recommandé dans SNIPPET.yaml (Z4 §3). En complément,
+  tripwire de similarité (warning, jamais erreur) entre `example.go` et le bloc
+  Go canonique de `source:` (vue focalisée ≠ copie → faux positifs possibles,
+  d'où warning). Statu quo seul (c) écarté : n'ajoute aucun déclencheur.
+  Contrats : C2 §2, Z4 §3/§5/§8, Z3 §5, Z1 §6 ; kit-audit phase C4 + §5-E.
+  Contrôle C2 exact (entrées/sortie/faux positifs/tests) : plan, annexe A —
+  à implémenter dans validate-kitv2.py à la passe suivante (KitV2).
+- **D-2026-08-05-12 (Chantier B, roadmap snippets)** : le design est sain,
+  fermé sans travail fabriqué. Comparaison : les 7 lignes roadmap de
+  `snippets/README.md` portent chacune un critère d'admission actionnable
+  (plus précis par ligne que le statut `planned` des templates « décision +
+  ligne ») ; le patron roadmap-pas-de-dossier-fantôme est mandaté par Z4 §3
+  règle 3 + C0 §7 et déjà en usage pour templates/TEMPLATES.md. Aucune
+  faiblesse réelle à corriger ; aucun changement de contrat.
+- **D-2026-08-05-13 (Chantier C, philosophie)** : tension vérifiée à 2 niveaux
+  (AGENTS.md racine « Go does not prescribe a universal project tree » ;
+  rules/core/philosophy « prescribes no universal project layout ») vs objectif
+  personnel de navigation identique. **Réponse Marie (question posée) :
+  Option 3 — « naviguer par la raison »** : liberté de structure conservée,
+  mais toute recette qui produit/recommande une disposition de projet doit
+  l'expliquer au même endroit (section Structure), et le README de tout
+  template sourcé justifie sa structure. Appliqué (méta-projet) : Z3 §3.8 +
+  §8 (contrôle de revue audit C1), Z5 §3. KitV2 en attente : section Structure
+  dans les recettes concernées + justification dans les README des 3
+  templates. Aucune modification d'AGENTS.md racine ni de rules/core
+  nécessaire (l'Option 3 est compatible avec la doctrine sourcée). Note :
+  `docs/research/2026-08-05-philosophy-tension.md`.
+- **D-2026-08-05-14 (Chantier D, template desktop-app)** : aucun candidat Wails
+  ne satisfait la politique Z5 §2 au 2026-08-05 (Wails v3 en beta, écosystème
+  immature ; v2 stable mais aucun projet réel MIT mono-techno testé ;
+  `wailsapp/examples` = démos, exclus). On n'assouplit pas les critères.
+  Précision Z5 §2 appliquée : la source d'un template doit être une application
+  réelle à responsabilité unique, pas un starter/template tiers ni un recueil
+  de démos (leçon transférable). Ligne roadmap desktop-app = `planned` avec
+  note « aucune source conforme au 2026-08-05, ré-évaluer à la GA » (texte prêt
+  : plan, annexe D — non appliquée, KitV2). kit-audit phase B : toute capacité
+  couverte par recette + probe sans reconnaissance roadmap de template est une
+  catégorie de finding nommée. Dossier :
+  `docs/research/2026-08-05-desktop-app-template-candidates.md`.
+- **D-2026-08-05-15 (Chantier E, instructions MANDATORY)** : Pi expose une
+  vraie porte mécanique (vérifié dans `docs/extensions.md` : l'événement
+  `tool_call` peut bloquer `{ block: true }`, `pi.setActiveTools()` active/
+  désactive des outils, `before_agent_start` injecte des messages,
+  `pi.appendEntry()` persiste l'état de session). Principe étendu aux artefacts
+  consommateurs (extension assumée d'.agent/instructions.md) : toute absolue
+  doit avoir un contrôle mécanique nommé OU être consignée « guidance seule »
+  dans le registre des lacunes d'automatisation (`.agent/instructions.md`
+  §Enforcement — première ligne : kit-resource-routing, statut guidance seule).
+  Contrats : C2 §2 (bloc instructions absolues), Z8 §3.6 ; kit-audit nouvelle
+  dimension C9 + §5-E. Spec de la porte (reminder doux, dégradation sans UI,
+  hard-block optionnel, confiance medium : présence-session ≠ bonne recherche) :
+  plan, annexe B — implémentation en passe suivante (KitV2/.pi/extensions/).
+  Pas de scan validateur dur : risque de faux positifs sur des absolus
+  légitimement appliqués par revue.

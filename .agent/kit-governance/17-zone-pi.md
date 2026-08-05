@@ -38,6 +38,12 @@ de connaissance de domaine (celle-ci vit dans les modules).
 5. `category: workflow` est une valeur kit-only (hors jeu validé des modules) :
    elle ne s'applique qu'à `.pi/skills/` ; les modules gardent les catégories
    A1.
+6. **Instruction absolue = contrôle nommé** (2026-08-05, D-2026-08-05-15) :
+   toute instruction `MANDATORY`/« toujours »/« jamais » portée par une skill
+   ou un prompt doit nommer un contrôle mécanique (validateur C2 ou porte Pi)
+   ou être étiquetée « guidance seule, non appliquée » et consignée dans le
+   registre des lacunes d'automatisation (`.agent/instructions.md`
+   §Enforcement).
 
 ## 4. Maintenance
 

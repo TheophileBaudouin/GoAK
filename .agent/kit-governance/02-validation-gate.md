@@ -46,6 +46,19 @@ déclarative : elle devient vérifiable.
   `Sources vérifiées` datée, âge (90 jours pour libraries, 180 jours pour
   reference-projects), retours suspects dans les blocs Go et paragraphes
   exactement dupliqués. La duplication sémantique reste une revue humaine.
+- **Fraîcheur inter-fichiers (nouveau — décision 2026-08-05, D-2026-08-05-11)** :
+  la revue sémantique inter-fichiers reste humaine (charte §4), mais son
+  déclenchement devient mécanique : toute modification d'un artefact canonique
+  (recette, règle, pattern) avec dépendants déclarés exige que chaque dépendant
+  soit re-vérifié dans le même changement. Forme vérifiable (contrôle à
+  implémenter, contrat exact : plan 2026-08-05-métaprojet, annexe A) :
+  `last_verified(dépendant) >= last_verified(canonique)` pour les chaînes
+  déclarées — snippet `source:` → SKILL.md cible, et relations YAML-graphe
+  (`references`/`uses`/`depends_on`) vers des artefacts datés ; champ
+  `last_verified` recommandé dans les SNIPPET.yaml (Z4 §3). En complément,
+  tripwire de similarité (warning, jamais erreur) entre
+  `snippets/*/example.go` et le bloc Go canonique de `source:` — détecte la
+  dérive littérale, ne remplace pas la revue sémantique.
 
 ### Qualité des descriptions (nouveau)
 
@@ -53,6 +66,19 @@ déclarative : elle devient vérifiable.
   « Load when » / équivalent) — une description sans condition d'activation
   est un échec (goulot de découvrabilité, cf. Red Hat/Anthropic).
 - Description > 1024 caractères → échec (déjà contrôlé).
+
+### Instructions absolues (MANDATORY) — nouveau, décision D-2026-08-05-15
+
+Extension assumée de `.agent/instructions.md` : toute instruction absolue
+(`MANDATORY`, « toujours », « jamais ») ajoutée dans un artefact consommateur
+(skills, prompts, AGENTS.md, recettes) doit soit s'accompagner d'un contrôle
+mécanique nommé (validateur C2 ou porte Pi), soit être consignée
+explicitement comme « guidance seule, non appliquée » dans le registre des
+lacunes d'automatisation (`.agent/instructions.md` §Enforcement). L'audit
+(dimension « instructions absolues », kit-audit phase C9) inventorie chaque
+occurrence et son statut d'application ; un contrôle C2 déterministe (grep des
+lexèmes + rattachement au registre) est planifié (annexe C du plan
+2026-08-05-métaprojet).
 
 ### Par catégorie (nouveau — aligné sur A1)
 
@@ -120,4 +146,6 @@ Règles :
 - La décision est appliquée depuis le 2026-08-05 : dérivation depuis
   l'arborescence, comparaison avec `capabilities.yaml`, tests positifs et
   négatifs dans `tools/validators/test_validate_kitv2.py`.
+- Faut-il un mode `--strict` (warnings = erreurs) pour la CI ?
+itv2.py`.
 - Faut-il un mode `--strict` (warnings = erreurs) pour la CI ?

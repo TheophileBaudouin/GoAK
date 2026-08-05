@@ -31,6 +31,12 @@ d'un squelette maison. La qualité vient de la communauté, pas de l'agent.
    modulaire** : chaque composant est isolé et remplaçable, de sorte que
    l'intégration dans un projet quelconque se fait par copie de modules bien
    délimités, et la modification reste simple.
+   **Application réelle obligatoire (2026-08-05, D-2026-08-05-14)** : la source
+   doit être une application réelle à responsabilité unique, **pas un
+   starter/template tiers ni un recueil d'exemples de démonstration** — un
+   dépôt nommé template/starter/example, ou une collection de démos, ne
+   satisfait pas la politique même sous MIT (leçon recherche 2026-08-05
+   desktop-app : aucun candidat Wails conforme).
 5. **Fonctionnel obligatoire** : compile et passe ses tests dans le Kit. Un
    template non fonctionnel est interdit, quelle que soit la source.
 6. **Réutilisable directement** : très peu de modifications pour l'adopter ;
@@ -48,7 +54,8 @@ templates/<shape>/
 ├── LICENSE              # MIT (copie de la licence du projet)
 ├── ATTRIBUTION.md       # source, version épinglée (commit/release), licence,
 │                        # adaptations (diff + raisons)
-├── README.md            # statut, source, scénario observable, modifications
+├── README.md            # statut, source, scénario observable, modifications,
+│                        # structure du projet et justification (D-2026-08-05-13)
 └── template.yaml        # name, status, purpose, source, validation
 ```
 

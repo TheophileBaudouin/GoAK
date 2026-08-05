@@ -127,6 +127,12 @@ Vérifie aussi le mismatch structurel :
 - un fichier réutilisable n'a aucun rattachement à un objet de charte ;
 - une couche du charter semble absente de `KitV2/`, ou est représentée par un
   autre mécanisme (manifest, graphe, probe, outil) non documenté ;
+- pour toute capacité couverte par une recette ET une probe (ex. desktop-app),
+  vérifier qu'une ligne roadmap de template existe dans
+  `templates/TEMPLATES.md` ; une capacité couverte partout sauf au niveau
+  template, sans reconnaissance roadmap, est une catégorie de finding nommée
+  à part entière, pas un cas générique noyé dans la formulation actuelle
+  (D-2026-08-05-14) ;
 - un dossier existe mais mélange plusieurs responsabilités sans frontière
   explicite.
 
@@ -189,6 +195,16 @@ Une similarité de vocabulaire ne suffit pas : cite les passages qui répondent
 (hash, bloc identique, identifiant répété), indique-le séparément d'une
 duplication sémantique qui exige une revue humaine.
 
+Échantillonne en outre explicitement les chaînes de pointeurs
+pattern↔recette↔snippet (D-2026-08-05-11) : pour chaque snippet, résoudre
+`source:` (SNIPPET.yaml) vers son artefact canonique et comparer la forme du
+code ; pour chaque recette, identifier les patterns/snippets référencés et
+vérifier qu'elle les compose sans les recopier. La dérive d'une chaîne
+(canonique modifié, snippet non re-vérifié) est un finding distinct de la
+duplication interne à une cible — indique pour chaque chaîne si elle est
+contrôlable mécaniquement par dates (`last_verified` dépendant >= canonique)
+ou seulement par revue.
+
 #### C5. Indépendance et dépendances cachées
 
 Un agent qui charge un seul artefact doit pouvoir comprendre son usage sans
@@ -235,6 +251,16 @@ validation aux frontières, interfaces consommateur, fermeture des ressources,
 concurrence, sécurité et commandes de validation. Cite le fichier de règle et
 la ligne du bloc. Si un contrôle exige une analyse que la lecture Markdown ne
 permet pas, marque-le `À VÉRIFIER` plutôt que d'inventer un verdict.
+
+#### C9. Instructions absolues et portes mécaniques
+
+Inventorie chaque instruction absolue du Kit (`MANDATORY`, « toujours »,
+« jamais ») dans les artefacts consommateurs (skills, prompts, AGENTS.md,
+recettes) et son statut d'application : contrôle mécanique nommé (validateur
+C2, porte Pi) ou « guidance seule, non appliquée » consignée dans le registre
+des lacunes d'automatisation (`.agent/instructions.md` §Enforcement). Une
+absolue sans contrôle ni consignation est un finding (D-2026-08-05-15) —
+n'évalue pas seulement la présence de la phrase, mais ce qui l'applique.
 
 ### Phase D — Décider « méta-projet ou Kit ? »
 
@@ -390,6 +416,15 @@ Regroupe les findings identiques mais conserve tous les chemins concernés.
 Tableau séparé : `dimension | déjà couvert par | trou | contrôle conseillé |
 raison`. Indique clairement ce qui doit rester une analyse sémantique humaine
 ou agentique et ce qui peut devenir une assertion Python répétable.
+
+Le tableau contient au minimum, à chaque audit :
+
+- la ligne « dérive inter-fichiers » : chaînes pattern↔recette↔snippet
+  contrôlables par dates (`last_verified` dépendant >= canonique) vs revue
+  sémantique (D-2026-08-05-11) ;
+- la ligne « instructions absolues (MANDATORY) » : chaque occurrence
+  MANDATORY/« toujours »/« jamais » du Kit et son statut d'application
+  (contrôle mécanique nommé ou « guidance seule » — D-2026-08-05-15).
 
 ### F. Verdict et suites
 
