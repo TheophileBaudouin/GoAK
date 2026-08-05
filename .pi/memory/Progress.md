@@ -24,13 +24,6 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `recipe-cli-interactive` — bubbletea v2 MVU, testable via handleKey(string) seam (skill + test, suite green)
 - [x] `recipe-desktop-app` — wails v3 service logic, testable pure Go (no wails import; wiring documented) (skill + test, suite green)
 
-## KitV2 reference projects
-
-- [x] `ardanlabs-service` — extract-only layer/observability reference.
-- [x] `pagoda` — extract-only SSR structure reference.
-- [x] `go-starter` — extract-only, stagnant; re-verify before relying on it.
-- [ ] [x] Remplacer les 7 scaffolds legacy de templates par 3 templates MIT sourcés (REST, CLI, worker), retirer les shapes sans source conforme, mettre à jour le validateur, router et evidence (2026-08-05).
-
 ## KitV2 rules
 
 - [x] `testing` — idiomatic Go testing (from quii/learn-go-with-tests)
@@ -126,6 +119,13 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - (none)
 
 ## Completed (this session)
+
+## KitV2 reference projects
+
+- [x] `ardanlabs-service` — extract-only layer/observability reference.
+- [x] `pagoda` — extract-only SSR structure reference.
+- [x] `go-starter` — extract-only, stagnant; re-verify before relying on it.
+- [x] Remplacer les 7 scaffolds legacy de templates par 3 templates MIT sourcés (REST, CLI, worker), retirer les shapes sans source conforme, mettre à jour le validateur, router et evidence (2026-08-05).
 
 ## KitV2 Pi prompt-templates (.pi/prompts/ — slash commands)
 

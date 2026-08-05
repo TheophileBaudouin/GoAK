@@ -9,6 +9,8 @@ Format:
 
 ---
 
+- **2026-08-05** — The first sourced-template attribution summaries claimed upstream files were unchanged even after Kit lint/security cleanups and README/config replacements. → **ATTRIBUTION.md must enumerate every adaptation, including behavior-preserving lint fixes, test cleanup, configuration replacement, Docker hardening, and documentation replacement; verify claims against a recursive diff at the pinned source commit before review.**
+
 - **2026-08-05** — The template validator hardcoded the seven inherited scaffold directories and required main.go/main_test.go, which blocked real sourced projects and let the old shape drive the contract. → **Template validation must discover actual template.yaml directories and, for status sourced, require MIT/source pin metadata, LICENSE, ATTRIBUTION.md, README.md, and a Technical scope section; planned shapes have no scaffold.**
 
 - **2026-08-05** — A root metaproject prompt is not covered by validate-instructions.py, whose prompt glob is rooted at KitV2/. → **For root .pi/prompts/*.md templates, validate Pi frontmatter/discovery manually or add a dedicated metaproject validator; do not mistake the consumer validator's PASS for root prompt coverage.**
