@@ -1,111 +1,114 @@
 ---
 name: wish
-description: "charm.land/wish/v2 — SSH application framework: run Bubble Tea TUIs and other apps over SSH sessions with middleware (logging, ratelimit, prometheus). Use when building a remote/SSH agent workbench or exposing a TUI over SSH."
+description: "charm.land/wish/v2 v2.0.3 — SSH application framework with middleware, PTY sessions, Bubble Tea integration, access control, and rate limiting. Use for remote Go/TUI applications over SSH; not for a raw SSH server/client or an unbounded public listener."
 category: library
 tags: [ssh, tui, server, remote, middleware]
-last-verified: 2026-08-04
+last-verified: 2026-08-05
 ---
 
-# wish — SSH application framework
+# wish — framework d'applications SSH
 
 ## Selection
 
-[`charm.land/wish/v2`](https://github.com/charmbracelet/wish) (v2).
-
-**Why it passes the gate** (actual reason, not stars): it turns an SSH server
-into an application platform — each session gets a PTY, and your handler can be
-anything from a Bubble Tea program to a plain command. Middleware compose
-(logging, rate limiting, prometheus, access control). This is the foundation of
-the kit's **H-shape architecture** (hybrid local-first / remote workbench): the
-same TUI logic runs locally and is reachable over SSH.
+[`charm.land/wish/v2`](https://github.com/charmbracelet/wish) v2.0.3,
+released 2026-07-31, builds SSH applications on `charm.land/ssh`. It provides
+middleware for logging, access control, rate limiting, metrics, recovery, Git,
+and Bubble Tea sessions. It is admitted for this focused remote application
+boundary and active Charm maintenance; it is not the lower-level SSH protocol
+library.
 
 ## Admission checklist
 
-- [x] Actively maintained — v2.0.x (2026)
-- [x] Single responsibility — SSH application framework
-- [x] Idiomatic Go — middleware chain over `charm.land/ssh`
-- [x] Tests present + CI — yes
-- [x] Documentation — README + examples + charm.sh docs
-- [x] Real-world usage — Soft Serve, Wishlist, many Charm SSH apps
-- [x] Readable end-to-end — yes
-- [x] Justified by need — remote agent workbenches need a maintained SSH app layer
+- [x] Current v2.0.3 and active upstream maintenance.
+- [x] Single responsibility: middleware/application composition over SSH.
+- [x] Bubble Tea, PTY, auth, timeout, access-control, and observability options.
+- [x] Tests, CI, documentation, and real Soft Serve/Charm ecosystem use exist.
+- [x] Underlying host-key/auth/session trust boundaries are explicit.
 
 ## Minimal use
 
 ```go
-srv, _ := wish.NewServer(
-    wish.WithAddress(":2222"),
-    wish.WithHostKeyPath("~/.ssh/ed25519_host"),
-    wish.WithBubbletea(initialModel()), // serve a Bubble Tea app over SSH
-)
-log.Fatal(srv.ListenAndServe())
+func server(model tea.Model) (*ssh.Server, error) {
+    srv, err := wish.NewServer(
+        wish.WithAddress(":2222"),
+        wish.WithHostKeyPath("/var/lib/app/ssh_host_ed25519"),
+        wish.WithBubbletea(model),
+    )
+    if err != nil {
+        return nil, fmt.Errorf("create SSH application: %w", err)
+    }
+    return srv, nil
+}
 ```
+
+Add public-key allowlists, persistent dedicated host keys, timeouts, rate
+limiting, and access-control middleware before exposing the listener. A public
+Wish server has no automatic global connection cap; design one at the
+infrastructure/application boundary.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 |---|---|
-| Raw `charm.land/ssh` | The correct base layer — but you build middleware, session handling, and Bubble Tea wiring yourself. Use wish when you want the app framework. |
-| gliderlabs/ssh | Predecessor; less active, no maintained Bubble Tea integration. |
-| `golang.org/x/crypto/ssh` directly | Lowest level; fine for one-off servers, verbose for app platforms. |
-
-## Security note
-
-- Generate a dedicated host key; never reuse a client key as host key.
-- `wish.WithMiddleware(wish.LogMiddleware())` first, then access control —
-  default wish setups allow any client with a valid key, so wire
-  `wish.WithPublicKeyAuth` / allowlists before exposing anything.
-- Pair with `keygen` (this catalog) for host key generation.
+| `charm.land/ssh` | Prefer for a server/session layer without Wish's middleware/app framework. |
+| `golang.org/x/crypto/ssh` | Prefer for low-level protocol/client control; more session plumbing is yours. |
+| gliderlabs/ssh | Predecessor/legacy boundary; do not choose for new work without a fresh decision. |
+| Local Bubble Tea | Prefer when remote access is not a product requirement. |
 
 ## Utiliser cette librairie quand
 
-- Exposer une TUI Bubble Tea (ou un handler SSH) sur des sessions SSH —
-  workbench distant / agent remote.
-- La **même logique TUI doit tourner en local ET être accessible par SSH**
-  (architecture H-shape du kit).
-- Les middlewares (logging, rate limiting, prometheus, contrôle d'accès)
-  doivent composer autour des sessions.
+- A Bubble Tea TUI or Go command must run in remote SSH sessions.
+- Middleware for auth, access control, logging, metrics, rate limits, and panic
+  recovery should compose around each session.
+- The product has an explicit remote workbench/SSH trust model.
 
 ## Ne pas utiliser cette librairie quand
 
-- Le serveur SSH est simple/one-off : `charm.land/ssh` (couche session/PTY)
-  ou x/crypto/ssh suffisent.
-- Seule la couche session/PTY est nécessaire, sans framework d'apps.
+- A plain local TUI or one-off SSH handler is sufficient.
+- The project needs an SSH client or low-level protocol implementation.
+- The public listener cannot provide host-key persistence, authentication,
+  timeouts, rate limiting, and connection/resource limits.
 
 ## Avantages
 
-- Framework d'apps SSH : session → PTY → handler (Bubble Tea ou commande).
-- Middlewares composables (logging, ratelimit, prometheus, access control).
-- Fondation de l'architecture H-shape du kit (local-first / remote
-  workbench).
-- Usage réel : Soft Serve, Wishlist, apps SSH Charm.
+- High-level SSH application composition over maintained session/PTY APIs.
+- Bubble Tea integration plus auth, access-control, rate-limit, logging,
+  recovery, metrics, and Git middleware.
+- v2 keeps a clear Charm module path and recent panic containment.
 
 ## Inconvénients
 
-- Framework opiné : le contrôle fin du protocole passe par les couches
-  basses (ssh/x/crypto).
-- La sécurité par défaut est permissive : allowlist et middlewares à câbler
-  explicitement (defaut = tout client avec une clé valide).
+- Opinionated middleware/application framework with SSH and Bubble Tea coupling.
+- No inherent connection-count cap; goroutine/file-descriptor/memory limits need
+  explicit design.
+- Security defaults are not a complete deployment policy; allowlists and rate
+  limiting must be wired by the consumer.
 
 ## Pièges connus
 
-- Générer une clé hôte DÉDIÉE, jamais réutiliser une clé client (voir
-  `pattern:antipattern:sec-ssh-host-key-reuse` + `keygen`).
-- Middlewares dans le bon ordre : log d'abord, puis contrôle d'accès —
-  l'auth est traitée AVANT le ratelimiter (issue #325) : un ratelimit ne
-  protège pas l'auth par défaut.
-- `WithPublicKeyAuth`/allowlists avant d'exposer quoi que ce soit ;
-  `WithHostKeyPath` vers une clé persistée.
-- Observabilité : `promwish` expose les métriques de session
-  (voir `source:wish:ssh-metrics`).
+- Persist a dedicated host key and never reuse a client key as a server key.
+- Configure public-key/trusted-CA authentication before exposing a server; do
+  not rely on “valid SSH key” as application authorization.
+- Apply idle/max timeouts and a rate limiter; rate limiting must cover the auth
+  threat model and be ordered deliberately with auth middleware.
+- Add OS/application resource limits because Wish does not cap concurrent
+  connections automatically.
+- Pin v2.0.3 and the underlying `charm.land/ssh` version together during
+  upgrades.
 
 ## Sources vérifiées
 
-- [charmbracelet/wish (repo officiel, v2)](https://github.com/charmbracelet/wish)
-  — vérifié 2026-08-04
-- [charmbracelet/promwish](https://github.com/charmbracelet/promwish) —
-  vérifié 2026-08-04
-- [Issue #325 — auth avant ratelimiter](https://github.com/charmbracelet/wish/issues/325)
-  — vérifié 2026-08-04 (issue officielle)
-- Artefacts internes : `source:wish:ssh-metrics`,
-  `pattern:antipattern:sec-ssh-host-key-reuse`, catalogs `ssh` et `keygen`
+- [Official Wish repository](https://github.com/charmbracelet/wish) — API,
+  maintenance, license, checked 2026-08-05.
+- [Wish v2.0.3 release](https://github.com/charmbracelet/wish/releases/tag/v2.0.3)
+  — exact version and recovery changes, checked 2026-08-05.
+- [Wish package documentation](https://pkg.go.dev/charm.land/wish/v2) — API and
+  module path, checked 2026-08-05.
+- [Recover middleware](https://github.com/charmbracelet/wish/blob/main/recover/recover.go)
+  — panic boundary, checked 2026-08-05.
+- [Rate limiter middleware](https://github.com/charmbracelet/wish/blob/main/ratelimiter/ratelimiter.go)
+  — connection-rate policy, checked 2026-08-05.
+- [Access-control middleware](https://github.com/charmbracelet/wish/blob/main/accesscontrol/accesscontrol.go)
+  — authorization boundary, checked 2026-08-05.
+- [Underlying Charm SSH](https://github.com/charmbracelet/ssh) — server/session
+  foundation, checked 2026-08-05.
