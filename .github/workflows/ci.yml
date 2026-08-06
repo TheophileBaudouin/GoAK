@@ -17,12 +17,16 @@ jobs:
     steps:
       # Actions pinned to full commit SHAs (supply-chain hardening: tags
       # can be repointed). SHAs resolved from the release tags below.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       # Explicit go-version, not go-version-file: gosec v2.28.0 requires
       # go >= 1.25.8 while go.mod declares 1.25.6. '1.26' matches the local
       # maintainer toolchain (go1.26.5) used by the validation gate.
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      # setup-go v7.0.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
         with:
           go-version: "1.26"
           cache: true
@@ -51,7 +55,7 @@ jobs:
           go install github.com/securego/gosec/v2/cmd/gosec@v2.28.0
           go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
 
-      # ---- metaproject validators (read-only; structure + registry gates) ----
+      # ---- metaproject validators (structure + registry gates) ----
       - name: validate-instructions
         run: python3 .agent/validators/validate-instructions.py
 
@@ -81,9 +85,10 @@ jobs:
         working-directory: KitV2
         run: go mod verify
 
+      # golangci-lint-action v2.12.2
       - name: golangci-lint
         uses: >-
-          golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a
+         golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a
         with:
           version: v2.12.2
           working-directory: KitV2

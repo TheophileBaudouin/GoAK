@@ -1,0 +1,15 @@
+# gitleaks allowlist — documented false positives.
+#
+# The kit's offline bundle manifest pins the module dependency graph of the
+# product (go.sum equivalent), which legitimately includes
+# `github.com/sourcegraph/conc` (a dependency of the viper/koanf config stack).
+# gitleaks' `sourcegraph-access-token` rule matches the keyword "sourcegraph"
+# in that module path even though no credential is present (verified: no
+# `sgp_` token exists anywhere in the repository). The module path is not a
+# secret and must not be removed from the shipped bundle manifest.
+title = "GoAK gitleaks allowlist (documented false positives)"
+
+[allowlist]
+regexes = [
+    '''github\.com/sourcegraph/conc''',
+]
