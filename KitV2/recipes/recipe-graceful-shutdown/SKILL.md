@@ -1,40 +1,40 @@
 ---
 name: recipe-graceful-shutdown
-description: "Arrêt propre (graceful shutdown) testable d'un serveur HTTP en Go via signal.NotifyContext, http.Server.Shutdown et délai d'expiration (timeout). Utiliser pour tout service HTTP devant drainer les requêtes sur SIGINT/SIGTERM."
+description: "Testable graceful shutdown of an HTTP server in Go via signal.NotifyContext, http.Server.Shutdown and an expiration timeout. Use for any HTTP service that must drain requests on SIGINT/SIGTERM."
 category: recipe
 tags: [shutdown, http, signal, context, stdlib]
 last-verified: 2026-08-05
 ---
 
-# recipe-graceful-shutdown — Arrêt propre de serveur HTTP (Graceful Shutdown)
+# recipe-graceful-shutdown — Graceful HTTP server shutdown
 
-## Objectif et cas d'utilisation
+## Objective and use case
 
-Arrêter un serveur HTTP Go de manière propre lors de la réception d'un signal système (SIGINT, SIGTERM) : refuser les nouvelles connexions, laisser les requêtes en cours s'exécuter jusqu'à leur terme dans la limite d'un délai d'expiration (timeout), tout en gardant l'orchestration totalement testable au niveau unitaire.
+Shut down a Go HTTP server cleanly when a system signal (SIGINT, SIGTERM) is received: refuse new connections, let in-flight requests run to completion within an expiration timeout, while keeping the orchestration fully testable at the unit level.
 
-Utiliser cette recette pour tous les services Web exposés en production afin d'éviter la coupure abrupte des connexions clients lors de redéploiements ou d'arrêts de pods (ex. Kubernetes).
+Use this recipe for all Web services exposed in production to avoid abruptly cutting client connections during redeployments or pod terminations (e.g., Kubernetes).
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-- Go 1.25+ (stdlib uniquement : `net/http`, `os/signal`, `context`)
-- Architecture testable :
-  - Séparer la capture des signaux OS (qui appartient au `main`) de l'orchestrateur d'arrêt `shutdown.Run(...)`.
+- Go 1.25+ (stdlib only: `net/http`, `os/signal`, `context`)
+- Testable architecture:
+  - Separate OS signal capture (which belongs to `main`) from the shutdown orchestrator `shutdown.Run(...)`.
   - `Run(ctx context.Context, srv *http.Server, ln net.Listener, timeout time.Duration) error`
-  - `Run` écoute l'annulation du contexte transmis. En cas d'annulation, il déclenche `srv.Shutdown(shutdownCtx)` avec un nouveau contexte à délai d'expiration (`timeout`).
-  - L'erreur `http.ErrServerClosed` renvoyée par `Serve` lors d'un arrêt normal est absorbée et ne fait pas échouer `Run`.
+  - `Run` listens for cancellation of the passed context. On cancellation, it triggers `srv.Shutdown(shutdownCtx)` with a new context with an expiration timeout (`timeout`).
+  - The `http.ErrServerClosed` error returned by `Serve` during a normal shutdown is absorbed and does not make `Run` fail.
 
-## Composants et choix
+## Components and choices
 
-- `signal.NotifyContext` (Go 1.16+) — API stdlib propre créant un contexte annulé lors de la réception d'un signal OS.
-- `http.Server.Shutdown` — méthode stdlib drainant les connexions HTTP.
+- `signal.NotifyContext` (Go 1.16+) — clean stdlib API creating a context canceled on receipt of an OS signal.
+- `http.Server.Shutdown` — stdlib method draining HTTP connections.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Capturer les signaux directement dans l'orchestrateur : empêche de tester l'arrêt en mode unitaire sans envoyer de véritables signaux OS au processus de test.
-- `signal.Notify(chan os.Signal)` pré-1.16 : verbeux, réinvente la gestion du contexte.
-- Paquets tiers (`appleboy/graceful`, etc.) : sur-ingénierie apportant des dépendances inutiles pour une fonctionnalité native de la stdlib.
+- Capturing signals directly in the orchestrator: prevents testing the shutdown at the unit level without sending real OS signals to the test process.
+- `signal.Notify(chan os.Signal)` pre-1.16: verbose, reinvents context handling.
+- Third-party packages (`appleboy/graceful`, etc.): over-engineering adding unnecessary dependencies for a stdlib-native feature.
 
-## Exemple complet
+## Complete example
 
 ```go
 package shutdown
@@ -79,25 +79,25 @@ if err := shutdown.Run(ctx, srv, ln, 5*time.Second); err != nil {
 }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Assurer que le délai `timeout` est inférieur au délai de grâce de l'orchestrateur (ex. `terminationGracePeriodSeconds` dans Kubernetes).
-- Les handlers HTTP de longue durée doivent écouter `r.Context().Done()` pour s'interrompre si le timeout d'arrêt est dépassé.
+- Ensure the `timeout` is shorter than the orchestrator's grace period (e.g., `terminationGracePeriodSeconds` in Kubernetes).
+- Long-running HTTP handlers must listen to `r.Context().Done()` to interrupt themselves if the shutdown timeout is exceeded.
 
-## Limites et extensions
+## Limits and extensions
 
-Pour éteindre simultanément d'autres composants (workers en arrière-plan, pools de connexions DB), combiner cette logique avec `golang.org/x/sync/errgroup`.
+To shut down other components simultaneously (background workers, DB connection pools), combine this logic with `golang.org/x/sync/errgroup`.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-graceful-shutdown/...
 go run ./probes/graceful-shutdown
 ```
 
-La probe instancie un serveur HTTP, déclenche l'arrêt via l'annulation du contexte, vérifie l'absorption de `http.ErrServerClosed` et la fermeture propre, puis affiche `graceful-shutdown: PASS`.
+The probe instantiates an HTTP server, triggers the shutdown via context cancellation, verifies the absorption of `http.ErrServerClosed` and the clean close, then prints `graceful-shutdown: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [net/http Server.Shutdown](https://pkg.go.dev/net/http#Server.Shutdown) — documentation stdlib.
-- [os/signal NotifyContext](https://pkg.go.dev/os/signal#NotifyContext) — documentation stdlib.
+- [net/http Server.Shutdown](https://pkg.go.dev/net/http#Server.Shutdown) — stdlib documentation.
+- [os/signal NotifyContext](https://pkg.go.dev/os/signal#NotifyContext) — stdlib documentation.

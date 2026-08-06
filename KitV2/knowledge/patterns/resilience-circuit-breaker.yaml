@@ -1,5 +1,5 @@
 id: pattern:resilience:circuit-breaker
-title: Circuit breaker — échec rapide pour isoler un dépendant
+title: Circuit breaker — fail fast to isolate a dependent
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Un dépendant en panne reçoit toutes les requêtes malgré ses échecs : les
-  appelants attendent des timeouts, les threads/goroutines s'épuisent, et la
-  panne se propage (voir pattern:antipattern:msg-retry-storm).
+  A failing dependent still receives every request despite its failures:
+  callers wait for timeouts, threads/goroutines exhaust, and the failure
+  propagates (see pattern:antipattern:msg-retry-storm).
 context: >-
-  S'applique aux appels vers des services tiers ou internes critiques, quand
-  l'échec rapide vaut mieux que l'attente systématique.
+  Applies to calls to critical third-party or internal services, when
+  failing fast beats waiting systematically.
 solution: >-
-  Interposer un breaker par dépendance : état fermé (appels normaux) → après
-  un seuil d'échecs, état ouvert (échec immédiat sans appeler) → après un
-  délai de refroidissement, état demi-ouvert (quelques appels de sonde) →
-  fermé si succès. En Go : bibliothèque dédiée (sony/gobreaker, cenkalti/
-  backoff) ou implémentation minimaliste avec compteur + mutex.
+  Interpose one breaker per dependency: closed state (normal calls) → after
+  a failure threshold, open state (immediate failure without calling) →
+  after a cooldown period, half-open state (a few probe calls) → closed on
+  success. In Go: a dedicated library (sony/gobreaker, cenkalti/backoff) or
+  a minimal implementation with a counter + mutex.
 benefits: >-
-  Le dépendant défaillant est délesté (pas de déluge), les appelants
-  récupèrent immédiatement, et le système dégrade proprement pendant la
-  panne.
+  The failing dependent is relieved (no deluge), callers recover
+  immediately, and the system degrades cleanly during the outage.
 costs: >-
-  Complexité d'état et de seuils (à régler par mesure) ; un breaker sans
-  timeouts stricts en amont est inefficace — le composer avec
-  pattern:resilience:timeout-deadlines et retry.
+  State and threshold complexity (tune by measurement); a breaker without
+  strict upstream timeouts is ineffective — compose it with
+  pattern:resilience:timeout-deadlines and retry.
 related: >-
-  Homologue négatif : pattern:antipattern:msg-retry-storm.
+  Negative counterpart: pattern:antipattern:msg-retry-storm.
 relationships:
   references:
     - https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/circuit-breaker.html

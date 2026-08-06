@@ -1,0 +1,45 @@
+---
+id: pattern:concurrency:channel-ownership
+title: Channel ownership — one sender, sender closes
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, channels, pipelines, cancellation]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  Sending on a closed channel panics, and so does closing a channel twice.
+  Without an explicit owner, "who closes the channel" races between
+  goroutines and fails only under load (see
+  pattern:antipattern:concurrency-close-from-receiver).
+context: >-
+  Applies to every channel shared between goroutines, especially pipeline
+  stages.
+solution: >-
+  Assign each channel one owner goroutine that sends on it and closes it;
+  receivers range and never close. In pipelines, each stage owns its output
+  channel and closes it when done, so the next stage's `for range`
+  terminates — the official pipelines pattern. Never close a channel you do
+  not send to: the sender is the closer, by construction.
+benefits: >-
+  Termination by construction (range ends when the sender closes), no
+  double-close or send-on-closed panics, and cancellation can be layered on
+  top with a done channel or a context.
+costs: >-
+  The ownership rule is a convention the compiler does not enforce; one
+  channel per owner multiplies channels in complex pipelines — group them or
+  use errgroup/context for cancellation.
+related: >-
+  Goroutine exit discipline: pattern:go:contextual-worker; pipeline
+  composition: pattern:concurrency:pipeline; negative counterpart:
+  pattern:antipattern:concurrency-close-from-receiver.
+relationships:
+  references:
+    - https://go.dev/blog/pipelines
+    - pattern:go:contextual-worker
+    - pattern:concurrency:pipeline
+    - pattern:antipattern:concurrency-close-from-receiver
+  uses: []
+  validated_by: []

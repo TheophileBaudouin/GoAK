@@ -1,5 +1,5 @@
 id: pattern:antipattern:api-no-pagination
-title: Collection sans pagination ni idempotence
+title: Collection without pagination or idempotency
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `GET /items` renvoie tout en une réponse (ou une limite arbitraire non
-  documentée), et les POST de création n'ont pas d'idempotence (doublons à la
+  `GET /items` returns everything in a single response (or an arbitrary
+  undocumented limit), and creation POSTs have no idempotency (duplicates on
   retry).
 detect: >-
-  - Endpoints de liste sans paramètres de pagination (`page`/`cursor`/`limit`).
-  - Corps de réponse de liste sans métadonnées (total, next).
-  - POST sans clé d'idempotence, doublons observés sur retry réseau.
+  - List endpoints without pagination parameters (`page`/`cursor`/`limit`).
+  - List response bodies without metadata (total, next).
+  - POST without an idempotency key, duplicates observed on network retry.
 problem: >-
-  Une collection non paginée dégénère : réponses énormes, timeouts, charge
-  inutile, impossible à consommer pour les gros volumes. Sans idempotence, une
-  retry (réseau, client) duplique des effets métier (paiement, création).
+  An unpaginated collection degenerates: huge responses, timeouts, useless
+  load, impossible to consume at large volumes. Without idempotency, a retry
+  (network, client) duplicates business effects (payment, creation).
 fix: >-
-  Pagination par curseur (recommandée pour les données volatiles) ou page/limit
-  avec métadonnées (`next`, `total`). Pour les écritures : `Idempotency-Key`
-  (ou POST avec identifiant client) et stocker la réponse associée pour les
-  retries. Toujours documenter les limites et les défauts.
+  Cursor pagination (recommended for volatile data) or page/limit with
+  metadata (`next`, `total`). For writes: `Idempotency-Key` (or POST with a
+  client identifier) and store the associated response for retries. Always
+  document the limits and defaults.
 when_ok: >-
-  Une collection interne bornée par construction (< quelques centaines) peut
-  rester non paginée ; la pagination et l'idempotence sont obligatoires dès
-  qu'un client externe ou des écritures sensibles existent.
+  An internal collection bounded by construction (< a few hundred) may stay
+  unpaginated; pagination and idempotency are mandatory as soon as an external
+  client or sensitive writes exist.
 relationships:
   references:
     - https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/

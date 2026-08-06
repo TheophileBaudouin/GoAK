@@ -1,5 +1,5 @@
 id: pattern:database:versioned-migrations
-title: Migrations versionnées — le schéma est du code
+title: Versioned migrations — the schema is code
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Modifier le schéma en prod par SQL ad hoc ou « ALTER à la main » rend
-  l'état des bases inconnu et les environnements divergents.
+  Modifying the schema in production with ad hoc SQL or a hand-run "ALTER"
+  makes the database state unknown and environments diverge.
 context: >-
-  S'applique dès qu'une base de données partagée existe, en particulier dès
-  que deux environnements (dev, prod) doivent rester synchronisés.
+  Applies as soon as a shared database exists, in particular as soon as two
+  environments (dev, prod) must stay synchronized.
 solution: >-
-  Migrations versionnées (fichiers numérotés, appliqués une fois, suivis dans
-  le VCS) via la CLI golang-migrate admise : up/down explicites, application
-  ordonnée, état tracé dans une table de versions. Les migrations font partie
-  du déploiement et ne sont pas lancées au démarrage de chaque réplique.
+  Versioned migrations (numbered files, applied once, tracked in VCS) via the
+  admitted golang-migrate CLI: explicit up/down, ordered application, state
+  traced in a version table. Migrations are part of the deployment and are
+  not run at each replica's startup.
 benefits: >-
-  État de base reproductible et auditable, rollback possible, revue des
-  changements de schéma comme du code, CI qui applique les migrations avant
-  les tests.
+  Reproducible and auditable database state, possible rollback, schema
+  changes reviewed like code, CI applying migrations before tests.
 costs: >-
-  Les migrations destructrices (drop, rename) exigent des plans de
-  déploiement (backward-compatible d'abord) ; l'ordre et les conflits entre
-  branches se gèrent comme pour le code.
+  Destructive migrations (drop, rename) require deployment plans
+  (backward-compatible first); ordering and branch conflicts are handled
+  like code.
 related: >-
-  Catalog : golang-migrate (knowledge/catalogs/libraries/golang-migrate/SKILL.md).
+  Catalog: golang-migrate
+  (knowledge/catalogs/libraries/golang-migrate/SKILL.md).
 relationships:
   references:
     - https://github.com/golang-migrate/migrate

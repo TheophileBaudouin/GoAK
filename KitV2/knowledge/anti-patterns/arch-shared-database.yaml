@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-shared-database
-title: Base de données partagée entre services
+title: Database shared between services
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Plusieurs services écrivent/lisent les mêmes tables : schéma unique central,
-  migrations coordonnées, contrats de données implicites entre services via la
-  base.
+  Several services write/read the same tables: single central schema,
+  coordinated migrations, implicit data contracts between services through the
+  database.
 detect: >-
-  - Deux services (ou plus) avec des migrations sur le même schéma.
-  - Modification de colonne nécessitant un déploiement coordonné.
-  - Verrous/contention DB imputables à des accès croisés entre services.
+  - Two services (or more) with migrations on the same schema.
+  - Column modification requiring a coordinated deployment.
+  - DB locks/contention attributable to cross-service accesses.
 problem: >-
-  La base partagée réintroduit le couplage que la décomposition devait
-  éliminer : les services sont liés par le schéma, les changements se
-  coordonnent, la base devient le goulot et le point de défaillance unique —
-  c'est le principal symptôme du monolithe distribué (voir
-  arch-distributed-monolith).
+  The shared database reintroduces the coupling decomposition was supposed to
+  eliminate: services are bound by the schema, changes are coordinated, the
+  database becomes the bottleneck and the single point of failure — it is the
+  main symptom of the distributed monolith (see arch-distributed-monolith).
 fix: >-
-  Donner à chaque service la propriété exclusive de ses données
-  (database-per-service) : les autres services accèdent via son API ou des
-  événements (projection de lecture, CQRS léger). Les vues partagées sont
-  exposées par le service propriétaire, jamais par accès direct.
+  Give each service exclusive ownership of its data (database-per-service):
+  other services access it through its API or events (read projection,
+  lightweight CQRS). Shared views are exposed by the owning service, never by
+  direct access.
 when_ok: >-
-  Pour une petite organisation, une base partagée avec des schémas séparés
-  par service (un user par schéma) est un compromis pragmatique ; la règle
-  forte s'applique quand les services évoluent indépendamment.
+  For a small organization, a shared database with per-service separated
+  schemas (one user per schema) is a pragmatic compromise; the strong rule
+  applies when services evolve independently.
 relationships:
   references:
     - https://algomaster.io/learn/microservices/anti-patterns-reference

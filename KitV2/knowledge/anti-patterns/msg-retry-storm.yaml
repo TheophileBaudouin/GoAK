@@ -1,5 +1,5 @@
 id: pattern:antipattern:msg-retry-storm
-title: Tempête de retries — retries agressives sans limite ni breaker
+title: Retry storm — aggressive retries without a limit or breaker
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Chaque client retente immédiatement et sans backoff quand un service
-  dégrade ; les retries s'amplifient à travers les couches (A retente sur B,
-  B sur C, C sur D) et le service en panne reçoit un déluge.
+  Every client retries immediately and without backoff when a service
+  degrades; retries amplify across layers (A retries against B, B against C,
+  C against D) and the failing service receives a deluge.
 detect: >-
-  - Retries sans délai exponentiel ni jitter, nombre de tentatives élevé.
-  - Cascade : un ralentissement d'un service provoque une hausse de charge
-    sur ses dépendants (effet d'emballement).
-  - Absence de circuit breaker : les retries continuent vers un service
-    manifestement en échec.
+  - Retries without exponential delay or jitter, high attempt count.
+  - Cascade: one service slowing down causes load to spike on its dependents
+    (runaway effect).
+  - No circuit breaker: retries keep hitting a service that is clearly
+    failing.
 problem: >-
-  L'architecture center Microsoft documente le retry storm comme cause
-  majeure d'outages : les retries synchronisées (tous les clients retentent
-  au même moment) transforment une panne limitée en effondrement général.
-  Sans breaker, l'échec se propage au lieu de s'isoler.
+  The Microsoft architecture center documents the retry storm as a major
+  cause of outages: synchronized retries (all clients retrying at the same
+  time) turn a limited failure into a general collapse. Without a breaker,
+  failure propagates instead of isolating.
 fix: >-
-  Retries avec backoff exponentiel + jitter, bornées (petit nombre de
-  tentatives) et limitées aux erreurs transitoires (timeout, 5xx, 429 avec
-  respect de Retry-After). Ajouter un circuit breaker par dépendance
-  (passer en échec rapide après un seuil d'erreurs), des timeouts stricts en
-  amont (voir http-no-timeouts) et de la redondance indépendante (bulkhead)
-  pour isoler les couches.
+  Retries with exponential backoff + jitter, bounded (small attempt count)
+  and limited to transient errors (timeout, 5xx, 429 with Retry-After
+  respected). Add a circuit breaker per dependency (fail fast after an error
+  threshold), strict upstream timeouts (see http-no-timeouts) and independent
+  redundancy (bulkhead) to isolate layers.
 when_ok: >-
-  La retry est saine sur les erreurs transitoires réelles avec backoff ;
-  l'anti-pattern est la retry aveugle, immédiate et sans plafond sur les
-  pannes durables.
+  Retry is healthy on real transient errors with backoff; the anti-pattern is
+  blind, immediate, uncapped retry on durable failures.
 relationships:
   references:
     - https://github.com/microsoftdocs/architecture-center/blob/main/docs/antipatterns/retry-storm/index.md

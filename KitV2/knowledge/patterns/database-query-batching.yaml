@@ -1,5 +1,5 @@
 id: pattern:database:query-batching
-title: Requêtes par lots — éliminer le N+1 par JOIN/IN
+title: Batch queries — eliminate the N+1 with JOIN/IN
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une requête par élément (N+1) coûte un aller-retour par ligne et fait
-  exploser la latence et la charge (voir pattern:antipattern:db-n-plus-one).
+  One query per item (N+1) costs one round-trip per row and makes latency
+  and load explode (see pattern:antipattern:db-n-plus-one).
 context: >-
-  S'applique dès qu'une liste de parents nécessite leurs enfants ou
-  références : tables liées, décomptes, statuts.
+  Applies as soon as a list of parents needs their children or references:
+  linked tables, counts, statuses.
 solution: >-
-  Une requête globale : `JOIN` pour les relations proches, ou chargement par
-  lots `WHERE parent_id IN (…)` (par paquets bornés, ex. 500 ids), puis
-  assemblage en mémoire dans une map `parentID → []child`. En Go, construire
-  les placeholders par lots et trier les résultats après jointure.
+  One global query: `JOIN` for close relations, or batch loading
+  `WHERE parent_id IN (…)` (in bounded batches, e.g. 500 ids), then in-memory
+  assembly in a map `parentID → []child`. In Go, build the placeholders in
+  batches and sort the results after the join.
 benefits: >-
-  Nombre de requêtes constant (1-2) quel que soit le volume, latence
-  linéaire-amortie, charge DB minimale.
+  Constant number of queries (1-2) whatever the volume, amortized-linear
+  latency, minimal DB load.
 costs: >-
-  L'assemblage en mémoire exige du code de groupement ; les IN géants cassent
-  les plans d'exécution (borner les lots) ; les données imbriquées profondes
-  peuvent justifier deux requêtes plutôt qu'un JOIN monstrueux.
+  In-memory assembly requires grouping code; giant IN lists break execution
+  plans (bound the batches); deeply nested data may justify two queries
+  rather than a monstrous JOIN.
 related: >-
-  Recette : recipe-sqlite-sqlc (sqlc génère les requêtes statiques).
-  Homologue négatif : pattern:antipattern:db-n-plus-one.
+  Recipe: recipe-sqlite-sqlc (sqlc generates the static queries). Negative
+  counterpart: pattern:antipattern:db-n-plus-one.
 relationships:
   references:
     - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/

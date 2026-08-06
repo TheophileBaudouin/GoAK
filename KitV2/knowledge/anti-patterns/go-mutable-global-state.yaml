@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-mutable-global-state
-title: État mutable au niveau package (variables globales)
+title: Mutable state at package level (global variables)
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Variables de package mutables (`var db *sql.DB`, `var config map[string]any`)
-  initialisées dans `init()` ou au premier usage, lues/écrites depuis plusieurs
+  Mutable package variables (`var db *sql.DB`, `var config map[string]any`)
+  initialized in `init()` or on first use, read/written from several
   packages.
 detect: >-
-  - `var` de package non constante hors des types et sentinelles.
-  - Accès à une variable de package depuis plusieurs goroutines sans
-    synchronisation (race).
-  - Tests qui interfèrent entre eux (état partagé non remis à zéro).
+  - Non-constant package `var` outside types and sentinels.
+  - Access to a package variable from several goroutines without
+    synchronization (race).
+  - Tests that interfere with each other (shared state not reset).
 problem: >-
-  Les globals mutables créent des dépendances cachées : les packages s'appellent
-  implicitement, l'ordre d'initialisation (`init`) est opaque, les tests ne sont
-  plus isolés (non-déterminisme), et la concurrence introduit des courses. C'est
-  le vecteur classique des bugs « ça marche en dev, pas en prod ».
+  Mutable globals create hidden dependencies: packages call each other
+  implicitly, the initialization order (`init`) is opaque, tests are no
+  longer isolated (non-determinism), and concurrency introduces races. It is
+  the classic vector of "works in dev, not in prod" bugs.
 fix: >-
-  Dépendance injectée : construire les dépendances (db, logger, config) dans
-  `main` ou une fonction `New(...)` et les passer explicitement. Pour les
-  valeurs de configuration, un type `Config` construit une fois et passé en
-  paramètre. Garder les globals uniquement pour les valeurs immuables et les
-  sentinelles.
+  Injected dependency: build the dependencies (db, logger, config) in `main`
+  or a `New(...)` function and pass them explicitly. For configuration
+  values, a `Config` type built once and passed as a parameter. Keep globals
+  only for immutable values and sentinels.
 when_ok: >-
-  Les singletons process-wide réellement partagés (pool de connexion) peuvent
-  vivre en variable de package s'ils sont construits explicitement et non
-  réassignés après démarrage — l'injection reste préférable pour la testabilité.
+  Truly process-wide shared singletons (connection pool) may live in a package
+  variable if they are built explicitly and not reassigned after startup —
+  injection remains preferable for testability.
 relationships:
   references:
     - https://dave.cheney.net/paste/going-without.pdf

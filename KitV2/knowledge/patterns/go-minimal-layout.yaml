@@ -1,5 +1,5 @@
 id: pattern:go:minimal-layout
-title: Structure minimale — packages par frontière d'import
+title: Minimal layout — packages by import boundary
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  L'arborescence copiée d'un template générique (cmd/pkg/internal/scripts…)
-  crée des packages vides et des couches artificielles pour un petit projet
-  (voir pattern:antipattern:go-over-structuring).
+  The tree copied from a generic template (cmd/pkg/internal/scripts…)
+  creates empty packages and artificial layers for a small project (see
+  pattern:antipattern:go-over-structuring).
 context: >-
-  S'applique à l'initialisation d'un module et à chaque ajout de package :
-  ne structurer que ce qui existe.
+  Applies at module initialization and at every package addition: structure
+  only what exists.
 solution: >-
-  Commencer à la racine du module ; ajouter des packages quand une frontière
-  d'import est réelle — `internal/` pour le code privé (le compilateur bloque
-  les imports externes), `cmd/` pour les binaires du module. Structurer
-  par responsabilité (domaine, transport, storage), pas par copie de layout.
+  Start at the module root; add packages when an import boundary is real —
+  `internal/` for private code (the compiler blocks external imports),
+  `cmd/` for the module's binaries. Structure by responsibility (domain,
+  transport, storage), not by copying a layout.
 benefits: >-
-  Navigation courte, pas de package fourre-tout, frontières vérifiées par le
-  compilateur (`internal/`), coût d'entretien minimal.
+  Short navigation, no catch-all package, boundaries enforced by the
+  compiler (`internal/`), minimal maintenance cost.
 costs: >-
-  La migration vers plus de structure est plus coûteuse que la création
-  initiale — un template de démarrage raisonnable (celui du kit) reste une
-  base saine, l'anti-pattern est d'en conserver les dossiers vides.
+  Migrating to more structure is more expensive than the initial creation —
+  a reasonable starter template (the kit's) remains a sound base; the
+  anti-pattern is keeping its empty folders.
 related: >-
-  Règles du kit : `rules/core/philosophy`. Homologue négatif :
+  Kit rules: `rules/core/philosophy`. Negative counterpart:
   pattern:antipattern:go-over-structuring.
 relationships:
   references:

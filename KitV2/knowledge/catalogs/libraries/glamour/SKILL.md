@@ -6,7 +6,7 @@ tags: [tui, markdown, terminal, rendering, cli]
 last-verified: 2026-08-05
 ---
 
-# glamour — rendu Markdown terminal
+# glamour — terminal Markdown rendering
 
 ## Selection
 
@@ -54,35 +54,30 @@ not be copied into new code.
 | Hand-written ANSI rendering | Rejected for non-trivial Markdown; it recreates parsing and layout bugs. |
 | glow | Choose the complete standalone Markdown reader; glamour is the embeddable renderer. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A CLI/TUI needs to render Markdown documents, reports, or LLM output in a
   terminal.
 - Built-in dark/light/notty themes or a custom style sheet are sufficient.
 - The output must remain terminal text rather than HTML or images.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The target is HTML, a browser, or a rich document format.
 - Image rendering is a requirement.
 - Only ANSI styling/layout is needed without Markdown parsing.
 - A standalone Markdown reader is desired instead of an embedded library.
 
-## Avantages
-
+## Advantages
 - Focused Markdown-to-terminal API on top of goldmark.
 - Stylesheet-based customization and a plain `notty` mode for pipes/CI.
 - v2 has a clear vanity module path and a maintained Charm ecosystem boundary.
 
-## Inconvénients
-
+## Disadvantages
 - Terminal output only; it does not replace an HTML renderer or image pipeline.
 - Word wrapping and table width require deliberate configuration for narrow or
   structured output.
 - v2 is a breaking import/API migration from the v1 package.
 
-## Pièges connus
-
+## Known pitfalls
 - Use `notty` for pipes, logs, and CI; ANSI escape codes are not a substitute
   for terminal capability detection.
 - Configure word wrap for tables and narrow terminals; upstream tracks width
@@ -91,8 +86,7 @@ not be copied into new code.
 - Keep terminal styling around the rendered document in Lip Gloss, not by
   post-processing arbitrary ANSI strings.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Glamour repository](https://github.com/charmbracelet/glamour) —
   maintenance and architecture, checked 2026-08-05.
 - [Glamour v2.0.1 on pkg.go.dev](https://pkg.go.dev/charm.land/glamour/v2@v2.0.1)

@@ -1,0 +1,46 @@
+---
+id: pattern:go:generics-when-worth
+title: Generics when they pay — write them for many types, not one call site
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, generics, type-parameters, design, stdlib]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  Generic code adds constraints, inference complexity, and compile cost;
+  used speculatively it makes simple code harder to read and is a
+  premature abstraction (see pattern:antipattern:go-interface-everywhere
+  for the interface-side trap).
+context: >-
+  Applies when a function or type would otherwise be duplicated for several
+  types, or forced through any/interface{} with runtime assertions.
+solution: >-
+  Write a generic function or type when the same operation serves many
+  types — containers, slice/map helpers, data structures, algorithms.
+  Constrain only what the body needs (comparable, ordered, a minimal
+  interface). Ian Lance Taylor's "When To Use Generics": write them when you
+  would otherwise write the same code several times with different types;
+  do not write them for a single type "just in case". The stdlib itself now
+  ships generic helpers (slices, maps) — reach for those before writing
+  your own.
+benefits: >-
+  One typed implementation instead of duplicated or any-typed code; type
+  errors stay at compile time; callers keep their concrete types and
+  documentation.
+costs: >-
+  Readability tax (constraints, inference edge cases), larger binaries and
+  slower compilation; a generic helper with one call site is indirection
+  without benefit.
+related: >-
+  Replaces interface{} indirection — compare pattern:go:concrete-returns;
+  negative counterpart: pattern:antipattern:go-interface-everywhere.
+relationships:
+  references:
+    - https://go.dev/blog/when-generics
+    - https://go.dev/blog/intro-generics
+    - pattern:antipattern:go-interface-everywhere
+  uses: []
+  validated_by: []

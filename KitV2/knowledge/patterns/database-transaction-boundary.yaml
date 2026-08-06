@@ -1,5 +1,5 @@
 id: pattern:database:transaction-boundary
-title: Frontière de transaction — BeginTx + Rollback en defer
+title: Transaction boundary — BeginTx + deferred Rollback
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Plusieurs écritures doivent être atomiques ; un BEGIN/COMMIT manuel ou un
-  commit sans rollback laisse la base dans un état imprévisible en cas
-  d'erreur (voir pattern:antipattern:db-raw-transactions).
+  Several writes must be atomic; a manual BEGIN/COMMIT or a commit without
+  rollback leaves the database in an unpredictable state on error (see
+  pattern:antipattern:db-raw-transactions).
 context: >-
-  S'applique à toute opération multi-écritures (créer + références, valider +
-  statuts, outbox) qui doit réussir ou échouer ensemble.
+  Applies to any multi-write operation (create + references, validate +
+  statuses, outbox) that must succeed or fail together.
 solution: >-
-  `tx, err := db.BeginTx(ctx, nil)` ; toutes les opérations sur `tx` ;
-  `defer tx.Rollback()` (sans effet après commit) ; `tx.Commit()` en fin avec
-  vérification de son erreur. Garder la transaction courte (pas d'I/O
-  externe dedans) et sa frontière à une fonction.
+  `tx, err := db.BeginTx(ctx, nil)`; all operations on `tx`;
+  `defer tx.Rollback()` (no effect after commit); `tx.Commit()` at the end
+  with its error checked. Keep the transaction short (no external I/O inside
+  it) and its boundary within a single function.
 benefits: >-
-  Atomicité garantie par l'API (jamais d'état orphelin), rollback automatique
-  sur tout chemin d'erreur, et une transaction = une fonction testable.
+  Atomicity guaranteed by the API (never an orphaned state), automatic
+  rollback on every error path, and one transaction = one testable function.
 costs: >-
-  La transaction verrouille des lignes et réserve une connexion du pool (voir
-  pattern:database:pool-config) — la courte durée est la contrepartie ; pas
-  d'API savepoint en database/sql (SQL brut driver-dépendant si nécessaire).
+  The transaction locks rows and holds a pool connection (see
+  pattern:database:pool-config) — short duration is the trade-off; no
+  savepoint API in database/sql (raw driver-dependent SQL if needed).
 related: >-
-  Homologue négatif : pattern:antipattern:db-raw-transactions.
+  Negative counterpart: pattern:antipattern:db-raw-transactions.
 relationships:
   references:
     - https://go.dev/doc/database/execute-transactions

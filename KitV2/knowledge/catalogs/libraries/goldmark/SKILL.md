@@ -6,7 +6,7 @@ tags: [markdown, commonmark, parsing, rendering, goldmark, extension]
 last-verified: 2026-08-05
 ---
 
-# goldmark — parser Markdown CommonMark
+# goldmark — CommonMark Markdown parser
 
 ## Selection
 
@@ -50,36 +50,31 @@ parsing.
 | `gomarkdown/markdown` | Consider when its dialect/API is required; verify maintenance independently. |
 | Regex rendering | Rejected: it cannot provide CommonMark correctness or safe URL/HTML policy. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go service needs CommonMark parsing, HTML output, an AST, or targeted GFM
   extensions.
 - The application needs custom AST transforms or renderer visitors.
 - Input trust and output sanitization can be made explicit at the boundary.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Untrusted Markdown is rendered without sanitization and safe HTML/URL policy.
 - The target is terminal output: use Glamour for the terminal renderer.
 - A different Markdown dialect is required but no compatible extension exists.
 - The project wants the unstable v2 beta API in a production contract.
 
-## Avantages
-
+## Advantages
 - Zero direct dependencies and tested CommonMark conformance.
 - Extensible AST and renderer interfaces instead of regex or string rewriting.
 - GFM and focused extensions can be selected without adopting a full framework.
 
-## Inconvénients
-
+## Disadvantages
 - Raw HTML and dangerous-link policy require deliberate configuration and
   downstream sanitization for untrusted content.
 - v2 beta is a future breaking boundary; extensions must be tested on upgrades.
 - It does not provide templates, terminal rendering, or application metadata
   management.
 
-## Pièges connus
-
+## Known pitfalls
 - Use a patched release (v1.7.17 or later); current v1.8.5 addresses the
   historical HTML-rendering XSS advisory.
 - Do not equate parsing with sanitization: apply a trusted HTML policy and a
@@ -88,8 +83,7 @@ parsing.
   part of the trusted content contract.
 - Pin v1.8.5 and test third-party extensions while v2 remains beta.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official goldmark repository](https://github.com/yuin/goldmark) — API,
   maintenance, license, checked 2026-08-05.
 - [goldmark on pkg.go.dev](https://pkg.go.dev/github.com/yuin/goldmark) — API,

@@ -1,6 +1,6 @@
 ---
 name: go-agent-kit-v2
-version: 2.4.1
+version: 2.5.0
 status: standalone
 capabilities:
   rules:
@@ -38,8 +38,8 @@ capabilities:
       code; run.sh discovers them by glob and never lists them by hand.
   pi-workflows:
     source: .pi/
-    status: native-workflow-surface
-    criteria: 8 prompts with an activation description and 6 workflow skills
+    status: partial
+    criteria: 3 prompts with an activation description and 8 workflow skills
       with complete frontmatter; prompts and skills keep disjoint roles.
   go-probes:
     source: probes/
@@ -59,22 +59,39 @@ capabilities:
   resource-routing:
     source: router/
     status: generated-read-only-index-and-native-pi-tool
-    criteria: index.json matches meta.json checksum and covers every indexable
-      resource; the runtime tool is read-only.
+    criteria: >-
+      index.json matches meta.json checksum and covers every indexable
+      resource; the runtime tool is read-only; routing quality is contract-
+      tested by scenarios.json under the real runtime scoring (metaproject
+      node gate), so the top resource for each documented intent stays
+      verifiable as the kit grows.
 coverage:
-  product_skills: 71
-  rules: 13
+  product_skills: 72
+  rules: 14
   recipes: 15
   knowledge_catalogs: 43
   probes: 15
   project_templates: 3
 metadata_role: product capability catalog, not an instruction entrypoint
 known_limits:
-  - Pi discovery was smoke-tested from a trusted temporary consumer copy;
-    individual skill invocation remains separate.
-  - Wails and interactive TUI probes verify service/model boundaries; full GUI
-    webview and TTY host rendering remain external system tests.
-  - Effective Go is pinned in the shipped bundle; pkg.go.dev and toolchain
-    units resolve from the local pinned Go toolchain.
-  - resource-routing: consumers never rebuild the router index; it is
-      regenerated in the metaproject and shipped read-only by design.
+  - id: pi-discovery-smoke-test
+    impact: >-
+      Pi discovery was smoke-tested from a trusted temporary consumer copy;
+      individual skill invocation remains separate and is not covered by an
+      automated probe.
+    status: open
+  - id: gui-tty-external-system-tests
+    impact: >-
+      Wails and interactive TUI probes verify service/model boundaries; full
+      GUI webview and TTY host rendering remain external system tests.
+    status: accepted
+  - id: offline-pinned-sources
+    impact: >-
+      Effective Go is pinned in the shipped bundle; pkg.go.dev and toolchain
+      units resolve from the local pinned Go toolchain.
+    status: accepted
+  - id: router-read-only-by-design
+    impact: >-
+      Consumers never rebuild the router index; it is regenerated in the
+      metaproject and shipped read-only by design.
+    status: accepted

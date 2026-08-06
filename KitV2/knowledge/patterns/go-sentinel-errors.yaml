@@ -1,5 +1,5 @@
 id: pattern:go:sentinel-errors
-title: Erreurs sentinelles, typées et opaques
+title: Sentinel, typed, and opaque errors
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Chaque appelant doit décider quoi faire selon la cause d'une erreur, mais
-  sans stratégie commune les comparaisons sont fragiles (chaînes) ou couplent
-  l'appelant à l'implémentation.
+  Every caller must decide what to do based on an error's cause, but without
+  a common strategy comparisons are fragile (strings) or couple the caller
+  to the implementation.
 context: >-
-  S'applique à la frontière publique d'un package qui expose des échecs
-  attendus : validation, introuvable, conflit, indisponible.
+  Applies at a package's public boundary that exposes expected failures:
+  validation, not found, conflict, unavailable.
 solution: >-
-  Choisir une des trois stratégies de Dave Cheney selon le besoin : sentinelle
-  (`var ErrNotFound = errors.New(...)`) pour les cas simples et stables ;
-  type d'erreur (`type ValidationError struct{ Field string }`) quand l'appelant
-  a besoin de détails structurés ; opaque (`return errors.New("…")`) quand
-  l'appelant ne doit décider que succès/échec. Inspecter via `errors.Is`/`As`.
+  Choose one of Dave Cheney's three strategies based on need: sentinel
+  (`var ErrNotFound = errors.New(...)`) for simple, stable cases; error type
+  (`type ValidationError struct{ Field string }`) when the caller needs
+  structured details; opaque (`return errors.New("…")`) when the caller only
+  decides success/failure. Inspect via `errors.Is`/`As`.
 benefits: >-
-  Contrat d'erreur stable et testable, découplage appelant/implémentation
-  (opaque), et mapping déterministe vers les statuts HTTP ou les retries.
+  Stable, testable error contract, caller/implementation decoupling
+  (opaque), and deterministic mapping to HTTP statuses or retries.
 costs: >-
-  Les sentinelles créent un couplage de package (l'appelant importe la
-  sentinelle) ; les types exigent une doc claire. Mélanger les trois dans un
-  même package brouille le contrat — choisir par frontière.
+  Sentinels create package coupling (the caller imports the sentinel); types
+  require clear docs. Mixing the three in one package blurs the contract —
+  choose per boundary.
 related: >-
-  Règles du kit : `rules/core/errors` (sentinel/typed/opaque, handle-once).
-  Homologue négatif : pattern:antipattern:go-error-string-matching.
+  Kit rules: `rules/core/errors` (sentinel/typed/opaque, handle-once).
+  Negative counterpart: pattern:antipattern:go-error-string-matching.
 relationships:
   references:
     - https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully

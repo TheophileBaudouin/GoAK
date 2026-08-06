@@ -1,5 +1,5 @@
 id: pattern:testing:fakes-over-mocks
-title: Fakes par rôle plutôt que mocks d'interactions
+title: Role-based fakes over interaction mocks
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les mocks d'interaction figent l'API interne, rendent les tests fragiles et
-  vérifient des attentes plutôt que des contrats (voir
+  Interaction mocks freeze the internal API, make tests fragile, and verify
+  expectations rather than contracts (see
   pattern:antipattern:test-over-mocking).
 context: >-
-  S'applique aux dépendances d'un test : repository, client HTTP, horloge —
-  à la frontière instable uniquement.
+  Applies to a test's dependencies: repository, HTTP client, clock — only
+  at the unstable boundary.
 solution: >-
-  Utiliser la taxonomie des test doubles par rôle (Meszaros) : **fake**
-  (implémentation fonctionnelle en mémoire, ex. repo en map), **stub**
-  (réponses fixes), **spy** (enregistre et relit) — en privilégiant les
-  fakes sur les mocks (vérification d'état, pas d'interaction). Pour HTTP :
-  `httptest.Server` (voir pattern:testing:httptest). Les frameworks de mock
-  (mockery, testify/mock) ne sont justifiés que pour les interfaces
-  réellement instables.
+  Use the role-based test double taxonomy (Meszaros): **fake** (functional
+  in-memory implementation, e.g. a map-backed repo), **stub** (fixed
+  responses), **spy** (records and replays) — preferring fakes over mocks
+  (state verification, not interaction). For HTTP: `httptest.Server` (see
+  pattern:testing:httptest). Mock frameworks (mockery, testify/mock) are
+  justified only for genuinely unstable interfaces.
 benefits: >-
-  Tests stables au refactor interne, contrats vérifiés sur données réelles,
-  moins de configuration de doubles — et les fakes sont réutilisables.
+  Tests stable under internal refactoring, contracts verified on real data,
+  less double configuration — and fakes are reusable.
 costs: >-
-  Un fake est du code à maintenir (garder le plus simple possible) ; il doit
-  refléter le vrai contrat, sinon il crée une fausse confiance (un test
-  d'intégration minimal reste nécessaire).
+  A fake is code to maintain (keep it as simple as possible); it must
+  reflect the real contract, otherwise it creates false confidence (a
+  minimal integration test remains necessary).
 related: >-
-  Règles du kit : `rules/registry/testing`. Recette : recipe-sqlite-sqlc
-  (base réelle en test). Homologue négatif :
+  Kit rules: `rules/registry/testing`. Recipe: recipe-sqlite-sqlc
+  (real database in tests). Negative counterpart:
   pattern:antipattern:test-over-mocking.
 relationships:
   references:

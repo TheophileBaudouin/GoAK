@@ -51,7 +51,8 @@ TEMPLATE_STATUSES = {"planned", "sourced", "legacy", "deprecated"}
 CATALOG_MAX_AGE_DAYS = 90
 REFERENCE_MAX_AGE_DAYS = 180
 SOURCE_HEADING_RE = re.compile(
-    r"^##+\s+Sources v[ée]rifi[ée]es\s*$", re.IGNORECASE | re.MULTILINE
+    r"^##+\s+(?:Verified sources|Sources v[ée]rifi[ée]es)\s*$",
+    re.IGNORECASE | re.MULTILINE,
 )
 GO_FENCE_RE = re.compile(r"^```(?:go|golang)\s*$", re.IGNORECASE)
 FENCE_RE = re.compile(r"^```\s*$")
@@ -146,12 +147,12 @@ def check_catalog_freshness(path: Path) -> list[str]:
     values = parse_frontmatter(path)
     source_heading = SOURCE_HEADING_RE.search(text)
     if source_heading is None:
-        return [f"{path}: missing 'Sources vérifiées' section"]
+        return [f"{path}: missing 'Verified sources' section"]
     source_text = text[source_heading.end() :]
     if not re.search(r"https?://", source_text):
-        errors.append(f"{path}: Sources vérifiées must contain a URL")
+        errors.append(f"{path}: Verified sources must contain a URL")
     if not re.search(r"20\d{2}-\d{2}-\d{2}", source_text):
-        errors.append(f"{path}: Sources vérifiées must contain a verification date")
+        errors.append(f"{path}: Verified sources must contain a verification date")
     try:
         verified = date.fromisoformat(values.get("last-verified", ""))
     except ValueError:
@@ -232,6 +233,43 @@ def check_snippet(path: Path) -> list[str]:
         errors.append(f"{check}: check must not mutate the snippet")
     if not re.search(r"\bgo\s+(?:test|run)\b", check_text):
         errors.append(f"{check}: check must compile and execute with go test or go run")
+    return errors
+
+
+def check_snippet_chain(root: Path = ROOT) -> list[str]:
+    """D-2026-08-05-11 cross-file freshness: a snippet must be re-verified
+    when its canonical source changes. Mechanical form: when both the snippet
+    and its canonical source carry a last-verified date, the snippet date must
+    be >= the canonical date. Missing dates are ignored (Z4 §3: the field is
+    recommended, not required). Source resolution itself stays check_snippet's
+    responsibility."""
+    errors: list[str] = []
+    for path in sorted((root / "snippets").glob("*/SNIPPET.yaml")):
+        try:
+            values = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as error:
+            errors.append(f"{path}: invalid YAML: {error}")
+            continue
+        if not isinstance(values, dict):
+            continue
+        snippet_date = values.get("last_verified", "")
+        source = values.get("source", "")
+        if isinstance(snippet_date, date) and not isinstance(snippet_date, str):
+            snippet_date = snippet_date.isoformat()
+        if not isinstance(snippet_date, str) or not snippet_date:
+            continue
+        if not isinstance(source, str) or not source:
+            continue
+        source_path = (path.parent / source).resolve()
+        try:
+            canonical_date = parse_frontmatter(source_path).get("last-verified", "")
+        except (OSError, ValueError):
+            continue  # missing/unreadable canonical is a different check
+        if canonical_date and snippet_date < canonical_date:
+            errors.append(
+                f"{path}: last_verified {snippet_date} older than canonical "
+                f"source {source_path} ({canonical_date}) — re-verify the snippet"
+            )
     return errors
 
 
@@ -704,6 +742,69 @@ def check_router() -> list[str]:
     return errors
 
 
+def check_router_scenarios() -> list[str]:
+    """Validate the routing-quality contract (Z11): scenarios.json is a
+    well-formed {query → expected resource ids} list, every expected id
+    exists in the index, and off-domain scenarios expect no resources.
+
+    This checks the contract file's integrity only. The actual ranking
+    verification (expected ids within top-K under the real runtime scoring)
+    is the metaproject gate (.agent/router/run_scenarios.mjs, node) — see
+    router/scenarios.json header. The ranking gate is not duplicated here
+    because the product validator must stay node-free; the scenario file is
+    shipped so consumers and CI can run the node gate themselves."""
+    errors: list[str] = []
+    router = ROOT / "router"
+    scenarios_path = router / "scenarios.json"
+    index_path = router / "index.json"
+    if not scenarios_path.exists():
+        return [f"{scenarios_path}: missing routing-quality contract (Z11)"]
+    try:
+        contract = json.loads(scenarios_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        return [f"{scenarios_path}: invalid JSON: {error}"]
+    if not isinstance(contract, dict) or contract.get("schema") != 1:
+        return [f"{scenarios_path}: expected schema-1 contract mapping"]
+    scenarios = contract.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        return [f"{scenarios_path}: scenarios list is empty or missing"]
+    try:
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+        indexed_ids = {
+            resource.get("id")
+            for resource in index.get("resources", [])
+            if isinstance(resource, dict)
+        }
+    except (OSError, json.JSONDecodeError):
+        indexed_ids = set()  # index drift is check_router's responsibility
+    for number, scenario in enumerate(scenarios, start=1):
+        where = f"{scenarios_path}: scenario #{number}"
+        if not isinstance(scenario, dict):
+            errors.append(f"{where}: expected a mapping")
+            continue
+        query = scenario.get("query")
+        if not isinstance(query, str) or not 3 <= len(query) <= 300:
+            errors.append(f"{where}: query must be a 3..300 char string")
+        expect = scenario.get("expect")
+        if not isinstance(expect, list) or not all(
+            isinstance(item, str) and item for item in expect
+        ):
+            errors.append(f"{where}: expect must be a non-empty list of ids")
+            expect = []
+        top = scenario.get("top")
+        if top is not None and (not isinstance(top, int) or not 1 <= top <= 8):
+            errors.append(f"{where}: top must be an int in 1..8")
+        off_domain = scenario.get("offDomain")
+        if off_domain is not None and not isinstance(off_domain, bool):
+            errors.append(f"{where}: offDomain must be a boolean")
+        if off_domain and expect:
+            errors.append(f"{where}: off-domain scenario must expect no ids")
+        for expected_id in expect:
+            if expected_id not in indexed_ids:
+                errors.append(f"{where}: expected id {expected_id!r} not in the index")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
@@ -743,6 +844,7 @@ def main() -> int:
             or not (path.parent / "check.sh").exists()
         ):
             errors.append(f"{path.parent}: example.go and check.sh are required")
+    errors.extend(check_snippet_chain())
     for path in (ROOT / ".pi" / "prompts").glob("*.md"):
         try:
             if not parse_frontmatter(path).get("description"):
@@ -754,6 +856,7 @@ def main() -> int:
         errors.extend(check_freshness(path, warnings))
     errors.extend(check_empty_markdown())
     errors.extend(check_router())
+    errors.extend(check_router_scenarios())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())
     errors.extend(check_template_build(warnings))

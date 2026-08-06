@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:sec-ip-trust
-title: Confiance en l'IP client depuis des en-têtes proxy non vérifiés
+title: Trusting the client IP from unverified proxy headers
 kind: Pattern
 version: 1
 status: active
@@ -10,36 +10,34 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  L'IP « client » est dérivée de X-Forwarded-For, X-Real-IP ou Forwarded sans
-  vérifier que le proxy qui a écrit l'en-tête est bien celui que vous
-  contrôlez ; le middleware RealIP de chi est utilisé ; rate-limit, audit ou
-  géo-filtrage se basent sur cette IP.
+  The "client" IP is derived from X-Forwarded-For, X-Real-IP, or Forwarded
+  without verifying that the proxy that wrote the header is actually the one
+  you control; chi's RealIP middleware is used; rate limiting, audit, or
+  geo-filtering rely on this IP.
 detect: >-
-  - `middleware.RealIP` de go-chi/chi : déprécié, 3 advisories de spoofing
-    ouverts contre lui (GHSA-9g5q-2w5x-hmxf, GHSA-rjr7-jggh-pgcp,
-    GHSA-3fxj-6jh8-hvhx) — chercher l'appel dans le stack middleware.
-  - Lecture directe de `r.Header.Get("X-Forwarded-For")` dans le code
-    applicatif.
-  - Aucun `ClientIPFrom*` configuré alors que l'app est derrière un proxy.
+  - `middleware.RealIP` from go-chi/chi: deprecated, 3 open spoofing
+    advisories against it (GHSA-9g5q-2w5x-hmxf, GHSA-rjr7-jggh-pgcp,
+    GHSA-3fxj-6jh8-hvhx) — look for the call in the middleware stack.
+  - Direct reads of `r.Header.Get("X-Forwarded-For")` in application code.
+  - No `ClientIPFrom*` configured while the app sits behind a proxy.
 problem: >-
-  Un client peut forger X-Forwarded-For (ex. `X-Forwarded-For: 127.0.0.1`) :
-  seuls les segments ajoutés par des proxies que vous contrôlez sont fiables
-  (MDN). Une IP forgée contourne le rate-limit par IP, falsifie l'audit,
-  trompe les protections géographiques et détourne les décisions fondées sur
-  l'identité réseau — sans aucune trace d'effraction.
+  A client can forge X-Forwarded-For (e.g. `X-Forwarded-For: 127.0.0.1`):
+  only the segments appended by proxies you control are trustworthy (MDN). A
+  forged IP bypasses per-IP rate limiting, falsifies audit, defeats
+  geo-protections, and subverts decisions based on network identity — with
+  no trace of intrusion.
 fix: >-
-  Choisir exactement UN middleware `ClientIPFrom*` de chi (v5.3+) en fonction
-  de la topologie : exposition directe à Internet →
-  `ClientIPFromRemoteAddr` ; derrière un proxy unique connu (nginx,
-  Cloudflare) → `ClientIPFromHeader` avec le nom d'en-tête exact ; derrière
-  un ensemble de CIDR proxies connus → `ClientIPFromXFF`. Ne jamais faire
-  confiance aux segments d'en-tête que votre proxy ne contrôle pas, et
-  traiter toute IP dérivée d'en-têtes comme non fiable pour une décision de
-  sécurité quand la topologie est inconnue.
+  Choose exactly ONE `ClientIPFrom*` middleware from chi (v5.3+) according to
+  the topology: direct Internet exposure → `ClientIPFromRemoteAddr`; behind a
+  single known proxy (nginx, Cloudflare) → `ClientIPFromHeader` with the
+  exact header name; behind a set of known proxy CIDRs → `ClientIPFromXFF`.
+  Never trust header segments your proxy does not control, and treat any
+  header-derived IP as untrustworthy for a security decision when the
+  topology is unknown.
 when_ok: >-
-  Une IP forgeable est acceptable seulement si aucune décision de sécurité
-  (rate-limit, autorisation, audit d'accès) n'en dépend — documenter alors
-  explicitement cette non-fiabilité.
+  A forgeable IP is acceptable only if no security decision (rate limiting,
+  authorization, access audit) depends on it — then document this
+  untrustworthiness explicitly.
 relationships:
   references:
     - https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf

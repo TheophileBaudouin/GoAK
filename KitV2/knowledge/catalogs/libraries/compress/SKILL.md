@@ -6,7 +6,7 @@ tags: [compression, zstd, s2, gzip, flate, performance]
 last-verified: 2026-08-05
 ---
 
-# compress — codecs compression Go
+# compress — Go compression codecs
 
 ## Selection
 
@@ -57,35 +57,30 @@ confidentiality.
 | Brotli/lzma/lz4 packages | Choose the library that owns the required format; this module does not implement every format. |
 | Encryption | Use `age` or a transport security layer; compression is not encryption. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - zstd or S2 is required in a pure-Go Go service.
 - A benchmark shows a meaningful ratio, latency, or throughput gain over stdlib.
 - The project needs one of the module's supported codecs and can pin/scan its
   dependency.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Stdlib gzip/flate already satisfies interoperability and performance.
 - The required format is Brotli, LZMA, or another codec not supplied here.
 - Untrusted compressed input cannot be bounded for memory/output amplification.
 - The requirement is encryption, integrity policy, or key management.
 
-## Avantages
-
+## Advantages
 - Pure Go and broad codec coverage behind familiar I/O APIs.
 - zstd/S2 implementations with benchmarks and production adoption.
 - Subpackage selection keeps a chosen codec's surface smaller than the whole
   module.
 
-## Inconvénients
-
+## Disadvantages
 - The module is broad; each codec has its own format and operational behavior.
 - New releases can change performance and memory characteristics.
 - Some formats and parallel helpers are separate modules or packages.
 
-## Pièges connus
-
+## Known pitfalls
 - Pin v1.18.7 or later: the historical S2 dictionary advisory affects older
   versions; v1.19.1 is the current checked version.
 - Match framed S2 streams with `s2.NewReader`; do not pass them to block APIs.
@@ -94,8 +89,7 @@ confidentiality.
   frame-size edge cases.
 - Do not manually parallelize a codec whose writer already owns its state.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official compress repository](https://github.com/klauspost/compress) — API,
   maintenance, license, checked 2026-08-05.
 - [v1.19.1 release](https://github.com/klauspost/compress/releases/tag/v1.19.1)

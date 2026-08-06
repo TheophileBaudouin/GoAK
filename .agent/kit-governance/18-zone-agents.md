@@ -13,7 +13,7 @@ The product's **single entry point** for a consumer agent: what this Kit is, whe
 2. **Source of truth**: where each truth lives (rules, knowledge, recipes, snippets, templates, probes, tools, `.pi/`).
 3. **Workflow**: the native resources to use for non-trivial work — the `spec-driven-dev` skill for large-scale transformations, `workflow-memory` for memory, `checklist-*` prompts for reviews (updated 2026-08-05: the former `workflow-clarify → plan → tasks → implement → verify` prompt chain is removed, D-2026-08-05-16).
 4. **Validation**: the complete, unambiguous gate — all commands (validator, gofmt, vet, lint, tests, gosec, govulncheck, probes) and the PARTIAL rule when a tool is missing.
-5. **Limits**: what the Kit does not claim to cover (Wails, TUI, Pi discovery).
+5. **Limits**: what the Kit does not claim to cover (full desktop-application wiring (Wails), TUI development beyond the interactive Bubble Tea recipe, Pi discovery internals, non-Go domains).
 
 ## 3. Rules
 

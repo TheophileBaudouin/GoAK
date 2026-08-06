@@ -1,44 +1,44 @@
 ---
 name: recipe-sqlite-sqlc
-description: "Accès SQLite fortement typé en Go via la génération de code sqlc v1.31.1 et le pilote pure-Go modernc.org/sqlite v1.56.0 (sans cgo). Utiliser pour tout service Go nécessitant une persistance SQLite robuste et testable."
+description: "Typed SQLite access in Go via sqlc v1.31.1 code generation and the pure-Go driver modernc.org/sqlite v1.56.0 (cgo-free). Use for any Go service needing robust, testable SQLite persistence."
 category: recipe
 tags: [sqlite, sqlc, database, sql, codegen, cgo-free]
 last-verified: 2026-08-05
 ---
 
-# recipe-sqlite-sqlc — SQLite sans CGO avec sqlc
+# recipe-sqlite-sqlc — CGO-free SQLite with sqlc
 
-## Objectif et cas d'utilisation
+## Goal and use case
 
-Interagir avec une base SQLite de manière fortement typée et portable (sans compilateur C ni CGO), en générant le code d'accès aux données à partir de schémas DDL et de requêtes SQL brutes via `sqlc v1.31.1`.
+Interact with a SQLite database in a strongly typed and portable way (no C compiler, no CGO), by generating data-access code from DDL schemas and raw SQL queries via `sqlc v1.31.1`.
 
-Utiliser cette recette pour éliminer le code verbeux `rows.Scan()` et attraper les erreurs SQL lors de la génération de code plutôt qu'à l'exécution.
+Use this recipe to eliminate verbose `rows.Scan()` code and to catch SQL errors at code-generation time rather than at runtime.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendances :
-  - `modernc.org/sqlite v1.56.0` (pilote SQLite pure-Go, zéro CGO)
-  - `sqlc v1.31.1` (outil de génération de code CLI)
-- Architecture :
-  - `schema.sql` définit la structure des tables.
-  - `query.sql` contient les requêtes annotées (`-- name: GetFoo :one`, etc.).
-  - `sqlc.yaml` configure le générateur (engine: sqlite, emit_json_tags: true).
-  - Les fichiers générés (`db.go`, `models.go`, `query.sql.go`) fournissent l'interface `DBTX` et la structure `*Queries`.
-  - `Open(dsn string) (*sql.DB, error)` initialise la connexion et applique le schéma via SQL embarqué (`//go:embed schema.sql`).
+- Dependencies:
+  - `modernc.org/sqlite v1.56.0` (pure-Go SQLite driver, zero CGO)
+  - `sqlc v1.31.1` (CLI code-generation tool)
+- Architecture:
+  - `schema.sql` defines the table structure.
+  - `query.sql` contains the annotated queries (`-- name: GetFoo :one`, etc.).
+  - `sqlc.yaml` configures the generator (engine: sqlite, emit_json_tags: true).
+  - The generated files (`db.go`, `models.go`, `query.sql.go`) provide the `DBTX` interface and the `*Queries` struct.
+  - `Open(dsn string) (*sql.DB, error)` initializes the connection and applies the schema via embedded SQL (`//go:embed schema.sql`).
 
-## Composants et choix
+## Components and choices
 
-- `modernc.org/sqlite` — pilote 100% pure Go compilé depuis C vers Go (transpilation). Permet le cross-compiling universel avec `CGO_ENABLED=0`.
-- `sqlc v1.31.1` — générateur de code SQL de référence qui préserve le SQL comme source de vérité.
+- `modernc.org/sqlite` — 100% pure Go driver compiled from C to Go (transpilation). Enables universal cross-compiling with `CGO_ENABLED=0`.
+- `sqlc v1.31.1` — reference SQL code generator that keeps SQL as the source of truth.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `mattn/go-sqlite3` : nécessite `CGO_ENABLED=1` et une chaîne d'outils C complète sur chaque cible de build. Compromet la portabilité.
-- `database/sql` sans sqlc : requiert du `Scan()` manuel, sensible aux erreurs d'alignement de types et sans vérification à la compilation.
-- GORM / ORM lourd : abstractions complexes qui masquent les requêtes SQL réelles, ralentissent les exécutions et génèrent un SQL imprévisible.
+- `mattn/go-sqlite3`: requires `CGO_ENABLED=1` and a full C toolchain on every build target. Compromises portability.
+- `database/sql` without sqlc: requires manual `Scan()`, prone to type-alignment errors, and without compile-time checking.
+- GORM / heavy ORM: complex abstractions that hide the real SQL queries, slow down execution, and generate unpredictable SQL.
 
-## Exemple complet
+## Complete example
 
 ```go
 package sqlcsqlite
@@ -75,26 +75,26 @@ func Open(dsn string) (*sql.DB, error) {
 }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Exécuter `sqlc generate` à chaque modification de `schema.sql` ou `query.sql` pour maintenir le code Go aligné.
-- L'interface `DBTX` générée permet d'exécuter les requêtes aussi bien sur une connexion `*sql.DB` que dans une transaction `*sql.Tx` via `q.WithTx(tx)`.
-- Éviter d'insérer des commentaires arbitraires en haut de `query.sql` s'ils ne sont pas directement liés aux requêtes annotées.
+- Run `sqlc generate` after every change to `schema.sql` or `query.sql` to keep the Go code in sync.
+- The generated `DBTX` interface allows running queries on either a `*sql.DB` connection or inside a `*sql.Tx` transaction via `q.WithTx(tx)`.
+- Avoid inserting arbitrary comments at the top of `query.sql` when they are not directly related to the annotated queries.
 
-## Limites et extensions
+## Limits and extensions
 
-Pour les besoins de très fortes performances en écriture concurrente (milliers de requêtes/s), évaluer si WAL mode ou PostgreSQL (`recipe-postgres-pgx`) est nécessaire.
+For very high concurrent write performance needs (thousands of queries/s), evaluate whether WAL mode or PostgreSQL (`recipe-postgres-pgx`) is required.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-sqlite-sqlc/...
 go run ./probes/sqlite-sqlc
 ```
 
-La probe ouvre une base de données SQLite en mémoire, insère une entrée via `CreateFoo`, la relit via `GetFoo` et valide les données obtenues avant d'afficher `sqlite-sqlc: PASS`.
+The probe opens an in-memory SQLite database, inserts an entry via `CreateFoo`, reads it back via `GetFoo`, and validates the retrieved data before printing `sqlite-sqlc: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [sqlc Documentation](https://docs.sqlc.dev) — guide officiel et tutoriel SQLite.
-- [modernc.org/sqlite](https://gitlab.com/cznic/sqlite) — dépôt officiel GitLab du pilote pure-Go.
+- [sqlc Documentation](https://docs.sqlc.dev) — official guide and SQLite tutorial.
+- [modernc.org/sqlite](https://gitlab.com/cznic/sqlite) — official GitLab repository of the pure-Go driver.

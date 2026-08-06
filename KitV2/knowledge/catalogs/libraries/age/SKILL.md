@@ -6,7 +6,7 @@ tags: [crypto, encryption, age, x25519, secrets, files]
 last-verified: 2026-08-05
 ---
 
-# age — chiffrement de fichiers
+# age — file encryption
 
 ## Selection
 
@@ -58,36 +58,31 @@ error at the application boundary.
 | Hand-written AES-GCM | Rejected: callers would own nonce, framing, and key-management mistakes. |
 | `age` CLI only | Correct for shell workflows; use the Go package when encryption is embedded in a Go program. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Encrypting files, archives, backups, or secrets at rest.
 - An interoperable format and a small cryptographic decision surface matter.
 - The caller can provide and protect identities outside the encryption stream.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The data is network traffic: use TLS.
 - The application needs KMS/HSM integration, key rotation, revocation, or
   multi-tenant key policy: use an appropriate key-management boundary.
 - The application needs replay/freshness protection: add authenticated
   application metadata and a freshness policy.
 
-## Avantages
-
+## Advantages
 - Minimal API with no caller-selected cipher or mode.
 - Pure Go, authenticated format, CLI interoperability, and focused surface.
 - Current v1.3 line adds hybrid post-quantum recipients without changing the
   basic file-encryption workflow.
 
-## Inconvénients
-
+## Disadvantages
 - It does not provide key storage, rotation, revocation, or network transport.
 - Whole-file replay is not detected by the format alone.
 - Identities remain application responsibility; losing the private identity
   makes encrypted data unrecoverable.
 
-## Pièges connus
-
+## Known pitfalls
 - Always check the writer's `Close` error; the final authenticated data is
   emitted there.
 - Do not pass untrusted plugin or recipient names without applying the package's
@@ -97,8 +92,7 @@ error at the application boundary.
 - Rebuild v1.3.1 binaries with a patched Go toolchain when the upstream binary
   toolchain advisory applies; it does not describe a library-source exploit.
 
-## Sources vérifiées
-
+## Verified sources
 - [FiloSottile/age repository](https://github.com/FiloSottile/age) — official
   repository and license, checked 2026-08-05.
 - [age v1.3.1 release](https://github.com/FiloSottile/age/releases/tag/v1.3.1)

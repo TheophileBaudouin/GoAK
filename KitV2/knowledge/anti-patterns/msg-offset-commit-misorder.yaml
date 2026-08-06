@@ -1,5 +1,5 @@
 id: pattern:antipattern:msg-offset-commit-misorder
-title: Mauvais ordre de commit des offsets consommateur
+title: Consumer offset commit misordering
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Offsets commités avant traitement (perte de données si le crash suit),
-  auto-commit activé avec traitement manuel, ou commit après traitement
-  asynchrone non ordonné (un commit d'un message plus ancien régresse
-  l'offset).
+  Offsets committed before processing (data loss if a crash follows),
+  auto-commit enabled with manual processing, or commit after unordered
+  asynchronous processing (committing an older message regresses the offset).
 detect: >-
-  - `enable.auto.commit=true` alors que la logique de traitement est
-    manuelle/asynchrone.
-  - Commit immédiat après réception, avant le traitement et sa persistance.
-  - Traitement concurrent par partitions/rangs sans garantie d'ordre de
-    commit (position qui recule).
+  - `enable.auto.commit=true` while the processing logic is
+    manual/asynchronous.
+  - Commit immediately after reception, before processing and its persistence.
+  - Concurrent processing by partitions/ranks without commit-order guarantee
+    (a position that moves backward).
 problem: >-
-  Commit trop tôt = perte de messages à la panne ; commit trop tard ou
-  désordonné = reprocessing et doublons. Les deux modes corrompent
-  l'exactitude du flux (au-most-once vs at-least-once incontrôlé).
+  Commit too early = message loss on failure; commit too late or out of order
+  = reprocessing and duplicates. Both modes corrupt stream accuracy
+  (at-most-once vs uncontrolled at-least-once).
 fix: >-
-  Choisir explicitement la sémantique : at-least-once → traiter puis commiter
-  (commit après persistance, en vérifiant l'erreur), en désactivant
-  l'auto-commit si le traitement n'est pas synchrone. Pour le traitement
-  concurrent, committer dans l'ordre (suivre la position du rang le plus
-  ancien) et gérer le rebalance (voir rebalance listener). Idempotence du
-  traitement pour absorber les doublons.
+  Choose the semantics explicitly: at-least-once → process then commit
+  (commit after persistence, checking the error), disabling auto-commit when
+  processing is not synchronous. For concurrent processing, commit in order
+  (track the oldest rank's position) and handle rebalance (see rebalance
+  listener). Idempotent processing absorbs duplicates.
 when_ok: >-
-  Au-most-once (commit avant traitement) peut convenir à des flux de
-  télémétrie où la perte est acceptée ; c'est un choix produit documenté, pas
-  un accident.
+  At-most-once (commit before processing) may suit telemetry streams where
+  loss is accepted; it is a documented product choice, not an accident.
 relationships:
   references:
     - https://docs.confluent.io/platform/current/clients/consumer.html

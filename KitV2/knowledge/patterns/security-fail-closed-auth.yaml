@@ -1,5 +1,5 @@
 id: pattern:security:fail-closed-auth
-title: Échec fermé — refuser par défaut
+title: Fail closed — deny by default
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les contrôles d'accès dont le défaut autorise (ou qui échouent ouvert en
-  cas d'erreur) transforment une panne en brèche (voir
-  pattern:antipattern:sec-fail-open).
+  Access controls whose default allows (or that fail open on error) turn an
+  outage into a breach (see pattern:antipattern:sec-fail-open).
 context: >-
-  S'applique à toute décision d'authentification/autorisation : middleware,
-  API, accès aux ressources.
+  Applies to every authentication/authorization decision: middleware, API,
+  resource access.
 solution: >-
-  Refuser par défaut, autoriser explicitement : `return 403` sur tout chemin
-  non validé, la vérification d'autorisation n'est jamais conditionnelle à un
-  flag, et toute erreur de vérification (IdP indisponible, token illisible,
-  timeout) est traitée comme un refus avec log. Tester explicitement les
-  chemins d'erreur du contrôle.
+  Deny by default, allow explicitly: `return 403` on any unvalidated path,
+  the authorization check is never conditional on a flag, and any
+  verification error (IdP unavailable, unreadable token, timeout) is
+  treated as a denial with a log. Test the control's error paths explicitly.
 benefits: >-
-  La défaillance d'un composant de sécurité dégrade vers le refus (dispo
-  réduite) jamais vers l'accès (brèche) — la seule orientation acceptable
-  pour les contrôles.
+  A failing security component degrades toward denial (reduced
+  availability), never toward access (breach) — the only acceptable
+  orientation for controls.
 costs: >-
-  Un IdP en panne bloque les accès (choix de disponibilité) ; le « mode
-  dégradé ouvert » exige une décision produit documentée et un risque
-  accepté, jamais un défaut.
+  A down IdP blocks access (an availability choice); 'open degraded mode'
+  requires a documented product decision and an accepted risk, never a
+  default.
 related: >-
-  Homologue négatif : pattern:antipattern:sec-fail-open.
+  Negative counterpart: pattern:antipattern:sec-fail-open.
 relationships:
   references:
     - https://owasp.org/Top10/2025/A10_2025-Mishandling_of_Exceptional_Conditions/

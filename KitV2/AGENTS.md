@@ -4,17 +4,19 @@ KitV2 is the standalone consumable Go agent kit.
 
 ## Source of truth
 
-- `rules/` — agent rules and principles, including catalog freshness, single-source, and example consistency.
-- `knowledge/` — sourced product indexes and decision context; it must not duplicate rule or recipe bodies or metaproject history.
-- `recipes/` — runnable Go recipes, tests, and procedure documents.
-- `snippets/` — metadata-bearing, focused examples linked to a canonical recipe or rule.
-- `templates/` — runnable project bases or explicitly labelled partial contracts.
-- `probes/` — product-facing runnable verification scenarios, including the offline retrieval probe.
-- `tools/offline/` — stdlib-only resolver, manifest, pinned source bundle, and attribution files.
-- `router/` — generated read-only routing index (index.json + meta.json); the search_kit_resources tool uses it to route tasks to resources without loading the kit.
-- `.pi/` — native Pi settings, prompt templates, skills, and the search_kit_resources extension loaded after trust.
+| Zone | Mission (one line) | Pointer |
+| --- | --- | --- |
+| `rules/` | Agent rules and principles (catalog freshness, single-source, example consistency) | `rules/core/`, `rules/registry/` |
+| `knowledge/` | Sourced product indexes and decision context; must not duplicate rule/recipe bodies or metaproject history | `knowledge/INDEX.md` |
+| `recipes/` | Runnable Go recipes, tests, and procedure documents | `recipes/README.md` |
+| `snippets/` | Metadata-bearing, focused examples linked to a canonical recipe or rule | `snippets/README.md` |
+| `templates/` | Runnable project bases or explicitly labelled partial contracts | `templates/README.md` |
+| `probes/` | Product-facing runnable verification scenarios, including the offline retrieval probe | `probes/README.md` |
+| `tools/offline/` | Stdlib-only resolver, manifest, pinned source bundle, and attribution files | `tools/README.md` |
+| `router/` | Generated read-only routing index; `search_kit_resources` routes tasks to resources without loading the kit | `router/README.md` |
+| `.pi/` | Native Pi settings, prompt templates, skills, and the `search_kit_resources` extension loaded after trust | `.pi/README.md` |
 
-If two files answer the same question, keep one canonical answer and replace the other with a pointer. Catalog updates require fresh primary-source research and dated `Sources vérifiées`; fenced Go examples must handle returned errors or be marked `illustrative`. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
+If two files answer the same question, keep one canonical answer and replace the other with a pointer. Catalog updates require fresh primary-source research and dated `Verified sources`; fenced Go examples must handle returned errors or be marked `illustrative`. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
 
 ## Workflow
 
@@ -29,9 +31,16 @@ resources — it replaces the former `workflow-clarify → plan → tasks →
 implement → verify` prompt chain (removed 2026-08-05). The `deep-discuss`
 skill handles structured problem analysis and solution design.
 
-Before planning or implementing technical work, call `search_kit_resources`
-(see the `kit-resource-routing` skill) to route to the relevant rules,
-recipes, and catalogs instead of scanning the kit tree.
+**Routing is mandatory, not optional.** Before planning or implementing any
+technical work, call `search_kit_resources` with the task's technical terms
+and read the top matching resource (rule, recipe, pattern, or catalog) before
+writing code — the index only routes, the kit files stay the source of truth.
+See the `kit-resource-routing` skill for query formulation and result
+interpretation. The tool's own guidelines name the rules and patterns that
+apply by default to ordinary Go code (naming, error wrapping, channel
+ownership, zero-value design); treat those as pre-loaded even when the user
+does not name them. Catalog fiches are routed on demand and are deliberately
+absent from the always-visible skill surface.
 
 ## Memory (consumer projects)
 
@@ -74,5 +83,7 @@ never as passing. The CI workflows (metaproject gate and
 floor of 70%; the local gate does not.
 
 ## Limits
+
+The kit does not claim to cover: full desktop-application wiring (Wails), TUI development beyond the kit's interactive Bubble Tea recipe, Pi discovery internals, or non-Go domains — check the catalog and the router before expecting a kit resource for a technology.
 
 Always preserve errors, cancellation, input validation, and observable evidence. Ask before adding dependencies or changing the manifest contract. Never claim an unexecuted scenario passed or treat static checks as proof of user intent.

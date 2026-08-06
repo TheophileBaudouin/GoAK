@@ -1,0 +1,45 @@
+---
+id: pattern:testing:blackbox-package-tests
+title: Black-box package tests — test through the exported API
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, testing, blackbox, packages, test-architecture]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  Tests in the same package can reach unexported identifiers, so they tend
+  to assert internals; when the internals change, the tests break even
+  though the exported behavior is intact (see
+  pattern:antipattern:test-implementation-details).
+context: >-
+  Applies when choosing the test package for a public package: same-package
+  (white-box) or external (black-box) tests.
+solution: >-
+  Write the primary test file in an external test package (`package foo_test`
+  in `foo_test.go`) that imports the package under test and exercises only
+  its exported API — the official testing docs call this black-box testing.
+  Keep a white-box `package foo` test file only where internals must be
+  tested (unexported helpers, invariants), and keep it small.
+benefits: >-
+  Tests verify the contract consumers actually use; refactoring internals
+  does not break the suite; the public surface is exercised exactly as
+  users do.
+costs: >-
+  Unexported helpers are unreachable from black-box tests — an internal seam
+  or a small white-box file is needed for them; black-box alone cannot cover
+  table-driven variants that require private constructors.
+related: >-
+  Behavioral assertions: pattern:testing:table-driven; seam injection:
+  pattern:testing:seam-injection; negative counterpart:
+  pattern:antipattern:test-implementation-details.
+relationships:
+  references:
+    - https://pkg.go.dev/testing
+    - pattern:testing:table-driven
+    - pattern:testing:seam-injection
+    - pattern:antipattern:test-implementation-details
+  uses: []
+  validated_by: []

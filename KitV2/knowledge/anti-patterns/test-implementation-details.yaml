@@ -1,5 +1,5 @@
 id: pattern:antipattern:test-implementation-details
-title: Tester l'implémentation, pas le comportement
+title: Testing the implementation, not the behavior
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Tests qui vérifient comment le code fait (nombre d'appels à une fonction
-  interne, ordre des appels, valeurs intermédiaires privées) plutôt que ce
-  qu'il produit.
+  Tests that check how the code does things (number of calls to an internal
+  function, call order, private intermediate values) rather than what it
+  produces.
 detect: >-
-  - Tests accédant à des champs/méthodes non exportés via le même package ou
-    comptant des appels internes.
-  - Refactor interne (fusion de fonctions, changement de structure) cassant
-    les tests sans changement de sortie.
-  - Mocks de fonctions triviales (ex. un wrapper de `strings.ToUpper`).
+  - Tests accessing unexported fields/methods via the same package or
+    counting internal calls.
+  - An internal refactor (function merging, structure change) breaking tests
+    with no output change.
+  - Mocks of trivial functions (e.g. a wrapper around `strings.ToUpper`).
 problem: >-
-  Les tests sur l'implémentation figent des détails qui doivent rester libres
-  de changer : ils transforment chaque refactor en travail de test, gonflent
-  la maintenance et ne protègent pas le vrai contrat — le comportement
-  observable depuis l'extérieur.
+  Implementation tests freeze details that must remain free to change: they
+  turn every refactor into test work, inflate maintenance, and do not protect
+  the real contract — the behavior observable from the outside.
 fix: >-
-  Tester par le comportement : entrées publiques → sorties publiques (voir
-  recipe-cli-interactive : test du seam `handleKey(string)` et non du framework).
-  Pour les dépendances, utiliser des interfaces consommateur petites ou des
-  fakes de données, pas des compteurs d'appels internes. Un refactor interne
-  ne doit pas toucher les tests.
+  Test by behavior: public inputs → public outputs (see recipe-cli-interactive:
+  test the `handleKey(string)` seam, not the framework). For dependencies,
+  use small consumer interfaces or data fakes, not internal call counters.
+  An internal refactor must not touch the tests.
 when_ok: >-
-  Une assertion sur un détail interne se justifie pour documenter un
-  comportement non observable autrement (ex. ordre de fermeture de
-  ressources) — rare et à commenter.
+  An assertion on an internal detail is justified to document behavior not
+  otherwise observable (e.g. resource close order) — rare and to be
+  commented.
 relationships:
   references:
     - http://xunitpatterns.com/TestSmells.html

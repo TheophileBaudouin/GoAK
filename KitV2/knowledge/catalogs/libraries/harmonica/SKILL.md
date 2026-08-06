@@ -6,7 +6,7 @@ tags: [animation, physics, spring, tui, charm]
 last-verified: 2026-08-05
 ---
 
-# harmonica — physique d'animation
+# harmonica — animation physics
 
 ## Selection
 
@@ -44,34 +44,29 @@ provides the corresponding constant-acceleration model.
 | Generic easing/tween library | Use when fixed easing curves, not physical spring behavior, are required. |
 | Ebitengine/Pixi-like UI framework | Use when the project needs rendering and a full game/UI loop. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A UI animation needs a damped spring, gravity, or projectile trajectory.
 - The application wants deterministic per-frame math independent of its renderer.
 - Multiple UI frameworks should be able to consume the same motion calculation.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The project needs rendering, event scheduling, or an animation timeline.
 - Fixed easing curves are enough and a physics model adds needless state.
 - The project requires a maintained feature-rich animation framework rather than
   a small math utility.
 
-## Avantages
-
+## Advantages
 - Tiny, framework-agnostic API with explicit per-frame state.
 - Spring parameters map directly to physical behavior.
 - Can be tested without a terminal, window, or renderer.
 
-## Inconvénients
-
+## Disadvantages
 - Low-velocity release cadence: v0.2.0 remains the latest tag.
 - No rendering, easing catalog, interpolation helpers, or lifecycle manager.
 - One spring instance models one spring; consumers manage collections and frame
   scheduling themselves.
 
-## Pièges connus
-
+## Known pitfalls
 - Advance with a stable `deltaTime`; inconsistent frame steps change the motion.
 - Keep one simulation state per animated value and persist position/velocity
   between frames.
@@ -80,8 +75,7 @@ provides the corresponding constant-acceleration model.
 - Pin v0.2.0 and review the pseudo-version separately if consuming unreleased
   changes.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official harmonica repository](https://github.com/charmbracelet/harmonica) —
   maintenance, license, checked 2026-08-05.
 - [harmonica on pkg.go.dev](https://pkg.go.dev/github.com/charmbracelet/harmonica)

@@ -1,6 +1,6 @@
 ---
 id: source:mcp:tool-security
-title: MCP / LLM tool security — inputs du modèle comme frontière de confiance
+title: MCP / LLM tool security — model inputs as a trust boundary
 kind: Source
 version: 1
 status: active

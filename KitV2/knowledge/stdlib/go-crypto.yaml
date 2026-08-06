@@ -1,0 +1,24 @@
+---
+id: source:go:crypto
+title: Go crypto — standard-library cryptographic primitives
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, crypto, security, primitives]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/crypto
+selection: >-
+  Load when choosing a cryptographic primitive: hashes, HMAC, AEAD ciphers,
+  TLS, or random values — prefer vetted stdlib implementations and never
+  roll your own. Constant-time comparisons route to crypto/subtle.
+limits: >-
+  A primitive being in the standard library does not make a protocol secure;
+  misuse (wrong mode, weak parameters, missing authentication) still breaks
+  it. Compare secrets with crypto/subtle —
+  pattern:antipattern:sec-timing-unsafe-comparison.
+relationships:
+  references:
+    - https://pkg.go.dev/crypto

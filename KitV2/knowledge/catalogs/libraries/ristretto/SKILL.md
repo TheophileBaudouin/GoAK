@@ -6,7 +6,7 @@ tags: [cache, memory, performance, tiny-lfu, in-memory]
 last-verified: 2026-08-05
 ---
 
-# ristretto — cache mémoire borné
+# ristretto — bounded in-memory cache
 
 ## Selection
 
@@ -58,36 +58,31 @@ application unit rather than assuming it means bytes automatically.
 | freecache | Choose for a simpler byte cache when TinyLFU/cost semantics are unnecessary. |
 | Redis/remote cache | Choose for shared/distributed cache state; Ristretto is process-local. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Hot data needs a process-local memory budget and an admission policy under
   churn.
 - Values are generic and entries can expose a meaningful cost.
 - Asynchronous buffered writes and eventual cache admission are acceptable.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Cache state must be shared between processes or survive process restart.
 - Every `Set` must synchronously guarantee admission or every `Get` must observe
   the write immediately.
 - Durable data, exact LRU semantics, or a simple one-key memo is required.
 
-## Avantages
-
+## Advantages
 - TinyLFU admission plus SampledLFU eviction avoids wasting capacity on cold
   churn better than a naive LRU in the intended workload.
 - Generic v2 API, explicit cost, optional TTL, metrics, and concurrent operation.
 - Pure Go, single-process deployment, and small focused surface.
 
-## Inconvénients
-
+## Disadvantages
 - Buffered operations can be dropped or delayed under contention.
 - Capacity is cost-based; the caller must define a meaningful cost model.
 - TTL uses bucket/ticker semantics rather than precise per-entry scheduling.
 - It is not durable or distributed.
 
-## Pièges connus
-
+## Known pitfalls
 - Call `Wait` when a test or lifecycle boundary needs buffered `Set` operations
   applied; do not assert immediate visibility without that synchronization.
 - Treat a false `Set` result as a rejected/dropped admission, not as durable
@@ -97,8 +92,7 @@ application unit rather than assuming it means bytes automatically.
 - Never use a process-local cache as the source of truth for user or security
   state.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Ristretto repository](https://github.com/dgraph-io/ristretto) —
   maintenance, design, license, checked 2026-08-05.
 - [Ristretto v2.4.2 releases](https://github.com/dgraph-io/ristretto/releases) —

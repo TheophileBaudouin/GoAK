@@ -6,7 +6,7 @@ tags: [tui, styling, terminal, ansi, cli]
 last-verified: 2026-08-05
 ---
 
-# lipgloss — styles terminal
+# lipgloss — terminal styles
 
 ## Selection
 
@@ -46,38 +46,33 @@ not infer that policy from a rendered style.
 | `pterm` | Choose for a broader imperative formatting/component layer when its extra surface is justified. |
 | Bubble Tea | Companion framework for interactive state, not a styling replacement. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - CLI/TUI output needs colors, borders, padding, alignment, width, or joined
   multi-line layouts.
 - Styles must be values that can be composed and rendered in tests.
 - The output belongs to the Charm terminal stack and should avoid raw ANSI.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The output target is HTML, a browser, or a non-terminal document.
 - A one-off plain string needs no style abstraction.
 - The requirement is event handling, widgets, forms, or a TUI framework.
 - The application needs an explicit terminal profile decision rather than style
   rendering.
 
-## Avantages
-
+## Advantages
 - Chained styles and layout helpers render deterministic strings.
 - Borders, padding, alignment, width, and joins share one composable API.
 - v2 separates style values from the framework/event-loop boundary.
 - It composes with Bubble Tea, Bubbles, Glamour, and Huh.
 
-## Inconvénients
-
+## Disadvantages
 - Terminal-only output; it does not produce HTML or own terminal events.
 - Unicode grapheme width and bordered-table edge cases require testing with real
   content.
 - The v2 API/import migration is breaking from v1.
 - Very simple output can be clearer with stdlib formatting alone.
 
-## Pièges connus
-
+## Known pitfalls
 - Derive a variant with `style.Copy()` rather than mutating shared style state.
 - Test emoji/grapheme widths, borders, padding, and wrapped lines if layout is
   part of the user-visible contract.
@@ -86,8 +81,7 @@ not infer that policy from a rendered style.
 - Use `colorprofile` for explicit capability detection and `sequin` for ANSI
   parsing/stripping.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Lip Gloss repository](https://github.com/charmbracelet/lipgloss) —
   API, maintenance, license, checked 2026-08-05.
 - [Lip Gloss v2.0.5 release](https://github.com/charmbracelet/lipgloss/releases/tag/v2.0.5)

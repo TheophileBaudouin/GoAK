@@ -1,5 +1,5 @@
 id: pattern:testing:table-driven
-title: Tests table-driven — cas en table, assertion en boucle
+title: Table-driven tests — cases in a table, assertions in a loop
 kind: Pattern
 version: 1
 status: active
@@ -9,25 +9,24 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Un test par cas duplique le harnais (appel, assertion, setup) ; les tests
-  copiés divergent et les cas limites sont oubliés.
+  One test per case duplicates the harness (call, assertion, setup); copied
+  tests diverge and edge cases are forgotten.
 context: >-
-  S'applique à toute fonction testable par entrées/sorties avec plusieurs cas
-  (nominal, limites, erreurs).
+  Applies to any function testable by inputs/outputs with several cases
+  (nominal, boundaries, errors).
 solution: >-
-  Le pattern idiomatique Go (wiki officiel) : une slice de cas `{name,
-  input, want}` + `t.Run(name, func(t *testing.T) { … })` en boucle. Nommer
-  chaque cas, tester les erreurs comme des sorties (wantErr), utiliser des
-  sous-tests pour l'isolation.
+  The idiomatic Go pattern (official wiki): a slice of cases `{name,
+  input, want}` + `t.Run(name, func(t *testing.T) { … })` in a loop. Name
+  each case, test errors as outputs (wantErr), use subtests for isolation.
 benefits: >-
-  Un harnais unique, ajout de cas trivial, exécution isolée par sous-test
-  (`-run TestX/cas`), et lisibilité du contrat complet en un coup d'œil.
+  A single harness, trivial case addition, isolated execution per subtest
+  (`-run TestX/cas`), and the full contract readable at a glance.
 costs: >-
-  Les cas aux setup très différents (dépendances lourdes) cassent la table —
-  extraire alors un harnais dédié ; ne pas forcer des scénarios étatiques
-  complexes dans une table plate.
+  Cases with very different setups (heavy dependencies) break the table —
+  extract a dedicated harness instead; do not force complex stateful
+  scenarios into a flat table.
 related: >-
-  Règles du kit : `rules/registry/testing`. Homologue négatif :
+  Kit rules: `rules/registry/testing`. Negative counterpart:
   pattern:antipattern:test-brittle-tests.
 relationships:
   references:

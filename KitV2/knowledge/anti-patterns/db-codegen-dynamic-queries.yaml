@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:db-codegen-dynamic-queries
-title: Requêtes dynamiques imposées à un générateur de code statique
+title: Dynamic queries forced onto a static code generator
 kind: Pattern
 version: 1
 status: active
@@ -10,36 +10,34 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Endpoints de liste ou de recherche multi-critères (WHERE/ORDER BY
-  optionnels) implémentés en luttant contre sqlc : fragments SQL passés en
-  paramètres, conditions CASE illisibles pour couvrir les combinaisons, ou N
-  requêtes générées pour N combinaisons de filtres.
+  List or multi-criteria search endpoints (optional WHERE/ORDER BY)
+  implemented by fighting sqlc: SQL fragments passed as parameters, unreadable
+  CASE conditions to cover the combinations, or N generated queries for N
+  filter combinations.
 detect: >-
-  - Recherche de fragments dynamiques dans les fichiers .sql (`@orderBy`,
-    `@filter`, concaténation conditionnelle de clauses).
-  - `sqlc.embed()` sur des LEFT JOIN avec colonnes NULL → crash de scan ou
-    valeurs absentes (issue #2348 ; `sqlc.nembed()` quand disponible).
-  - Endpoints de liste qui génèrent une requête par combinaison de filtres au
-    lieu d'une construction paramétrée.
+  - Search for dynamic fragments in .sql files (`@orderBy`, `@filter`,
+    conditional concatenation of clauses).
+  - `sqlc.embed()` on LEFT JOIN with NULL columns → scan crash or missing
+    values (issue #2348; use `sqlc.nembed()` when available).
+  - List endpoints that generate one query per filter combination instead of a
+    parameterized construction.
 problem: >-
-  sqlc ne génère que des requêtes STATIQUES : les WHERE/ORDER BY dynamiques
-  sont explicitement hors périmètre (issues #3414, #2061, discussion #364).
-  Forcer le dynamique produit du code fragile et illisible, ou — pire — une
-  interpolation de fragments SQL non paramétrée qui ouvre une injection.
-  C'est le premier point de friction d'adoption de sqlc (top issues par
-  réactions).
+  sqlc only generates STATIC queries: dynamic WHERE/ORDER BY are explicitly
+  out of scope (issues #3414, #2061, discussion #364). Forcing dynamic
+  behavior produces fragile, unreadable code — or worse, an unparameterized
+  interpolation of SQL fragments that opens injection. It is the first
+  adoption friction point of sqlc (top issues by reactions).
 fix: >-
-  Partitionner l'accès aux données : garder sqlc pour les requêtes
-  statiques et typées ; pour les filtres dynamiques, utiliser database/sql +
-  un query builder (squirrel) ou sqlx qui construit la clause paramétrée.
-  Borner les combinaisons quand c'est possible (un nombre fini de requêtes
-  connues). Vérifier la nullabilité des embeds sur JOIN (préférer
-  `sqlc.nembed()` pour les LEFT JOIN).
+  Partition data access: keep sqlc for static, typed queries; for dynamic
+  filters, use database/sql + a query builder (squirrel) or sqlx that builds
+  the parameterized clause. Bound the combinations when possible (a finite set
+  of known queries). Verify the nullability of embeds on JOIN (prefer
+  `sqlc.nembed()` for LEFT JOIN).
 when_ok: >-
-  Un nombre borné et connu de combinaisons de filtres peut rester en sqlc via
-  des paramètres optionnels (COALESCE / `$1 IS NULL OR`) si le plan
-  d'exécution et l'index restent corrects — à valider par plan d'exécution,
-  pas par commodité.
+  A bounded, known number of filter combinations can stay in sqlc via optional
+  parameters (COALESCE / `$1 IS NULL OR`) if the execution plan and the index
+  remain correct — to be validated with an execution plan, not for
+  convenience.
 relationships:
   references:
     - https://github.com/sqlc-dev/sqlc/issues/3414

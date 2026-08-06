@@ -6,7 +6,7 @@ tags: [http, router, middleware, rest]
 last-verified: 2026-08-05
 ---
 
-# chi — routeur HTTP
+# chi — HTTP router
 
 ## Selection
 
@@ -51,42 +51,36 @@ method/path routing.
 | gin / echo | Choose only when an application explicitly accepts framework-owned contexts and APIs. |
 | gorilla/mux | Do not choose for new work without independent maintenance verification; chi keeps the net/http boundary smaller. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go HTTP service needs route groups, mounts, path parameters, and middleware
   composition while keeping standard `net/http` signatures.
 - Existing net/http middleware must remain reusable without adapter code.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - `ServeMux` already covers the routing and middleware needs.
 - The project wants an all-in-one framework with integrated validation, auth,
   rendering, or API generation.
 - The project cannot accept a third-party router dependency.
 
-## Avantages
-
+## Advantages
 - Standard handlers and middleware preserve portability and testability.
 - Groups, mounts, method routes, and path parameters are compact to compose.
 - The core is small compared with full HTTP frameworks.
 
-## Inconvénients
-
+## Disadvantages
 - Authentication, validation, rendering, and API contracts remain application
   responsibilities.
 - Middleware security depends on the deployment topology and selected helper.
 - OpenAPI/client generation is outside chi's responsibility.
 
-## Pièges connus
-
+## Known pitfalls
 - Do not use deprecated `middleware.RealIP`: its trust behavior enabled IP
   spoofing. Use one `ClientIPFrom*` helper matching the actual proxy topology.
 - Read parameters with `chi.URLParam`; do not parse path strings manually.
 - Review redirect and proxy middleware advisories when upgrading; pin v5.3.1 or
   a later patched release.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official chi repository](https://github.com/go-chi/chi) — API, maintenance,
   license, checked 2026-08-05.
 - [chi v5.3.1 release](https://github.com/go-chi/chi/releases/tag/v5.3.1) —

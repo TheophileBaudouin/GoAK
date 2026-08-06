@@ -1,5 +1,5 @@
 id: pattern:config:twelve-factor-config
-title: Configuration externalisée — valeurs par environnement
+title: Externalized configuration — per-environment values
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les valeurs par environnement (URLs, ports, credentials) codées en dur
-  imposent un rebuild par environnement et risquent la fuite (voir
+  Per-environment values (URLs, ports, credentials) hardcoded in the source
+  force a rebuild per environment and risk leakage (see
   pattern:antipattern:cfg-hardcoded-values).
 context: >-
-  S'applique à tout programme déployé dans plus d'un environnement ou
-  consommé par d'autres équipes.
+  Applies to any program deployed in more than one environment or consumed
+  by other teams.
 solution: >-
-  Principe Twelve-Factor : la config vit dans l'environnement (variables ou
-  fichier injecté), jamais dans le code. En Go : struct `Config` typée,
-  chargée depuis env/flags/fichier (voir recipe-config-viper et
-  recipe-config-koanf), validée au démarrage avec échec rapide — le même
-  artefact déployé partout, valeurs au runtime.
+  Twelve-Factor principle: configuration lives in the environment (variables
+  or an injected file), never in the code. In Go: a typed `Config` struct,
+  loaded from env/flags/file (see recipe-config-viper and
+  recipe-config-koanf), validated at startup with fast failure — the same
+  artifact deployed everywhere, values at runtime.
 benefits: >-
-  Même binaire en dev/staging/prod, rotation des credentials sans rebuild,
-  démarrage qui échoue vite si la config est invalide (pas de surprise à la
-  première requête).
+  Same binary in dev/staging/prod, credential rotation without rebuild,
+  startup that fails fast when the config is invalid (no surprise at the
+  first request).
 costs: >-
-  La prolifération de variables non documentées devient illisible — regrouper
-  et valider ; les secrets ne doivent pas passer par les flags de processus
-  (historique dans ps), préférer env/secret manager.
+  The proliferation of undocumented variables becomes unreadable — group and
+  validate; secrets must not go through process flags (history visible in
+  ps), prefer env/secret manager.
 related: >-
-  Recettes : recipe-config-viper, recipe-config-koanf. Homologue négatif :
+  Recipes: recipe-config-viper, recipe-config-koanf. Negative counterpart:
   pattern:antipattern:cfg-hardcoded-values,
   pattern:antipattern:sec-hardcoded-credentials.
 relationships:

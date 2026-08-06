@@ -24,10 +24,10 @@ content.
 - `Selection`: what the library is and why it is admitted.
 - `Minimal use`: the smallest correct example, not a second limitations list.
 - `Alternatives considered`: comparative decisions only.
-- `Utiliser...` / `Ne pas utiliser...`: selection boundaries not already stated.
-- `Avantages` / `Inconvénients`: trade-offs, each stated once.
-- `Pièges connus`: actionable misuse warnings not already covered elsewhere.
-- `Sources vérifiées`: evidence and dates, not a prose summary.
+- `When to use` / `When NOT to use`: selection boundaries not already stated.
+- `Advantages` / `Disadvantages`: trade-offs, each stated once.
+- `Known pitfalls`: actionable misuse warnings not already covered elsewhere.
+- `Verified sources`: evidence and dates, not a prose summary.
 
 ## Verification
 

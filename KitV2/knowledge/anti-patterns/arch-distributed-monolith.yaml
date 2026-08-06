@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-distributed-monolith
-title: Monolithe distribué — services couplés au runtime
+title: Distributed monolith — services coupled at runtime
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Des services déployés séparément mais couplés au runtime : appels
-  synchrones en chaîne profonde, base de données partagée, contrats qui
-  changent ensemble, transaction distribuée.
+  Services deployed separately but coupled at runtime: deep synchronous call
+  chains, shared database, contracts that change together, distributed
+  transaction.
 detect: >-
-  - Chaînes d'appels synchrones A→B→C→D pour une seule requête utilisateur.
-  - Un changement de schéma dans un service impose un changement immédiat
-    dans un autre (contrat implicite).
-  - Latence qui s'additionne le long de la chaîne ; dégradation en cascade.
+  - Synchronous call chains A→B→C→D for a single user request.
+  - A schema change in one service forces an immediate change in another
+    (implicit contract).
+  - Latency that adds up along the chain; cascade degradation.
 problem: >-
-  Le monolithe distribué combine les coûts d'un système distribué (latence,
-  échecs partiels, déploiements) avec les inconvénients d'un monolithe
-  (couplage, changements coordonnés) — le pire des deux mondes. C'est
-  l'échec le plus fréquent des migrations microservices.
+  The distributed monolith combines the costs of a distributed system
+  (latency, partial failures, deployments) with the drawbacks of a monolith
+  (coupling, coordinated changes) — the worst of both worlds. It is the most
+  frequent failure of microservices migrations.
 fix: >-
-  Renforcer les frontières : contrats explicites et versionnés, données
-  possédées par un seul service (pas de base partagée — voir
-  arch-shared-database), communication asynchrone (événements) pour les
-  flux non transactionnels, et tolérance aux pannes (timeouts, retry bornée,
-  circuit breaker — voir msg-retry-storm). Ne décomposer que des frontières
-  métier réelles.
+  Strengthen boundaries: explicit, versioned contracts, data owned by a
+  single service (no shared database — see arch-shared-database), asynchronous
+  communication (events) for non-transactional flows, and fault tolerance
+  (timeouts, bounded retry, circuit breaker — see msg-retry-storm). Only
+  decompose real business boundaries.
 when_ok: >-
-  Si le système est déployé et évolue déjà de façon cohérente, un monolithe
-  modulaire (frontières de packages strictes) est souvent la meilleure
-  option ; la décomposition est une dette à rembourser avec des mesures.
+  If the system is already deployed and evolves coherently, a modular
+  monolith (strict package boundaries) is often the best option; decomposition
+  is debt to be repaid with measurements.
 relationships:
   references:
     - https://softwarepatternslexicon.com/microservices-boundaries-and-service-decomposition/anti-patterns/the-distributed-monolith/

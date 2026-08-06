@@ -164,6 +164,46 @@ class ValidatorTests(unittest.TestCase):
             any("vetted" in error and "unvetted" not in error for error in errors)
         )
 
+    def test_snippet_chain_requires_fresh_dependent(self) -> None:
+        """KVA-105 — a snippet older than its canonical source must fail."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "recipes" / "recipe-x" / "SKILL.md",
+                "---\nname: recipe-x\ndescription: canonical\n"
+                "category: recipe\ntags: [x]\nlast-verified: 2026-08-05\n---\n",
+            )
+            write(
+                root / "snippets" / "sx" / "SNIPPET.yaml",
+                "id: sx\npurpose: p\nsource: ../../recipes/recipe-x/SKILL.md\n"
+                "last_verified: 2026-08-04\nfiles: [example.go]\ntests: [check.sh]\n",
+            )
+            errors = module.check_snippet_chain(root=root)
+        self.assertTrue(
+            any("older than canonical" in error for error in errors), errors
+        )
+
+    def test_snippet_chain_accepts_fresh_or_undated(self) -> None:
+        """KVA-105 — fresh dependents and missing dates are accepted."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "recipes" / "recipe-x" / "SKILL.md",
+                "---\nname: recipe-x\ndescription: canonical\n"
+                "category: recipe\ntags: [x]\nlast-verified: 2026-08-05\n---\n",
+            )
+            write(
+                root / "snippets" / "sa" / "SNIPPET.yaml",
+                "id: sa\npurpose: p\nsource: ../../recipes/recipe-x/SKILL.md\n"
+                "last_verified: 2026-08-06\nfiles: [example.go]\ntests: [check.sh]\n",
+            )
+            write(
+                root / "snippets" / "sb" / "SNIPPET.yaml",
+                "id: sb\npurpose: p\nsource: ../../recipes/recipe-x/SKILL.md\n"
+                "files: [example.go]\ntests: [check.sh]\n",
+            )
+            self.assertEqual(module.check_snippet_chain(root=root), [])
+
 
 if __name__ == "__main__":
     unittest.main()

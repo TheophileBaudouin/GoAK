@@ -6,7 +6,7 @@ tags: [tui, components, widgets, bubbletea, terminal]
 last-verified: 2026-08-05
 ---
 
-# bubbles — composants TUI pour Bubble Tea
+# bubbles — TUI components for Bubble Tea
 
 ## Selection
 
@@ -47,8 +47,7 @@ Bubble Tea program. Use a `tea.Model` wrapper to forward `Update` and `View`.
 | tview | A separate imperative TUI model; choose it when that model is preferred instead of Bubble Tea MVU. |
 | lipgloss | Companion styling library, not a replacement for widgets. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Bubble Tea v2 TUI needs a list, table, text input, textarea, spinner,
   progress bar, paginator, viewport, timer, or help component.
 - The application wants standard widget state and rendering while retaining its
@@ -56,29 +55,25 @@ Bubble Tea program. Use a `tea.Model` wrapper to forward `Update` and `View`.
 - Keyboard, scrolling, or input-state edge cases should be delegated to a
   maintained component.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The program only prints formatted terminal output.
 - The application does not use Bubble Tea v2.
 - The required widget is simpler to implement than the dependency boundary.
 - The application needs an imperative widget tree and has selected tview.
 
-## Avantages
-
+## Advantages
 - Components fit the `tea.Model` lifecycle and compose with Bubble Tea.
 - The v2 module has a clear vanity import path and active upstream maintenance.
 - Standard widgets reduce repeated keyboard, pagination, and viewport code.
 - The package family covers both basic controls and asynchronous progress/timer
   views.
 
-## Inconvénients
-
+## Disadvantages
 - Components inherit Bubble Tea's MVU model and v2 migration cost.
 - Generic widgets still require consumer delegates, styles, and composition.
 - The v2 API is not source-compatible with the old GitHub import path.
 
-## Pièges connus
-
+## Known pitfalls
 - Forward the child component's `Update` and `View`; constructing a widget alone
   does not wire it into the parent model.
 - Pin and import `charm.land/bubbles/v2`; do not mix v1 examples with v2 code.
@@ -86,8 +81,7 @@ Bubble Tea program. Use a `tea.Model` wrapper to forward `Update` and `View`.
 - Review viewport dimensions and timer lifecycle at boundaries; upstream tracks
   edge-case issues for zero dimensions and repeated starts.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Bubbles repository](https://github.com/charmbracelet/bubbles) —
   maintenance, license, components, checked 2026-08-05.
 - [Bubbles v2.1.1 release](https://github.com/charmbracelet/bubbles/releases/tag/v2.1.1)

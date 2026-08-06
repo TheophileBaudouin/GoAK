@@ -1,5 +1,5 @@
 id: pattern:antipattern:db-eav
-title: Entité-Attribut-Valeur (EAV) pour des données structurées
+title: Entity-Attribute-Value (EAV) for structured data
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Tables génériques `(entity_id, attribute, value)` pour stocker des attributs
-  qui sont en réalité fixes et typés (propriétés de produits, champs de
-  profil), souvent pour « éviter de changer le schéma ».
+  Generic tables `(entity_id, attribute, value)` used to store attributes that
+  are in fact fixed and typed (product properties, profile fields), often to
+  "avoid changing the schema".
 detect: >-
-  - Schéma avec peu de tables et beaucoup de lignes attribut/value.
-  - Requêtes qui pivotent (GROUP BY + MAX(CASE…)) pour reconstruire une ligne.
-  - Type de valeur unique (TEXT) pour des données hétérogènes.
+  - Schema with few tables and many attribute/value rows.
+  - Queries that pivot (GROUP BY + MAX(CASE…)) to rebuild a row.
+  - A single value type (TEXT) for heterogeneous data.
 problem: >-
-  EAV sacrifie les garanties du schéma : pas de type, pas de contrainte NOT
-  NULL/CHECK, pas d'index naturel, JOINs et pivots coûteux, intégrité gérée en
-  application. La complexité déplacée du schéma vers chaque requête.
+  EAV sacrifices schema guarantees: no type, no NOT NULL/CHECK constraint, no
+  natural index, costly JOINs and pivots, integrity managed in the
+  application. The complexity moves from the schema into every query.
 fix: >-
-  Colonnes dédiées typées pour les attributs fixes (`price NUMERIC NOT NULL`),
-  et une table liée pour les attributs réellement dynamiques (paires clé/valeur
-  limitées et validées). Si le besoin est un schéma flexible et versionné,
-  évaluer une colonne JSONB + validation applicative au lieu d'EAV.
+  Dedicated typed columns for fixed attributes (`price NUMERIC NOT NULL`), and
+  a linked table for truly dynamic attributes (bounded, validated key/value
+  pairs). If the need is a flexible, versioned schema, evaluate a JSONB column
+  + application-level validation instead of EAV.
 when_ok: >-
-  EAV se justifie pour des attributs extensibles par l'utilisateur final non
-  connus à l'avance (formulaires dynamiques) ; la payer par des index
-  partiels et des vues matérialisées si besoin.
+  EAV is justified for attributes extensible by the end user and unknown in
+  advance (dynamic forms); pay for it with partial indexes and materialized
+  views if needed.
 relationships:
   references:
     - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/

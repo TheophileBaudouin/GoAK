@@ -6,7 +6,7 @@ tags: [auth, jwt, security, token, api]
 last-verified: 2026-08-05
 ---
 
-# golang-jwt — signature et validation JWT
+# golang-jwt — JWT signing and validation
 
 ## Selection
 
@@ -52,16 +52,14 @@ successful parse alone as authorization.
 | `lestrrat-go/jwx` | Consider when JWE/JWS breadth or JSON Canonicalization support is a hard requirement. |
 | `dgrijalva/jwt-go` | Discontinued predecessor; never use its legacy import path. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A service needs a signed, interoperable JWT for APIs or service-to-service
   authentication.
 - The issuer, audience, expiry, signing method, and key rotation policy are
   explicit application decisions.
 - The service can validate claims and signing method at its trust boundary.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A server-side browser session is the actual requirement: prefer `scs`.
 - The application needs key storage, rotation, revocation, or a KMS/HSM policy
   that JWT itself does not provide.
@@ -69,22 +67,19 @@ successful parse alone as authorization.
   an algorithm.
 - The project needs JWE or broad JOSE capabilities not covered by this package.
 
-## Avantages
-
+## Advantages
 - Familiar JWT API and standard v5 module path.
 - `RegisteredClaims` and parser options make validation policy explicit.
 - Multiple signing methods and interoperable compact token format.
 - Small focused responsibility with active maintenance and security advisories.
 
-## Inconvénients
-
+## Disadvantages
 - Signed JWTs are not encrypted and are usually bearer credentials.
 - Revocation, rotation, issuer/audience policy, and storage remain application
   responsibilities.
 - Parser edge cases and cross-language JSON serialization require explicit tests.
 
-## Pièges connus
-
+## Known pitfalls
 - Whitelist the signing method and key source; never accept an algorithm or key
   solely because the token header requests it.
 - Validate claims with the parser and application policy; `ParseUnverified` is
@@ -94,8 +89,7 @@ successful parse alone as authorization.
   header parsing allocation and documented claim-error handling.
 - Do not use `SigningMethodNone` in application authentication.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official golang-jwt repository](https://github.com/golang-jwt/jwt) — API,
   maintenance, license, checked 2026-08-05.
 - [Releases](https://github.com/golang-jwt/jwt/releases) — current stable

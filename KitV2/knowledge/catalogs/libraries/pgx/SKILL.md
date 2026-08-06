@@ -61,37 +61,32 @@ concurrency-safe shared pool.
 | GORM/sqlx | Higher-level ORM/helper choices; select them when their abstraction, not just the driver, is required. |
 | sqlc | Code generator that can target pgx; complementary to the runtime driver. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go service uses PostgreSQL and needs native pooling, transactions, COPY,
   notifications, types, or protocol controls.
 - The application can own connection lifecycle, query modes, and parameterized
   SQL policy.
 - Existing `database/sql` code needs the pgx driver through `stdlib`.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The database is SQLite, MySQL, or another non-PostgreSQL engine.
 - SQL code generation or an ORM is the actual required boundary rather than a
   runtime driver.
 - A single `database/sql` interface is enough and native pgx features add no
   value.
 
-## Avantages
-
+## Advantages
 - Native PostgreSQL features plus a standard-library adapter.
 - `pgxpool`, COPY, LISTEN/NOTIFY, typed PostgreSQL values, and tracing.
 - Active maintenance, fuzzing, protocol hardening, and sqlc integration.
 
-## Inconvénients
-
+## Disadvantages
 - Native transaction/error/query modes differ from `database/sql` and require
   learning the API.
 - Pool configuration and connection ownership are application decisions.
 - Security fixes require exact version pinning and safe query-mode choices.
 
-## Pièges connus
-
+## Known pitfalls
 - Pin v5.9.2 or later; the historical placeholder/dollar-quoted SQL injection
   advisory is fixed in current v5.10.0.
 - Always use parameters (`$1`...); never interpolate untrusted values.
@@ -102,8 +97,7 @@ concurrency-safe shared pool.
 - Review PgBouncer compatibility and disable prepared-statement modes when its
   transaction pooling requires that policy.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official pgx repository](https://github.com/jackc/pgx) — API, maintenance,
   license, checked 2026-08-05.
 - [pgx releases](https://github.com/jackc/pgx/releases) — v5.10.0 current tag,

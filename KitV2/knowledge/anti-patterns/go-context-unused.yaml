@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-context-unused
-title: Context ignoré ou cancel jamais appelé
+title: Ignored context or cancel never called
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Une fonction reçoit un `ctx` mais ne le transmet à aucun appel bloquant (I/O,
-  requête, boucle), ou `context.WithCancel/WithTimeout` est appelé sans
+  A function receives a `ctx` but does not pass it to any blocking call (I/O,
+  request, loop), or `context.WithCancel/WithTimeout` is called without
   `defer cancel()`.
 detect: >-
-  - Paramètre `ctx context.Context` présent dans la signature mais absent de
-    tous les appels internes bloquants (linters : `contextcheck`,
-    `containedctx`).
-  - Appel de `WithTimeout`/`WithCancel` sans `defer cancel()` (golangci-lint :
-    `contextcheck` ne le couvrent pas tous — revue manuelle).
-  - Tests qui ignorent `ctx` et ne peuvent pas simuler une annulation.
+  - `ctx context.Context` parameter present in the signature but absent from
+    all internal blocking calls (linters: `contextcheck`, `containedctx`).
+  - Call to `WithTimeout`/`WithCancel` without `defer cancel()` (golangci-lint:
+    `contextcheck` does not cover all of them — manual review).
+  - Tests that ignore `ctx` and cannot simulate a cancellation.
 problem: >-
-  Un contexte accepté mais non utilisé est un bug de correction, pas un style :
-  l'appelant qui annule ou impose un délai est ignoré silencieusement — le code
-  continue de tourner jusqu'à la fin de l'opération. Un `cancel` jamais appelé
-  fuit une goroutine par opération (voir go-goroutine-leak).
+  An accepted but unused context is a correctness bug, not a style issue: the
+  caller that cancels or imposes a deadline is silently ignored — the code
+  keeps running until the end of the operation. A `cancel` never called leaks
+  one goroutine per operation (see go-goroutine-leak).
 fix: >-
-  Transmettre `ctx` à chaque appel qui peut bloquer (net/http, database/sql,
-  requêtes réseau). Appeler `cancel` immédiatement : `ctx, cancel :=
-  context.WithTimeout(parent, d); defer cancel()`. Ne créer un contexte dérivé
-  que si on ajoute une valeur ou une contrainte ; sinon transmettre le parent
-  tel quel.
+  Pass `ctx` to every call that can block (net/http, database/sql, network
+  requests). Call `cancel` immediately: `ctx, cancel :=
+  context.WithTimeout(parent, d); defer cancel()`. Create a derived context
+  only to add a value or a constraint; otherwise pass the parent as-is.
 when_ok: >-
-  Une fonction pure ou une opération garantie bornée (calcul local court) peut
-  ne pas utiliser le contexte — mais la convention veut quand même le recevoir
-  pour la composabilité des appels futurs. Règles de concurrence du kit :
+  A pure function or a guaranteed bounded operation (short local computation)
+  may not use the context — but the convention still expects it to receive one
+  for the composability of future calls. Kit concurrency rules:
   `rules/core/concurrency`.
 relationships:
   references:

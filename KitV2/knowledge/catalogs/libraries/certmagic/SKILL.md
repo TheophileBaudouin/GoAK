@@ -6,7 +6,7 @@ tags: [tls, acme, https, certificates, letsencrypt, certmagic, security]
 last-verified: 2026-08-05
 ---
 
-# certmagic — TLS automatisé ACME
+# certmagic — automated ACME TLS
 
 ## Selection
 
@@ -50,35 +50,30 @@ application operation; certificate automation is not observability.
 | Caddy/nginx at the edge | Prefer when the application does not own TLS termination. |
 | `lego` | Consider when a lower-level ACME client and custom issuer workflow are required. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go server owns HTTPS and needs automatic ACME issue/renew/OCSP lifecycle.
 - On-demand TLS, multiple issuers, or shared storage/locking are real requirements.
 - The deployment can provide DNS/HTTP/TLS-ALPN challenge reachability and
   persistent storage.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A static certificate or small `autocert` flow covers the requirement.
 - TLS terminates in an external proxy or load balancer.
 - The CA/issuer is outside the supported ACME/API behavior.
 - The project cannot persist certificate state or monitor renewal failures.
 
-## Avantages
-
+## Advantages
 - Complete issuance, renewal, OCSP, on-demand, issuer, and storage lifecycle.
 - Shared storage and locking support clustered certificate management.
 - Caddy provides substantial real-world production validation.
 
-## Inconvénients
-
+## Disadvantages
 - Larger dependency/operational surface than stdlib-adjacent autocert.
 - ACME issuance depends on public DNS/network/ports and external rate limits.
 - Storage, backup, alerting, and instance coordination remain deployment duties.
 - Package-level default helpers can hide shared mutable configuration.
 
-## Pièges connus
-
+## Known pitfalls
 - Prefer instance `Cache`/`Config`; avoid `certmagic.Default` in tests or
   multi-tenant services.
 - Use ACME staging and bounded integration tests to avoid CA rate limits.
@@ -86,8 +81,7 @@ application operation; certificate automation is not observability.
 - Monitor expiry, renewal errors, issuer availability, and storage locks.
 - Validate the issuer and challenge topology before exposing on-demand TLS.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official CertMagic repository](https://github.com/caddyserver/certmagic) —
   API, maintenance, license, checked 2026-08-05.
 - [CertMagic v0.25.4 package](https://pkg.go.dev/github.com/caddyserver/certmagic)

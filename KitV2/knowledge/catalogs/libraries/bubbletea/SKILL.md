@@ -6,7 +6,7 @@ tags: [tui, cli, mvu, elm-architecture, terminal]
 last-verified: 2026-08-05
 ---
 
-# bubbletea — framework TUI MVU
+# bubbletea — MVU TUI framework
 
 ## Selection
 
@@ -51,38 +51,33 @@ constructing framework message structs.
 | lipgloss | Companion styling library, not an interactive framework. |
 | Ratatui | Rust alternative; not a Go dependency choice. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Building an interactive Go CLI, wizard, dashboard, or agent-facing TUI.
 - The state transitions should be unit-testable without a real terminal.
 - Commands and subscriptions are useful for asynchronous work or terminal
   events.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The program only formats or prints terminal output.
 - The interface belongs in a browser or desktop webview.
 - An imperative widget tree is a better fit than MVU.
 - The project cannot accept the breaking import/API migration from v1 to v2.
 
-## Avantages
-
+## Advantages
 - A clear Model/Update/View architecture with explicit asynchronous commands.
 - The application state can be tested independently from terminal rendering.
 - The v2 API exposes terminal capabilities and keyboard enhancements through a
   structured `tea.View`.
 - It composes with Bubbles widgets, Lip Gloss styling, and Huh forms.
 
-## Inconvénients
-
+## Disadvantages
 - MVU adds ceremony for a one-screen or non-interactive command.
 - v2 is a breaking migration: vanity import path, key message names, and View
   return type differ from v1.
 - Terminal capabilities such as clipboard or keyboard enhancements depend on
   the user's terminal.
 
-## Pièges connus
-
+## Known pitfalls
 - Pin `charm.land/bubbletea/v2`; do not copy v1 examples using the old import
   path or `tea.KeyMsg`.
 - Keep the framework message at the adapter seam and test pure transitions
@@ -92,8 +87,7 @@ constructing framework message structs.
 - Add Bubbles separately when standard widgets are needed; Bubble Tea itself is
   the framework, not the widget catalog.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Bubble Tea repository](https://github.com/charmbracelet/bubbletea) —
   maintenance, license, architecture, checked 2026-08-05.
 - [Bubble Tea v2.0.8 release](https://github.com/charmbracelet/bubbletea/releases/tag/v2.0.8)

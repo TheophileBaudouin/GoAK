@@ -6,42 +6,43 @@ tags: [database, migrations, sql, postgresql, deployment, cli]
 last-verified: 2026-08-05
 ---
 
-# golang-migrate — migrations SQL versionnées
+# golang-migrate — versioned SQL migrations
 
 ## Selection
 
 [`github.com/golang-migrate/migrate/v4`](https://github.com/golang-migrate/migrate)
-v4.19.1 est admis pour appliquer, dans le déploiement, des migrations SQL
-versionnées sur PostgreSQL. La CLI lit les fichiers dans l'ordre et maintient
-l'état de migration. Le kit retient une commande externe unique plutôt qu'un
-import Go runtime : chaque réplique de l'application reste indépendante du
-protocole de déploiement du schéma.
+v4.19.1 is admitted to apply, during deployment, versioned SQL migrations on
+PostgreSQL. The CLI reads the files in order and maintains the migration
+state. The kit keeps a single external command rather than a Go runtime
+import: each application replica stays independent of the schema deployment
+protocol.
 
 ## Admission checklist
 
-- [x] **Problème distinct** : déployer un schéma versionné, non exécuter les
-  requêtes de l'application (pgx couvre cette seconde frontière).
-- [x] **Source primaire fraîche** : dépôt, release v4.19.1, documentation CLI
-  et politique de sécurité vérifiés le 2026-08-05.
-- [x] **Version compatible** : ligne v4 supportée, binaire pinable en
-  `v4.19.1` et migrations SQL `up`/`down` sur filesystem.
-- [x] **Responsabilité limitée** : migration de base, sans ORM, framework HTTP
-  ni orchestration de répliques.
-- [x] **Maintenance** : dépôt public actif, CI et historique de releases
-  vérifiés ; revalider dans les 90 jours avant une nouvelle adoption.
-- [x] **Qualité opérationnelle** : ordre, état et arrêt gracieux sont exposés
-  par l'outil ; la procédure de sauvegarde/rollback demeure applicative.
-- [x] **Sécurité** : politique `SECURITY.md` et surfaces d'advisories consultées
-  le 2026-08-05 ; les secrets de l'URL ne sont ni commités ni journalisés.
-- [x] **Alternatives** : un runner maison, `goose`, `tern` et migrations ORM ne
-  réduisent pas la décision retenue ou ne sont pas admis dans le catalogue.
-- [x] **Usage réel vérifiable** : la recipe PostgreSQL applique cette CLI avant
-  le test d'intégration ; elle ne l'importe pas dans le processus Go.
+- [x] **Distinct problem**: deploying a versioned schema, not executing the
+  application's queries (pgx covers that second boundary).
+- [x] **Fresh primary source**: repository, release v4.19.1, CLI documentation,
+  and security policy verified on 2026-08-05.
+- [x] **Compatible version**: supported v4 line, pinable binary at `v4.19.1`
+  and `up`/`down` SQL migrations on the filesystem.
+- [x] **Limited responsibility**: base migration, no ORM, HTTP framework, or
+  replica orchestration.
+- [x] **Maintenance**: active public repository, CI, and release history
+  verified; revalidate within 90 days before any new adoption.
+- [x] **Operational quality**: order, state, and graceful stop are exposed by
+  the tool; the backup/rollback procedure remains the application's concern.
+- [x] **Security**: `SECURITY.md` policy and advisory surfaces consulted on
+  2026-08-05; URL secrets are neither committed nor logged.
+- [x] **Alternatives**: a homegrown runner, `goose`, `tern`, and ORM
+  migrations neither reduce the retained decision nor are admitted to the
+  catalog.
+- [x] **Verifiable real usage**: the PostgreSQL recipe applies this CLI before
+  the integration test; it does not import it into the Go process.
 
 ## Minimal use
 
-Installer la CLI dans l'environnement de déploiement puis appliquer une fois
-les migrations détenues par le projet :
+Install the CLI in the deployment environment, then apply the migrations the
+project owns once:
 
 ```sh
 go install github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
@@ -49,67 +50,66 @@ migrate -path recipes/recipe-postgres-pgx/migrations \
   -database "$DATABASE_URL" up
 ```
 
-`DATABASE_URL` vient du secret store du déploiement. L'application démarre
-seulement après cette étape orchestrée ; elle ne lance jamais `migrate up` à
-chaque démarrage de réplique.
+`DATABASE_URL` comes from the deployment's secret store. The application
+starts only after this orchestrated step; it never runs `migrate up` at each
+replica startup.
 
 ## Alternatives considered
 
 | Alternative | Verdict |
 | --- | --- |
-| Runner SQL maison | Rejeté : réimplique l'état, le verrouillage et les cas d'échec. |
-| `pressly/goose` | Non admis : réévaluer séparément si ses choix opérationnels deviennent nécessaires. |
-| `jackc/tern` | Non admis : alternative pgx-spécifique à réévaluer, pas une seconde recette. |
-| Migrations ORM | Rejetées : le kit garde SQL révisable et une frontière sans ORM. |
-| Import Go `migrate/v4` | Rejeté ici : créerait une migration automatique dans les répliques. |
+| Homegrown SQL runner | Rejected: re-implements state, locking, and failure cases. |
+| `pressly/goose` | Not admitted: re-evaluate separately if its operational choices become necessary. |
+| `jackc/tern` | Not admitted: a pgx-specific alternative to re-evaluate, not a second recipe. |
+| ORM migrations | Rejected: the kit keeps revisable SQL and an ORM-free boundary. |
+| Go `migrate/v4` import | Rejected here: would create automatic migration in replicas. |
 
-## Utiliser cette librairie quand
+## When to use this library
 
-- Une base partagée doit recevoir des migrations SQL révisables et versionnées.
-- Le pipeline peut fournir une étape unique, privilégiée et observable avant le
-  déploiement des instances applicatives.
-- Les fichiers `up` et `down` font partie du VCS et ont une stratégie de
-  compatibilité/rollback revue.
+- A shared database must receive revisable, versioned SQL migrations.
+- The pipeline can provide a single, privileged, observable step before the
+  application instances are deployed.
+- The `up` and `down` files live in VCS and have a reviewed
+  compatibility/rollback strategy.
 
-## Ne pas utiliser cette librairie quand
+## When NOT to use this library
 
-- Chaque réplique devrait exécuter les migrations au démarrage.
-- Une modification de schéma ad hoc ou sans historique versionné est recherchée.
-- Le projet ne peut pas fournir un verrouillage opérationnel, une sauvegarde ou
-  une procédure de réparation après une migration interrompue.
+- Each replica should run migrations at startup.
+- An ad-hoc schema change without versioned history is what is wanted.
+- The project cannot provide operational locking, a backup, or a repair
+  procedure after an interrupted migration.
 
-## Avantages
+## Advantages
 
-- CLI simple, version pinable, fichiers SQL portables et migrations ordonnées.
-- Support PostgreSQL officiel et convention claire `NNN_name.up.sql` /
-  `NNN_name.down.sql`.
-- Sépare explicitement les droits de migration des droits runtime.
+- Simple CLI, pinnable version, portable SQL files, and ordered migrations.
+- Official PostgreSQL support and a clear `NNN_name.up.sql` /
+  `NNN_name.down.sql` convention.
+- Explicitly separates migration rights from runtime rights.
 
-## Inconvénients
+## Disadvantages
 
-- Une migration reste un changement d'état : les rollbacks destructifs et les
-  déploiements multi-versions demandent une planification humaine.
-- La CLI ne remplace ni backup, ni revue SQL, ni politique de déploiement.
-- Les URLs de base peuvent contenir des secrets et demandent un encodage correct.
+- A migration remains a state change: destructive rollbacks and multi-version
+  deployments require human planning.
+- The CLI replaces neither backup, SQL review, nor deployment policy.
+- Base URLs can contain secrets and require correct encoding.
 
-## Pièges connus
+## Known pitfalls
 
-- Ne pas ajouter `migrate/v4` à `go.mod` pour cette recipe ni lancer la CLI dans
-  le serveur HTTP.
-- Exécuter une fois avec une identité de déploiement dédiée ; éviter les courses
-  entre jobs et toutes les répliques.
-- Tester `up` et `down` sur une base jetable, mais préférer les changements
-  rétrocompatibles plutôt qu'un rollback destructif en production.
-- Ne pas écrire `DATABASE_URL`, mots de passe ou SQL sensible dans les logs.
+- Do not add `migrate/v4` to `go.mod` for this recipe nor run the CLI inside
+  the HTTP server.
+- Run once with a dedicated deployment identity; avoid races between jobs and
+  across replicas.
+- Test `up` and `down` on a throwaway database, but prefer backward-compatible
+  changes over a destructive production rollback.
+- Do not write `DATABASE_URL`, passwords, or sensitive SQL into logs.
 
-## Sources vérifiées
+## Verified sources
 
-- [Dépôt officiel](https://github.com/golang-migrate/migrate) — CLI, drivers,
-  usage filesystem et politique de sécurité, vérifié le 2026-08-05.
+- [Official repository](https://github.com/golang-migrate/migrate) — CLI,
+  drivers, filesystem usage, and security policy, verified 2026-08-05.
 - [Release v4.19.1](https://github.com/golang-migrate/migrate/releases/tag/v4.19.1)
-  — version pin retenue, vérifiée le 2026-08-05.
-- [Documentation pkg.go.dev v4](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)
-  — API et compatibilité de la ligne v4, vérifiée le 2026-08-05.
-- [Guide de migrations officiel](https://github.com/golang-migrate/migrate/blob/master/MIGRATIONS.md)
-  — conventions et pratiques de migration, vérifié le 2026-08-05.
-
+  — retained version pin, verified 2026-08-05.
+- [pkg.go.dev documentation v4](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)
+  — API and v4-line compatibility, verified 2026-08-05.
+- [Official migration guide](https://github.com/golang-migrate/migrate/blob/master/MIGRATIONS.md)
+  — conventions and migration practices, verified 2026-08-05.

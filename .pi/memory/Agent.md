@@ -138,3 +138,11 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   validation and observable evidence.
 - Never store secrets, consumer history, transcripts, or raw command output in
   the product or metaproject memory.
+
+## Router & scoring maintenance (metaproject-owned, D-2026-08-06-11)
+
+- The router system has ONE scoring implementation: `.pi/extensions/kit-resource-router-scoring.ts`. I never re-implement scoring in a test language (Python port, duplicate TS); I extend the shared module and re-run the gate.
+- The routing-quality contract `router/scenarios.json` is maintained through the metaproject gate (`.agent/router/run_scenarios.mjs`, Node ≥ 23.6): every new scenario is a realistic agent intent, targets an existing indexed id, and MUST be able to fail — decorative expectations are not admitted.
+- The gate's tripwire is proven: negative tests assert exit 1 on an unreachable expectation and on a stale id. When I add or re-tag a knowledge artifact, I re-run the gate and check that existing scenarios still pass (a silent ranking shift is a routing regression, not a cosmetic change).
+- Two-layer verification: the product validator (node-free) checks scenarios schema + id linkage; the metaproject gate checks ranking under the real scoring. I never move the ranking check into the product validator (node dependency) and never move the contract file out of the product.
+- Ownership boundary: builder, gate runner, and router tests live in `.agent/router/`; the product ships index/meta/scenarios + the runtime tool only. Consumers never rebuild or re-gate.

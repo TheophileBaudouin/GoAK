@@ -1,5 +1,5 @@
 id: pattern:antipattern:cfg-hardcoded-values
-title: Valeurs de configuration codées en dur dans le code
+title: Configuration values hardcoded in the code
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  URLs de production, ports, timeouts, feature flags et paramètres
-  d'environnement littéraux dans le code source, modifiables seulement par
-  recompilation.
+  Production URLs, ports, timeouts, feature flags and literal environment
+  parameters in the source code, modifiable only by recompilation.
 detect: >-
-  - Constantes/valeurs d'environnement mélangées au code (grep des URLs,
-    ports).
-  - Déploiement vers un autre environnement nécessitant un build distinct
-    (config embarquée dans l'artefact).
-  - « Ça marche en dev, pas en prod » — la config diffère sans contrôle.
+  - Constants/environment values mixed with the code (grep of URLs, ports).
+  - Deployment to another environment requiring a distinct build (config
+    embedded in the artifact).
+  - "It works in dev, not in prod" — the config differs without control.
 problem: >-
-  Les valeurs codées en dur violent l'externalisation de la configuration
-  (CWE-15, Twelve-Factor) : changement = redéploiement, environnements
-  confondus, secrets exposés (voir sec-hardcoded-credentials) et risque de
-  dérive de configuration entre environnements.
+  Hardcoded values violate configuration externalization (CWE-15,
+  Twelve-Factor): change = redeployment, environments confused, secrets
+  exposed (see sec-hardcoded-credentials) and risk of configuration drift
+  between environments.
 fix: >-
-  Lire la configuration depuis l'environnement ou un fichier de config
-  injecté au déploiement, avec des défauts sûrs et une validation au
-  démarrage (échec rapide). Voir recipe-config-viper et recipe-config-koanf
-  du kit pour une gestion typée. Même artefact déployé partout, valeurs au
-  runtime.
+  Read configuration from the environment or a config file injected at
+  deployment, with safe defaults and validation at startup (fail fast). See
+  the kit's recipe-config-viper and recipe-config-koanf for typed management.
+  Same artifact deployed everywhere, values at runtime.
 when_ok: >-
-  Une constante de code réellement immuable (limite de protocole, valeur
-  métier fixe) peut rester en code ; la règle concerne les valeurs qui
-  varient par environnement.
+  A truly immutable code constant (protocol limit, fixed business value) may
+  stay in code; the rule concerns values that vary by environment.
 relationships:
   references:
     - https://cwe.mitre.org/data/definitions/15.html

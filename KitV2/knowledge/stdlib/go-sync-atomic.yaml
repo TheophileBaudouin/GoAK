@@ -1,0 +1,23 @@
+---
+id: source:go:sync-atomic
+title: Go sync/atomic — lock-free state and counters
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, atomic, concurrency, sync]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/sync/atomic
+selection: >-
+  Load when sharing a single word-sized value between goroutines — counters,
+  flags, sequence numbers — where a mutex would be heavier, or when
+  publishing an immutable snapshot with atomic.Pointer.
+limits: >-
+  atomic only covers single-word operations and the Go memory model rules;
+  multi-field invariants still need a mutex (see source:go:sync). Do not
+  use atomic to "avoid locks" on complex state. Pointer-only routing.
+relationships:
+  references:
+    - https://pkg.go.dev/sync/atomic

@@ -180,6 +180,100 @@ class Fixture(unittest.TestCase):
         )
 
 
+class RouterScenariosFixture(unittest.TestCase):
+    """check_router_scenarios: the contract file's schema and id linkage.
+
+    Ranking itself is the metaproject node gate (test_router_scenarios.py);
+    here only the shipped contract's integrity is validated (Z7: each new
+    control needs positive and negative cases)."""
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self.kit = root / "KitV2"
+        self.router = self.kit / "router"
+        (self.router).mkdir(parents=True)
+        (self.kit / "manifest.yaml").write_text(
+            "name: go-agent-kit-v2\nversion: 2.5.0\nschema_version: 1\n",
+            encoding="utf-8",
+        )
+        (self.router / "index.json").write_text(
+            json.dumps(
+                {
+                    "schema": 1,
+                    "resources": [
+                        {
+                            "id": "naming",
+                            "kind": "rule",
+                            "path": "rules/registry/naming/SKILL.md",
+                            "description": "naming conventions",
+                            "tags": [],
+                            "terms": ["naming"],
+                        }
+                    ],
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        self.contract = {
+            "schema": 1,
+            "scenarios": [
+                {
+                    "query": "go naming conventions package names",
+                    "expect": ["naming"],
+                },
+                {"query": "quantum computing", "expect": [], "offDomain": True},
+            ],
+        }
+        validate.ROOT = self.kit  # type: ignore[attr-defined]
+
+    def tearDown(self) -> None:
+        self.tmp.cleanup()
+        validate.ROOT = KIT  # type: ignore[attr-defined]
+
+    def write_contract(self) -> None:
+        (self.router / "scenarios.json").write_text(
+            json.dumps(self.contract) + "\n",
+            encoding="utf-8",
+        )
+
+    def test_positive(self) -> None:
+        self.write_contract()
+        self.assertEqual(validate.check_router_scenarios(), [])
+
+    def test_missing_contract(self) -> None:
+        errors = validate.check_router_scenarios()
+        self.assertTrue(any("missing routing-quality contract" in e for e in errors))
+
+    def test_invalid_json(self) -> None:
+        (self.router / "scenarios.json").write_text("{not json", encoding="utf-8")
+        errors = validate.check_router_scenarios()
+        self.assertTrue(any("invalid JSON" in e for e in errors))
+
+    def test_unresolved_expected_id(self) -> None:
+        self.contract["scenarios"][0]["expect"] = ["does-not-exist"]
+        self.write_contract()
+        errors = validate.check_router_scenarios()
+        self.assertTrue(
+            any("does-not-exist" in e and "not in the index" in e for e in errors)
+        )
+
+    def test_off_domain_with_expect(self) -> None:
+        self.contract["scenarios"][1]["expect"] = ["naming"]
+        self.write_contract()
+        errors = validate.check_router_scenarios()
+        self.assertTrue(
+            any("off-domain scenario must expect no ids" in e for e in errors)
+        )
+
+    def test_bad_query_length(self) -> None:
+        self.contract["scenarios"][0]["query"] = "ab"
+        self.write_contract()
+        errors = validate.check_router_scenarios()
+        self.assertTrue(any("3..300 char" in e for e in errors))
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     unittest.main()

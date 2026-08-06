@@ -1,41 +1,41 @@
 ---
 name: recipe-worker-pool
-description: "Worker pool avec goroutines bornées et annulation sur première erreur via errgroup.SetLimit. Validation stricte des entrées et respect des annulations de contexte. Utiliser pour le traitement concurrent avec limite de charge."
+description: "Bounded worker pool with first-error cancellation via errgroup.SetLimit. Strict input validation and context-cancellation awareness. Use for concurrent processing with a load limit."
 category: recipe
 tags: [concurrency, errgroup, worker-pool, goroutine, context]
 last-verified: 2026-08-05
 ---
 
-# recipe-worker-pool — Worker Pool borné avec errgroup
+# recipe-worker-pool — bounded worker pool with errgroup
 
-## Objectif et cas d'utilisation
+## Goal and use case
 
-Exécuter $N$ tâches de manière concurrente tout en plafonnant le nombre maximum de goroutines simultanées (`limit`) et en annulant automatiquement l'ensemble du lot dès qu'un worker rencontre une erreur.
+Run $N$ tasks concurrently while capping the maximum number of simultaneous goroutines (`limit`) and automatically cancelling the whole batch as soon as a worker hits an error.
 
-Utiliser ce pattern pour contrôler la concurrence sur les ressources (processeur, connexions DB, appels API distants) sans utiliser de bibliothèques de pool complexes.
+Use this pattern to control concurrency over resources (CPU, DB connections, remote API calls) without relying on complex pool libraries.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendance : `golang.org/x/sync/errgroup`
-- Architecture :
+- Dependency: `golang.org/x/sync/errgroup`
+- Architecture:
   - `Run[T any](ctx context.Context, items []T, limit int, fn func(ctx, item) error) error`
-  - Validation stricte des entrées : rejeter `ctx == nil`, `limit < 1`, ou `fn == nil`.
-  - Vérifier l'annulation initiale du contexte via `ctx.Err()` avant de démarrer le moindre worker.
-  - Dériver `g, workerCtx := errgroup.WithContext(ctx)` et appliquer `g.SetLimit(limit)`.
-  - Dans la boucle, vérifier `workerCtx.Err()` pour ne pas planifier de workers inutiles si une annulation a déjà eu lieu.
+  - Strict input validation: reject `ctx == nil`, `limit < 1`, or `fn == nil`.
+  - Check the initial context cancellation via `ctx.Err()` before starting any worker.
+  - Derive `g, workerCtx := errgroup.WithContext(ctx)` and apply `g.SetLimit(limit)`.
+  - In the loop, check `workerCtx.Err()` so no useless workers are scheduled once a cancellation has already happened.
 
-## Composants et choix
+## Components and choices
 
-- `golang.org/x/sync/errgroup` — extension canonique maintenue par l'équipe Go.
-- `g.SetLimit(n)` — fonctionnalité native Go 1.18+ remplaçant le pattern historique sémaphore/channel + WaitGroup.
+- `golang.org/x/sync/errgroup` — canonical extension maintained by the Go team.
+- `g.SetLimit(n)` — native Go 1.18+ feature replacing the historical semaphore/channel + WaitGroup pattern.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Sémaphore manuelle par canal (`chan struct{}` + `sync.WaitGroup`) : ~25 lignes de boilerplate sujettes aux fuites de goroutines et erreurs de gestion du contexte.
-- Pools de goroutines persistants (`panjf2000/ants`, `alitto/pond`) : sur-ingénierie inutile pour la plupart des charges applicatives. Justifié uniquement pour des millions de micro-tâches par seconde où l'allocation de goroutines devient le goulet d'étranglement.
+- Hand-rolled channel semaphore (`chan struct{}` + `sync.WaitGroup`): ~25 lines of boilerplate prone to goroutine leaks and context-handling errors.
+- Persistent goroutine pools (`panjf2000/ants`, `alitto/pond`): unnecessary over-engineering for most application workloads. Justified only for millions of micro-tasks per second where goroutine allocation becomes the bottleneck.
 
-## Exemple complet
+## Complete example
 
 ```go
 package pool
@@ -83,24 +83,24 @@ func Run[T any](ctx context.Context, items []T, limit int, fn func(ctx context.C
 }
 ```
 
-## Bonnes pratiques et pièges
+## Good practices and pitfalls
 
-- Depuis Go 1.22, les variables de boucle sont instanciées par itération (`fresh per iteration`) : la capture manuelle `item := item` n'est plus nécessaire.
-- Les callbacks `fn` doivent respecter le contexte passe `workerCtx` et interrompre promptement leur traitement lorsque `workerCtx.Done()` est clos.
+- Since Go 1.22, loop variables are instantiated per iteration (`fresh per iteration`): the manual `item := item` capture is no longer needed.
+- The `fn` callbacks must honor the passed `workerCtx` context and promptly interrupt their work when `workerCtx.Done()` is closed.
 
-## Limites et extensions
+## Limits and extensions
 
-Si les tâches sont produites en continu de manière indéfinie (stream) plutôt qu'un slice fixe $N$, utiliser une boucle canal/worker dédiée.
+If tasks are produced continuously and indefinitely (stream) rather than as a fixed slice of $N$, use a dedicated channel/worker loop.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-worker-pool/...
 go run ./probes/worker-pool
 ```
 
-La probe exécute un lot valide, puis un lot interrompu par une erreur, vérifie l'arrêt du traitement et affiche `worker-pool: PASS`.
+The probe runs a valid batch, then a batch interrupted by an error, verifies that processing stops, and prints `worker-pool: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [golang.org/x/sync/errgroup](https://pkg.go.dev/golang.org/x/sync/errgroup) — documentation officielle du package `errgroup`.
+- [golang.org/x/sync/errgroup](https://pkg.go.dev/golang.org/x/sync/errgroup) — official documentation of the `errgroup` package.

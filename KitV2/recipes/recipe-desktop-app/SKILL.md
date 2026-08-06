@@ -1,40 +1,40 @@
 ---
 name: recipe-desktop-app
-description: "Service Go testable pour application Desktop Wails v3 sans dépendance runtime directe. Méthodes liées typées et isolées du Webview. Utiliser pour concevoir la logique métier Go d'une application Desktop Wails."
+description: "Testable Go service layer for a Wails v3 desktop application without a direct runtime dependency. Typed bound methods isolated from the Webview. Use to design the Go business logic of a Wails desktop application."
 category: recipe
 tags: [desktop, wails, gui, bindings, frontend, Go]
 last-verified: 2026-08-05
 ---
 
-# recipe-desktop-app — Adaptateur de service Go pour Wails v3
+# recipe-desktop-app — Go service adapter for Wails v3
 
-## Objectif et cas d'utilisation
+## Objective and use cases
 
-Concevoir la couche de services métier en Go d'une application Desktop Wails v3 de sorte que les méthodes exposées au frontend web soient 100% testables en Go pur, sans nécessiter la compilation CGO du webview ni le runtime Wails dans la suite de tests.
+Design the Go business service layer of a Wails v3 desktop application so that the methods exposed to the web frontend are 100% testable in pure Go, without requiring CGO compilation of the webview or the Wails runtime in the test suite.
 
-Utiliser cette recette pour créer des applications de bureau hybrides (Go + HTML/TS frontend) tout en maintenant les tests unitaires Go portables et rapides.
+Use this recipe to create hybrid desktop applications (Go + HTML/TS frontend) while keeping the Go unit tests portable and fast.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Wails v3 (Beta-to-GA transition) — documenté pour l'application cliente, non importé dans ce package Go.
-- Architecture testable :
-  - L'objet `App` contient l'état applicatif et la synchronisation (`sync.Mutex`).
-  - Les méthodes publiques (`AddNote`, `Notes`, `DeleteNote`) prennent et retournent des types Go typés avec des tags JSON (`json:"id"`).
-  - Ne contenir aucun import vers `github.com/wailsapp/wails/v3/pkg/application` dans le package de service métier, pour éviter de tirer la dépendance CGO/GTK/Webview2 dans la gate Go.
+- Wails v3 (Beta-to-GA transition) — documented for the client application, not imported in this Go package.
+- Testable architecture:
+  - The `App` object holds the application state and the synchronization (`sync.Mutex`).
+  - The public methods (`AddNote`, `Notes`, `DeleteNote`) take and return typed Go types with JSON tags (`json:"id"`).
+  - Contain no import of `github.com/wailsapp/wails/v3/pkg/application` in the business service package, to avoid pulling the CGO/GTK/Webview2 dependency into the Go gate.
 
-## Composants et choix
+## Components and choices
 
-- Struct métier Go pur avec Mutex — garantit la sécurité d'accès concurrent entre le thread principal Go et les appels JS asynchrones du frontend.
-- Contrat d'interface transparent — les méthodes exportées sont automatiquement exposées au frontend par les générateurs de bindings Wails (`wails3 generate bindings`).
+- Pure Go business struct with Mutex — guarantees concurrent access safety between the main Go thread and the frontend's asynchronous JS calls.
+- Transparent interface contract — the exported methods are automatically exposed to the frontend by the Wails bindings generators (`wails3 generate bindings`).
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Importer directement le package `application` de Wails dans le package de service : impose la présence de bibliothèques système CGO/GUI (WebKitGTK sur Linux, Webview2 sur Windows), brisant les tests unitaires croisés sur CI sans GUI.
-- Tauri (Rust) : framework alternatif majeur, mais rédigé en Rust et non en Go.
-- Fyne / Gio : frameworks GUI purement Go sans webview (autre paradigme d'architecture).
+- Importing the Wails `application` package directly into the service package: imposes the presence of CGO/GUI system libraries (WebKitGTK on Linux, Webview2 on Windows), breaking cross-platform unit tests on CI without a GUI.
+- Tauri (Rust): another major framework, but written in Rust and not Go.
+- Fyne / Gio: pure-Go GUI frameworks without a webview (different architecture paradigm).
 
-## Exemple complet
+## Complete example
 
 ```go
 package desktop
@@ -98,26 +98,26 @@ func (a *App) DeleteNote(id int) bool {
 }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Protéger tout état partagé avec `sync.Mutex` : le frontend Wails peut exécuter des appels de méthodes en parallèle.
-- Valider systématiquement les arguments côté Go : Go est la frontière de confiance, le frontend peut transmettre des entrées invalides.
-- Noter que Wails v3 est actuellement en statut Beta-to-GA : vérifier le suivi d'issues avant la mise en production.
+- Protect all shared state with `sync.Mutex`: the Wails frontend can execute method calls in parallel.
+- Always validate arguments on the Go side: Go is the trust boundary, the frontend can pass invalid inputs.
+- Note that Wails v3 is currently in Beta-to-GA status: check the issue tracker before going to production.
 
-## Limites et extensions
+## Limits and extensions
 
-Cette recette couvre l'adaptateur Go testable. Le câblage `main.go` Wails avec la fenêtre webview et l'embarquement d'actifs statiques (`embed.FS`) vit dans le binaire d'application client final.
+This recipe covers the testable Go adapter. The Wails `main.go` wiring with the webview window and static asset embedding (`embed.FS`) lives in the final client application binary.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-desktop-app/...
 go run ./probes/desktop-app
 ```
 
-La probe instancie `NewApp()`, ajoute une note, la liste, la supprime et vérifie le résultat, puis affiche `desktop-app: PASS`.
+The probe instantiates `NewApp()`, adds a note, lists it, deletes it and verifies the result, then prints `desktop-app: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [Wails Documentation](https://wails.io/) — site officiel et documentation Wails v2 / v3.
-- [Wails v3 Beta Repository](https://github.com/wailsapp/wails) — dépôt officiel Wails.
+- [Wails Documentation](https://wails.io/) — official Wails v2 / v3 site and documentation.
+- [Wails v3 Beta Repository](https://github.com/wailsapp/wails) — official Wails repository.

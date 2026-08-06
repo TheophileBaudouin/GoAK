@@ -1,5 +1,5 @@
 id: pattern:antipattern:test-over-mocking
-title: Mock de tout — le faux devient le système
+title: Mocking everything — the fake becomes the system
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,30 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Chaque dépendance est mockée (couches entières : repository, HTTP client,
-  filesystem, horloge), les tests vérifient des interactions entre mocks et
-  ne touchent plus aucune implémentation réelle.
+  Every dependency is mocked (entire layers: repository, HTTP client,
+  filesystem, clock), tests verify interactions between mocks and no longer
+  touch any real implementation.
 detect: >-
-  - Suite de tests sans aucun test d'intégration ; mocks de couches sans
-    logique (simple relais).
-  - Tests qui passent alors que le système réel casse (contrat faux entre
-    mock et implémentation).
-  - Configuration de mock aussi complexe que le code testé.
+  - A test suite with no integration test at all; mocks of layers without
+    logic (simple relay).
+  - Tests passing while the real system breaks (false contract between mock
+    and implementation).
+  - Mock configuration as complex as the tested code.
 problem: >-
-  Les mocks ne vérifient que les attentes programmées : ils figent l'API
-  interne (voir test-implementation-details), ne détectent ni les erreurs de
-  contrat réel ni les régressions d'intégration, et donnent une fausse
-  confiance. La hiérarchie de tests (pyramide) exige plus de tests de bas
-  niveau réels que de mocks.
+  Mocks only verify programmed expectations: they freeze the internal API
+  (see test-implementation-details), detect neither real contract errors nor
+  integration regressions, and give false confidence. The test hierarchy
+  (pyramid) requires more real low-level tests than mocks.
 fix: >-
-  Mockez seulement les frontières instables (réseau, horloge, I/O) avec des
-  fakes de données simples ; testez la logique sur des implémentations réelles
-  (base de test, httptest.Server pour HTTP). Vérifiez les contrats par un test
-  d'intégration minimal (voir recipe-sqlite-sqlc, recipe-rest-chi). Le kit
-  privilégie les seams purs (fonctions testables) aux frameworks de mock.
+  Mock only the unstable boundaries (network, clock, I/O) with simple data
+  fakes; test logic against real implementations (test database,
+  httptest.Server for HTTP). Verify contracts with a minimal integration
+  test (see recipe-sqlite-sqlc, recipe-rest-chi). The kit prefers pure seams
+  (testable functions) to mock frameworks.
 when_ok: >-
-  Un mock se justifie pour une dépendance externe non reproductible en test
-  (fournisseur SaaS, réseau) ; il doit refléter le vrai contrat, pas une
-  attente ad hoc.
+  A mock is justified for an external dependency that is not reproducible in
+  tests (SaaS provider, network); it must reflect the real contract, not an
+  ad hoc expectation.
 relationships:
   references:
     - http://xunitpatterns.com/Mock%20Object.html

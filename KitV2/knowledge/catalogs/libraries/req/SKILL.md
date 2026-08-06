@@ -62,37 +62,32 @@ its API and dependency/security trade-offs.
 | `goforj/httpx` | Wrapper built on req; not a lower-dependency replacement. |
 | Hand-written retry/client singleton | Reject hidden global state and unbounded retry behavior. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - As an extract-only source for explicit client setup, bounded retry, response
   middleware, and body-size handling.
 - A project explicitly wants HTTP/3/TLS/proxy features and accepts the dependency
   and API boundary after review.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The kit's canonical auditable `net/http` client is sufficient.
 - Package-global convenience calls would be copied into shared service code.
 - The response body may be unbounded or debug output may expose credentials.
 
-## Avantages
-
+## Advantages
 - Rich HTTP/1.1/2/3 client, retries, middleware, TLS/proxy options, and upload
   support in one package.
 - v3.60 adds response-size bounding and streams large multipart uploads through
   `io.Pipe`.
 - Extractable patterns map cleanly to smaller stdlib implementations.
 
-## Inconvénients
-
+## Disadvantages
 - Larger surface and hidden convenience state than explicit `net/http`.
 - Auto-read response behavior must be bounded or disabled when handling large or
   untrusted bodies.
 - Retry, impersonation, TLS fingerprinting, and HTTP/3 features need security
   and operational review instead of being enabled by default.
 
-## Pièges connus
-
+## Known pitfalls
 - Set a maximum response size; auto-read is enabled by default and an oversized
   response must not be allowed to consume unbounded memory.
 - Use a replayable/streaming body intentionally: retries require a body that can
@@ -100,8 +95,7 @@ its API and dependency/security trade-offs.
 - Treat malformed URLs and TLS fingerprinting as security-sensitive options.
 - Keep debug dumps off normal paths and redact authorization/cookie headers.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official req repository](https://github.com/imroc/req) — API, maintenance,
   license, checked 2026-08-05.
 - [req v3 on pkg.go.dev](https://pkg.go.dev/github.com/imroc/req/v3) — module and

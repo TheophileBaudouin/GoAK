@@ -6,7 +6,7 @@ tags: [testing, integration, containers, docker, testcontainers]
 last-verified: 2026-08-05
 ---
 
-# testcontainers-go — dépendances réelles en test
+# testcontainers-go — real dependencies in tests
 
 ## Selection
 
@@ -49,36 +49,31 @@ service. Docker/Podman must be available when the test runs.
 | Docker CLI scripts | Avoid when typed lifecycle, wait, cleanup, and test ownership are required. |
 | Testcontainers Cloud | Operational alternative when local Docker is unavailable, not a code replacement. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Integration tests must exercise a real PostgreSQL, Redis, Kafka, or other
   dependency with reproducible lifecycle control.
 - The test environment provides Docker, Podman, or Testcontainers Cloud.
 - Readiness, cleanup, image pinning, and failure diagnostics can be owned by CI.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Unit tests can use a deterministic in-memory fake.
 - The production binary would import container lifecycle code.
 - CI cannot provide a container runtime or the test must run offline.
 - An unpinned latest image would make the test result non-reproducible.
 
-## Avantages
-
+## Advantages
 - Real dependency behavior without hand-written container lifecycle scripts.
 - Typed wait strategies, modules, cleanup, and compose integration.
 - Supports rootless/remote/container-cloud testing configurations.
 
-## Inconvénients
-
+## Disadvantages
 - Slow, environment-dependent tests require Docker/Podman and image pulls.
 - Ryuk cleanup uses a privileged helper container by default; review that trust
   boundary and configure it deliberately.
 - Dependency and image versions form a larger supply-chain surface.
 - A container passing readiness does not prove application-level correctness.
 
-## Pièges connus
-
+## Known pitfalls
 - Pin images by digest or explicit compatible tag; never use `latest` in a gate.
 - Always register cleanup and set bounded startup/test contexts.
 - Treat Docker credentials, socket access, Ryuk, and privileged containers as
@@ -87,8 +82,7 @@ service. Docker/Podman must be available when the test runs.
 - Keep integration tests tagged/isolated when a local runtime is unavailable;
   report `PARTIAL` rather than silently skipping them.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official testcontainers-go repository](https://github.com/testcontainers/testcontainers-go)
   — API, maintenance, license, checked 2026-08-05.
 - [v0.43.0 releases](https://github.com/testcontainers/testcontainers-go/releases)

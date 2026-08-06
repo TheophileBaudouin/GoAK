@@ -37,8 +37,8 @@ exit code.
    failure + non-zero exit code); a probe that asserts nothing is an error.
 4. **Automatic discovery**: `run.sh` discovers probes by glob
    (`probes/*/main.go`) — a hardcoded list is forbidden.
-5. Raw outputs belong to metaproject evidence (`docs/evidence/`), never to
-   the product.
+5. Raw outputs belong to the consumer's own evidence area, never to the
+   product.
 
 ## Adding a probe
 

@@ -3,7 +3,11 @@
 This directory contains the native Pi runtime surface of the installed Kit.
 
 - `settings.json` loads product modules through paths relative to `.pi/`:
-  `../rules`, `../recipes`, and `../knowledge/catalogs`.
+  `../rules` and `../recipes` (always-visible skill surface: rules and
+  runnable procedures). Library fiches (`../knowledge/catalogs`) are routed
+  on demand via `search_kit_resources` instead of being listed in every
+  prompt — this keeps the always-visible surface small so rules stay
+  salient.
 - `prompts/` contains manually invoked workflow and checklist orchestrators.
 - `skills/` contains durable workflow procedures loaded by context.
 - `extensions/` contains the read-only semantic resource router and its

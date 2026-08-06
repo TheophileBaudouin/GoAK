@@ -6,50 +6,49 @@ tags: [openapi, validation, api, http, contract, security]
 last-verified: 2026-08-05
 ---
 
-# recipe-openapi-validation — contrat HTTP exécutable
+# recipe-openapi-validation — executable HTTP contract
 
-## Objectif et cas d'utilisation
+## Purpose and use cases
 
-Charger et valider un document OpenAPI embarqué au démarrage, puis valider
-requête **et** réponse d'un handler `net/http`. La middleware borne les corps,
-résout la route, exige une `AuthenticationFunc` réelle, et ne laisse sortir une
-réponse qu'après validation de son statut, headers et corps.
+Load and validate an embedded OpenAPI document at startup, then validate the
+request **and** the response of a `net/http` handler. The middleware bounds
+bodies, resolves the route, requires a real `AuthenticationFunc`, and only
+lets a response out after validating its status, headers, and body.
 
-Utiliser quand OpenAPI est le contrat réel de l'API. Le contrat n'est pas un
-générateur et ne remplace pas la décision d'authentification métier.
+Use when OpenAPI is the API's real contract. The contract is not a generator
+and does not replace the business authentication decision.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-- `Config.Spec` vient de `go:embed` ou d'un octet contrôlé au démarrage.
-- `AuthenticationFunc` est obligatoire et `NoopAuthenticationFunc` est rejeté.
-- `MaxBodyBytes` borne autant la requête que le tampon de réponse.
-- Les réponses d'erreur `400`, `413` et `500` doivent figurer dans le document,
-  comme dans `openapi.yaml`, avec une forme générique stable.
+- `Config.Spec` comes from `go:embed` or from bytes controlled at startup.
+- `AuthenticationFunc` is mandatory and `NoopAuthenticationFunc` is rejected.
+- `MaxBodyBytes` bounds both the request and the response buffer.
+- The `400`, `413`, and `500` error responses must be present in the document,
+  as in `openapi.yaml`, with a stable generic shape.
 
-La recipe utilise le routeur legacy de kin-openapi et son validateur filtre.
-Elle n'utilise pas `ValidationHandler`, dont la version retenue ne valide pas
-les réponses. Cela justifie le petit adaptateur local plutôt qu'un double
-middleware incomplet.
+The recipe uses kin-openapi's legacy router and its filter validator. It does
+not use `ValidationHandler`, whose pinned version does not validate responses.
+This justifies the small local adapter over a duplicated incomplete middleware.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/getkin/kin-openapi v0.146.0` — catalogue `kin-openapi` ; parsing,
-  route matching et validation OpenAPI 3.
-- `openapi3filter.ValidateRequest`/`ValidateResponse` — contrat à l'entrée et à
-  la sortie.
-- tampon borné — réponse invalide ou trop grande devient une erreur générique
-  conforme au contrat ; son contenu et le détail du validateur ne sont pas
-  divulgués.
+- `github.com/getkin/kin-openapi v0.146.0` — `kin-openapi` catalog; OpenAPI 3
+  parsing, route matching, and validation.
+- `openapi3filter.ValidateRequest`/`ValidateResponse` — contract at input and
+  at output.
+- bounded buffer — an invalid or oversized response becomes a generic
+  contract-conformant error; its content and the validator's detail are not
+  disclosed.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `ValidationHandler` : rejeté car il porte encore `TODO: validateResponse`.
-- `NoopAuthenticationFunc`, callback absente ou fail-open : rejetés.
-- Validation seulement de requête : laisse l'API violer son contrat en sortie.
-- Streaming, `Hijacker`, `Flusher`, WebSocket et corps au-delà de la limite :
-  incompatibles avec la validation entièrement tamponnée.
+- `ValidationHandler`: rejected because it still carries `TODO: validateResponse`.
+- `NoopAuthenticationFunc`, a missing callback, or fail-open: rejected.
+- Request-only validation: lets the API violate its contract on output.
+- Streaming, `Hijacker`, `Flusher`, WebSocket, and bodies beyond the limit:
+  incompatible with fully buffered validation.
 
-## Exemple complet
+## Example
 
 ```go
 validator, err := openapivalidation.New(context.Background(), openapivalidation.Config{
@@ -64,38 +63,38 @@ if err != nil {
 handler := validator.Middleware(appHandler)
 ```
 
-## Bonnes pratiques et pièges
+## Good practices and pitfalls
 
-- Valider le document au démarrage : un contrat invalide empêche le service de
-  démarrer.
-- Définir dans le document tous les statuts/headers émis par le handler.
-- Garder les limites proportionnées ; les payloads compressés et gros objets
-  demandent une recette d'upload séparée.
-- Ne jamais inclure corps, token ni détail de validation dans l'erreur client ou
-  les logs de réponse invalide.
+- Validate the document at startup: an invalid contract prevents the service
+  from starting.
+- Define in the document every status/header emitted by the handler.
+- Keep limits proportionate; compressed payloads and large objects require a
+  separate upload recipe.
+- Never include the body, token, or validation detail in the client error or
+  the invalid-response logs.
 
-## Limites et extensions
+## Limits and extensions
 
-Le routeur legacy ne couvre pas toutes les formes de chemin/extensions ; tester
-les routes réelles du contrat. Pas de streaming, hijacking, export de métriques,
-génération de client/serveur, ni autorisation métier. Ces besoins changent la
-frontière et exigent une recipe dédiée.
+The legacy router does not cover every path/extension form; test the
+contract's real routes. No streaming, hijacking, metric export,
+client/server generation, or business authorization. These needs change the
+boundary and require a dedicated recipe.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-openapi-validation/...
 go run ./probes/openapi-validation
 ```
 
-La probe valide un `POST /widgets` authentifié et une réponse `201`, puis
-affiche `openapi-validation: PASS`. Les tests prouvent une requête invalide,
-une réponse invalide masquée et un corps trop grand.
+The probe validates an authenticated `POST /widgets` and a `201` response,
+then prints `openapi-validation: PASS`. The tests prove an invalid request, a
+masked invalid response, and an oversized body.
 
-## Sources primaires
+## Primary sources
 
 - [kin-openapi openapi3filter](https://pkg.go.dev/github.com/getkin/kin-openapi/openapi3filter)
-  — entrées de validation et fonction d'authentification.
-- [OpenAPI Specification](https://spec.openapis.org/oas/latest.html) — contrat
-  des opérations, réponses et security requirements.
+  — validation inputs and authentication function.
+- [OpenAPI Specification](https://spec.openapis.org/oas/latest.html) — contract
+  for operations, responses, and security requirements.
 

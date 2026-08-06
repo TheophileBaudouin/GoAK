@@ -48,8 +48,7 @@ current library catalogs for implementation choices. If a proposed design
 relies on this template's current behavior, stop and re-verify the specific
 source or reject the reference.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official go-starter repository](https://github.com/allaboutapps/go-starter) —
   template identity, license, and stack, checked 2026-08-05.
 - [Repository API metadata](https://github.com/allaboutapps/go-starter)

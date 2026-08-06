@@ -15,7 +15,7 @@ catalog module, perform a fresh web check of the official repository or
 maintainer documentation and a version/API source such as `pkg.go.dev`, a
 release page, changelog, specification, or official issue/advisory.
 
-Record each source URL and the real verification date in `Sources vérifiées`.
+Record each source URL and the real verification date in `Verified sources`.
 `last-verified` is the date of the complete recheck, not the date the prose was
 edited.
 

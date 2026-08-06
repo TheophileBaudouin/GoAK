@@ -6,7 +6,7 @@ tags: [html, template, type-safe, xss, components]
 last-verified: 2026-08-05
 ---
 
-# templ — composants HTML type-safe
+# templ — type-safe HTML components
 
 ## Selection
 
@@ -65,37 +65,32 @@ explicit security review.
 | React/Vue | Choose for a client-side/browser application rather than Go SSR. |
 | quicktemplate/pongo2 | Consider only when their performance/syntax trade-offs are an explicit requirement. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - SSR needs compile-time type/signature checks and component composition.
 - HTML output should be generated as Go and tested with ordinary Go tooling.
 - Automatic escaping, CSP nonces, and controlled `SafeURL`/CSS boundaries fit
   the application security model.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A tiny runtime template is simpler with `html/template`.
 - The UI is client-rendered or requires a browser component framework.
 - The build cannot run or pin the `templ generate` tool.
 - The application needs raw HTML/script injection without a deliberate safe
   boundary.
 
-## Avantages
-
+## Advantages
 - Compiled components catch type/signature errors before runtime.
 - HTML/attribute escaping and typed component composition reduce template bugs.
 - Components render to standard writers and integrate with `net/http`.
 - Generation, formatting, watch, and proxy workflows are explicit CLI steps.
 
-## Inconvénients
-
+## Disadvantages
 - Adds a generator/toolchain step and generated-file lifecycle.
 - Large/unformatted `.templ` files can make generation memory/time expensive.
 - Server-side only; browser behavior and client security remain separate.
 - The v0.x tool/API requires pinning and generation tests.
 
-## Pièges connus
-
+## Known pitfalls
 - Run `templ generate` in CI and fail when generated output is stale; do not
   assume opening a `.templ` file compiles it automatically.
 - Keep dynamic script/style values in the supported `ComponentScript`/safe APIs;
@@ -104,8 +99,7 @@ explicit security review.
 - Pin v0.3.1020 and track the transitive `x/net` security boundary.
 - Test large components and concurrent rendering after generator/runtime bumps.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official templ repository](https://github.com/a-h/templ) — API,
   maintenance, license, checked 2026-08-05.
 - [templ v0.3.1020 release](https://github.com/a-h/templ/releases/tag/v0.3.1020)

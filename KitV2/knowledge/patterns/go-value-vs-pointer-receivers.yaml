@@ -1,0 +1,45 @@
+---
+id: pattern:go:value-vs-pointer-receivers
+title: Value vs pointer receivers — choose by mutation, size, and method set
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, receivers, methods, method-sets, api]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  The receiver kind is a contract: a value receiver copies the struct and
+  cannot mutate it, a pointer receiver can mutate and adds the method to
+  the method set of *T only. The wrong choice silently copies on every call,
+  or excludes the type from interfaces it should satisfy.
+context: >-
+  Applies to every method definition; the decision matters most on exported
+  types and on types used in interfaces.
+solution: >-
+  Use a pointer receiver when the method mutates the receiver, holds a lock,
+  or the type is large or copy-sensitive; use a value receiver for small,
+  immutable values and for types that must stay copyable. Keep receivers
+  consistent within one type. Code Review Comments: "if in doubt, use a
+  pointer"; maps, funcs, and chans never need a pointer receiver.
+benefits: >-
+  Correct mutation semantics, predictable copying cost, and a method set
+  that matches what interfaces need — value methods belong to T, pointer
+  methods to *T only.
+costs: >-
+  A value method on a large struct copies it on every call; a pointer
+  receiver makes the value unusable as a map key and awkward in
+  copyable-API positions; mixing receiver kinds on one type confuses the
+  method set.
+related: >-
+  Method-set effects determine interface satisfaction (language spec);
+  zero-value usability interacts: pattern:go:zero-value-valid.
+relationships:
+  references:
+    - https://go.dev/wiki/CodeReviewComments
+    - https://go.dev/doc/faq
+    - https://go.dev/doc/effective_go
+    - pattern:go:zero-value-valid
+  uses: []
+  validated_by: []

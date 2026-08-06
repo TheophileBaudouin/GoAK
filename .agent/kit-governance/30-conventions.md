@@ -68,13 +68,16 @@ this table.
   Preexisting sections (Selection, Admission checklist, Minimal use,
   Alternatives, Notes) are kept as-is.
 - **Language migration note (D-2026-08-05-21)**: the kit is under a mandatory
-  English rule. The residual French in the kit is a tracked migration wave:
-  (a) catalog fiche headers (`Utiliser cette librairie quand` …) and their
-  `Sources vérifiées` field — to convert together with the `validate-kitv2.py`
-  check that requires the French header; (b) graph-YAML bodies of
-  `knowledge/patterns/` and `knowledge/anti-patterns/` (title/problem/
-  context/solution… in French) — a dedicated content wave, one domain at a
-  time. kit-audit C7 keeps flagging these as `NON CONFORM` until converted.
+  English rule. **Wave executed 2026-08-06 (D-2026-08-06-01)**: the residual
+  French documented below was converted to English in one pass — 15 recipe
+  SKILL.md (bodies + frontmatter descriptions), 39 `knowledge/patterns/` +
+  54 `knowledge/anti-patterns/` graph-YAML bodies, 43 catalog fiche files
+  (the 6 fiche headers, 37 French H1 titles, and the two French fiche bodies
+  `bleve` and `golang-migrate`), `knowledge/architecture/mcp-server-shape.yaml`,
+  and the `AGENTS.md` / `rules/registry/` references to the old French section
+  names. Zero French remains on the kit instruction surface (accent-scan
+  check, 2026-08-06). New content must be written in English at admission;
+  kit-audit C7 verifies the instruction surface each audit.
 
 ## 5. Kit / Metaproject Boundaries (inviolable)
 

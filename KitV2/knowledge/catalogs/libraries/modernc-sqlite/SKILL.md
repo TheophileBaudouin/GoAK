@@ -6,7 +6,7 @@ tags: [database, sqlite, driver, pure-go, cgo-free]
 last-verified: 2026-08-05
 ---
 
-# modernc-sqlite — driver SQLite sans CGO
+# modernc-sqlite — CGO-free SQLite driver
 
 ## Selection
 
@@ -48,39 +48,34 @@ wiring. Use `recipe-sqlite-sqlc` for a tested store shape and explicit cleanup.
 | PostgreSQL/other server DB | Choose when replication, multi-node access, or server-side concurrency is required. |
 | SQLCipher | Separate encryption requirement; modernc-sqlite does not provide it natively. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - The application needs SQLite through standard `database/sql` and must build
   statically or cross-compile without a C compiler.
 - CGO-free portability matters more than a measured native-driver advantage.
 - `sqlc` or ordinary database/sql code can stay within SQLite's supported SQL.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Native SQLite throughput is measured as the bottleneck and CGO is acceptable.
 - The deployment requires an unsupported SQLite VFS, SQLCipher, or platform
   integration not covered by this driver.
 - A server database is required for replication or multi-process write scale.
 - The project cannot pin the matching `modernc.org/libc` dependency boundary.
 
-## Avantages
-
+## Advantages
 - `CGO_ENABLED=0` static and cross-platform builds without a C toolchain.
 - Standard `database/sql` integration and compatibility with sqlc patterns.
 - Current SQLite engine updates and a maintained pure-Go distribution.
 - `NewConnector` provides a connection boundary for instrumentation in current
   releases.
 
-## Inconvénients
-
+## Disadvantages
 - Transpiled engine and `modernc.org/libc` dependency make internals harder to
   debug than a direct C binding.
 - Performance and feature parity must be measured for the actual workload.
 - Some VFS, transaction, Windows, and advanced SQLite behaviors have open
   upstream issues.
 
-## Pièges connus
-
+## Known pitfalls
 - Use driver name `sqlite` and pin the exact `modernc.org/libc` version required
   by the selected sqlite release; mismatches can cause build/type failures.
 - Test transaction failure paths and `busy_timeout` behavior for the chosen
@@ -89,8 +84,7 @@ wiring. Use `recipe-sqlite-sqlc` for a tested store shape and explicit cleanup.
 - Do not confuse CGO-free distribution with automatic data encryption,
   replication, or server-grade concurrency.
 
-## Sources vérifiées
-
+## Verified sources
 - [Canonical sqlite GitLab repository](https://gitlab.com/cznic/sqlite) —
   maintenance, license, checked 2026-08-05.
 - [v1.56.0 tags](https://gitlab.com/cznic/sqlite/-/tags) — exact version,

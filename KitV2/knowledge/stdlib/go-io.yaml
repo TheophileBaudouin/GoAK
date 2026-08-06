@@ -1,0 +1,23 @@
+---
+id: source:go:io
+title: Go io — Reader/Writer contracts and composition
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, io, reader, writer, streaming]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/io
+selection: >-
+  Load when designing functions that read or write streams, wrapping I/O,
+  handling io.EOF and io.ErrUnexpectedEOF, or composing with
+  io.Copy/io.ReadAll and helpers such as io.ReaderFrom.
+limits: >-
+  Pointer-only routing; contracts (Reader may return a short read, EOF is not
+  an error to report as failure) are semantics the source documents — read
+  them before wrapping a stream.
+relationships:
+  references:
+    - https://pkg.go.dev/io

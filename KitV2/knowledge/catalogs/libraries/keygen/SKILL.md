@@ -6,7 +6,7 @@ tags: [ssh, keys, crypto, security, cli]
 last-verified: 2026-08-05
 ---
 
-# keygen — génération de clés SSH
+# keygen — SSH key generation
 
 ## Selection
 
@@ -53,36 +53,31 @@ those modes.
 | `x/crypto/ssh` parsing | Parsing/signing support, not a complete key-generation wrapper. |
 | KMS/HSM | Prefer for production key custody, rotation, audit, and non-exportable keys. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go tool must generate host or client SSH keys without shelling out.
 - Ed25519/RSA/ECDSA, OpenSSH/PEM serialization, passphrases, and file modes are
   enough for the generation boundary.
 - The application owns authorization, rotation, backup, and secure key storage.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A one-shot interactive command can use a trusted `ssh-keygen` binary.
 - Existing keys only need parsing or verification.
 - The system needs an SSH agent, KMS/HSM custody, rotation, authorization, or
   audit lifecycle.
 - Hardware-backed Ed25519-SK or other unsupported key types are required.
 
-## Avantages
-
+## Advantages
 - Small API over standard crypto and SSH marshaling.
 - Ed25519, RSA, ECDSA, passphrase support, and explicit file permissions.
 - Pure Go generation without a host binary dependency.
 
-## Inconvénients
-
+## Disadvantages
 - Generation only; no key discovery, agent, rotation, revocation, or authorization.
 - Passphrases remain application-managed sensitive data.
 - Stable v0.5.4 is older than the latest unreleased pseudo-version; pin the tag
   for reproducibility.
 
-## Pièges connus
-
+## Known pitfalls
 - Prefer Ed25519; use RSA only for legacy interoperability and select a strong
   key size.
 - Keep private files `0600`; never log private material or passphrases.
@@ -90,8 +85,7 @@ those modes.
   secret store.
 - Define a recovery/rotation policy before generating keys for a durable service.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official keygen repository](https://github.com/charmbracelet/keygen) —
   maintenance, API, license, checked 2026-08-05.
 - [keygen v0.5.4 releases](https://github.com/charmbracelet/keygen/releases) —

@@ -50,8 +50,7 @@ project when only one structural idea is required.
   rechecked before relying on it as a maintained base.
 - MIT template; Go 1.24-era metadata; admin panel explicitly beta.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Pagoda repository](https://github.com/mikestefanello/pagoda) — stack,
   template identity, and architecture, checked 2026-08-05.
 - [Pagoda releases](https://github.com/mikestefanello/pagoda/releases) — current

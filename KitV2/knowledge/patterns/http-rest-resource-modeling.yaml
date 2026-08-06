@@ -1,5 +1,5 @@
 id: pattern:http:rest-resource-modeling
-title: Modélisation REST — ressources, verbes et statuts
+title: REST modeling — resources, verbs, and statuses
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une API qui tunnelise tout par POST/GET générique est opaque : pas de cache,
-  pas d'idempotence, statuts inexploitables (voir
+  An API that tunnels everything through generic POST/GET is opaque: no
+  caching, no idempotency, unusable statuses (see
   pattern:antipattern:rest-tunneling).
 context: >-
-  S'applique à toute API HTTP exposant des entités et leurs cycles de vie à
-  des clients (internes ou externes).
+  Applies to any HTTP API exposing entities and their lifecycles to clients
+  (internal or external).
 solution: >-
-  Modéliser des ressources (noms, hiérarchies) et utiliser les verbes selon
-  leur sémantique : GET (lecture, idempotent), POST (création/action), PUT
-  (remplacement), PATCH (mise à jour partielle), DELETE ; statuts standards
-  (400/401/403/404/409/429/5xx) ; erreurs structurées (RFC 9457 Problem
-  Details) ; en-têtes de cache quand la ressource le permet.
+  Model resources (names, hierarchies) and use verbs according to their
+  semantics: GET (read, idempotent), POST (creation/action), PUT
+  (replacement), PATCH (partial update), DELETE; standard statuses
+  (400/401/403/404/409/429/5xx); structured errors (RFC 9457 Problem
+  Details); cache headers when the resource allows it.
 benefits: >-
-  Les clients standards (caches, proxies, libs) fonctionnent sans adaptation ;
-  le contrat est lisible ; l'idempotence des verbes protège les retries.
+  Standard clients (caches, proxies, libraries) work without adaptation; the
+  contract is readable; verb idempotency protects retries.
 costs: >-
-  L'action non-CRUD (annuler une commande) exige un POST d'action
-  (`/orders/{id}/cancel`) — légitime ; forcer chaque opération dans un cadre
-  de ressource « propre » produit des modèles artificiels.
+  The non-CRUD action (cancel an order) requires an action POST
+  (`/orders/{id}/cancel`) — legitimate; forcing every operation into a
+  "clean" resource frame produces artificial models.
 related: >-
-  Catalog : chi. Recette : recipe-rest-chi. Homologue négatif :
+  Catalog: chi. Recipe: recipe-rest-chi. Negative counterpart:
   pattern:antipattern:rest-tunneling,
   pattern:antipattern:rest-ignoring-http-semantics.
 relationships:

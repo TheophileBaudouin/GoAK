@@ -1,5 +1,5 @@
 id: pattern:messaging:idempotent-consumer
-title: Consommateur idempotent — absorber les doublons
+title: Idempotent consumer — absorb duplicates
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les files garantissent au-moins-une-fois : un message peut être reçu
-  plusieurs fois (rebalance, retry, redelivery). Traiter deux fois un effet
-  non-idempotent produit des doublons (voir
+  Queues guarantee at-least-once delivery: a message can be received several
+  times (rebalance, retry, redelivery). Processing a non-idempotent effect
+  twice produces duplicates (see
   pattern:antipattern:msg-offset-commit-misorder).
 context: >-
-  S'applique à tout consommateur dont le traitement a un effet externe
-  (écriture DB, appel API, envoi).
+  Applies to any consumer whose processing has an external effect (DB write,
+  API call, sending).
 solution: >-
-  Rendre le traitement idempotent par clé métier : dédupliquer par
-  `event_id` (table de processus traités vérifiée atomiquement avec l'effet,
-  ou contrainte unique sur la clé), ou concevoir l'effet pour être rejouable
-  (upsert, PUT). Commiter l'offset après traitement réussi
-  (voir pattern:messaging:transactional-outbox pour la fiabilisation).
+  Make processing idempotent by business key: deduplicate by `event_id`
+  (table of processed events checked atomically with the effect, or a unique
+  constraint on the key), or design the effect to be replayable (upsert,
+  PUT). Commit the offset after successful processing
+  (see pattern:messaging:transactional-outbox for reliability).
 benefits: >-
-  Doublons absorbés sans coût, retry et rebalance sans conséquence, et
-  sémantique at-least-once assumée proprement.
+  Duplicates absorbed at no cost, retries and rebalances without
+  consequence, and at-least-once semantics assumed cleanly.
 costs: >-
-  Stockage de déduplication (TTL) ou contraintes à concevoir ; l'idempotence
-  par clé exige une clé stable côté producteur — documenter le contrat
-  d'événement.
+  Deduplication storage (TTL) or constraints to design; key-based
+  idempotency requires a stable key on the producer side — document the
+  event contract.
 related: >-
-  Homologue négatif : pattern:antipattern:msg-offset-commit-misorder.
+  Negative counterpart: pattern:antipattern:msg-offset-commit-misorder.
 relationships:
   references:
     - https://kafka.apache.org/documentation/#semantics

@@ -6,7 +6,7 @@ tags: [validation, input, structs, security, api]
 last-verified: 2026-08-05
 ---
 
-# validator — validation de structures
+# validator — struct validation
 
 ## Selection
 
@@ -47,38 +47,33 @@ namespace details, or internal values to an untrusted client.
 | JSON Schema/OpenAPI validation | Prefer when the external schema is the source of truth; this package validates Go values. |
 | Sanitizer | Separate concern; validation must not be treated as HTML/SQL/path sanitization. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - HTTP, CLI, config, or message inputs map to Go structs with repeatable field
   and cross-field constraints.
 - Tags/aliases and collection traversal improve readability without hiding the
   domain policy.
 - The application converts validation errors into a stable public response.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Validation is a single trivial condition or a domain invariant that should be
   visible in a constructor/service.
 - Input needs sanitization, canonicalization, authorization, or permission
   checks instead of shape validation.
 - The raw validator namespace/value should be exposed to users.
 
-## Avantages
-
+## Advantages
 - Large built-in tag set for common shape, network, identifier, and collection
   constraints.
 - Custom field/struct validators and aliases support application-specific rules.
 - Works on ordinary Go values without imposing an HTTP framework.
 
-## Inconvénients
-
+## Disadvantages
 - Reflection/tag strings can hide rules from ordinary code navigation.
 - Validation tags do not define authorization, normalization, or business policy.
 - Error translation and public-field mapping remain application responsibilities.
 - A broad tag set can encourage over-validation or unstable external contracts.
 
-## Pièges connus
-
+## Known pitfalls
 - Validate at the trust boundary, then apply domain invariants again where state
   changes; a tag is not proof of authorization.
 - Do not return `Field`, `Namespace`, or `Value` blindly when they reveal secrets
@@ -88,8 +83,7 @@ namespace details, or internal values to an untrusted client.
 - Register custom validators once in an explicit validator instance and test
   them with table-driven cases.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official validator repository](https://github.com/go-playground/validator) —
   API, maintenance, license, checked 2026-08-05.
 - [validator v10 on pkg.go.dev](https://pkg.go.dev/github.com/go-playground/validator/v10)

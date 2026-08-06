@@ -1,5 +1,5 @@
 id: pattern:antipattern:http-no-timeouts
-title: Serveur HTTP sans timeouts (valeurs par défaut)
+title: HTTP server without timeouts (default values)
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `http.Server{Addr: ":8080"}` sans `ReadTimeout`, `ReadHeaderTimeout`,
-  `WriteTimeout`, `IdleTimeout` — ou `http.ListenAndServe` brut.
+  `http.Server{Addr: ":8080"}` without `ReadTimeout`, `ReadHeaderTimeout`,
+  `WriteTimeout`, `IdleTimeout` — or raw `http.ListenAndServe`.
 detect: >-
-  - Struct `http.Server` avec uniquement Addr/Handler.
-  - Revue des handlers : opérations longues sans `http.TimeoutHandler` ni
-    gestion du contexte de requête.
+  - `http.Server` struct with only Addr/Handler.
+  - Handler review: long-running operations without `http.TimeoutHandler` or
+    request-context handling.
 problem: >-
-  Les défauts du ServeMux n'imposent aucun timeout : un client lent occupe un
-  worker indéfiniment, les connexions inactives s'accumulent, et un handler
-  bloqué fait grossir la file — déni de service trivial (slowloris) et
-  indisponibilité sous charge. Le guide Cloudflare documente la distinction
-  entre les timeouts serveur et handler.
+  ServeMux defaults impose no timeouts: a slow client occupies a worker
+  indefinitely, idle connections accumulate, and a blocked handler grows the
+  queue — trivial denial of service (slowloris) and unavailability under
+  load. The Cloudflare guide documents the distinction between server and
+  handler timeouts.
 fix: >-
-  Configurer tous les timeouts : `ReadHeaderTimeout` (5-10s), `ReadTimeout`
-  (10-30s), `WriteTimeout` (30-60s), `IdleTimeout` (60-120s) selon le profil.
-  Pour les opérations longues, `http.TimeoutHandler` au niveau handler et
-  respecter `r.Context()` ; `http.Server.Shutdown(ctx)` pour l'arrêt gracieux
-  (voir recipe-graceful-shutdown).
+  Configure all timeouts: `ReadHeaderTimeout` (5-10s), `ReadTimeout`
+  (10-30s), `WriteTimeout` (30-60s), `IdleTimeout` (60-120s) according to the
+  profile. For long-running operations, `http.TimeoutHandler` at the handler
+  level and respect `r.Context()` ; `http.Server.Shutdown(ctx)` for graceful
+  shutdown (see recipe-graceful-shutdown).
 when_ok: >-
-  Les valeurs exactes dépendent du produit ; la règle est d'en définir —
-  aucune valeur par défaut n'est acceptable en production.
+  Exact values depend on the product; the rule is to define them — no
+  default value is acceptable in production.
 relationships:
   references:
     - https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/

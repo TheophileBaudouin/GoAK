@@ -1,0 +1,40 @@
+---
+id: pattern:antipattern:sec-timing-unsafe-comparison
+title: Timing-unsafe comparison — byte-by-byte equality of secrets
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, security, crypto, timing-attack, anti-pattern]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+symptom: >-
+  Comparing hashes, MACs, signatures, or PINs with ==, bytes.Equal, or a
+  hand-written loop; the comparison returns early on the first mismatch.
+detect: >-
+  - grep for `bytes.Equal` or `==` on values derived from secrets (digests,
+    tokens, auth tags).
+  - A loop `for i := range a { if a[i] != b[i] { return false } }` over
+    secret material.
+problem: >-
+  An early-exit comparison leaks how many leading bytes matched through
+  timing; an attacker can recover the secret byte by byte. crypto/subtle
+  exists exactly for this. Note that even ConstantTimeCompare leaks a
+  length difference (golang/go#18936), so compare equal-length digests.
+fix: >-
+  Compare fixed-length digests with crypto/subtle.ConstantTimeCompare —
+  equalize the length first by hashing both sides or enforcing a canonical
+  length. Use HMAC and constant-time APIs for MAC checks; prefer a
+  "hash then compare" shape so the compared values always have a fixed size.
+when_ok: >-
+  Plain == is acceptable for public, non-secret data (cached values, enums,
+  request metadata). The rule applies when a mismatch reveals information
+  about secret input an attacker controls.
+relationships:
+  references:
+    - https://pkg.go.dev/crypto/subtle
+    - https://github.com/golang/go/issues/18936
+    - source:go:crypto
+  uses: []
+  validated_by: []

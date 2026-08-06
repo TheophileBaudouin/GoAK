@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-context-key-collision
-title: Clé de contexte exportée ou de type string
+title: Exported or string-typed context key
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `context.WithValue(ctx, "user", u)` avec une clé de type `string` ou un type
-  exporté défini dans un autre package.
+  `context.WithValue(ctx, "user", u)` with a key of type `string` or an
+  exported type defined in another package.
 detect: >-
-  - `context.WithValue` dont la clé est une string littérale ou un type exporté
-    (lint : `revive` rule `context-key-type`).
-  - Recherche des clés de contexte partagées entre packages.
+  - `context.WithValue` whose key is a string literal or an exported type
+    (lint: `revive` rule `context-key-type`).
+  - Search for context keys shared between packages.
 problem: >-
-  La doc officielle est explicite : les clés doivent être d'un type défini dans
-  le package de l'appelant et non exporté. Une clé string ou exportée crée des
-  collisions silencieuses entre packages (deux packages écrivent la même clé,
-  lecture d'une valeur corrompue) et rend l'API impossible à inspecter.
+  The official documentation is explicit: keys must be of a type defined in
+  the caller's package and unexported. A string or exported key creates silent
+  collisions between packages (two packages write the same key, reading a
+  corrupted value) and makes the API impossible to inspect.
 fix: >-
-  Définir un type privé dans le package qui lit la valeur :
-  `type ctxKey struct{}` (ou `type ctxKey string` avec constante privée), et
-  exporter uniquement des fonctions d'accès (`WithUser(ctx, u)`,
-  `UserFrom(ctx)`)
-  qui encapsulent la clé.
+  Define a private type in the package that reads the value:
+  `type ctxKey struct{}` (or `type ctxKey string` with a private constant), and
+  export only accessor functions (`WithUser(ctx, u)`, `UserFrom(ctx)`)
+  that encapsulate the key.
 when_ok: >-
-  Jamais de clé exportée ou string pour des valeurs portées par le contexte ;
-  si la valeur doit être visible d'autres packages, exposer une fonction
-  d'accès, pas la clé.
+  Never an exported or string key for values carried by the context; if the
+  value must be visible to other packages, expose an accessor function, not
+  the key.
 relationships:
   references:
     - https://go.dev/blog/context

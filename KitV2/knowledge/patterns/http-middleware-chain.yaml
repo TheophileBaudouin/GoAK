@@ -1,5 +1,5 @@
 id: pattern:http:middleware-chain
-title: Chaîne de middleware — composition transverse propre
+title: Middleware chain — clean cross-cutting composition
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  La gestion transverse (logging, auth, recovery, CORS, rate limit) dupliquée
-  dans chaque handler devient incohérente et inoubliable (voir
+  Cross-cutting concerns (logging, auth, recovery, CORS, rate limiting)
+  duplicated in every handler become inconsistent and easy to forget (see
   pattern:antipattern:rest-ignoring-http-semantics).
 context: >-
-  S'applique à tout serveur HTTP avec des préoccupations transverses partagées
-  par plusieurs routes.
+  Applies to any HTTP server with cross-cutting concerns shared by several
+  routes.
 solution: >-
-  Middleware = `func(http.Handler) http.Handler` composé avant les routes :
-  avec chi, `r.Use(requestID, logger, recoverer, auth)` pour le global et
-  `r.Group`/`r.With` pour le périmètre. Chaque middleware enveloppe, appelle
-  le suivant, et peut court-circuiter (auth → 401) sans toucher les handlers.
+  Middleware = `func(http.Handler) http.Handler` composed before the routes:
+  with chi, `r.Use(requestID, logger, recoverer, auth)` for global concerns
+  and `r.Group`/`r.With` for a scope. Each middleware wraps, calls the next,
+  and can short-circuit (auth → 401) without touching the handlers.
 benefits: >-
-  Une préoccupation = un composant testable isolément (httptest, voir
-  pattern:testing:httptest) ; ordre explicite (request ID avant logger) ;
-  zéro duplication dans les handlers.
+  One concern = one component testable in isolation (httptest, see
+  pattern:testing:httptest); explicit order (request ID before logger); zero
+  duplication in handlers.
 costs: >-
-  L'ordre des middlewares est un contrat implicite (documenter) ; un
-  middleware trop épais (toute la logique dedans) redevient du code spaghetti
-  — garder chaque middleware monofonction.
+  Middleware order is an implicit contract (document it); an over-thick
+  middleware (all the logic inside) becomes spaghetti code again — keep each
+  middleware single-function.
 related: >-
-  Catalog : chi (knowledge/catalogs/libraries/chi). Recette :
-  recipe-rest-chi. Homologue négatif :
+  Catalog: chi (knowledge/catalogs/libraries/chi). Recipe:
+  recipe-rest-chi. Negative counterpart:
   pattern:antipattern:rest-ignoring-http-semantics.
 relationships:
   references:

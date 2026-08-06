@@ -6,103 +6,102 @@ tags: [auth, session, cookie, csrf, scs, http, security]
 last-verified: 2026-08-05
 ---
 
-# recipe-auth-session-scs — session navigateur et CSRF
+# recipe-auth-session-scs — browser session and CSRF
 
-## Objectif et cas d'utilisation
+## Objective and use case
 
-Authentifier un navigateur sur la même origine avec une session serveur et un
-cookie opaque. La recipe expose `VerifyFunc`, un `*scs.SessionManager` injecté,
-`GET /csrf`, `POST /login`, `POST /logout` et `GET /protected`. Elle applique
-un synchronizer token avant chaque écriture et ne journalise ni mot de passe ni
-jeton.
+Authenticate a browser on the same origin with a server-side session and an
+opaque cookie. The recipe exposes `VerifyFunc`, an injected
+`*scs.SessionManager`, `GET /csrf`, `POST /login`, `POST /logout` and
+`GET /protected`. It applies a synchronizer token before every write and logs
+neither passwords nor tokens.
 
-Choisir cette recipe pour une UI navigateur contrôlée par le même site. Pour une
-API Bearer sans cookie, utiliser `recipe-auth-jwt` ; les deux frontières ne sont
-pas interchangeables.
+Choose this recipe for a browser UI controlled by the same site. For a Bearer
+API without cookies, use `recipe-auth-jwt`; the two boundaries are not
+interchangeable.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-- TLS est actif : le cookie est toujours `Secure`, `HttpOnly` et
+- TLS is active: the cookie is always `Secure`, `HttpOnly` and
   `SameSite=Strict`.
-- Le vérificateur de credentials est injecté et renvoie uniquement un subject.
-- `scs` garde son store mémoire par défaut : cela convient aux tests ou à un
-  processus unique. Un store persistant/multi-réplique est un point d'extension
-  qui exige une admission séparée.
+- The credential verifier is injected and returns only a subject.
+- `scs` keeps its default in-memory store: this suits tests or a single
+  process. A persistent/multi-replica store is an extension point that
+  requires separate admission.
 
-`LoadAndSave` charge et écrit la session ; le handler login valide le token
-CSRF, vérifie les credentials, appelle `RenewToken` après élévation de
-privilège, puis stocke le subject et un token CSRF neuf. Les écritures suivantes
-comparent les tokens par `subtle.ConstantTimeCompare`.
+`LoadAndSave` loads and writes the session; the login handler validates the
+CSRF token, verifies the credentials, calls `RenewToken` after privilege
+elevation, then stores the subject and a fresh CSRF token. Subsequent writes
+compare tokens with `subtle.ConstantTimeCompare`.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/alexedwards/scs/v2 v2.9.0` — catalogue `scs` ; gestion de session
-  explicite et compatible `net/http`.
-- `crypto/rand` + token synchronizer — évite un middleware CSRF supplémentaire.
-- `VerifyFunc` — la recipe ne choisit ni table utilisateur, ni hash de mot de
-  passe, ni fournisseur d'identité.
+- `github.com/alexedwards/scs/v2 v2.9.0` — `scs` catalog; explicit session
+  management compatible with `net/http`.
+- `crypto/rand` + synchronizer token — avoids an extra CSRF middleware.
+- `VerifyFunc` — the recipe chooses neither a user table, nor a password
+  hash, nor an identity provider.
 
-Patterns : `pattern:security:auth-session-vs-jwt`,
+Patterns: `pattern:security:auth-session-vs-jwt`,
 `pattern:antipattern:sec-missing-csrf`, `pattern:http:middleware-chain`.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- JWT dans le cookie : mélange une frontière API avec un risque CSRF ; choisir
-  une session opaque ici.
-- Cookie sans `Secure` ou `SameSite=Strict` : incompatible avec le contrat de
-  cette recipe.
-- Double-submit cookie, middleware global ou store distribué implicite : besoin
-  distinct qui doit documenter sa topologie et son admission.
+- JWT in a cookie: mixes an API boundary with a CSRF risk; choose an opaque
+  session here.
+- Cookie without `Secure` or `SameSite=Strict`: incompatible with this
+  recipe's contract.
+- Double-submit cookie, global middleware, or implicit distributed store: a
+  distinct need that must document its topology and admission.
 
-## Exemple complet
+## Complete example
 
 ```go
 sessions := authsessionscs.NewSessionManager()
 app, err := authsessionscs.New(sessions, func(ctx context.Context, email, password string) (string, error) {
-	if email != "person@example.test" || password != "correct" {
-		return "", authsessionscs.ErrInvalidCredentials
-	}
-	return "user-42", nil
+ if email != "person@example.test" || password != "correct" {
+  return "", authsessionscs.ErrInvalidCredentials
+ }
+ return "user-42", nil
 })
 if err != nil {
-	return err
+ return err
 }
 return http.ListenAndServeTLS(":8443", "cert.pem", "key.pem", app.Router())
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Obtenir `/csrf` avant login, puis remplacer le token reçu après login.
-- Exiger CSRF aussi pour logout ; rendre les échecs génériques.
-- Ne jamais mettre mot de passe, cookie, token CSRF ou subject sensible dans les
-  logs. Limiter la taille du JSON de login comme le fait l'exemple.
-- Régénérer le token de session lors d'une montée de privilège ; ne pas fixer
-  l'identité depuis un header client.
+- Fetch `/csrf` before login, then replace the received token after login.
+- Require CSRF for logout too; make failures generic.
+- Never put passwords, cookies, CSRF tokens, or sensitive subjects in logs.
+  Limit the login JSON size as the example does.
+- Regenerate the session token on privilege elevation; never set identity
+  from a client header.
 
-## Limites et extensions
+## Limits and extensions
 
-Cette recipe ne fournit ni inscription, reset de mot de passe, MFA, rate limit,
-révocation globale, stockage persistant, ni fédération. Ajouter ces capacités à
-des recipes séparées avec leurs décisions de sécurité ; ne les cacher pas dans
-le middleware session.
+This recipe provides neither signup, password reset, MFA, rate limiting,
+global revocation, persistent storage, nor federation. Add these capabilities
+in separate recipes with their own security decisions; do not hide them in the
+session middleware.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-auth-session-scs/...
 go run ./probes/auth-session
 ```
 
-La probe effectue sur TLS `GET /csrf`, login, lecture protégée et logout, puis
-affiche `auth-session: PASS`. Les tests couvrent CSRF manquant/invalide,
-credentials invalides et dépendances absentes.
+The probe performs over TLS `GET /csrf`, login, protected read, and logout,
+then prints `auth-session: PASS`. Tests cover missing/invalid CSRF, invalid
+credentials, and missing dependencies.
 
-## Sources primaires
+## Primary sources
 
 - [scs v2](https://pkg.go.dev/github.com/alexedwards/scs/v2) — sessions,
-  `LoadAndSave`, cookies et renouvellement.
+  `LoadAndSave`, cookies and renewal.
 - [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
-  — synchronizer token et comparaison sûre.
-- [net/http](https://pkg.go.dev/net/http) et [crypto/subtle](https://pkg.go.dev/crypto/subtle)
-  — frontières HTTP et comparaison constante.
-
+  — synchronizer token and safe comparison.
+- [net/http](https://pkg.go.dev/net/http) and [crypto/subtle](https://pkg.go.dev/crypto/subtle)
+  — HTTP boundaries and constant-time comparison.

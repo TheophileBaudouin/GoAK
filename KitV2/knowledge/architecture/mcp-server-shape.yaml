@@ -1,6 +1,6 @@
 ---
 id: pattern:architecture:mcp-server-shape
-title: Forme d'un serveur MCP — primitives, transport et frontière
+title: MCP server shape — primitives, transport, and trust boundary
 kind: Pattern
 version: 1
 status: active
@@ -10,36 +10,35 @@ go_version: "1.25+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Exposer des capacités à un agent LLM sans cadre produit des serveurs
-  ad-hoc, des frontières de sécurité floues et des protocoles incompatibles
-  entre clients (IDE, agents, applications). Comment structurer un serveur
-  MCP de façon cohérente avec la spec ?
+  Exposing capabilities to an LLM agent without a framework produces ad-hoc
+  servers, blurry security boundaries, and protocols that are incompatible
+  across clients (IDEs, agents, applications). How do you structure an MCP
+  server coherently with the spec?
 context: >-
-  S'applique quand on construit un serveur MCP (SDK officiel
-  github.com/modelcontextprotocol/go-sdk) ou qu'on décide du découpage entre
-  host, client et serveur dans une application agentique.
+  Applies when building an MCP server (official SDK
+  github.com/modelcontextprotocol/go-sdk) or deciding how to split host,
+  client, and server in an agentic application.
 solution: >-
-  Suivre l'architecture client-host-server de la spec : le host orchestre,
-  chaque client gère une session avec un serveur. Un serveur expose
-  exactement trois primitives distinctes — tools (fonctions exécutables que
-  le modèle peut appeler), resources (données/contextes lisibles), prompts
-  (modèles de tâches guidant l'interaction) — et les déclare via des schémas
-  explicites. Choisir un transport adapté (stdio pour les processus locaux,
-  HTTP/WebSocket streamable pour les serveurs distants), négocier la version
-  du protocole, et traiter chaque primitive comme une frontière de confiance
-  (l'entrée du modèle est non fiable, voir source:mcp:tool-security).
+  Follow the spec's client-host-server architecture: the host orchestrates,
+  each client manages one session with a server. A server exposes exactly
+  three distinct primitives — tools (executable functions the model can
+  call), resources (readable data/contexts), prompts (task templates that
+  guide the interaction) — and declares them through explicit schemas. Pick
+  a suitable transport (stdio for local processes, streamable HTTP/WebSocket
+  for remote servers), negotiate the protocol version, and treat each
+  primitive as a trust boundary (model input is untrusted, see
+  source:mcp:tool-security).
 benefits: >-
-  Interopérabilité avec tous les clients MCP, séparation claire
-  lecture (resources) / action (tools) / guidance (prompts), sessions
-  standardisées, et une frontière de sécurité identifiable pour les entrées
-  du modèle.
+  Interoperability with every MCP client, a clear separation between read
+  (resources) / act (tools) / guide (prompts), standardized sessions, and an
+  identifiable security boundary for model inputs.
 costs: >-
-  Le protocole et ses évolutions de version ajoutent de la complexité par
-  rapport à une API HTTP simple ; les schémas de primitives doivent être
-  maintenus en synchronisation avec l'implémentation ; l'outillage est
-  pré-1.0-era (épingler les versions, cf. catalog mcp-go-sdk).
+  The protocol and its version evolution add complexity compared with a plain
+  HTTP API; primitive schemas must be kept in sync with the implementation;
+  the tooling is pre-1.0-era (pin versions, see the mcp-go-sdk catalog
+  entry).
 related: >-
-  Homologue sécurité : source:mcp:tool-security. Catalogue de sélection :
+  Security counterpart: source:mcp:tool-security. Selection catalog:
   `knowledge/catalogs/libraries/mcp-go-sdk`.
 relationships:
   references:

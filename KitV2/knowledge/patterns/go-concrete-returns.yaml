@@ -1,5 +1,5 @@
 id: pattern:go:concrete-returns
-title: Retours concrets, interfaces côté consommateur
+title: Concrete returns, consumer-side interfaces
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une fonction qui retourne une interface force tous ses appelants dans une
-  abstraction, souvent pour une seule implémentation — indirection sans
-  bénéfice (voir pattern:antipattern:go-interface-everywhere).
+  A function that returns an interface forces all its callers into an
+  abstraction, often for a single implementation — indirection without
+  benefit (see pattern:antipattern:go-interface-everywhere).
 context: >-
-  S'applique aux API de package : constructeurs, factories, services qui
-  exposent des implémentations concrètes à leurs consommateurs.
+  Applies to package APIs: constructors, factories, services that expose
+  concrete implementations to their consumers.
 solution: >-
-  Retourner le type concret (`*Store`, `*Client`) ; définir une interface
-  minimale là où elle est consommée, avec les méthodes réellement utilisées,
-  uniquement quand un mock ou une seconde implémentation se justifie.
-  Vérifier la conformité à la compilation : `var _ Interface =
-  (*Concrete)(nil)`.
+  Return the concrete type (`*Store`, `*Client`); define a minimal interface
+  where it is consumed, with the methods actually used, only when a mock or a
+  second implementation is justified. Verify conformance at compile time:
+  `var _ Interface = (*Concrete)(nil)`.
 benefits: >-
-  API simple à comprendre et à étendre, aucun coût de dispatch virtuel
-  inutile, et la liberté de varier l'abstraction du côté qui en a besoin.
+  API simple to understand and extend, no unnecessary virtual dispatch cost,
+  and the freedom to vary the abstraction on the side that needs it.
 costs: >-
-  Le consommateur ne peut pas substituer une implémentation sans interface
-  (acceptable quand une seule existe) ; un retour concret crée un couplage de
-  type — à peser pour les frontières réellement stables.
+  The consumer cannot substitute an implementation without an interface
+  (acceptable when only one exists); a concrete return creates type coupling
+  — weigh it for genuinely stable boundaries.
 related: >-
-  Règles du kit : `rules/core/philosophy`. Homologue négatif :
+  Kit rules: `rules/core/philosophy`. Negative counterpart:
   pattern:antipattern:go-interface-everywhere.
 relationships:
   references:

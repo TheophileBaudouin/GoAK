@@ -1,5 +1,5 @@
 id: pattern:go:constructor-injection
-title: Injection par constructeur — dépendances explicites sans framework
+title: Constructor injection — explicit dependencies without a framework
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les dépendances (db, logger, config, clients) sont lues depuis des globals ou
-  construites à l'intérieur des types : impossibles à remplacer en test,
-  ordre d'initialisation opaque, état partagé (voir
-  pattern:antipattern:go-mutable-global-state).
+  Dependencies (db, logger, config, clients) are read from globals or built
+  inside the types: impossible to replace in tests, opaque initialization
+  order, shared state (see pattern:antipattern:go-mutable-global-state).
 context: >-
-  S'applique à tout type qui a besoin d'une dépendance pour fonctionner, dès
-  qu'il est testé ou réutilisé.
+  Applies to any type that needs a dependency to work, as soon as it is
+  tested or reused.
 solution: >-
-  Constructeur conventionnel `New(deps…) (*T, error)` qui stocke les
-  dépendances dans les champs du type ; composition des graphes dans `main`
-  ou une fonction `wire()`/`newApp()` unique. Pas de framework : l'injection
-  manuelle par constructeur couvre ~95 % des cas.
+  Conventional constructor `New(deps…) (*T, error)` that stores dependencies
+  in the type's fields; graph composition in `main` or a single
+  `wire()`/`newApp()` function. No framework: manual constructor injection
+  covers ~95% of cases.
 benefits: >-
-  Testable (dépendances réelles ou fakes par construction, jamais de
-  mutation globale), initialisation explicite et ordonnée, erreurs de
-  construction retournées au lieu de paniquer.
+  Testable (real dependencies or fakes by construction, never global
+  mutation), explicit and ordered initialization, construction errors
+  returned instead of panicking.
 costs: >-
-  Le passage manuel des dépendances devient verbeux dans les grands graphes
-  (seuil où fx/wire se justifient) ; le constructeur doit rester sans effet
-  de bord (voir pattern:antipattern:go-init-misuse).
+  Manual dependency passing becomes verbose in large graphs (the threshold
+  where fx/wire are justified); the constructor must stay side-effect-free
+  (see pattern:antipattern:go-init-misuse).
 related: >-
-  Homologue négatif : pattern:antipattern:go-mutable-global-state,
+  Negative counterparts: pattern:antipattern:go-mutable-global-state,
   pattern:antipattern:go-init-misuse.
 relationships:
   references:

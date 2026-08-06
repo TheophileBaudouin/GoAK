@@ -1,5 +1,5 @@
 id: pattern:observability:structured-logging
-title: Logging structuré — slog comme interface standard
+title: Structured logging — slog as the standard interface
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les logs texte libres (fmt.Printf) ne sont ni filtrables, ni corrélables, ni
-  interrogeables en masse — et le bruit détruit la valeur (voir
+  Free-form text logs (fmt.Printf) are neither filterable, nor
+  correlatable, nor queryable at scale — and noise destroys value (see
   pattern:antipattern:obs-excessive-logging).
 context: >-
-  S'applique à tout programme qui journalise des événements exploitables
-  (opérations, erreurs, démarrages), en particulier ceux déployés.
+  Applies to any program that logs exploitable events (operations, errors,
+  startups), especially deployed ones.
 solution: >-
-  `log/slog` (Go 1.21+) : clés/valeurs typées (`slog.Info("started", "port",
-  p)`), niveaux (debug/info/warn/error), handlers remplaçables (text, JSON,
-  ou charm log coloré — catalog log). La règle du kit : Error = échec,
-  contexte explicite par appel, jamais de concaténation de messages.
+  `log/slog` (Go 1.21+): typed keys/values (`slog.Info("started", "port",
+  p)`), levels (debug/info/warn/error), replaceable handlers (text, JSON,
+  or charm colored log — catalog log). The kit rule: Error = failure,
+  explicit context per call, never message concatenation.
 benefits: >-
-  Logs interrogeables (JSON → outil de collecte), ajout de contexte sans
-  formattage fragile, interface standard évitant le lock-in d'un logger
-  tiers.
+  Queryable logs (JSON → collection tool), context added without fragile
+  formatting, a standard interface avoiding third-party logger lock-in.
 costs: >-
-  Une ligne slog coûte une allocation par clé (négligeable hors chemins
-  ultra-chauds) ; les messages doivent rester concis — l'agrégation et le
-  volume se gèrent par niveau, pas par plus de texte.
+  A slog line costs one allocation per key (negligible outside ultra-hot
+  paths); messages must stay concise — aggregation and volume are managed
+  by level, not by more text.
 related: >-
-  Règles du kit : `rules/registry/logging`. Catalog : log
-  (knowledge/catalogs/libraries/log). Homologue négatif :
+  Kit rules: `rules/registry/logging`. Catalog: log
+  (knowledge/catalogs/libraries/log). Negative counterpart:
   pattern:antipattern:obs-excessive-logging.
 relationships:
   references:

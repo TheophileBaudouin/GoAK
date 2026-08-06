@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-shadowing
-title: Shadowing — masquage de variable par une déclaration interne
+title: Shadowing — variable masked by an inner declaration
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `err :=` (ou `:=`) à l'intérieur d'un bloc réutilise un nom déjà déclaré dans
-  une portée englobante, masquant l'original : la valeur de la portée externe
-  reste inchangée alors que le code semble la mettre à jour.
+  `err :=` (or `:=`) inside a block reuses a name already declared in an
+  enclosing scope, masking the original: the outer scope value stays
+  unchanged while the code seems to update it.
 detect: >-
-  - Analyseur `shadow` (`go vet -vettool=$(which shadow)` ou
-    `golang.org/x/tools/go/analysis/passes/shadow`) ; golangci-lint
-    (`govet` avec le check shadow activé).
-  - Revue : `:=` dans des `if`/`for`/`switch` qui réutilise un nom externe.
+  - `shadow` analyzer (`go vet -vettool=$(which shadow)` or
+    `golang.org/x/tools/go/analysis/passes/shadow`); golangci-lint (`govet`
+    with the shadow check enabled).
+  - Review: `:=` in `if`/`for`/`switch` reusing an outer name.
 problem: >-
-  Le shadowing produit des bugs silencieux : une affectation qui « ne prend
-  pas », un `err` masqué qui ne propage pas l'erreur, une confusion de variable
-  qui survit aux refactors. Le compilateur n'alerte pas (légal en Go).
+  Shadowing produces silent bugs: an assignment that "does not take", a
+  masked `err` that does not propagate the error, a variable confusion that
+  survives refactors. The compiler does not warn (legal in Go).
 fix: >-
-  Éviter de réutiliser des noms de portée externe dans des blocs imbriqués ;
-  préférer des noms distincts ou restructurer pour affecter la variable
-  externe délibérément. Activer le check shadow dans le lint pour rendre la
-  détection déterministe.
+  Avoid reusing outer-scope names in nested blocks; prefer distinct names or
+  restructure to deliberately assign the outer variable. Enable the shadow
+  check in lint to make detection deterministic.
 when_ok: >-
-  Le shadowing volontaire est parfois utilisé pour restreindre une portée
-  (ex. un `err` local à un bloc) ; il doit alors être explicite et commenté,
-  jamais accidentel.
+  Deliberate shadowing is sometimes used to restrict a scope (e.g. an `err`
+  local to a block); it must then be explicit and commented, never
+  accidental.
 relationships:
   references:
     - https://100go.co/

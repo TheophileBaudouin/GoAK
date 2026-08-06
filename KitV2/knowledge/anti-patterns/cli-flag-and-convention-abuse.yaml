@@ -1,5 +1,5 @@
 id: pattern:antipattern:cli-flag-and-convention-abuse
-title: CLI qui abuse des flags et ignore les conventions
+title: CLI that abuses flags and ignores conventions
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Flags obligatoires alors qu'un « option » doit être optionnel, flags
-  réutilisés pour des sens différents (ex. `-i` pour autre chose que
-  interactive), valeurs positionnelles surchargées, sortie et code de sortie
-  incohérents.
+  Mandatory flags while an "option" should be optional, flags reused with
+  different meanings (e.g. `-i` for something other than interactive),
+  overloaded positional values, inconsistent output and exit codes.
 detect: >-
-  - Help incomplet ou inexistant (`-h` ne documente pas l'usage).
-  - Flags dont le nom contredit le comportement ou l'habitude commune.
-  - Codes de sortie identiques (toujours 0 ou toujours 1) quelle que soit la
-    cause de l'échec.
-  - Scriptabilité cassée : sortie formatée pour l'humain sans mode
-    stable/pipeline.
+  - Incomplete or missing help (`-h` does not document usage).
+  - Flags whose name contradicts the behavior or common practice.
+  - Identical exit codes (always 0 or always 1) whatever the cause of the
+    failure.
+  - Broken scriptability: output formatted for humans without a
+    stable/pipeline mode.
 problem: >-
-  Les conventions CLI ont 40 ans : les utilisateurs et scripts les attendent
-  (help, `-h/--help`, `--version`, code de sortie 0/≠0, options sur stdin
-  quand nécessaire). Les ignorer rend l'outil imprévisible, non scriptable et
-  coûteux à adopter — le guide clig.dev documente ces attendus.
+  CLI conventions are 40 years old: users and scripts expect them (help,
+  `-h/--help`, `--version`, exit code 0/≠0, options on stdin when needed).
+  Ignoring them makes the tool unpredictable, non-scriptable, and costly to
+  adopt — the clig.dev guide documents these expectations.
 fix: >-
-  Suivre clig.dev : help complet, options réellement optionnelles, aliases
-  cohérents, codes de sortie signifiants (0 succès, 2 usage, ≠0 erreur),
-  sortie stable pour les scripts (mode JSON ou `--quiet`), sous-commandes
-  pour les actions (voir recipe-cli-cobra). Tester le help et les codes de
-  sortie.
+  Follow clig.dev: complete help, truly optional options, coherent aliases,
+  meaningful exit codes (0 success, 2 usage, ≠0 error), stable output for
+  scripts (JSON mode or `--quiet`), subcommands for actions (see
+  recipe-cli-cobra). Test the help and the exit codes.
 when_ok: >-
-  Un script jetable interne peut tolérer des raccourcis ; toute CLI
-  distribuée ou utilisée en CI doit suivre les conventions.
+  A disposable internal script may tolerate shortcuts; any distributed CLI or
+  one used in CI must follow the conventions.
 relationships:
   references:
     - https://clig.dev/

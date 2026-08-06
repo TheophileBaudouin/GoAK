@@ -1,44 +1,44 @@
 ---
 name: recipe-rest-chi
-description: "API REST idiomatic avec le routeur chi v5, middleware composable, groupes de routes, décodage JSON borné (MaxBytesReader), tri déterministe et journalisation sécurisée. Utiliser pour concevoir un service HTTP REST réutilisable."
+description: "Idiomatic REST API with the chi v5 router, composable middleware, route groups, bounded JSON decoding (MaxBytesReader), deterministic ordering, and safe logging. Use when building a reusable HTTP REST service."
 category: recipe
 tags: [rest, http, chi, router, middleware, json]
 last-verified: 2026-08-05
 ---
 
-# recipe-rest-chi — Service API REST avec chi v5
+# recipe-rest-chi — REST API service with chi v5
 
-## Objectif et cas d'utilisation
+## Objective and use case
 
-Construire un service Web HTTP REST en Go avec `chi v5` offrant des middlewares composables (`RequestID`, `Recoverer`), des sous-routeurs/groupes de routes, l'extraction de paramètres d'URL, la limitation stricte de la taille des requêtes JSON et la journalisation d'événements sans exposer de données sensibles.
+Build an HTTP REST web service in Go with `chi v5` providing composable middleware (`RequestID`, `Recoverer`), sub-routers/route groups, URL parameter extraction, strict size limiting of JSON requests, and event logging without exposing sensitive data.
 
-Utiliser `chi` lorsque le projet nécessite une composition avancée de middlewares ou un découpage en sous-routeurs tout en restant 100% compatible avec la signature stdlib `net/http`.
+Use `chi` when the project needs advanced middleware composition or sub-router decomposition while staying 100% compatible with the stdlib `net/http` signature.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendance : `github.com/go-chi/chi/v5 v5.3.1`
-- Architecture :
-  - `Store` encapsule l'état (en mémoire ou DB) et le logger `*slog.Logger`.
-  - La méthode `(s *Store) Router() http.Handler` instancie le routeur et expose les endpoints.
-  - Bornage strict des corps de requêtes HTTP avec `http.MaxBytesReader(w, r.Body, 8KB)`.
-  - Décodage JSON avec `decoder.DisallowUnknownFields()` et contrôle d'absence d'éléments résiduels.
-  - Réponses de liste triées de manière déterministe par ID.
-  - Ne jamais journaliser les corps de requêtes ou données sensibles clients.
+- Dependency: `github.com/go-chi/chi/v5 v5.3.1`
+- Architecture:
+  - `Store` encapsulates the state (in memory or DB) and the `*slog.Logger` logger.
+  - The `(s *Store) Router() http.Handler` method instantiates the router and exposes the endpoints.
+  - Strict bounding of HTTP request bodies with `http.MaxBytesReader(w, r.Body, 8KB)`.
+  - JSON decoding with `decoder.DisallowUnknownFields()` and a check that no residual elements remain.
+  - List responses sorted deterministically by ID.
+  - Never log request bodies or sensitive client data.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/go-chi/chi/v5` — routeur ultra-léger (~1000 lignes de code, 0 dépendances externes) purement compatible `net/http`.
-- `log/slog` — journalisation structurée standard avec injection de logger.
-- `middleware.RequestID` et `middleware.Recoverer` — pile middleware de base.
+- `github.com/go-chi/chi/v5` — ultra-light router (~1000 lines of code, 0 external dependencies) purely compatible with `net/http`.
+- `log/slog` — standard structured logging with logger injection.
+- `middleware.RequestID` and `middleware.Recoverer` — base middleware stack.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `net/http` 1.22+ `ServeMux` : adapté aux APIs simples sans middleware complexe. Préférer `chi` dès que le chaînage ou le groupement de routes devient lourd.
-- Gin / Echo : non compatibles avec `net/http` (signatures de handler propriétaires `gin.Context` / `echo.Context`), couplage fort au framework.
-- `middleware.RealIP` de chi : déprécié et vulnérable à l'usurpation d'IP (GHSA-3fxj-6jh8-hvhx). Préférer `ClientIPFrom*` selon l'environnement de déploiement.
+- `net/http` 1.22+ `ServeMux`: suited to simple APIs without complex middleware. Prefer `chi` as soon as route chaining or grouping becomes heavy.
+- Gin / Echo: not compatible with `net/http` (proprietary handler signatures `gin.Context` / `echo.Context`), strong framework coupling.
+- chi's `middleware.RealIP`: deprecated and vulnerable to IP spoofing (GHSA-3fxj-6jh8-hvhx). Prefer `ClientIPFrom*` depending on the deployment environment.
 
-## Exemple complet
+## Complete example
 
 ```go
 package restchi
@@ -95,26 +95,26 @@ func (s *Store) Router() http.Handler {
 }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Toujours borner la taille maximale du corps de requête avec `http.MaxBytesReader` pour éviter les attaques DoS par mémoire saturée.
-- Utiliser `DisallowUnknownFields()` lors du décodage JSON pour rejeter les champs inattendus.
-- Ne pas placer de données confidentielles ou d'identifiants clients dans les attributs de log structurés.
+- Always bound the maximum request body size with `http.MaxBytesReader` to avoid memory-exhaustion DoS attacks.
+- Use `DisallowUnknownFields()` when decoding JSON to reject unexpected fields.
+- Do not put confidential data or client identifiers in structured log attributes.
 
-## Limites et extensions
+## Limits and extensions
 
-Pour la validation de schémas complexes ou OpenAPI, combiner ce routeur avec `recipe-openapi-validation`.
+For complex schema or OpenAPI validation, combine this router with `recipe-openapi-validation`.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-rest-chi/...
 go run ./probes/rest-chi
 ```
 
-La probe lance un serveur `httptest`, effectue une requête `POST /items`, vérifie le statut HTTP `201 Created` et le corps JSON de retour, puis affiche `rest-chi: PASS`.
+The probe starts an `httptest` server, performs a `POST /items` request, checks the `201 Created` HTTP status and the returned JSON body, then prints `rest-chi: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [go-chi/chi](https://github.com/go-chi/chi) — dépôt officiel chi.
-- [pkg.go.dev/github.com/go-chi/chi/v5](https://pkg.go.dev/github.com/go-chi/chi/v5) — documentation officielle chi v5.
+- [go-chi/chi](https://github.com/go-chi/chi) — official chi repository.
+- [pkg.go.dev/github.com/go-chi/chi/v5](https://pkg.go.dev/github.com/go-chi/chi/v5) — official chi v5 documentation.

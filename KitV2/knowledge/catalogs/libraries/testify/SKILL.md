@@ -6,7 +6,7 @@ tags: [testing, assertions, mocks, suites, go]
 last-verified: 2026-08-05
 ---
 
-# testify — assertions et mocks
+# testify — assertions and mocks
 
 ## Selection
 
@@ -46,35 +46,30 @@ simple behavior.
 | `gomock` | Consider when generated strict mocks and call contracts justify its separate tooling. |
 | `suite` | Use only when suite lifecycle adds value; ordinary subtests are often simpler. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Repeated assertions are clearer with `assert`/`require`.
 - The test needs testify's mock object or suite helpers.
 - The project accepts a test-only dependency and keeps behavior assertions
   independent from implementation details.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Stdlib `testing` expresses the test with a few direct checks.
 - A fake or pure function test is simpler than mock expectations.
 - The project would use suites with parallel tests or over-specify incidental
   call order.
 
-## Avantages
-
+## Advantages
 - Readable fatal/non-fatal assertion distinction.
 - Mock and suite packages cover common test seams without production imports.
 - Stable v1 line with broad documentation and ecosystem familiarity.
 
-## Inconvénients
-
+## Disadvantages
 - Assertion helpers can hide the exact failure context if messages are vague.
 - Mocks couple tests to calls and argument matching rather than behavior.
 - `suite` and mock semantics have concurrency/pointer caveats.
 - Dependency is unnecessary when stdlib checks are already concise.
 
-## Pièges connus
-
+## Known pitfalls
 - Use `require.NoError` before dereferencing a value that an error may invalidate.
 - Do not mutate pointer arguments after a mock call when using call assertions;
   matching may observe changed values.
@@ -85,8 +80,7 @@ simple behavior.
 - Testify has no published security advisory at verification time; still scan
   its transitive dependencies in the normal gate.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official testify repository](https://github.com/stretchr/testify) — API,
   maintenance, license, checked 2026-08-05.
 - [v1.11.1 release](https://github.com/stretchr/testify/releases/tag/v1.11.1)

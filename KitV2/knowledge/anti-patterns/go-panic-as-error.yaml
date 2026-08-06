@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-panic-as-error
-title: Panic/recover utilisé comme try/catch général
+title: Panic/recover used as a general try/catch
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `panic(err)` dans les chemins d'erreur attendus (entrée invalide, échec I/O,
-  réponse d'API) et un `recover()` générique en haut de pile pour tout attraper.
+  `panic(err)` in expected error paths (invalid input, I/O failure, API
+  response) and a generic `recover()` at the top of the stack to catch
+  everything.
 detect: >-
-  - `panic(` dans du code autre que les invariants de programme.
-  - `defer func() { recover() }()` sans gérer une valeur de panique spécifique.
-  - La doc officielle : panic = erreur de programme (index hors bornes, état
-    impossible), pas erreur d'exécution attendue.
+  - `panic(` in code other than program invariants.
+  - `defer func() { recover() }()` without handling a specific panic value.
+  - The official doc: panic = program error (index out of range, impossible
+    state), not an expected runtime error.
 problem: >-
-  Un panic non rattrapé tue le process (ou le goroutine, pour les handlers HTTP)
-  ; un recover générique masque des bugs réels et perd la valeur et la stack
-  trace. La gestion par flot de contrôle est illisible et casse `errors.Is/As`.
+  An uncaught panic kills the process (or the goroutine, for HTTP handlers);
+  a generic recover masks real bugs and loses the value and the stack trace.
+  Control-flow-based error handling is unreadable and breaks `errors.Is/As`.
 fix: >-
-  Retourner les erreurs attendues (`return err`) et les gérer au point
-  d'appel ; réserver panic aux invariants (programmation défensive d'un état
-  corrompu) et recover à une frontière précise (ex. un middleware HTTP qui
-  convertit un panic en 500 et loggue la stack).
+  Return expected errors (`return err`) and handle them at the call site;
+  reserve panic for invariants (defensive programming against corrupted
+  state) and recover for a precise boundary (e.g. an HTTP middleware that
+  converts a panic into a 500 and logs the stack).
 when_ok: >-
-  Un recover à la frontière du serveur (ne pas faire tomber le process) est
-  acceptable s'il loggue la stack et re-panic éventuellement en mode debug ;
-  il ne remplace pas la gestion d'erreur.
+  A recover at the server boundary (so the process does not go down) is
+  acceptable if it logs the stack and possibly re-panics in debug mode; it
+  does not replace error handling.
 relationships:
   references:
     - https://go.dev/wiki/PanicAndRecover

@@ -1,5 +1,5 @@
 id: pattern:antipattern:db-select-star
-title: SELECT * en production — colonnes non nommées
+title: SELECT * in production — unnamed columns
 kind: Pattern
 version: 1
 status: active
@@ -9,25 +9,25 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `SELECT * FROM users` dans le code applicatif, ou un `rows.Scan` qui dépend de
-  l'ordre et du nombre de colonnes de la table.
+  `SELECT * FROM users` in application code, or a `rows.Scan` that depends on
+  the order and the number of columns of the table.
 detect: >-
-  - Occurrences de `SELECT *` hors requêtes d'exploration (grep SQL).
-  - `rows.Columns()` utilisé pour adapter dynamiquement le scan.
+  - Occurrences of `SELECT *` outside exploration queries (SQL grep).
+  - `rows.Columns()` used to adapt the scan dynamically.
 problem: >-
-  `SELECT *` transfère toutes les colonnes (y compris blob, json volumineux,
-  colonnes ajoutées plus tard), empêche l'optimiseur d'utiliser des index
-  couvrants, et casse `Scan` dès qu'une colonne est ajoutée/supprimée — le
-  contrat devient implicite et fragile.
+  `SELECT *` transfers all columns (including blob, large json, columns added
+  later), prevents the optimizer from using covering indexes, and breaks
+  `Scan` as soon as a column is added/removed — the contract becomes implicit
+  and fragile.
 fix: >-
-  Lister explicitement les colonnes nécessaires (`SELECT id, name, …`) et
-  mapper vers des champs nommés. Pour les gros objets, projeter les colonnes
-  lourdes seulement si besoin. Ré-évaluer la liste à chaque changement de
-  schéma (générer les requêtes depuis des types ou des modèles).
+  Explicitly list the needed columns (`SELECT id, name, …`) and map to named
+  fields. For large objects, project the heavy columns only when needed.
+  Re-evaluate the list at every schema change (generate queries from types or
+  models).
 when_ok: >-
-  `SELECT *` se justifie dans l'exploration interactive (psql), les
-  démonstrations, ou les vues avec colonnes réellement toutes consommées et
-  contrôlées ; pas dans le code de production.
+  `SELECT *` is justified in interactive exploration (psql), demonstrations,
+  or views whose columns are truly all consumed and controlled; not in
+  production code.
 relationships:
   references:
     - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/

@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:db-placeholder-cache-injection
-title: Injection SQL via modes de requête et littéraux dollar-quoted
+title: SQL injection via query modes and dollar-quoted literals
 kind: Pattern
 version: 1
 status: active
@@ -10,34 +10,33 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-05
 symptom: >-
-  Des valeurs contrôlées par l'utilisateur finissent dans du SQL dont le
-  texte est assemblé avec des littéraux `$tag$...$tag$` (fonctions PL/pgSQL,
-  requêtes dynamiques), combiné à des modes de requête qui interprètent les
-  placeholders (`QueryExecModeCacheStatement`/`Describe` par défaut de pgx).
-  Un placeholder reconnu hors d'un littéral attendu devient une injection.
+  User-controlled values end up in SQL whose text is assembled with
+  `$tag$...$tag$` literals (PL/pgSQL functions, dynamic queries), combined
+  with query modes that interpret placeholders
+  (`QueryExecModeCacheStatement`/`Describe` by default in pgx). A placeholder
+  recognized outside an expected literal becomes an injection.
 detect: >-
-  - `$1..$n` ou des fragments concaténés dans du texte censé être un littéral
-    dollar-quoted (`$body$ ... $body$`).
-  - `QueryExecModeCacheStatement` actif (défaut pgx) avec requêtes construites
-    dynamiquement.
-  - Advisory GO-2026-5004 / GHSA-j88v-2chj-qfwx (fix pgx v5.9.2) : SQLi par
-    confusion de placeholders avec littéraux dollar-quoted en protocole
-    simple.
+  - `$1..$n` or concatenated fragments inside text meant to be a dollar-quoted
+    literal (`$body$ ... $body$`).
+  - `QueryExecModeCacheStatement` active (pgx default) with dynamically built
+    queries.
+  - Advisory GO-2026-5004 / GHSA-j88v-2chj-qfwx (fixed in pgx v5.9.2): SQLi by
+    placeholder confusion with dollar-quoted literals in the simple protocol.
 problem: >-
-  Les requêtes paramétrées protègent les valeurs, pas le texte SQL : si le
-  SQL lui-même contient des fragments non contrôlés (littéraux `$tag$`,
-  clauses assemblées), un attaquant peut fermer le littéral et injecter des
-  commandes. La classe de bug est réapparue 3 fois sur pgx en 2 ans
-  (CVE-2024-27304, CVE-2026-33815/33816, GO-2026-5004).
+  Parameterized queries protect values, not the SQL text: if the SQL itself
+  contains uncontrolled fragments (`$tag$` literals, assembled clauses), an
+  attacker can close the literal and inject commands. This bug class reappeared
+  3 times on pgx in 2 years (CVE-2024-27304, CVE-2026-33815/33816,
+  GO-2026-5004).
 fix: >-
-  Épingler pgx ≥ v5.9.2 ; ne jamais placer de valeur contrôlée dans un
-  littéral dollar-quoted ; pour les requêtes dynamiques (filtres/ORDER BY),
-  choisir `QueryExecModeExec` ou valider chaque fragment contre une liste
-  blanche (voir `pattern:antipattern:db-codegen-dynamic-queries` pour le cas
-  sqlc). Tester avec des entrées adverses (`'$q$'; DROP ...`).
+  Pin pgx ≥ v5.9.2; never place a controlled value inside a dollar-quoted
+  literal; for dynamic queries (filters/ORDER BY), choose `QueryExecModeExec`
+  or validate each fragment against a whitelist (see
+  `pattern:antipattern:db-codegen-dynamic-queries` for the sqlc case). Test
+  with adversarial inputs (`'$q$'; DROP ...`).
 when_ok: >-
-  SQL statique (aucun littéral `$tag$` ni fragment assemblé) + requêtes
-  paramétrées : le mode par défaut est sûr.
+  Static SQL (no `$tag$` literal nor assembled fragment) + parameterized
+  queries: the default mode is safe.
 relationships:
   references:
     - https://github.com/jackc/pgx/security/advisories/GHSA-j88v-2chj-qfwx

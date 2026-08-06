@@ -7,6 +7,7 @@ dependencies: [golang.org/x/sync/errgroup]
 when_to_use: When a bounded fan-out operation must return the first failure.
 avoid_when: When work is independent and unbounded concurrency is safe by measurement.
 source: ../../recipes/recipe-worker-pool/SKILL.md
+last_verified: 2026-08-05
 complexity: medium
 files: [example.go]
 tests: [check.sh]

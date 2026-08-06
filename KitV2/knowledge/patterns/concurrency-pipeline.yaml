@@ -1,5 +1,5 @@
 id: pattern:concurrency:pipeline
-title: Pipeline — étages de goroutines reliés par canaux
+title: Pipeline — goroutine stages connected by channels
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Traiter un flux de données par étapes séquentielles (lecture → transform →
-  écriture) en parallélisant chaque étape sans fuite de goroutines.
+  Process a data stream in sequential stages (read → transform → write)
+  while parallelizing each stage without goroutine leaks.
 context: >-
-  S'applique aux traitements de flux où chaque étage est indépendant et peut
-  tourner en concurrence (ETL, logs, transformations de lots).
+  Applies to stream processing where each stage is independent and can run
+  concurrently (ETL, logs, batch transformations).
 solution: >-
-  Le pattern officiel du Go blog : un étage = une goroutine qui lit un canal
-  d'entrée et écrit sur un canal de sortie ; chaque étage **ferme son canal de
-  sortie** ; l'annulation se propage par `ctx.Done()` sélectionné dans chaque
-  étage ; le consommateur final draine.
+  The official Go blog pattern: a stage = one goroutine that reads an input
+  channel and writes to an output channel; each stage **closes its output
+  channel**; cancellation propagates via `ctx.Done()` selected in each
+  stage; the final consumer drains.
 benefits: >-
-  Parallélisme par étage sans verrou (les canaux coordonnent), bornes
-  naturelles de backpressure, et la fermeture + annulation garantissent
-  l'absence de fuites (voir pattern:go:contextual-worker).
+  Per-stage parallelism without locks (channels coordinate), natural
+  backpressure bounds, and closure + cancellation guarantee the absence of
+  leaks (see pattern:go:contextual-worker).
 costs: >-
-  Latence inter-étages et complexité de raisonnement ; pour un simple map sur
-  liste, un worker pool suffit — le pipeline se justifie quand chaque étage
-  coûte cher ou bloque (I/O).
+  Inter-stage latency and reasoning complexity; for a simple map over a
+  list, a worker pool suffices — the pipeline is justified when each stage
+  is expensive or blocks (I/O).
 related: >-
-  Règles du kit : `rules/core/concurrency`. Homologue négatif :
+  Kit rules: `rules/core/concurrency`. Negative counterpart:
   pattern:antipattern:go-goroutine-leak.
 relationships:
   references:

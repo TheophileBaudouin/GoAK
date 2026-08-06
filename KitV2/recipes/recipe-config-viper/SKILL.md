@@ -1,41 +1,54 @@
 ---
 name: recipe-config-viper
-description: "Configuration typée et isolée avec Viper instance-scoped (sans singleton global), chargement YAML, valeurs par défaut et validation. Utiliser pour intégrer ou maintenir des projets s'appuyant sur l'écosystème Viper."
+description: "Typed and isolated configuration with instance-scoped Viper (no global singleton), YAML loading, defaults, and validation. Use when integrating or maintaining projects built on the Viper ecosystem."
 category: recipe
 tags: [config, viper, yaml, files, env, instance-scoped]
 last-verified: 2026-08-05
 ---
 
-# recipe-config-viper — Configuration instance-scoped avec Viper
+# recipe-config-viper — instance-scoped configuration with Viper
 
-## Objectif et cas d'utilisation
+## Objective and use cases
 
-Charger un fichier de configuration (YAML/JSON/TOML) et appliquer des valeurs par défaut dans une instance isolée de Viper via `viper.New()`, sans utiliser le singleton global du package.
+Load a configuration file (YAML/JSON/TOML) and apply defaults in an isolated
+Viper instance via `viper.New()`, without using the package's global
+singleton.
 
-Utiliser cette recette dans les projets existants standardisés sur Viper ou nécessitant ses intégrations poussées (remote config, etcd/consul, pflag binding).
+Use this recipe in existing projects standardized on Viper or requiring its
+advanced integrations (remote config, etcd/consul, pflag binding).
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendance : `github.com/spf13/viper v1.21.0`
-- Architecture :
-  - Créer une instance locale `v := viper.New()` pour chaque chargement dans une fonction `Load(path string) (Config, error)`.
-  - Configurer explicitement `v.SetConfigFile(path)` et les valeurs par défaut via `v.SetDefault()`.
-  - Lire le fichier avec `v.ReadInConfig()` puis un-marchaler avec `v.Unmarshal(&config)`.
-  - Ne jamais partager l'instance `viper.CommandLine` ou le singleton global dans les tests unitaires.
+- Dependency: `github.com/spf13/viper v1.21.0`
+- Architecture:
+  - Create a local instance `v := viper.New()` for each load in a
+    `Load(path string) (Config, error)` function.
+  - Configure `v.SetConfigFile(path)` explicitly and set defaults via
+    `v.SetDefault()`.
+  - Read the file with `v.ReadInConfig()` then unmarshal with
+    `v.Unmarshal(&config)`.
+  - Never share the `viper.CommandLine` instance or the global singleton in
+    unit tests.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/spf13/viper v1.21.0` — version stable épinglée pour la configuration applicative.
-- `mapstructure` tags (`mapstructure:"host"`) — tags de structure requis par Viper pour le un-marshaling typé.
+- `github.com/spf13/viper v1.21.0` — pinned stable version for application
+  configuration.
+- `mapstructure` tags (`mapstructure:"host"`) — struct tags required by
+  Viper for typed unmarshaling.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Singleton global `viper.Get()` / `viper.SetConfigFile()` : rend les tests dépendants de l'état global et empêche l'exécution en parallèle des tests (`t.Parallel()`).
-- `recipe-config-koanf` : recommandé pour les nouveaux projets légers sans dépendance à l'écosystème Viper.
-- Standard library `flag` / `os` : trop limité pour la lecture de fichiers YAML structurés.
+- Global singleton `viper.Get()` / `viper.SetConfigFile()`: makes tests
+  dependent on global state and prevents parallel test execution
+  (`t.Parallel()`).
+- `recipe-config-koanf`: recommended for new lightweight projects without a
+  dependency on the Viper ecosystem.
+- Standard library `flag` / `os`: too limited for reading structured YAML
+  files.
 
-## Exemple complet
+## Complete example
 
 ```go
 package viperconfig
@@ -84,33 +97,37 @@ func validate(config Config) error {
 }
 ```
 
-> La fonction `validate` est volontairement partagée avec
-> `recipe-config-koanf` (packages distincts qui doivent compiler séparément ;
-> une copie Go indépendante est conservée dans chaque recette, décision
-> D-2026-08-05-09). Les deux recettes répondent à la même question de
-> validation d'entrées : consultez la fiche de l'autre bibliothèque pour la
-> comparaison koanf ↔ viper.
+> The `validate` function is deliberately shared with `recipe-config-koanf`
+> (separate packages that must compile independently; an independent Go copy
+> is kept in each recipe, decision D-2026-08-05-09). Both recipes answer the
+> same input-validation question: consult the other library's fiche for the
+> koanf ↔ viper comparison.
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Prêter attention aux clés : Viper convertit automatiquement toutes les clés en minuscules (`lowercase`).
-- Vérifier `ReadInConfig()` : distinguer les erreurs de fichier absent des erreurs de syntaxe YAML.
-- Toujours utiliser `viper.New()` plutôt que le singleton de package.
+- Mind the keys: Viper automatically converts all keys to lowercase.
+- Check `ReadInConfig()`: distinguish missing-file errors from YAML syntax
+  errors.
+- Always use `viper.New()` instead of the package singleton.
 
-## Limites et extensions
+## Limits and extensions
 
-Viper v2 n'est pas encore sorti comme cible stable ; garder la version `v1.21.0`. Les instances de Viper ne sont pas sûres pour les accès concurrents sans verrou externe (`sync.RWMutex`).
+Viper v2 is not yet released as a stable target; keep version `v1.21.0`.
+Viper instances are not safe for concurrent access without an external lock
+(`sync.RWMutex`).
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-config-viper/...
 go run ./probes/config-viper
 ```
 
-La probe crée un fichier temporaire `config.yaml`, le charge via `Load`, vérifie les valeurs lues et affiche `config-viper: PASS`.
+The probe creates a temporary `config.yaml` file, loads it via `Load`,
+verifies the read values, and prints `config-viper: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [spf13/viper](https://github.com/spf13/viper) — dépôt officiel Viper.
-- [Viper UPGRADE.md](https://github.com/spf13/viper/blob/master/UPGRADE.md) — guide de migration et breaking changes.
+- [spf13/viper](https://github.com/spf13/viper) — official Viper repository.
+- [Viper UPGRADE.md](https://github.com/spf13/viper/blob/master/UPGRADE.md) —
+  migration guide and breaking changes.

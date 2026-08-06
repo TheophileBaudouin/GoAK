@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-error-string-matching
-title: Comparaison d'erreurs par chaîne au lieu de errors.Is/As
+title: Comparing errors by string instead of errors.Is/As
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,25 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `if strings.Contains(err.Error(), "not found")` ou comparaison de
-  `err.Error()` contre un message exact pour décider d'un chemin de code.
+  `if strings.Contains(err.Error(), "not found")` or comparing `err.Error()`
+  against an exact message to decide a code path.
 detect: >-
-  - Occurrences de `.Error()` dans des conditions ou des switch.
-  - `strings.Contains/HasPrefix` sur `err.Error()` (grep `err.Error()`).
-  - Tests qui cassent dès qu'un message d'erreur est reformulé.
+  - Occurrences of `.Error()` in conditions or switches.
+  - `strings.Contains/HasPrefix` on `err.Error()` (grep `err.Error()`).
+  - Tests that break as soon as an error message is reworded.
 problem: >-
-  Les messages sont des détails d'affichage, pas un contrat : ils changent, sont
-  localisés, et un message peut être emballé par `%w` plusieurs fois. La
-  comparaison par chaîne casse au refactor et ignore la chaîne d'erreurs
-  (`errors.Is` traverse les `%w`).
+  Messages are display details, not a contract: they change, they are
+  localized, and a message can be wrapped several times by `%w`. String
+  comparison breaks on refactor and ignores the error chain (`errors.Is`
+  traverses the `%w` wrappers).
 fix: >-
-  Définir des sentinelles (`var ErrNotFound = errors.New("not found")`) et des
-  types d'erreur, puis `errors.Is(err, ErrNotFound)` ou `errors.As` pour les
-  types. Si une chaîne doit être inspectée (erreur d'un paquet tiers sans
-  sentinelle), isoler l'inspection dans une fonction dédiée et documentée.
+  Define sentinels (`var ErrNotFound = errors.New("not found")`) and error
+  types, then `errors.Is(err, ErrNotFound)` or `errors.As` for types. If a
+  string must be inspected (error from a third-party package without a
+  sentinel), isolate the inspection in a dedicated, documented function.
 when_ok: >-
-  L'inspection de message reste un dernier recours pour les erreurs de paquets
-  tiers non structurées ; la projeter dans un sentinelle local le plus tôt
-  possible.
+  Message inspection remains a last resort for unstructured third-party
+  package errors; project it into a local sentinel as early as possible.
 relationships:
   references:
     - https://go.dev/blog/errors-are-values

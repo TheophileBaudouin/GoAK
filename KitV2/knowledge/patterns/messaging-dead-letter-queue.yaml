@@ -1,5 +1,5 @@
 id: pattern:messaging:dead-letter-queue
-title: File de messages morts — isoler les messages non processables
+title: Dead-letter queue — isolate unprocessable messages
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,25 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Un message structurellement invalide boucle en retry et bloque la partition
-  (voir pattern:antipattern:msg-poison-pill-no-dlq) : les messages valides
-  derrière ne sont jamais traités.
+  A structurally invalid message loops in retry and blocks the partition
+  (see pattern:antipattern:msg-poison-pill-no-dlq): valid messages behind it
+  are never processed.
 context: >-
-  S'applique à tout consommateur de file (Kafka, AMQP) dont les messages
-  peuvent être corrompus ou non conformes.
+  Applies to any queue consumer (Kafka, AMQP) whose messages can be
+  corrupted or non-conforming.
 solution: >-
-  Séparer les erreurs : transitoires → retry borné ; définitives
-  (désérialisation, validation) → routage vers une DLQ avec la cause et les
-  métadonnées. Consommer la DLQ par un processus dédié (réparation, rejeu,
-  alerte) et mesurer son volume.
+  Separate the errors: transient → bounded retry; permanent
+  (deserialization, validation) → route to a DLQ with the cause and
+  metadata. Consume the DLQ with a dedicated process (repair, replay,
+  alert) and measure its volume.
 benefits: >-
-  La partition avance toujours, l'ordre des messages valides est préservé,
-  et les problèmes de contrat sont visibles et traitables — pas silencieux.
+  The partition always advances, the order of valid messages is preserved,
+  and contract problems are visible and actionable — not silent.
 costs: >-
-  Infrastructure supplémentaire (topic + consommateur) et politiques de
-  rétention/rejeu à définir ; une DLQ non surveillée devient une poubelle
-  silencieuse — alerter sur sa croissance.
+  Additional infrastructure (topic + consumer) and retention/replay policies
+  to define; an unmonitored DLQ becomes a silent dump — alert on its growth.
 related: >-
-  Homologue négatif : pattern:antipattern:msg-poison-pill-no-dlq.
+  Negative counterpart: pattern:antipattern:msg-poison-pill-no-dlq.
 relationships:
   references:
     - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/

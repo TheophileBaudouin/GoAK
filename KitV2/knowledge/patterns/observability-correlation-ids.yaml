@@ -1,5 +1,5 @@
 id: pattern:observability:correlation-ids
-title: Identifiants de corrélation — relier les signaux d'une requête
+title: Correlation identifiers — link a request's signals
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  En architecture distribuée, une action utilisateur traverse plusieurs
-  services : sans lien commun, les logs de chaque étape sont des îlots et
-  l'incident est impossible à reconstituer (voir
+  In a distributed architecture, a user action crosses several services:
+  without a common link, the logs of each step are islands and the incident
+  is impossible to reconstruct (see
   pattern:antipattern:obs-logging-not-observability).
 context: >-
-  S'applique dès que plus d'un service ou processus participe à une requête,
-  ou qu'un worker consomme des événements.
+  Applies as soon as more than one service or process participates in a
+  request, or a worker consumes events.
 solution: >-
-  Générer un identifiant unique à l'entrée (middleware), le propager par
-  en-tête (`X-Request-Id`, `traceparent`) et dans le contexte (voir
-  pattern:go:private-context-keys), et l'inclure dans chaque log, erreur et
-  métrique de la requête. En Go : middleware chi + `slog` avec l'ID dans le
-  handler, ou OpenTelemetry pour les traces complètes (source du kit).
+  Generate a unique identifier at the entry (middleware), propagate it via
+  header (`X-Request-Id`, `traceparent`) and in the context (see
+  pattern:go:private-context-keys), and include it in every log, error, and
+  metric of the request. In Go: chi middleware + `slog` with the ID in the
+  handler, or OpenTelemetry for full traces (kit source).
 benefits: >-
-  Reconstituer le chemin complet d'une requête (logs + erreurs + métriques),
-  répondre « cette requête a-t-elle réussi ? » et corréler les plaintes
-  utilisateurs aux traces.
+  Reconstruct the full path of a request (logs + errors + metrics), answer
+  "did this request succeed?" and correlate user complaints with traces.
 costs: >-
-  L'injection d'ID dans chaque log demande de la discipline (handler dédié) ;
-  l'ID seul ne remplace pas les traces distribuées (voir
-  source:go:opentelemetry) quand le budget le justifie.
+  Injecting the ID into every log requires discipline (dedicated handler);
+  the ID alone does not replace distributed traces (see
+  source:go:opentelemetry) when the budget justifies them.
 related: >-
-  Knowledge : observability/otel-go.yaml (source:go:opentelemetry). Homologue
-  négatif : pattern:antipattern:obs-logging-not-observability.
+  Knowledge: observability/otel-go.yaml (source:go:opentelemetry). Negative
+  counterpart: pattern:antipattern:obs-logging-not-observability.
 relationships:
   references:
     - https://microservices.io/patterns/observability/distributed-tracing.html

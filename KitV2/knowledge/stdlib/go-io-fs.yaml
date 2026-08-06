@@ -1,0 +1,22 @@
+---
+id: source:go:io-fs
+title: Go io/fs — filesystem abstraction and fs.FS
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, filesystem, fs, io]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/io/fs
+selection: >-
+  Load when reading files in a portable way — os.DirFS for the real
+  filesystem, embed.FS for embedded files, fstest.MapFS in tests — or when
+  a function should accept "any filesystem" instead of hard-coding paths.
+limits: >-
+  fs.FS is read-only by design and does not cover writes, permissions, or
+  platform-specific behavior; pointer-only routing to the official docs.
+relationships:
+  references:
+    - https://pkg.go.dev/io/fs

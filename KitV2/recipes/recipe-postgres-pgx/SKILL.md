@@ -6,49 +6,50 @@ tags: [postgresql, pgx, database, sql, migrations, persistence]
 last-verified: 2026-08-05
 ---
 
-# recipe-postgres-pgx — pool pgx et migrations SQL
+# recipe-postgres-pgx — pgx pool and SQL migrations
 
-## Objectif et cas d'utilisation
+## Purpose and use cases
 
-Fournir une frontière PostgreSQL native, petite et observable : `Open` est
-annulable, configure un `pgxpool.Pool`, appelle `Ping`, et `Close` libère le
-pool. Les requêtes utilisent exclusivement `$1…$n` et enrichissent les erreurs.
-Les migrations SQL versionnées sont appliquées séparément par la CLI
-`golang-migrate` avant le déploiement.
+Provide a small, observable native PostgreSQL boundary: `Open` is cancellable,
+configures a `pgxpool.Pool`, calls `Ping`, and `Close` releases the pool.
+Queries use exclusively `$1…$n` and wrap errors. Versioned SQL migrations are
+applied separately by the `golang-migrate` CLI before deployment.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-- Une `DATABASE_URL` PostgreSQL est injectée par l'environnement/secret store,
-  jamais écrite dans le dépôt ou les logs.
-- `pgx/v5 v5.10.0` est la frontière runtime ; pas de `database/sql` ni ORM.
-- `golang-migrate v4.19.1` est une CLI de déploiement, absente de `go.mod` et
-  jamais exécutée au démarrage des répliques.
-- La base d'intégration est exclusivement jetable et réservée au scénario.
+- A PostgreSQL `DATABASE_URL` is injected by the environment/secret store,
+  never written to the repository or the logs.
+- `pgx/v5 v5.10.0` is the runtime boundary; no `database/sql` or ORM.
+- `golang-migrate v4.19.1` is a deployment CLI, absent from `go.mod` and
+  never run at replica startup.
+- The integration database is exclusively disposable and reserved for the
+  scenario.
 
-`migrations/` contient les paires `up/down`. Une phase de déploiement unique
-applique `up`, les instances ouvrent ensuite leur pool, et le test d'intégration
-crée puis relit une donnée avant d'appliquer `down -all` au nettoyage.
+`migrations/` contains the `up/down` pairs. A single deployment phase applies
+`up`, instances then open their pool, and the integration test creates and
+re-reads a record before applying `down -all` during cleanup.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/jackc/pgx/v5 v5.10.0` — catalogue `pgx`, pool natif PostgreSQL.
-- `golang-migrate` CLI v4.19.1 — catalogue admis, état versionné hors runtime.
-- SQL statique paramétré — rend les requêtes révisables et interdit la
-  composition de SQL avec entrée non fiable.
+- `github.com/jackc/pgx/v5 v5.10.0` — `pgx` catalog, native PostgreSQL pool.
+- `golang-migrate` CLI v4.19.1 — admitted catalog, versioned state outside the
+  runtime.
+- Static parameterized SQL — makes queries reviewable and forbids composing
+  SQL with untrusted input.
 
-Patterns : `pattern:database:versioned-migrations`,
+Patterns: `pattern:database:versioned-migrations`,
 `pattern:antipattern:db-placeholder-cache-injection`.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `database/sql` : le besoin est PostgreSQL natif et `pgxpool` est plus direct.
-- ORM ou générateur SQL : abstraction différente ; pas de duplication avec la
-  recipe SQLite/sqlc.
-- SQL dynamique : augmente le risque d'injection et contourne les paramètres.
-- Migrations par réplique : course et droits excessifs ; la CLI est une étape de
-  déploiement unique.
+- `database/sql`: the need is native PostgreSQL and `pgxpool` is more direct.
+- ORM or SQL generator: different abstraction; no duplication with the
+  SQLite/sqlc recipe.
+- Dynamic SQL: increases the injection risk and bypasses parameters.
+- Per-replica migrations: race and excessive privileges; the CLI is a single
+  deployment step.
 
-## Exemple complet et scénario observable
+## Complete example and observable scenario
 
 ```sh
 go install github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
@@ -56,41 +57,42 @@ migrate -path recipes/recipe-postgres-pgx/migrations -database "$DATABASE_URL" u
 DATABASE_URL="$DATABASE_URL" go test -tags=postgres ./recipes/recipe-postgres-pgx/...
 ```
 
-Le test réel ouvre le pool, écrit `integration-widget`, le relit puis applique
-`down -all`. Il doit viser une base PostgreSQL autorisée et jetable : ne jamais
-lancer cette commande contre une base partagée. Sans `DATABASE_URL`, le scénario
-est **BLOCKED**, non couvert par une probe simulée.
+The real test opens the pool, writes `integration-widget`, re-reads it, then
+applies `down -all`. It must target an authorized, disposable PostgreSQL
+database: never run this command against a shared database. Without
+`DATABASE_URL`, the scenario is **BLOCKED**, not covered by a simulated probe.
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Appeler `Ping` après création du pool et propager l'annulation du contexte.
-- Fermer le pool ; utiliser `pgx.ErrNoRows` via `errors.Is` pour l'absence.
-- Réserver une identité de migration et sérialiser les jobs de déploiement.
-- Préférer les migrations rétrocompatibles ; `down` est testé mais n'est pas une
-  stratégie de récupération automatique en production.
+- Call `Ping` after pool creation and propagate context cancellation.
+- Close the pool; use `pgx.ErrNoRows` via `errors.Is` for absence.
+- Reserve a migration identity and serialize deployment jobs.
+- Prefer backward-compatible migrations; `down` is tested but is not an
+  automatic recovery strategy in production.
 
-## Limites et extensions
+## Limits and extensions
 
-La recipe ne couvre pas transactions métier, PgBouncer, réplication, backup,
-multi-tenant, code generation ni migrations de données longues. Chaque besoin
-ajoute une décision explicite au lieu d'élargir ce store exemple.
+The recipe does not cover business transactions, PgBouncer, replication,
+backup, multi-tenancy, code generation, or long-running data migrations. Each
+need adds an explicit decision instead of widening this example store.
 
-## Vérification
+## Verification
 
 ```sh
 go test ./recipes/recipe-postgres-pgx/...
 DATABASE_URL="$DATABASE_URL" go test -tags=postgres ./recipes/recipe-postgres-pgx/...
 ```
 
-Le second test échoue volontairement si l'URL ou la CLI manque. Aucune probe
-PostgreSQL n'est créée, afin que `probes/run.sh` reste sans service externe.
+The second test fails deliberately if the URL or the CLI is missing. No
+PostgreSQL probe is created, so that `probes/run.sh` stays free of external
+services.
 
-## Sources primaires
+## Primary sources
 
-- [pgx v5](https://pkg.go.dev/github.com/jackc/pgx/v5) — pool, contexte,
-  requêtes et erreurs.
-- [golang-migrate](https://github.com/golang-migrate/migrate) — CLI, formats
-  de migrations et procédure de déploiement.
+- [pgx v5](https://pkg.go.dev/github.com/jackc/pgx/v5) — pool, context,
+  queries, and errors.
+- [golang-migrate](https://github.com/golang-migrate/migrate) — CLI, migration
+  formats, and deployment procedure.
 - [PostgreSQL SQL syntax](https://www.postgresql.org/docs/current/sql.html) —
-  paramètres et DDL doivent rester adaptés au moteur cible.
+  parameters and DDL must stay adapted to the target engine.
 

@@ -1,5 +1,5 @@
 id: pattern:antipattern:rest-tunneling
-title: Tunnel RPC — tout par GET ou POST
+title: RPC tunnel — everything through GET or POST
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Toutes les opérations passent par `GET /api/action?op=delete` ou
-  `POST /api/do` avec une enveloppe JSON « action » ; les verbes HTTP et les
-  codes de statut ne portent aucune information.
+  All operations go through `GET /api/action?op=delete` or `POST /api/do`
+  with a JSON 'action' envelope; HTTP verbs and status codes carry no
+  information.
 detect: >-
-  - Endpoints génériques (`/api`, `/execute`) avec des noms d'action en
-    paramètre ou en corps.
-  - Réponses toujours 200 avec un champ `success`/`error` dans le corps.
-  - Opérations non-idempotentes exposées en GET (casse la mise en cache, les
-    clients, les robots).
+  - Generic endpoints (`/api`, `/execute`) with action names in a parameter
+    or the body.
+  - Responses always 200 with a `success`/`error` field in the body.
+  - Non-idempotent operations exposed via GET (breaks caching, clients,
+    crawlers).
 problem: >-
-  Réinventer RPC au-dessus d'HTTP perd les garanties du protocole : cache,
-  idempotence, statuts standard, découverte. Les clients ne peuvent rien
-  déduire, l'API est opaque, et les GET destructeurs provoquent des accidents.
+  Reinventing RPC over HTTP loses the protocol's guarantees: caching,
+  idempotency, standard statuses, discovery. Clients can infer nothing, the
+  API is opaque, and destructive GETs cause accidents.
 fix: >-
-  Exposer des ressources avec les verbes HTTP : GET (lecture, idempotent),
-  POST (création/action non idempotente), PUT (remplacement), PATCH (mise à
-  jour partielle), DELETE ; utiliser les codes de statut et les en-têtes
-  standards. Voir recipe-rest-chi pour une base conforme.
+  Expose resources with HTTP verbs: GET (read, idempotent), POST
+  (non-idempotent creation/action), PUT (replacement), PATCH (partial
+  update), DELETE; use standard status codes and headers. See
+  recipe-rest-chi for a conforming base.
 when_ok: >-
-  Les « action endpoints » REST (POST /orders/{id}/cancel) sont légitimes
-  quand l'action n'est pas une simple CRUD sur ressource ; le tunnel est
-  l'abus, pas l'action endpoint.
+  REST action endpoints (POST /orders/{id}/cancel) are legitimate when the
+  action is not plain CRUD on a resource; the tunnel is the abuse, not the
+  action endpoint.
 relationships:
   references:
     - https://www.infoq.com/articles/rest-anti-patterns

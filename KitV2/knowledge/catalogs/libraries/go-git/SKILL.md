@@ -6,7 +6,7 @@ tags: [git, vcs, repository, pure-go, automation]
 last-verified: 2026-08-05
 ---
 
-# go-git — Git pur Go
+# go-git — pure-Go Git
 
 ## Selection
 
@@ -48,15 +48,13 @@ concurrency ownership at the application boundary.
 | `os/exec` with the git CLI | Choose when the host guarantees git and exact CLI behavior is more valuable than pure-Go portability. |
 | go-git v6 alpha | Track for migration, but do not use as the stable catalog recommendation until v6 is released. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go service must inspect, clone, fetch, commit, or push repositories without
   spawning a git binary.
 - Pure-Go portability and an embeddable repository API matter.
 - The application can serialize access to each repository and own credentials.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Multiple goroutines must mutate or read the same repository concurrently
   without an explicit synchronization design.
 - Full porcelain parity or exact compatibility with the system Git client is a
@@ -64,23 +62,20 @@ concurrency ownership at the application boundary.
 - A C dependency is acceptable and libgit2 provides the required operation.
 - The project is not prepared to review v6's breaking alpha API.
 
-## Avantages
-
+## Advantages
 - Pure-Go repository and transport APIs, no external git process.
 - Covers common clone/open/fetch/commit/push operations and lower-level Git
   objects.
 - Stable v5 line with active maintenance and a clear v6 migration track.
 
-## Inconvénients
-
+## Disadvantages
 - Not thread-safe for concurrent access to one repository.
 - Some Git porcelain and edge behavior differ from the command-line client.
 - Authentication, redirects, filesystem isolation, and repository locking need
   explicit application policy.
 - v6 changes filesystem bounds and transport APIs before stabilization.
 
-## Pièges connus
-
+## Known pitfalls
 - Serialize access to a repository; concurrent reads/writes can corrupt or
   produce inconsistent state.
 - Treat HTTP redirects and credentials as a trust boundary; do not silently
@@ -89,8 +84,7 @@ concurrency ownership at the application boundary.
 - Use bounded repository paths and review filesystem behavior before accepting
   untrusted repository names.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official go-git repository](https://github.com/go-git/go-git) — maintenance,
   API, license, checked 2026-08-05.
 - [go-git releases](https://github.com/go-git/go-git/releases) — stable v5.19.2

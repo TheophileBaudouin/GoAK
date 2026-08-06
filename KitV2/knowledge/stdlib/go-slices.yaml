@@ -1,0 +1,23 @@
+---
+id: source:go:slices
+title: Go slices — generic slice operations
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, slices, generics, stdlib]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/slices
+selection: >-
+  Load when operating on slices with the standard helpers: sort, search,
+  dedupe (Compact), transform (Map), filter (DeleteFunc/Filter), compare,
+  and clone — instead of hand-written loops.
+limits: >-
+  slices helpers have documented aliasing and performance notes (e.g.
+  Compact and sort semantics); generics require Go 1.21+. Pointer-only
+  routing to the official docs.
+relationships:
+  references:
+    - https://pkg.go.dev/slices

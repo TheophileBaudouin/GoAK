@@ -1,5 +1,5 @@
 id: pattern:cli:subcommands-conventions
-title: CLI structurée — sous-commandes et conventions
+title: Structured CLI — subcommands and conventions
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une CLI sans structure (flags globaux, actions ad hoc, sortie incohérente)
-  est imprévisible et non scriptable (voir
+  A CLI without structure (global flags, ad hoc actions, inconsistent output)
+  is unpredictable and not scriptable (see
   pattern:antipattern:cli-flag-and-convention-abuse).
 context: >-
-  S'applique à tout outil en ligne de commande avec plus de quelques
-  opérations ou destiné à d'autres utilisateurs/CI.
+  Applies to any command-line tool with more than a few operations or meant
+  for other users/CI.
 solution: >-
-  Arbre de sous-commandes (git/gcloud/docker) : `outil groupe action
-  [flags]` ; help complet et `--version` ; codes de sortie signifiants
-  (0 succès, 2 usage, ≠0 erreur) ; flags optionnels avec défauts sûrs et
-  aliases cohérents ; sortie stable pour les scripts (JSON/--quiet quand
-  nécessaire). En Go : stdlib flag pour le minimal (recipe-cli-minimal),
-  cobra pour l'arborescence (recipe-cli-cobra, catalog cobra).
+  Subcommand tree (git/gcloud/docker): `tool group action [flags]`; full
+  help and `--version`; meaningful exit codes (0 success, 2 usage, ≠0
+  error); optional flags with safe defaults and consistent aliases; stable
+  output for scripts (JSON/--quiet when needed). In Go: stdlib flag for the
+  minimal case (recipe-cli-minimal), cobra for the tree (recipe-cli-cobra,
+  cobra catalog).
 benefits: >-
-  Découverte par `help`, scriptabilité prévisible, conventions familières
-  (utilisables par les humains ET les LLM), et tests du help/codes de sortie.
+  Discovery via `help`, predictable scriptability, familiar conventions
+  (usable by humans AND LLMs), and tests of help/exit codes.
 costs: >-
-  Un outil à une seule action n'a pas besoin de sous-commandes (le minimal
-  suffit) ; l'arborescence ajoute de la surface de doc à maintenir.
+  A single-action tool does not need subcommands (the minimal suffices); the
+  tree adds documentation surface to maintain.
 related: >-
-  Recettes : recipe-cli-minimal, recipe-cli-cobra, recipe-cli-interactive.
-  Catalog : cobra. Homologue négatif :
+  Recipes: recipe-cli-minimal, recipe-cli-cobra, recipe-cli-interactive.
+  Catalog: cobra. Negative counterpart:
   pattern:antipattern:cli-flag-and-convention-abuse.
 relationships:
   references:

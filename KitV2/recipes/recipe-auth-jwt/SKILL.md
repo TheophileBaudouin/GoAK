@@ -8,42 +8,42 @@ last-verified: 2026-08-05
 
 # recipe-auth-jwt — Bearer API HS256
 
-## Objectif et cas d'utilisation
+## Purpose and use case
 
-Émettre et vérifier des JWT HS256 pour une API dont l'émetteur et le vérificateur
-partagent une même clé secrète injectée. Le middleware accepte exclusivement
-`Authorization: Bearer`, impose HS256, expiration, issuer, audience et subject,
-puis transmet uniquement le subject validé dans le contexte de requête.
+Issue and verify HS256 JWTs for an API whose issuer and verifier share the same
+injected secret key. The middleware accepts exclusively `Authorization:
+Bearer`, enforces HS256, expiration, issuer, audience, and subject, then
+forwards only the validated subject in the request context.
 
-Utiliser cette recipe à l'intérieur d'une frontière de confiance unique. Pour
-les cookies navigateur et CSRF, utiliser `recipe-auth-session-scs`.
+Use this recipe inside a single trust boundary. For browser cookies and CSRF,
+use `recipe-auth-session-scs`.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-`Config` exige au moins 32 octets de clé, issuer, audience, TTL et optionnellement
-une horloge testable. `Issue` inscrit les claims enregistrés ; `Middleware`
-extrait un seul header, configure `WithValidMethods`, puis valide les claims.
-Il ne place pas le token ni les claims complets dans `context.Context`.
+`Config` requires at least 32 bytes of key, issuer, audience, TTL, and
+optionally a testable clock. `Issue` writes the registered claims; `Middleware`
+extracts a single header, configures `WithValidMethods`, then validates the
+claims. It does not place the token or the full claims in `context.Context`.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/golang-jwt/jwt/v5 v5.3.1` — catalogue `golang-jwt` ; parser et
-  validation explicite des claims.
-- HS256 — une seule frontière émetteur/vérificateur, clé injectée et jamais
-  écrite dans les logs, exemples ou repository.
-- Horloge injectée — expiration testable sans sommeil ni variable globale.
+- `github.com/golang-jwt/jwt/v5 v5.3.1` — `golang-jwt` catalog; explicit parser
+  and claims validation.
+- HS256 — a single issuer/verifier boundary, injected key never written to
+  logs, examples, or the repository.
+- Injected clock — testable expiration without sleeping or global state.
 
-Pattern : `pattern:security:auth-session-vs-jwt`.
+Pattern: `pattern:security:auth-session-vs-jwt`.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- JWT en cookie : une session navigateur est plus cohérente et gère CSRF.
-- `alg=none`, algorithme implicite ou `kid` non borné : aucun chemin n'est
-  accepté ; le middleware limite strictement HS256.
-- OIDC, rotation, révocation et clés asymétriques : nécessitent une recette de
-  distribution de clés et de découverte séparée.
+- JWT in a cookie: a browser session is more coherent and handles CSRF.
+- `alg=none`, implicit algorithm, or unbounded `kid`: no such path is accepted;
+  the middleware strictly limits to HS256.
+- OIDC, rotation, revocation, and asymmetric keys: they require a separate key
+  distribution and discovery recipe.
 
-## Exemple complet
+## Complete example
 
 ```go
 auth, err := authjwt.New(authjwt.Config{
@@ -56,40 +56,39 @@ if err != nil {
 http.Handle("GET /v1/orders", auth.Middleware(http.HandlerFunc(listOrders)))
 ```
 
-Dans `listOrders`, récupérer `subject, ok := authjwt.Subject(r.Context())` et
-traiter l'absence comme une erreur interne de chaînage, non comme une identité
-client fournie.
+In `listOrders`, retrieve `subject, ok := authjwt.Subject(r.Context())` and
+treat its absence as an internal chaining error, not as a provided client
+identity.
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Garder TTL court et clé à forte entropie dans un secret store ; ne jamais
-  journaliser header Authorization, token ou clé.
-- Vérifier signature, exp, issuer, audience et subject ensemble : une signature
-  valide n'implique pas que le token soit destiné à cette API.
-- Ne pas accepter Basic, query parameter, cookie, header dupliqué ou algorithme
-  alternatif dans ce middleware.
+- Keep the TTL short and the key high-entropy in a secret store; never log the
+  Authorization header, token, or key.
+- Verify signature, exp, issuer, audience, and subject together: a valid
+  signature does not imply the token is intended for this API.
+- Do not accept Basic, query parameter, cookie, duplicated header, or
+  alternative algorithm in this middleware.
 
-## Limites et extensions
+## Limits and extensions
 
-La recipe ne couvre ni refresh token, rotation, révocation, permissions, JWKS,
-OIDC ni multi-émetteur. Une distribution de clés ou une délégation d'identité
-change la frontière de confiance et exige une nouvelle décision sourcée.
+The recipe covers neither refresh tokens, rotation, revocation, permissions,
+JWKS, OIDC, nor multi-issuer. Key distribution or identity delegation changes
+the trust boundary and requires a new sourced decision.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-auth-jwt/...
 go run ./probes/auth-jwt
 ```
 
-La probe obtient un token, appelle une route protégée et affiche `auth-jwt:
-PASS`. Les tests couvrent header absent, méthode erronée, expiration, issuer,
-audience et subject invalides.
+The probe obtains a token, calls a protected route, and prints `auth-jwt:
+PASS`. The tests cover missing header, wrong method, expiration, and invalid
+issuer, audience, and subject.
 
-## Sources primaires
+## Primary sources
 
-- [golang-jwt v5](https://pkg.go.dev/github.com/golang-jwt/jwt/v5) — parseur,
-  options de validation et claims enregistrés.
-- [JWT BCP — RFC 8725](https://www.rfc-editor.org/rfc/rfc8725) — validation
-  explicite de l'algorithme et de l'usage du token.
-
+- [golang-jwt v5](https://pkg.go.dev/github.com/golang-jwt/jwt/v5) — parser,
+  validation options, and registered claims.
+- [JWT BCP — RFC 8725](https://www.rfc-editor.org/rfc/rfc8725) — explicit
+  validation of the algorithm and token usage.

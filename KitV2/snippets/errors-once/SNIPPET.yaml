@@ -7,6 +7,7 @@ dependencies: [stdlib]
 when_to_use: When a failure crosses a package or request boundary.
 avoid_when: When the caller still needs the original cause unchanged.
 source: ../../rules/core/errors/SKILL.md
+last_verified: 2026-08-05
 complexity: low
 files: [example.go]
 tests: [check.sh]

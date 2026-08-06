@@ -1,5 +1,5 @@
 id: pattern:concurrency:singleflight
-title: Singleflight — fusionner les appels concurrents identiques
+title: Singleflight — merge identical concurrent calls
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  N requêtes simultanées ratent un cache au même instant et toutes frappent la
-  source (voir pattern:antipattern:cache-stampede) : charge multipliée et
-  latence en pointe.
+  N simultaneous requests miss a cache at the same instant and all hit the
+  source (see pattern:antipattern:cache-stampede): multiplied load and
+  latency spikes.
 context: >-
-  S'applique à tout calcul ou fetch coûteux partagé entre goroutines du même
-  processus : cache miss, token d'accès, configuration distante.
+  Applies to any expensive computation or fetch shared between goroutines of
+  the same process: cache miss, access token, remote configuration.
 solution: >-
-  `golang.org/x/sync/singleflight` : `g.Do(key, fn)` garantit qu'une seule
-  exécution de `fn` par clé est en vol, les autres goroutines partagent le
-  résultat. Combiner avec un cache (miss → singleflight → populate) pour
-  absorber les pointes.
+  `golang.org/x/sync/singleflight`: `g.Do(key, fn)` guarantees that only one
+  execution of `fn` per key is in flight, the other goroutines share the
+  result. Combine with a cache (miss → singleflight → populate) to absorb
+  spikes.
 benefits: >-
-  La source ne reçoit qu'un seul appel par fenêtre de miss ; latence réduite
-  pour les appelants en attente ; implémentation triviale et testable.
+  The source receives only one call per miss window; reduced latency for
+  waiting callers; trivial and testable implementation.
 costs: >-
-  La fusion est par processus uniquement (pas inter-neuds — un verrou
-  distribué ou Redis serait nécessaire) ; la première requête reste payée, et
-  un échec est partagé par tous (les appelants doivent retry).
+  Merging is per-process only (not inter-node — a distributed lock or Redis
+  would be needed); the first request remains paid, and a failure is shared
+  by all (callers must retry).
 related: >-
-  Homologue négatif : pattern:antipattern:cache-stampede.
+  Negative counterpart: pattern:antipattern:cache-stampede.
 relationships:
   references:
     - https://pkg.go.dev/golang.org/x/sync/singleflight

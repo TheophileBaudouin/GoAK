@@ -35,9 +35,13 @@ catalog keeps only three real, pinned, MIT, verified projects:
 | cli | sourced | danjdewhurst/go-toc | Markdown TOC generation CLI |
 | worker | sourced | sangianpatrick/go-workerpool | bounded worker pool |
 
-The `grpc`, `microservice`, `monolith`, and `cloud-service` shapes remain a
-roadmap without an operational template. No scaffold must be recreated to
-represent them: a shape without a conforming MIT source stays planned.
+The `grpc`, `microservice`, `monolith`, `cloud-service`, and `desktop-app`
+shapes remain a roadmap without an operational template. `desktop-app` is
+covered at recipe + probe level (`recipe-desktop-app`, `probes/desktop-app`)
+but no conforming MIT source was found in the 2026-08-05 desktop-app research
+(no real single-responsibility Wails application). No scaffold must be
+recreated to represent them: a shape without a conforming MIT source stays
+planned.
 
 ## Admitting a new template (sourced)
 

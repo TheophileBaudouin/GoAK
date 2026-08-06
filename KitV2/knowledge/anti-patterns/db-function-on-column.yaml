@@ -1,5 +1,5 @@
 id: pattern:antipattern:db-function-on-column
-title: Fonction appliquée à une colonne indexée dans le WHERE
+title: Function applied to an indexed column in the WHERE clause
 kind: Pattern
 version: 1
 status: active
@@ -10,25 +10,25 @@ dependencies: []
 last_verified: 2026-08-04
 symptom: >-
   `WHERE date(created_at) = '2026-08-04'`, `WHERE lower(email) = 'x@y.z'`,
-  `WHERE YEAR(birth) = 1990` — la fonction empêche l'usage de l'index sur la
-  colonne.
+  `WHERE YEAR(birth) = 1990` — the function prevents the use of the index on
+  the column.
 detect: >-
-  - Requêtes lentes avec plan d'exécution montrant un SEQ SCAN / FULL TABLE SCAN
-    sur une colonne indexée.
-  - `EXPLAIN` : l'index n'apparaît pas alors que la colonne est indexée.
+  - Slow queries whose execution plan shows a SEQ SCAN / FULL TABLE SCAN on an
+    indexed column.
+  - `EXPLAIN`: the index does not appear although the column is indexed.
 problem: >-
-  Une fonction sur la colonne rend l'index inutilisable : le SGBD parcourt
-  toutes les lignes et calcule la fonction sur chacune. Le coût passe de
-  logarithmique à linéaire dès que la table grossit — c'est la cause n°1 de
-  requêtes qui « ralentissent d'un coup ».
+  A function on the column makes the index unusable: the DBMS scans all rows
+  and computes the function on each one. The cost goes from logarithmic to
+  linear as soon as the table grows — it is the #1 cause of queries that
+  "suddenly slow down".
 fix: >-
-  Exprimer la condition sur la colonne nue : `created_at >= ? AND created_at < ?
-  ` (intervalle), `email = ?` avec normalisation à l'écriture (stockage en
-  lowercase), index sur l'expression si le SGBD le supporte
-  (`CREATE INDEX ON t (lower(email))`). Garder la fonction hors de la colonne.
+  Express the condition on the bare column: `created_at >= ? AND created_at <
+  ?` (range), `email = ?` with normalization at write time (storing
+  lowercase), or an expression index if the DBMS supports it
+  (`CREATE INDEX ON t (lower(email))`). Keep the function off the column.
 when_ok: >-
-  Sur de très petites tables (< quelques milliers de lignes) l'impact est nul ;
-  la règle devient critique à l'échelle — la concevoir dès l'écriture.
+  On very small tables (< a few thousand rows) the impact is nil; the rule
+  becomes critical at scale — design for it from the start.
 relationships:
   references:
     - https://sonra.io/mastering-sql-how-to-detect-and-avoid-34-common-sql-antipatterns/

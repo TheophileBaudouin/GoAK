@@ -1,44 +1,44 @@
 ---
 name: recipe-config-koanf
-description: "Configuration en cascade explicite et typée avec Koanf v2, fusion de sources (valeurs par défaut, carte, environnement, fichier, drapeaux) et validation stricte. Utiliser pour tout service Go combinant plusieurs sources de configuration."
+description: "Explicit, typed configuration cascade with Koanf v2, merging sources (defaults, map, environment, file, flags) with strict validation. Use for any Go service combining multiple configuration sources."
 category: recipe
 tags: [config, koanf, cascade, env, flags, yaml]
 last-verified: 2026-08-05
 ---
 
-# recipe-config-koanf — Cascade de configuration explicite avec Koanf v2
+# recipe-config-koanf — explicit configuration cascade with Koanf v2
 
-## Objectif et cas d'utilisation
+## Purpose and use cases
 
-Charger et fusionner la configuration d'une application Go depuis plusieurs sources selon un ordre de précédence explicite (par exemple : valeurs par défaut < fichier de configuration < variables d'environnement < drapeaux CLI) et un-marchaler le résultat dans une structure typée et validée.
+Load and merge a Go application's configuration from multiple sources in an explicit precedence order (for example: defaults < config file < environment variables < CLI flags) and unmarshal the result into a typed, validated structure.
 
-Utiliser Koanf pour les nouvelles applications nécessitant une architecture modulaire et un contrôle total sur l'ordre de fusion des providers.
+Use Koanf for new applications that need a modular architecture and full control over the provider merge order.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendances :
+- Dependencies:
   - `github.com/knadh/koanf/v2 v2.3.6`
   - `github.com/knadh/koanf/providers/confmap v1.0.0`
-- Architecture :
-  - Instancier `koanf.New(".")` localement dans une fonction `Load(overrides map[string]any) (Config, error)`.
-  - Éviter toute instance globale mutable.
-  - Charger d'abord les valeurs par défaut via `confmap.Provider`.
-  - Charger séquentiellement les surcharges (fichiers, env, map) ; chaque `Load` successif écrase les clés précédentes.
-  - Décoder via `k.Unmarshal("", &config)` puis exécuter une étape de validation métier explicite.
+- Architecture:
+  - Instantiate `koanf.New(".")` locally inside a `Load(overrides map[string]any) (Config, error)` function.
+  - Avoid any mutable global instance.
+  - Load defaults first via `confmap.Provider`.
+  - Load overrides sequentially (files, env, map); each successive `Load` overwrites previous keys.
+  - Decode via `k.Unmarshal("", &config)`, then run an explicit business validation step.
 
-## Composants et choix
+## Components and choices
 
-- `github.com/knadh/koanf/v2` — bibliothèque moderne, légère et modulaire (~15x plus légère que Viper sans dépendances inutiles).
-- `confmap.Provider` — provider d'objets en mémoire idéal pour injecter des valeurs par défaut et des surcharges de test.
+- `github.com/knadh/koanf/v2` — modern, lightweight, modular library (~15x lighter than Viper with no unneeded dependencies).
+- `confmap.Provider` — in-memory object provider, ideal for injecting defaults and test overrides.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Standard library `os.Getenv` / `flag` seuls : suffisant pour 1 ou 2 variables, mais devient rapidement verbeux et sujet aux erreurs pour les cascades complexes.
-- `spf13/viper` : populaire mais monolithique, utilise des singletons globaux par défaut et convertit les clés en minuscules de manière irréversible.
-- `kelseyhightower/envconfig` : limité uniquement aux variables d'environnement ; ne permet pas la fusion multi-sources.
+- Standard library `os.Getenv` / `flag` alone: sufficient for 1 or 2 variables, but quickly becomes verbose and error-prone for complex cascades.
+- `spf13/viper`: popular but monolithic, uses global singletons by default, and lowercases keys irreversibly.
+- `kelseyhightower/envconfig`: limited to environment variables only; does not allow multi-source merging.
 
-## Exemple complet
+## Complete example
 
 ```go
 package koanfconfig
@@ -90,33 +90,32 @@ func validate(config Config) error {
 }
 ```
 
-> La fonction `validate` est volontairement partagée avec
-> `recipe-config-viper` (packages distincts qui doivent compiler séparément ;
-> une copie Go indépendante est conservée dans chaque recette, décision
-> D-2026-08-05-09). Les deux recettes répondent à la même question de
-> validation d'entrées : consultez la fiche de l'autre bibliothèque pour la
-> comparaison koanf ↔ viper.
+> The `validate` function is deliberately shared with
+> `recipe-config-viper` (separate packages that must compile independently;
+> an independent Go copy is kept in each recipe, decision
+> D-2026-08-05-09). Both recipes answer the same input-validation question:
+> consult the other library's fiche for the koanf ↔ viper comparison.
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Toujours valider la structure `Config` après le `Unmarshal` pour détecter les valeurs hors limites ou manquantes.
-- En cas de rechargement dynamique en cours d'exécution, protéger l'instance `*koanf.Koanf` avec un `sync.RWMutex`.
-- Ne pas conserver de secrets en clair dans les fichiers de configuration sous contrôle de version.
+- Always validate the `Config` struct after `Unmarshal` to detect out-of-range or missing values.
+- For dynamic runtime reloading, protect the `*koanf.Koanf` instance with a `sync.RWMutex`.
+- Do not keep plaintext secrets in configuration files under version control.
 
-## Limites et extensions
+## Limits and extensions
 
-Koanf ne définit pas d'ordre de cascade par défaut : le développeur doit orchestrer l'ordre des appels `k.Load(...)`. Les parsers (YAML, JSON, TOML) doivent être importés séparément.
+Koanf defines no default cascade order: the developer must orchestrate the order of `k.Load(...)` calls. Parsers (YAML, JSON, TOML) must be imported separately.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-config-koanf/...
 go run ./probes/config-koanf
 ```
 
-La probe charge la configuration avec surcharges, vérifie l'application des valeurs par défaut et des surcharges, puis affiche `config-koanf: PASS`.
+The probe loads the configuration with overrides, verifies that defaults and overrides are applied, then prints `config-koanf: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [knadh/koanf](https://github.com/knadh/koanf) — dépôt et documentation officielle de Koanf.
-- [pkg.go.dev/github.com/knadh/koanf/v2](https://pkg.go.dev/github.com/knadh/koanf/v2) — référence API v2.
+- [knadh/koanf](https://github.com/knadh/koanf) — official Koanf repository and documentation.
+- [pkg.go.dev/github.com/knadh/koanf/v2](https://pkg.go.dev/github.com/knadh/koanf/v2) — v2 API reference.

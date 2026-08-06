@@ -6,7 +6,7 @@ tags: [terminal, color, detection, tui, ansi]
 last-verified: 2026-08-05
 ---
 
-# colorprofile — détection de profil terminal
+# colorprofile — terminal color profile detection
 
 ## Selection
 
@@ -46,33 +46,28 @@ must both participate. `NewWriter` can downsample ANSI output while writing;
 | Manual `TERM` parsing | Avoid: it duplicates a changing, edge-case-heavy capability matrix. |
 | `sequin` | Companion for parsing/stripping ANSI sequences, not profile detection. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A CLI/TUI must choose between no color, ANSI, 256-color, and truecolor.
 - Output must be downsampled through an `io.Writer` for the target terminal.
 - Environment, TTY, terminfo, or tmux signals need a single tested decision.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The application only needs styles: use Lip Gloss or another styling layer.
 - It needs ICC, image color-space, or general color mathematics.
 - The terminal target is fixed and no runtime profile decision is needed.
 
-## Avantages
-
+## Advantages
 - Focused API for detection and palette conversion.
 - Handles common terminal environment conventions instead of requiring manual
   parsing.
 - Small, tested, and composable with Charm's styling and ANSI packages.
 
-## Inconvénients
-
+## Disadvantages
 - Detection remains heuristic for unusual terminals and multiplexers.
 - It is not a styling framework and does not solve general color management.
 - `FORCE_COLOR` is not the same input as the supported `CLICOLOR_FORCE` policy.
 
-## Pièges connus
-
+## Known pitfalls
 - Test `NO_COLOR`, `CLICOLOR`, `CLICOLOR_FORCE`, tmux, and non-TTY output in the
   consumer's actual output path.
 - An open tmux issue can misclassify `COLORTERM=truecolor`; do not treat
@@ -80,8 +75,7 @@ must both participate. `NewWriter` can downsample ANSI output while writing;
 - Use `Convert` before rendering, and use `sequin` separately when ANSI needs
   to be stripped for a pipe or log.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official colorprofile repository](https://github.com/charmbracelet/colorprofile)
   — maintenance, API, license, checked 2026-08-05.
 - [colorprofile v0.4.3 on pkg.go.dev](https://pkg.go.dev/github.com/charmbracelet/colorprofile@v0.4.3)

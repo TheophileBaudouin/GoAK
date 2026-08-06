@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-nano-services
-title: Nano-services — décomposition trop fine
+title: Nano-services — decomposition too fine-grained
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Des services minuscules (un handler, une table) déployés séparément :
-  « chaque endpoint est un microservice », des dizaines de dépôts pour une
-  petite équipe.
+  Tiny services (one handler, one table) deployed separately: "every endpoint
+  is a microservice", dozens of repositories for a small team.
 detect: >-
-  - Services avec une seule responsabilité atomique mais des dépendances
-    partagées à d'autres services (appels inter-services constants).
-  - Coût d'opération (déploiement, observabilité, CI) supérieur au coût du
-    code de chaque service.
-  - Presque toutes les requêtes traversent plusieurs services (voir
+  - Services with a single atomic responsibility but shared dependencies to
+    other services (constant inter-service calls).
+  - Operation cost (deployment, observability, CI) higher than the code cost
+    of each service.
+  - Almost all requests traverse several services (see
     arch-distributed-monolith).
 problem: >-
-  La décomposition fine multiplie les points de défaillance, la latence
-  inter-service et le coût d'exploitation sans apporter de frontière métier :
-  la maintenabilité globale se dégrade alors que chaque unité est « propre ».
-  C'est la sur-correction inverse du monolithe.
+  Fine-grained decomposition multiplies failure points, inter-service latency,
+  and operation cost without bringing a business boundary: overall
+  maintainability degrades while each unit is "clean". It is the inverse
+  over-correction of the monolith.
 fix: >-
-  Décomposer par frontière métier cohérente (agrégats, cycles de vie
-  indépendants) plutôt que par fonction technique. Regrouper les opérations
-  qui partagent données et invariants dans un même service. Mesurer : un
-  service se justifie s'il a un cycle de vie, une équipe ou une échelle
-  propres.
+  Decompose by coherent business boundary (aggregates, independent lifecycles)
+  rather than by technical function. Group operations that share data and
+  invariants into the same service. Measure: a service is justified if it has
+  its own lifecycle, team, or scale.
 when_ok: >-
-  Une taille réduite est acceptable si les frontières sont réelles et les
-  données non partagées ; le signal d'erreur est la conversation
-  inter-services permanente, pas la taille en lignes.
+  A small size is acceptable if the boundaries are real and data is not
+  shared; the error signal is permanent inter-service conversation, not size
+  in lines.
 relationships:
   references:
     - https://dzone.com/articles/antipatterns-of-microservices

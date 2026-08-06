@@ -1,5 +1,5 @@
 id: pattern:go:string-builder
-title: Builder de chaînes — strings.Builder pour l'assemblage en boucle
+title: String building — strings.Builder for loop assembly
 kind: Pattern
 version: 1
 status: active
@@ -9,25 +9,24 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  L'immutabilité des chaînes Go rend la concaténation en boucle quadratique
-  (voir pattern:antipattern:go-string-concat-loop) : chaque `+=` copie toute
-  la chaîne.
+  Go string immutability makes loop concatenation quadratic (see
+  pattern:antipattern:go-string-concat-loop): every `+=` copies the whole
+  string.
 context: >-
-  S'applique à tout assemblage de texte en plusieurs morceaux : CSV, SQL
-  dynamique, HTML, logs multilignes, requêtes.
+  Applies to any text assembled in several pieces: CSV, dynamic SQL, HTML,
+  multiline logs, queries.
 solution: >-
-  `var b strings.Builder` + `b.WriteString(part)` ; préallouer avec
-  `b.Grow(n)` quand la taille est connue ; `strings.Join` pour les
-  séparateurs fixes ; `bytes.Buffer` pour le binaire. Construire puis
-  convertir une seule fois (`b.String()`).
+  `var b strings.Builder` + `b.WriteString(part)`; preallocate with
+  `b.Grow(n)` when the size is known; `strings.Join` for fixed separators;
+  `bytes.Buffer` for binary. Build then convert once (`b.String()`).
 benefits: >-
-  Amortit la réallocation (coût linéaire au lieu de quadratique), zéro
-  allocation intermédiaire de la chaîne entière, API triviale.
+  Amortizes reallocation (linear cost instead of quadratic), zero
+  intermediate allocation of the whole string, trivial API.
 costs: >-
-  Pour 2-3 concaténations fixes (`a + b + c`), le builder est du bruit sans
-  gain mesurable — la règle vise les boucles et chemins chauds.
+  For 2-3 fixed concatenations (`a + b + c`), the builder is noise without a
+  measurable gain — the rule targets loops and hot paths.
 related: >-
-  Homologue négatif : pattern:antipattern:go-string-concat-loop.
+  Negative counterpart: pattern:antipattern:go-string-concat-loop.
 relationships:
   references:
     - https://go.dev/blog/strings

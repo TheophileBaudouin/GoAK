@@ -1,5 +1,5 @@
 id: pattern:antipattern:obs-logging-not-observability
-title: Logging confondu avec observabilité
+title: Logging mistaken for observability
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,30 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Des logs existent (parfois massifs) mais une question de production
-  (« pourquoi cette requête est lente ? », « quelle file de messages est en
-  retard ? ») reste sans réponse sans instrumentation supplémentaire.
+  Logs exist (sometimes massive) but a production question ('why is this
+  request slow?', 'which message queue is behind?') remains unanswered
+  without additional instrumentation.
 detect: >-
-  - Incident débogué en ajoutant des logs puis en redéployant (boucle).
-  - Aucune corrélation (request ID) entre les signaux ; pas de métriques de
-    latence/débit, pas de traces.
-  - « Dashboard as a security blanket » : des dashboards existent mais ne
-    racontent pas l'incident.
+  - Incident debugged by adding logs then redeploying (loop).
+  - No correlation (request ID) between signals; no latency/throughput
+    metrics, no traces.
+  - 'Dashboard as a security blanket': dashboards exist but do not tell the
+    incident story.
 problem: >-
-  Le logging seul est passif : il enregistre ce qu'on a pensé à logger avant
-  l'incident, sans structure pour répondre à des questions nouvelles.
-  L'observabilité relie logs, métriques et traces (corrélation) pour
-  reconstruire le comportement d'un système distribué.
+  Logging alone is passive: it records what you thought to log before the
+  incident, with no structure to answer new questions. Observability links
+  logs, metrics and traces (correlation) to reconstruct the behavior of a
+  distributed system.
 fix: >-
-  Instrumenter les trois signaux : métriques RED/USE sur les endpoints et
-  files, traces distribuées avec contexte (opentelemetry — voir
-  source:go:opentelemetry), logs structurés corrélés (request/span ID).
-  Formuler les questions opérationnelles attendues et vérifier qu'un
-  dashboard y répond avant l'incident.
+  Instrument the three signals: RED/USE metrics on endpoints and queues,
+  distributed traces with context (opentelemetry — see
+  source:go:opentelemetry), correlated structured logs (request/span ID).
+  Formulate the expected operational questions and verify that a dashboard
+  answers them before the incident.
 when_ok: >-
-  Un script ou outil interne court peut vivre sans observabilité complète ;
-  tout service partagé ou distribué en a besoin dès la première mise en
-  production.
+  A short internal script or tool can live without full observability; any
+  shared or distributed service needs it from the first production
+  deployment.
 relationships:
   references:
     - https://observability-antipatterns.github.io/

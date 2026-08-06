@@ -579,6 +579,39 @@ questions utilisateur.
   secondary but the selected scope (active instruction surfaces) is
   translated in the same pass.
 
+## Language wave + audit remediation (2026-08-06)
+
+- **D-2026-08-06-01 (language wave executed, KVA-101…110 closed)**: the
+  residual-French wave documented in N1 §4 was converted to English in one
+  pass: 15 recipe SKILL.md (bodies + descriptions), 93 pattern/anti-pattern
+  graph-YAML, 43 catalog fiche files (6 headers, 37 H1s, bleve +
+  golang-migrate bodies), `mcp-server-shape.yaml`, and the `AGENTS.md` /
+  `rules/registry/` references to the old French section names. Zero French
+  remains on the kit instruction surface (accent-scan, 2026-08-06). New
+  content must be written in English at admission.
+- **D-2026-08-06-02 (fiche source heading English)**: `validate-kitv2.py`
+  strict-catalog check now accepts/requires the English `Verified sources`
+  heading (French tolerated for one migration cycle); the 43 files were
+  converted in the same change (N1 §4a coupling). Plan:
+  `docs/plans/2026-08-06-language-wave-and-fix-pipeline.md`.
+- **D-2026-08-06-03 (snippet date-chain check)**: `validate-kitv2.py`
+  implements the D-2026-08-05-11 cross-file freshness check
+  (`last_verified(snippet) >= last_verified(canonical)`; missing dates
+  ignored) with positive + negative tests (11/11); the 3 `SNIPPET.yaml` now
+  carry `last_verified`.
+- **D-2026-08-06-04 (known_limits structured)**: `capabilities.yaml`
+  `known_limits` migrated to `id`/`impact`/`status` (C1 §3.4 target state);
+  the open pi-discovery limit downgrades `pi-workflows` to `partial`;
+  criteria text corrected to the real counts (3 prompts, 8 workflow skills).
+- **D-2026-08-06-05 (absolute-instruction interpretation)**: rule-content
+  boundaries (Z1 semantic elements with their own "Verification" section)
+  are NOT "process absolutes" for the `.agent/instructions.md` §Enforcement
+  registry; only process instructions in skills/prompts/AGENTS.md/recipes are
+  recorded (4 new rows added, KVA-106).
+- **D-2026-08-06-06 (template roadmap recognition)**: `templates/TEMPLATES.md`
+  now records `desktop-app` as `planned` (recipe + probe exist; no conforming
+  real single-responsibility MIT Wails source, research 2026-08-05).
+
 ## structure.md contract + governance hardening (2026-08-06)
 
 - **RDN-003 (structure.md reading map, as ruled)**: no forced identical
@@ -610,3 +643,67 @@ questions utilisateur.
   validate-kitv2.py date-chain check, `build_index --check`,
   `.agent/instructions.md` §Enforcement + kit-audit C9/C15. Kit-audit gained
   dimensions C11–C15.
+
+## KitV2 AGENTS.md Z9-conformity correction (2026-08-06)
+
+- **D-2026-08-06-10 (AGENTS.md zone map + Limits brought to Z9)**: a
+  critical report proposed rewriting `KitV2/AGENTS.md`; verification showed
+  most premises stale (the `workflow-clarify → plan → tasks → implement →
+  verify` chain was removed 2026-08-05, D-16..20; the skill inventory is 8,
+  not 5; the "MANDATORY search_kit_resources" rule already lives in
+  `kit-resource-routing` and is registered guidance-only). Applied only the
+  contract-required parts: Source-of-truth converted from a bullet list to
+  the Z9 §2.1 table (zone → one-line mission → pointer), Limits now states
+  uncovered domains (Z9 §2.5): full Wails desktop wiring, TUI beyond the
+  interactive Bubble Tea recipe, Pi discovery internals, non-Go domains.
+  `rules/` repointed to `rules/core/` + `rules/registry/` (no zone README may
+  be created: rules/ is a declared Pi skill dir, gotcha 2026-08-03). The
+  AGENTS.md §Limits absolutes were registered guidance-only in
+  `.agent/instructions.md` (charter §16.1.4). Z9 §2.5 example aligned with
+  actual coverage (rewording, not a scope change). Validators PASS,
+  fresh-context review REQUEST-CHANGES → 1 dangling pointer + 1 TUI wording
+  tension fixed, then APPROVE.
+
+## Routing guarantee wave (2026-08-06, product 2.5.0)
+
+- **D-2026-08-06-11 (routing quality is contract-tested, owner decisions)**: three
+  owner decisions (asked 2026-08-06): (1) implement the routing-quality gate —
+  `router/scenarios.json` (22 scenarios) verified by the metaproject runner
+  `.agent/router/run_scenarios.mjs` under the REAL runtime scoring
+  (`kit-resource-router-scoring.ts`, the exact module the tool imports — zero
+  divergence by construction); (2) reduce the always-visible Pi skill surface —
+  `.pi/settings.json` now loads only `../rules` + `../recipes`, catalog fiches
+  stay indexed and routable on demand; (3) strengthen the routing mandate —
+  KitV2/AGENTS.md "Routing is mandatory, not optional" + the tool's
+  promptGuidelines name the default-applicable patterns (naming, error
+  wrapping, channel ownership, zero value). Product validator stays node-free
+  (`check_router_scenarios`: schema + id linkage); the ranking gate is
+  metaproject-owned. Z11 updated with the full maintenance protocol; the gate
+  has demonstrated failure modes (2 negative tests: unreachable expectation →
+  exit 1, stale id → exit 1) — a gate that cannot fail proves nothing.
+  Evidence: plan `docs/plans/2026-08-06-routing-guarantee.md`, gate
+  `run_scenarios.mjs` 22/22 PASS, metaproject tests 27 passed, review APPROVE.
+
+## Audit-fix wave (2026-08-06, KVA-101..110, release v2.5.0)
+
+- **D-2026-08-06-12 (template.yaml schema gains two mandatory fields)**: per
+  charter §16.1.3 (usage-evidence at admission) and Layer 5.1 (structure.md
+  mechanism), every sourced template's `template.yaml` must carry
+  `usage-evidence` (real, documented usage — never theoretical utility) and
+  `structure.md` (generation/validation declaration). This changes Z5 §3's
+  documented schema; the Z5 contract and the product validator are updated in
+  the same change. The three existing sourced templates are backfilled with
+  honest evidence (worker template notes its young repo and thin popularity
+  evidence explicitly).
+- **D-2026-08-06-13 (CI coverage floor measures the testable surface)**:
+  the 15 probe `main.go` files are executable observable scenarios verified
+  by `bash probes/run.sh` in the same CI run — not unit-testable library
+  code. The coverage aggregate excludes `probes/` (library surface alone is
+  79.6% ≥ 70%); this is scope definition, not metric gaming. The CI gate is
+  completed with the product validators, `build_index.py --check`, and
+  `probes/run.sh` so the machine gate equals the local gate.
+- **D-2026-08-06-14 (English-only stopwords)**: the router stopword list is
+  pruned of the residual French tokens (pre-2026-08-05 bilingual era);
+  queries and descriptions are English-only (D-2026-08-05-21). The routing
+  skill's "French terms have partial synonym coverage" note is reworded
+  accordingly. Index regenerated; routing gate must stay 22/22.

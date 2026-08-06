@@ -1,0 +1,23 @@
+---
+id: source:go:regexp
+title: Go regexp — RE2 regular expressions
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, regexp, regex, parsing]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/regexp
+selection: >-
+  Load when matching or extracting text with regular expressions: RE2
+  syntax limits (no backreferences, linear time), compiling once with
+  regexp.MustCompile at package level, and avoiding ReDoS-class blowups.
+limits: >-
+  regexp is not a parser for nested or recursive formats (JSON, HTML);
+  overuse for simple prefix/suffix checks is slower than strings/bytes
+  helpers. Pointer-only routing to the official docs.
+relationships:
+  references:
+    - https://pkg.go.dev/regexp

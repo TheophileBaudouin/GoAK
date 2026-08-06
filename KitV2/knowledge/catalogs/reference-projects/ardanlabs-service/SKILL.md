@@ -54,8 +54,7 @@ behavior. Do not clone the repository wholesale.
 - Treat Go/toolchain and deployment choices as versioned source facts, not as
   universal kit defaults.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official ardanlabs/service repository](https://github.com/ardanlabs/service) —
   project identity and README, checked 2026-08-05.
 - [Repository activity](https://github.com/ardanlabs/service/activity) —

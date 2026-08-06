@@ -6,7 +6,7 @@ tags: [mcp, protocol, agent, tools, llm, interoperability]
 last-verified: 2026-08-05
 ---
 
-# mcp-go-sdk — SDK MCP officiel
+# mcp-go-sdk — official MCP SDK
 
 ## Selection
 
@@ -46,35 +46,30 @@ validate it at the server boundary and define authorization separately.
 | Hand-written JSON-RPC | Rejected for interoperable MCP: it duplicates protocol versioning and security work. |
 | No MCP | Prefer a simpler private API when no MCP client/host ecosystem is required. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go client or server must interoperate with MCP hosts, IDEs, or agents.
 - The application exposes tools, resources, or prompts through the protocol.
 - Standard MCP transports, auth, and protocol negotiation are required.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The requirement is only raw WebSocket or JSON-RPC transport.
 - No MCP host/client ecosystem is part of the product contract.
 - A private local protocol is simpler and interoperability has no value.
 - The project cannot pin and re-test an evolving protocol SDK.
 
-## Avantages
-
+## Advantages
 - Official Go implementation aligned with the current MCP specification.
 - Client and server APIs for tools, resources, prompts, auth, and transports.
 - Typed context-aware boundaries make validation and cancellation explicit.
 - Recent security fixes and protocol revisions are released upstream.
 
-## Inconvénients
-
+## Disadvantages
 - MCP is a rich protocol with a meaningful learning/configuration cost.
 - The specification and SDK evolve rapidly; exact version pinning is required.
 - Protocol revision changes can affect transports and lifecycle assumptions.
 - The SDK does not decide application authorization or tool safety policy.
 
-## Pièges connus
-
+## Known pitfalls
 - Pin v1.7.0 or later and read the matching protocol revision before integrating.
 - Validate tool inputs, resource identifiers, prompt arguments, and output sizes;
   model-controlled input is a trust boundary.
@@ -85,8 +80,7 @@ validate it at the server boundary and define authorization separately.
 - Never expose a tool merely because it compiles: define authorization,
   capability, timeout, and audit policy separately.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Go SDK repository](https://github.com/modelcontextprotocol/go-sdk)
   — API, maintenance, license, checked 2026-08-05.
 - [v1.7.0 release](https://github.com/modelcontextprotocol/go-sdk/releases/tag/v1.7.0)

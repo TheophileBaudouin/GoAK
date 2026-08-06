@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-init-misuse
-title: init() à effet de bord — initialisation implicite
+title: init() with side effects — implicit initialization
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `init()` ouvre des connexions, charge des fichiers, configure des globals,
-  enregistre des handlers, ou fait des I/O — effets déclenchés par le simple
-  import du package.
+  `init()` opens connections, loads files, configures globals, registers
+  handlers, or does I/O — effects triggered by the mere import of the package.
 detect: >-
-  - Présence de `init()` hors des cas de registre inévitables (flags,
-  profiling).
-  - Import d'un package uniquement pour son `init` (import à effet de bord),
-    difficile à repérer en revue.
-  - Tests qui échouent selon l'ordre d'import des packages.
+  - Presence of `init()` outside the unavoidable registry cases (flags,
+    profiling).
+  - Importing a package only for its `init` (side-effect import), hard to spot
+    in review.
+  - Tests that fail depending on the package import order.
 problem: >-
-  L'exécution d'`init` est implicite, non ordonnée (ordre d'import, indéfini
-  entre fichiers d'un même package) et non testable directement : les échecs
-  d'initialisation sont impossibles à simuler, les dépendances cachées
-  compliquent les tests et l'état global (voir go-mutable-global-state) est
-  partagé.
+  `init` execution is implicit, unordered (import order, undefined between
+  files of the same package) and not directly testable: initialization
+  failures are impossible to simulate, hidden dependencies complicate tests,
+  and global state (see go-mutable-global-state) is shared.
 fix: >-
-  Déplacer l'initialisation dans des fonctions explicites appelées depuis `main`
-  ou un constructeur `New(...)` qui retourne l'erreur. L'échec d'initialisation
-  doit être une erreur retournée et gérée, pas un `panic` d'`init`. Réserver
-  `init` aux registres statiques inévitables (flags, `http.HandleFunc` de
-  package de démonstration) et les garder sans I/O.
+  Move initialization into explicit functions called from `main` or a
+  `New(...)` constructor that returns the error. An initialization failure
+  must be a returned and handled error, not an `init` `panic`. Reserve `init`
+  for the unavoidable static registries (flags, `http.HandleFunc` of demo
+  packages) and keep them I/O-free.
 when_ok: >-
-  Un `init` sans effet de bord (déclaration de variables de package,
-  enregistrement
-  de registre purement en mémoire) reste acceptable.
+  An `init` without side effects (package variable declarations, purely
+  in-memory registry registration) remains acceptable.
 relationships:
   references:
     - https://100go.co/

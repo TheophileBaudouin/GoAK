@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-goroutine-leak
-title: Goroutine leak — goroutine lancée sans chemin de sortie garanti
+title: Goroutine leak — goroutine launched without a guaranteed exit path
 kind: Pattern
 version: 1
 status: active
@@ -9,34 +9,32 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `go f()` est lancé dans un chemin où rien ne garantit que f se termine :
-  blocage
-  permanent sur une réception de canal, une boucle `for` sans condition de
-  sortie,
-  un worker sans mécanisme d'arrêt.
+  `go f()` is launched on a path where nothing guarantees that f terminates:
+  permanent blocking on a channel receive, a `for` loop without an exit
+  condition,
+  a worker without a shutdown mechanism.
 detect: >-
-  - `runtime.NumGoroutine()` qui croît sous charge ou en boucle de test.
-  - Profil goroutine (`go tool pprof` → `goroutine`), stack trace qui montre des
-    réceptions de canal sans émetteur.
-  - Revue : chercher `go ` suivi d'un appel sans contexte ni canal de fin, et
-  des
-    pipelines dont une étape n'est jamais fermée.
+  - `runtime.NumGoroutine()` that grows under load or in a test loop.
+  - Goroutine profile (`go tool pprof` → `goroutine`), stack trace showing
+    channel receives without a sender.
+  - Review: look for `go ` followed by a call without a context or end
+  channel, and
+    pipelines where a stage is never closed.
 problem: >-
-  Chaque fuite consomme une pile et ses références ; les fuites s'accumulent
-  silencieusement jusqu'au OOM. C'est un bug permissif : aucun avertissement
-  runtime, il ne se révèle qu'en production.
+  Each leak consumes a stack and its references; leaks accumulate silently
+  until OOM. It is a permissive bug: no runtime warning, it only reveals
+  itself in production.
 fix: >-
-  Donner à chaque goroutine une condition de sortie explicite : passer un
-  `context.Context` et `select` sur `ctx.Done()`, fermer les canaux que les
-  consommateurs parcourent (`for range`), utiliser `errgroup.WithContext` et
-  `defer cancel()`. Le pipeline officiel : chaque étape ferme son canal de
-  sortie,
-  la propagation d'annulation se fait via le contexte.
+  Give every goroutine an explicit exit condition: pass a `context.Context`
+  and `select` on `ctx.Done()`, close the channels consumers range over
+  (`for range`), use `errgroup.WithContext` and `defer cancel()`. The official
+  pipeline: each stage closes its output channel, cancellation propagation
+  happens through the context.
 when_ok: >-
-  Une goroutine longue durée est acceptable si elle est délibérée (boucle
-  d'acceptation d'un serveur, worker daemon) et possède un mécanisme d'arrêt ;
-  la règle est « exit condition explicite », pas « aucune goroutine persistante
-  ». Règles de concurrence du kit : `rules/core/concurrency`.
+  A long-lived goroutine is acceptable if it is deliberate (a server accept
+  loop, daemon worker) and has a shutdown mechanism; the rule is "explicit
+  exit condition", not "no persistent goroutine". Kit concurrency rules:
+  `rules/core/concurrency`.
 relationships:
   references:
     - https://go.dev/blog/pipelines

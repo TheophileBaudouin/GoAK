@@ -1,5 +1,5 @@
 id: pattern:http:api-idempotency-keys
-title: Clés d'idempotence — retries sûres pour les écritures
+title: Idempotency keys — safe retries for writes
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une retry réseau ou client duplique un effet métier (paiement, création,
-  envoi) — les POST ne sont pas idempotents par nature (voir
+  A network or client retry duplicates a business effect (payment, creation,
+  sending) — POSTs are not idempotent by nature (see
   pattern:antipattern:api-no-pagination).
 context: >-
-  S'applique aux écritures non-idempotentes (création, action) où un doublon
-  coûte cher.
+  Applies to non-idempotent writes (creation, action) where a duplicate is
+  expensive.
 solution: >-
-  Le client envoie un en-tête `Idempotency-Key` (UUID) ; le serveur stocke la
-  clé et la réponse associée (table clé → réponse/état), et renvoie la même
-  réponse pour une retry avec la même clé. En Go : middleware ou couche
-  service qui consulte/écrit la table dans la même transaction que l'effet.
+  The client sends an `Idempotency-Key` header (UUID); the server stores the
+  key and the associated response (key → response/state table), and returns
+  the same response for a retry with the same key. In Go: middleware or
+  service layer that reads/writes the table in the same transaction as the
+  effect.
 benefits: >-
-  Les clients peuvent retenter sans risque, les incidents réseau ne produisent
-  plus de doublons, et le contrat est simple à documenter.
+  Clients can retry safely, network incidents no longer produce duplicates,
+  and the contract is simple to document.
 costs: >-
-  Coût de stockage/expiration des clés (TTL) et de la vérification ; la clé
-  doit être vérifiée AVANT l'effet (race) — la stocker atomiquement avec la
-  création.
+  Storage/expiration cost of keys (TTL) and of the check; the key must be
+  checked BEFORE the effect (race) — store it atomically with the creation.
 related: >-
-  Homologue négatif : pattern:antipattern:api-no-pagination.
+  Negative counterpart: pattern:antipattern:api-no-pagination.
 relationships:
   references:
     - https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/

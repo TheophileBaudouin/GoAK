@@ -6,7 +6,7 @@ tags: [storage, s3, object-storage, minio, aws, client]
 last-verified: 2026-08-05
 ---
 
-# minio-go — client stockage objet S3
+# minio-go — S3 object storage client
 
 ## Selection
 
@@ -58,37 +58,32 @@ application boundary.
 | Direct HTTP/SigV4 | Reject hand-written signing; it recreates a security-sensitive protocol boundary. |
 | Local filesystem | Use `os`/`io` for local files; S3 clients do not simplify that case. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - The service reads/writes objects on MinIO, AWS S3, R2, or another S3-compatible
   backend.
 - Multipart uploads, presigned URLs, bucket lifecycle, and object operations
   are required without a full multi-service cloud SDK.
 - Multiple S3-compatible endpoints share one client boundary.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The project needs AWS services beyond S3 and already standardizes on AWS SDK
   v2.
 - Storage is local files, native GCS, Azure Blob, or a non-S3 protocol.
 - Strict AWS-only API compatibility is more important than MinIO extensions.
 
-## Avantages
-
+## Advantages
 - Broad S3-compatible API with context, multipart, presigned, and credential
   chain support.
 - Pure Go and smaller responsibility than a full cloud SDK.
 - Current stable v7 line with active MinIO maintenance.
 
-## Inconvénients
-
+## Disadvantages
 - Larger transitive surface than a tiny custom object boundary; scan it with
   `go mod verify` and `govulncheck`.
 - MinIO extensions can exceed strict AWS S3 compatibility expectations.
 - Upload retries depend on reader seekability and known-size choices.
 
-## Pièges connus
-
+## Known pitfalls
 - Never hardcode credentials; use environment, IAM, or a protected provider.
 - Use HTTPS outside an explicitly trusted local network.
 - Give uploads a bounded size and a cancellable context; unknown-size uploads
@@ -97,8 +92,7 @@ application boundary.
 - Distinguish the MinIO server's advisories from the client SDK's own advisory
   record when reviewing dependencies.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official minio-go repository](https://github.com/minio/minio-go) — API,
   maintenance, license, checked 2026-08-05.
 - [minio-go v7 on pkg.go.dev](https://pkg.go.dev/github.com/minio/minio-go/v7)

@@ -1,0 +1,41 @@
+---
+id: pattern:antipattern:sec-weak-randomness
+title: Weak randomness — math/rand for security-sensitive values
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, security, randomness, crypto, anti-pattern]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+symptom: >-
+  Tokens, IDs, secrets, or challenge values generated with math/rand (or
+  math/rand/v2) instead of crypto/rand; a seed derived from time.Now() or a
+  fixed value.
+detect: >-
+  - grep for `math/rand` imports near token, secret, password, OTP, or CSRF
+    generation.
+  - Check that session IDs, API keys, password salts, and nonces come from
+    crypto/rand.
+problem: >-
+  math/rand output is predictable: the package docs state it "should not be
+  used for security-sensitive work" and that its outputs "might be easily
+  predictable regardless of how it's seeded". Predictable values defeat
+  tokens, reset keys, and challenge-response flows.
+fix: >-
+  Use crypto/rand for any value an attacker can observe and guess: tokens,
+  keys, salts, nonces, CSRF. Keep math/rand (or rand/v2, Go 1.22+) for
+  simulation, sampling, and tests, where speed and reproducibility are an
+  advantage.
+when_ok: >-
+  math/rand is fine outside security contexts: simulations, sampling,
+  deterministic test sequences. The boundary: "can a guessed value
+  compromise anything?" — if yes, crypto/rand.
+relationships:
+  references:
+    - https://pkg.go.dev/math/rand
+    - https://pkg.go.dev/math/rand/v2
+    - https://go.dev/blog/chacha8rand
+  uses: []
+  validated_by: []

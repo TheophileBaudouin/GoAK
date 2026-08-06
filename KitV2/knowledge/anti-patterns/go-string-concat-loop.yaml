@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-string-concat-loop
-title: Concaténation de chaînes en boucle avec +=
+title: String concatenation in a loop with +=
 kind: Pattern
 version: 1
 status: active
@@ -9,25 +9,24 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `s := ""` puis `s += part` dans une boucle (assemblage de CSV, SQL, HTML,
-  requêtes) — O(n²) et allocation par itération.
+  `s := ""` then `s += part` in a loop (assembling CSV, SQL, HTML, queries) —
+  O(n²) and one allocation per iteration.
 detect: >-
-  - `+=` sur une chaîne dans un corps de boucle.
-  - Benchmarks montrant un temps quadratique quand la taille des entrées double.
-  - Profil d'allocation (pprof allocs) avec un pic sur les strings.
+  - `+=` on a string in a loop body.
+  - Benchmarks showing quadratic time when the input size doubles.
+  - Allocation profile (pprof allocs) with a peak on strings.
 problem: >-
-  Les chaînes Go sont immuables : chaque `+=` copie la chaîne entière. Pour n
-  itérations, le coût est O(n²) avec n allocations — visible dès quelques
-  milliers d'itérations, catastrophique en pipeline de données.
+  Go strings are immutable: each `+=` copies the whole string. For n
+  iterations, the cost is O(n²) with n allocations — visible from a few
+  thousand iterations, catastrophic in a data pipeline.
 fix: >-
-  Utiliser `strings.Builder` (`var b strings.Builder; b.WriteString(part)`) ou
-  `strings.Join` pour les séparateurs fixes. Builder amortit la réallocation ;
-  préallouer avec `b.Grow(n)` quand la taille est connue. Alternative :
-  `slices`/`bytes.Buffer` selon le contexte (binaire).
+  Use `strings.Builder` (`var b strings.Builder; b.WriteString(part)`) or
+  `strings.Join` for fixed separators. Builder amortizes reallocation;
+  preallocate with `b.Grow(n)` when the size is known. Alternative:
+  `slices`/`bytes.Buffer` depending on the context (binary).
 when_ok: >-
-  Une concaténation de 2-3 chaînes hors boucle (`a + b + c`) est idiomatique et
-  sans impact mesurable ; la règle ne concerne que les boucles et les chemins
-  chauds.
+  A concatenation of 2-3 strings outside a loop (`a + b + c`) is idiomatic
+  and without measurable impact; the rule only concerns loops and hot paths.
 relationships:
   references:
     - https://go.dev/blog/strings

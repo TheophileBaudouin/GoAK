@@ -1,139 +1,139 @@
 ---
 name: recipe-cli-interactive
-description: "Interface TUI interactive testable avec Bubble Tea v2 (charm.land/bubbletea/v2), architecture MVU (Elm), façade NewModel et logique d'événements découplée du terminal réel. Utiliser pour toute application TUI interactive."
+description: "Testable interactive TUI built with Bubble Tea v2 (charm.land/bubbletea/v2), MVU (Elm) architecture, NewModel facade, and event logic decoupled from the real terminal. Use for any interactive TUI application."
 category: recipe
 tags: [tui, cli, bubbletea, mvu, elm-architecture, interactive]
 last-verified: 2026-08-05
 ---
 
-# recipe-cli-interactive — Application TUI interactive avec Bubble Tea v2
+# recipe-cli-interactive — Interactive TUI application with Bubble Tea v2
 
-## Objectif et cas d'utilisation
+## Goal and use case
 
-Construire une interface utilisateur interactive en terminal (TUI) en Go selon l'architecture MVU (Model-View-Update / The Elm Architecture) via Bubble Tea v2 (`charm.land/bubbletea/v2`), tout en conservant la logique de transition d'état et le rendu 100% testables sans dépendre d'un véritable émulateur de terminal.
+Build an interactive terminal user interface (TUI) in Go following the MVU architecture (Model-View-Update / The Elm Architecture) with Bubble Tea v2 (`charm.land/bubbletea/v2`), while keeping the state-transition logic and the rendering 100% testable without depending on a real terminal emulator.
 
-Utiliser cette recette pour créer des menus interactifs, des sélecteurs, des formulaires CLI ou des dashboards terminal.
+Use this recipe to build interactive menus, selectors, CLI forms, or terminal dashboards.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
 - Go 1.25+
-- Dépendance : `charm.land/bubbletea/v2 v2.0.8` (import de vanité charm.land/bubbletea/v2)
-- Architecture testable :
-  - Isoler la machine à états dans une méthode pure `(m model) handleKey(key string) (model, tea.Cmd)` qui prend des chaînes de caractères ("j", "k", "q", "enter", "space").
-  - `Update(msg tea.Msg)` convertit simplement `tea.KeyPressMsg` en chaîne et délègue à `handleKey`.
-  - Exposer la fonction façade `NewModel() tea.Model` pour permettre l'instanciation et le test du modèle sans terminal actif.
-  - `render() string` génère le texte brut du composant ; `View()` l'encapsule dans `tea.NewView(m.render())`.
+- Dependency: `charm.land/bubbletea/v2 v2.0.8` (vanity import charm.land/bubbletea/v2)
+- Testable architecture:
+  - Isolate the state machine in a pure `(m model) handleKey(key string) (model, tea.Cmd)` method that takes strings ("j", "k", "q", "enter", "space").
+  - `Update(msg tea.Msg)` simply converts `tea.KeyPressMsg` to a string and delegates to `handleKey`.
+  - Expose the facade function `NewModel() tea.Model` to allow instantiating and testing the model without an active terminal.
+  - `render() string` generates the component's raw text; `View()` wraps it in `tea.NewView(m.render())`.
 
-## Composants et choix
+## Components and choices
 
-- `charm.land/bubbletea/v2` — framework TUI de référence en Go pour les interfaces réactives.
-- `tea.NewView(string)` — constructeur de vue réquis par Bubble Tea v2.
+- `charm.land/bubbletea/v2` — the reference TUI framework in Go for reactive interfaces.
+- `tea.NewView(string)` — view constructor required by Bubble Tea v2.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `github.com/charmbracelet/bubbletea` v1 : ancienne version legacy. Préférer le nouvel import v2 `charm.land/bubbletea/v2`.
-- `gdamore/tcell` ou `nsf/termbox-go` : API de bas niveau verbeuse nécessitant la gestion manuelle du tampon d'écran et des séquences d'échappement ANSI.
-- Tester directement l'exécution de `tea.NewProgram().Run()` dans les tests unitaires : nécessite une TTY réelle et échoue dans les environnements CI/head-less.
+- `github.com/charmbracelet/bubbletea` v1: old legacy version. Prefer the new v2 import `charm.land/bubbletea/v2`.
+- `gdamore/tcell` or `nsf/termbox-go`: verbose low-level APIs requiring manual management of the screen buffer and ANSI escape sequences.
+- Testing `tea.NewProgram().Run()` directly in unit tests: requires a real TTY and fails in CI/headless environments.
 
-## Exemple complet
+## Complete example
 
 ```go
 package tui
 
 import (
-	"fmt"
+ "fmt"
 
-	tea "charm.land/bubbletea/v2"
+ tea "charm.land/bubbletea/v2"
 )
 
 type model struct {
-	choices  []string
-	cursor   int
-	selected map[int]struct{}
+ choices  []string
+ cursor   int
+ selected map[int]struct{}
 }
 
 func initialModel() model {
-	return model{
-		choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
-		selected: make(map[int]struct{}),
-	}
+ return model{
+  choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
+  selected: make(map[int]struct{}),
+ }
 }
 
 func NewModel() tea.Model {
-	return initialModel()
+ return initialModel()
 }
 
 func (m model) Init() tea.Cmd { return nil }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if k, ok := msg.(tea.KeyPressMsg); ok {
-		return m.handleKey(k.String())
-	}
-	return m, nil
+ if k, ok := msg.(tea.KeyPressMsg); ok {
+  return m.handleKey(k.String())
+ }
+ return m, nil
 }
 
 func (m model) handleKey(key string) (model, tea.Cmd) {
-	switch key {
-	case "q", "ctrl+c":
-		return m, tea.Quit
-	case "up", "k":
-		if m.cursor > 0 {
-			m.cursor--
-		}
-	case "down", "j":
-		if m.cursor < len(m.choices)-1 {
-			m.cursor++
-		}
-	case "enter", "space":
-		if _, ok := m.selected[m.cursor]; ok {
-			delete(m.selected, m.cursor)
-		} else {
-			m.selected[m.cursor] = struct{}{}
-		}
-	}
-	return m, nil
+ switch key {
+ case "q", "ctrl+c":
+  return m, tea.Quit
+ case "up", "k":
+  if m.cursor > 0 {
+   m.cursor--
+  }
+ case "down", "j":
+  if m.cursor < len(m.choices)-1 {
+   m.cursor++
+  }
+ case "enter", "space":
+  if _, ok := m.selected[m.cursor]; ok {
+   delete(m.selected, m.cursor)
+  } else {
+   m.selected[m.cursor] = struct{}{}
+  }
+ }
+ return m, nil
 }
 
 func (m model) render() string {
-	s := "What should we buy at the market?\n\n"
-	for i, choice := range m.choices {
-		cursor := " "
-		if m.cursor == i {
-			cursor = ">"
-		}
-		checked := " "
-		if _, ok := m.selected[i]; ok {
-			checked = "x"
-		}
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
-	}
-	s += "\nPress q to quit.\n"
-	return s
+ s := "What should we buy at the market?\n\n"
+ for i, choice := range m.choices {
+  cursor := " "
+  if m.cursor == i {
+   cursor = ">"
+  }
+  checked := " "
+  if _, ok := m.selected[i]; ok {
+   checked = "x"
+  }
+  s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+ }
+ s += "\nPress q to quit.\n"
+ return s
 }
 
 func (m model) View() tea.View { return tea.NewView(m.render()) }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Respecter le récepteur de valeur (`value receiver`) pour `model` : les méthodes d'update retournent une nouvelle copie modifiée du modèle.
-- Tester les transitions d'état en appelant `handleKey` directement dans les tests unitaires.
-- Éviter d'insérer de l'I/O bloquante dans `Update` ; utiliser `tea.Cmd` pour l'I/O asynchrone.
+- Keep a value receiver for `model`: the update methods return a new modified copy of the model.
+- Test state transitions by calling `handleKey` directly in unit tests.
+- Avoid blocking I/O in `Update`; use `tea.Cmd` for asynchronous I/O.
 
-## Limites et extensions
+## Limits and extensions
 
-Pour ajouter des styles riches (couleurs, bordures) ou des composants pré-faits, utiliser `charmbracelet/lipgloss` et `charmbracelet/bubbles`.
+To add rich styles (colors, borders) or pre-built components, use `charmbracelet/lipgloss` and `charmbracelet/bubbles`.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-cli-interactive/...
 go run ./probes/cli-interactive
 ```
 
-La probe instancie le modèle via `NewModel()`, vérifie l'état initial et la vue générée, puis affiche `cli-interactive: PASS`.
+The probe instantiates the model via `NewModel()`, checks the initial state and the generated view, then prints `cli-interactive: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [charm.land/bubbletea/v2](https://pkg.go.dev/charm.land/bubbletea/v2) — documentation API v2 de Bubble Tea.
-- [Charm ecosystem](https://charm.sh/) — spécifications The Elm Architecture en Go.
+- [charm.land/bubbletea/v2](https://pkg.go.dev/charm.land/bubbletea/v2) — Bubble Tea v2 API documentation.
+- [Charm ecosystem](https://charm.sh/) — The Elm Architecture specifications in Go.

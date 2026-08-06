@@ -1,5 +1,5 @@
 id: pattern:go:private-context-keys
-title: Clés de contexte privées et typées
+title: Private and typed context keys
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,25 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Porter des valeurs de requête (user ID, request ID, tenant) dans le contexte
-  sans collision ni fuite d'implémentation entre packages.
+  Carry request values (user ID, request ID, tenant) in the context without
+  collision or implementation leakage between packages.
 context: >-
-  S'applique quand des valeurs de requête traversent plusieurs couches et ne
-  doivent pas être des paramètres de fonction (cross-cutting, middleware).
+  Applies when request values cross several layers and must not be function
+  parameters (cross-cutting, middleware).
 solution: >-
-  Type de clé privé au package qui lit la valeur
-  (`type ctxKey string` + constante privée non exportée), fonctions d'accès
-  exportées (`WithUser(ctx, u)`, `UserFrom(ctx)`) qui encapsulent la clé.
-  Garder le nombre de clés minimal et documenter chaque valeur.
+  Key type private to the package that reads the value
+  (`type ctxKey string` + unexported private constant), exported access
+  functions (`WithUser(ctx, u)`, `UserFrom(ctx)`) that encapsulate the key.
+  Keep the number of keys minimal and document each value.
 benefits: >-
-  Impossible de collisionner avec un autre package ; l'API publique expose des
-  fonctions, pas des clés ; les valeurs sont typées à la lecture (pas de
-  cast hasardeux).
+  Impossible to collide with another package; the public API exposes
+  functions, not keys; values are typed on read (no risky cast).
 costs: >-
-  Une indirection (fonctions) ; le contexte reste adapté aux valeurs de
-  requête, pas aux paramètres métier — ne pas y cacher des dépendances (voir
+  One indirection (functions); the context stays suited to request values,
+  not business parameters — do not hide dependencies in it (see
   pattern:go:constructor-injection).
 related: >-
-  Homologue négatif : pattern:antipattern:go-context-key-collision.
+  Negative counterpart: pattern:antipattern:go-context-key-collision.
 relationships:
   references:
     - https://go.dev/blog/context

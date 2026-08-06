@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-bloater
-title: Bloater — méthode/fonction trop longue, données gonflées
+title: Bloater — overlong method/function, bloated data
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Fonctions de plusieurs centaines de lignes avec plusieurs niveaux de
-  condition, structures avec beaucoup de champs jamais utilisés ensemble, et
-  duplication de blocs entre fonctions.
+  Functions of several hundred lines with multiple levels of condition,
+  structs with many fields never used together, and duplicated blocks between
+  functions.
 detect: >-
-  - Complexité cyclomatique élevée par fonction (outil d'analyse, lint) —
-    les seuils pi-lens/complexity le signalent.
-  - Fonctions qui nécessitent un défilement long pour être comprises.
-  - Champs de struct jamais lus (dead code) ; duplication détectable (jscpd).
+  - High cyclomatic complexity per function (analysis tool, lint) — the
+    pi-lens/complexity thresholds flag it.
+  - Functions that require long scrolling to be understood.
+  - Struct fields never read (dead code); detectable duplication (jscpd).
 problem: >-
-  Les « bloaters » sont le terreau des bugs : une fonction longue rend les
-  chemins d'erreur difficiles à auditer, les données gonflées créent des états
-  impossibles (combinaisons de champs incohérentes), la duplication fait
-  diverger les correctifs. Le catalogue de refactoring (Fowler) traite ces
-  odeurs par extraction.
+  "Bloaters" are the breeding ground of bugs: a long function makes error
+  paths hard to audit, bloated data creates impossible states (incoherent
+  field combinations), duplication makes fixes diverge. The refactoring
+  catalog (Fowler) treats these smells by extraction.
 fix: >-
-  Extraire les blocs en fonctions nommées (extraire méthode), regrouper les
-  champs liés en types dédiés, factoriser la duplication en un point unique.
-  La règle du kit : petite fonction explicite plutôt que grande fonction
-  générale — le refactoring est mécanique et testable (voir rules/testing).
+  Extract blocks into named functions (extract method), group related fields
+  into dedicated types, factor the duplication into a single point. The kit
+  rule: a small explicit function over a large general one — the refactoring
+  is mechanical and testable (see rules/testing).
 when_ok: >-
-  Une fonction longue sans branche (séquence linéaire de traitement de
-  données) peut rester lisible ; le signal principal est la complexité
-  conditionnelle, pas la longueur brute.
+  A long function without branches (linear data-processing sequence) may stay
+  readable; the main signal is conditional complexity, not raw length.
 relationships:
   references:
     - https://refactoring.guru/refactoring/smells

@@ -1,5 +1,5 @@
 id: pattern:go:contextual-worker
-title: Worker contextuel — goroutine avec condition de sortie explicite
+title: Contextual worker — goroutine with an explicit exit condition
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Lancer une goroutine est trivial ; la faire s'arrêter proprement ne l'est pas.
-  Sans condition de sortie, les goroutines fuient (mémoire, pile) jusqu'au OOM.
+  Starting a goroutine is trivial; stopping it cleanly is not. Without an
+  exit condition, goroutines leak (memory, stack) until OOM.
 context: >-
-  S'applique à toute goroutine dont la durée de vie dépasse la fonction qui la
-  lance : worker, pipeline, poller, handler long.
+  Applies to any goroutine whose lifetime exceeds the function that starts
+  it: worker, pipeline, poller, long-running handler.
 solution: >-
-  Donner à chaque goroutine un `context.Context` d'annulation et une sélection
-  explicite : `select { case <-ctx.Done(): return; case <-jobs: … }`. Le
-  lanceur crée `ctx, cancel := context.WithCancel(parent)`, appelle `cancel()`
-  dans son `defer`, et attend la fin (WaitGroup/errgroup) avant de retourner.
+  Give each goroutine a `context.Context` for cancellation and an explicit
+  select: `select { case <-ctx.Done(): return; case <-jobs: … }`. The
+  launcher creates `ctx, cancel := context.WithCancel(parent)`, calls
+  `cancel()` in its `defer`, and waits for completion (WaitGroup/errgroup)
+  before returning.
 benefits: >-
-  Les goroutines ont une durée de vie bornée et vérifiable ; l'annulation se
-  propage aux appels bloquants ; le test peut simuler l'arrêt en annulant le
-  contexte (voir pattern:go:concurrency-worker-pool pour le groupement).
+  Goroutines have a bounded, verifiable lifetime; cancellation propagates to
+  blocking calls; the test can simulate shutdown by cancelling the context
+  (see pattern:go:concurrency-worker-pool for grouping).
 costs: >-
-  Coût d'une sélection et d'un canal de plus ; l'oubli d'un `cancel()` fuit
-  l'annulation (voir pattern:go:private-context-keys pour les valeurs).
+  Cost of one extra select and channel; forgetting a `cancel()` leaks
+  cancellation (see pattern:go:private-context-keys for values).
 related: >-
-  Règles du kit : `rules/core/concurrency` (goroutine lifetimes, cancellation).
-  Recette : recipe-worker-pool, recipe-graceful-shutdown. Homologue négatif :
-  pattern:antipattern:go-goroutine-leak.
+  Kit rules: `rules/core/concurrency` (goroutine lifetimes, cancellation).
+  Recipes: recipe-worker-pool, recipe-graceful-shutdown. Negative
+  counterpart: pattern:antipattern:go-goroutine-leak.
 relationships:
   references:
     - https://go.dev/blog/pipelines

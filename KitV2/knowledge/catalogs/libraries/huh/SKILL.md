@@ -6,7 +6,7 @@ tags: [tui, cli, forms, prompts, bubbletea, terminal]
 last-verified: 2026-08-05
 ---
 
-# huh — formulaires terminal
+# huh — terminal forms
 
 ## Selection
 
@@ -52,37 +52,32 @@ boundary and validate again at the application trust boundary.
 | `asky`/`prompt` libraries | Consider for a smaller prompt surface; verify maintenance and TTY behavior independently. |
 | Web form | Prefer when the interaction must be browser-accessible or remotely managed. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A CLI needs a validated wizard, select, multi-select, input, confirmation,
   or multi-group form.
 - Bubble Tea v2/Lip Gloss v2 are acceptable transitive boundaries.
 - The user interaction is genuinely interactive and terminal-based.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Input must work non-interactively in pipes, CI, or scripts without an
   accessible-mode design.
 - A single flag or line can use stdlib with less ceremony.
 - The project needs a custom TUI state machine rather than form primitives.
 - The application cannot accept a TTY dependency or the v2 import migration.
 
-## Avantages
-
+## Advantages
 - High-level fields, groups, validation, themes, sizing, and accessibility.
 - Bubble Tea model integration with much less form boilerplate.
 - Current v2 API aligns with the Charm TUI stack and handles common field types.
 
-## Inconvénients
-
+## Disadvantages
 - Interactive forms require a compatible terminal and terminal width.
 - v2 is a breaking migration from the old GitHub import path and theme API.
 - Dynamic/custom layouts can expose viewport and narrow-terminal edge cases.
 - Hidden fields may still trigger TTY behavior; accessible mode is an explicit
   choice, not an automatic replacement.
 
-## Pièges connus
-
+## Known pitfalls
 - Check `Form.Run` and preserve its error; do not treat cancelled input as a
   successful configuration.
 - Use the v2 import path and `ThemeCharm(isDark)` shape; do not copy v1 themes.
@@ -92,8 +87,7 @@ boundary and validate again at the application trust boundary.
 - Provide an accessible/non-interactive fallback when CI or automation can run
   the command without a real TTY.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official huh repository](https://github.com/charmbracelet/huh) — maintenance,
   API, license, checked 2026-08-05.
 - [huh v2.0.3 on pkg.go.dev](https://pkg.go.dev/charm.land/huh/v2@v2.0.3) —

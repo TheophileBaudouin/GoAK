@@ -1,0 +1,27 @@
+---
+id: source:performance:benchmarking
+title: Go benchmarking — testing.B, -benchmem, and benchstat
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, performance, benchmarking, benchstat, measurement]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/testing
+selection: >-
+  Load when writing a benchmark, comparing two implementations, or deciding
+  whether an optimization is real: testing.B and -benchmem, testing.B.Loop
+  (Go 1.24+), and statistical comparison with benchstat.
+limits: >-
+  A benchmark measures the machine and compiler version it ran on; it does
+  not prove user-visible behavior. Compare with benchstat across repeated
+  runs; -benchmem reports allocations, not escape behavior — combine with
+  profiling (source:go:profiling) for the full picture.
+relationships:
+  references:
+    - https://pkg.go.dev/testing
+    - https://pkg.go.dev/golang.org/x/perf/cmd/benchstat
+    - https://go.dev/blog/testing-b-loop
+    - source:go:profiling

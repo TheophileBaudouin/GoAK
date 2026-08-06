@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-god-object
-title: God Object — type central qui sait tout faire
+title: God Object — central type that does everything
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Un type (struct) accumule des dizaines de méthodes sans rapport : validation,
-  persistance, calcul, rendu, notification — référencé par presque tout le
-  codebase.
+  A type (struct) accumulates dozens of unrelated methods: validation,
+  persistence, computation, rendering, notification — referenced by almost the
+  whole codebase.
 detect: >-
-  - Un type central avec un nombre de méthodes démesuré (> ~20) et plusieurs
-    responsabilités (noms de méthodes de domaines différents).
-  - Fan-in élevé : ce type apparaît dans la signature d'une grande part des
-    fonctions (module_report « hubs »).
-  - Tests qui doivent construire l'objet entier pour tester un comportement
-    isolé.
+  - A central type with a disproportionate number of methods (> ~20) and
+    several responsibilities (method names from different domains).
+  - High fan-in: this type appears in the signature of a large share of
+    functions (module_report "hubs").
+  - Tests that must build the whole object to test an isolated behavior.
 problem: >-
-  Le god object viole la cohésion : chaque modification touche un type partagé,
-  les dépendances transitives se multiplient, le test unitaire devient coûteux
-  (monster builder), et la concurrence sur l'état central crée des courses.
+  The god object violates cohesion: every modification touches a shared type,
+  transitive dependencies multiply, unit testing becomes expensive (monster
+  builder), and concurrency on the central state creates races.
 fix: >-
-  Découper par responsabilité en petits types (ou fonctions libres) avec un
-  état minimal : le handler HTTP ne manipule pas le store, le domaine ne
-  connaît pas le rendu. Réduire le fan-in via l'injection de dépendances des
-  composants (voir go-mutable-global-state et go-interface-everywhere).
+  Split by responsibility into small types (or free functions) with minimal
+  state: the HTTP handler does not manipulate the store, the domain does not
+  know about rendering. Reduce fan-in via dependency injection of components
+  (see go-mutable-global-state and go-interface-everywhere).
 when_ok: >-
-  Un agrégat de domaine (DDD) avec invariants et méthodes de cohésion forte
-  n'est pas un god object ; le signal est la pluralité de responsabilités sans
-  rapport, pas la taille seule.
+  A domain aggregate (DDD) with invariants and strong-cohesion methods is not
+  a god object; the signal is the plurality of unrelated responsibilities, not
+  size alone.
 relationships:
   references:
     - https://refactoring.guru/smells/large-class

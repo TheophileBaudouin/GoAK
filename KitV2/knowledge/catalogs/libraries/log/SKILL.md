@@ -6,7 +6,7 @@ tags: [logging, slog, tui, cli, terminal]
 last-verified: 2026-08-05
 ---
 
-# log — handler slog coloré
+# log — colored slog handler
 
 ## Selection
 
@@ -45,37 +45,32 @@ logfmt for machine pipelines and disable styling when output is not a TTY.
 | zap / zerolog | Consider for measured high-throughput or JSON-first service workloads. |
 | logrus | Legacy compatibility only; do not choose for new code without a reason. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A CLI/TUI needs readable colored logs and the application still wants the
   standard `slog` API.
 - Text, JSON, logfmt, caller reporting, or sub-loggers are useful at the edge.
 - Styling is a presentation decision, not an audit/security guarantee.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The service needs only stdlib `slog` and no human-facing styling.
 - Logs feed a high-throughput machine pipeline where performance is measured and
   a specialized JSON logger is justified.
 - The requirement includes tamper-proof, encrypted, or compliance-grade audit
   storage; a formatter cannot provide those properties.
 
-## Avantages
-
+## Advantages
 - Standard `slog.Handler` compatibility preserves the kit's logging contract.
 - Human-readable levels, styles, text/JSON/logfmt formatters, and sub-loggers.
 - Terminal color behavior can be disabled at non-TTY output boundaries.
 
-## Inconvénients
-
+## Disadvantages
 - Human-oriented styling is extra surface for a service that already uses
   stdlib `slog`.
 - No custom slog levels, tamper-proof audit log, encryption, or compliance
   guarantees.
 - Review concurrency behavior and output ownership for high-load use.
 
-## Pièges connus
-
+## Known pitfalls
 - Keep using `slog` in application code; `charm.land/log/v2` is a handler, not
   a reason to hide the logger in global state.
 - Select JSON/logfmt or disable colors for pipes, CI, and machine ingestion.
@@ -83,8 +78,7 @@ logfmt for machine pipelines and disable styling when output is not a TTY.
 - Review upstream concurrency issues before using it as the critical service
   logger under extreme load.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official charm log repository](https://github.com/charmbracelet/log) — API,
   maintenance, license, checked 2026-08-05.
 - [log v2 on pkg.go.dev](https://pkg.go.dev/charm.land/log/v2) — exact version

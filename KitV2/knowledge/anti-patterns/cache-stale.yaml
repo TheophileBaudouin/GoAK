@@ -1,5 +1,5 @@
 id: pattern:antipattern:cache-stale
-title: Cache périmé — incohérence avec la source
+title: Stale cache — inconsistency with the source
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,30 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Le cache sert des valeurs obsolètes après une mise à jour de la source :
-  prix, disponibilité, états qui ne changent pas alors que la donnée a
-  changé, sans stratégie d'invalidation.
+  The cache serves outdated values after a source update: prices, availability,
+  states that do not change while the data has changed, without an invalidation
+  strategy.
 detect: >-
-  - TTL long sans mécanisme d'invalidation à l'écriture.
-  - Mises à jour écrites directement en base sans purge/mise à jour du cache.
-  - Incohérences constatées entre l'API et la source (tests ou opérations).
+  - Long TTL without an invalidation mechanism on write.
+  - Updates written directly to the database without purging/updating the
+    cache.
+  - Inconsistencies observed between the API and the source (tests or
+    operations).
 problem: >-
-  Un cache qui dérive sert des faits faux (prix erronés, stock dépassé) ; la
-  discipline de cohérence du cache (redis.io) est de borner cette dérive
-  selon l'exigence métier. La dérive incontrôlée érode la confiance dans le
-  système entier.
+  A cache that drifts serves false facts (wrong prices, oversold stock); the
+  cache consistency discipline (redis.io) is to bound this drift according to
+  the business requirement. Uncontrolled drift erodes trust in the whole
+  system.
 fix: >-
-  Invalider ou mettre à jour le cache à l'écriture (write-through, invalidation
-  par événement), choisir un TTL cohérent avec la tolérance de fraîcheur
-  métier, et différencier les données (stable vs volatile). Pour les données
-  critiques, valider l'âge (stale-while-revalidate avec seuil) et alerter
-  sur la dérive.
+  Invalidate or update the cache on write (write-through, event-driven
+  invalidation), choose a TTL consistent with the business freshness
+  tolerance, and differentiate data (stable vs volatile). For critical data,
+  validate the age (stale-while-revalidate with a threshold) and alert on
+  drift.
 when_ok: >-
-  Certaines données tolèrent la fraîcheur différée (contenu, agrégats) ;
-  l'anti-pattern est la dérive sans borne ni stratégie explicite, pas la
-  présence d'un cache.
+  Some data tolerates deferred freshness (content, aggregates); the
+  anti-pattern is drift without bound or explicit strategy, not the presence
+  of a cache.
 relationships:
   references:
     - https://redis.io/blog/cache-consistency-strategies/

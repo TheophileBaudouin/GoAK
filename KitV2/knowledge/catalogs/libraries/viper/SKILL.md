@@ -6,7 +6,7 @@ tags: [config, viper, env, flags, files]
 last-verified: 2026-08-05
 ---
 
-# viper — configuration intégrée
+# viper — integrated configuration
 
 ## Selection
 
@@ -54,37 +54,32 @@ the package-level singleton. Synchronize reload/read access yourself.
 | Existing Viper application | Viper, pinned and instance-scoped; avoid a casual migration. |
 | Strict schema/config contract | A typed configuration package or explicit constructor validation. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - An existing application already depends on Viper and migration cost exceeds
   the benefit of changing configuration libraries.
 - Broad file/env/flag/remote integration and Viper's precedence model are needed.
 - The project can own instance lifecycle, synchronization, and upgrade testing.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A new service needs a small explicit cascade: prefer Koanf or stdlib.
 - The project cannot tolerate case-insensitive keys or package-global legacy
   behavior.
 - Concurrent reads/writes or watch callbacks cannot be synchronized.
 - A typed schema and strict validation boundary are the actual requirement.
 
-## Avantages
-
+## Advantages
 - Broad integrations for files, env, flags, remote stores, and decoding.
 - Familiar precedence model and compatibility with Cobra/pflag ecosystems.
 - `viper.New()` supports explicit ownership despite the legacy singleton API.
 
-## Inconvénients
-
+## Disadvantages
 - Package-level singleton makes hidden mutable state easy to introduce.
 - Instances are not safe for concurrent read/write without synchronization.
 - Case-insensitive keys can hide configuration collisions.
 - Upgrade and decoding changes require reading the official guide and testing
   existing configurations.
 
-## Pièges connus
-
+## Known pitfalls
 - Prefer `viper.New()`; never let package-global Viper state cross tests or
   service boundaries.
 - Synchronize reads/writes and watch/reload callbacks explicitly.
@@ -93,8 +88,7 @@ the package-level singleton. Synchronize reload/read access yourself.
 - Read the official upgrade guide before moving across v1.19/v1.20 behavior and
   pin v1.21.0 for reproducible builds.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Viper repository](https://github.com/spf13/viper) — API,
   maintenance, license, checked 2026-08-05.
 - [Viper releases](https://github.com/spf13/viper/releases) — v1.21.0 current

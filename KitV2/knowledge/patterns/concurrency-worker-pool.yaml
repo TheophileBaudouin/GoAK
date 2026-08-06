@@ -1,5 +1,5 @@
 id: pattern:concurrency:worker-pool
-title: Worker pool — fan-out borné avec errgroup.SetLimit
+title: Worker pool — bounded fan-out with errgroup.SetLimit
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Lancer une goroutine par tâche sans limite épuise la mémoire et les
-  connexions sous charge (voir pattern:antipattern:go-goroutine-leak).
+  Launching one goroutine per task without a limit exhausts memory and
+  connections under load (see pattern:antipattern:go-goroutine-leak).
 context: >-
-  S'applique quand un lot de tâches indépendantes (items à traiter, requêtes
-  à émettre) doit être exécuté avec une concurrence plafonnée.
+  Applies when a batch of independent tasks (items to process, requests to
+  emit) must run with capped concurrency.
 solution: >-
-  `errgroup.Group` avec `SetLimit(n)` : la limite borne les goroutines
-  actives, `Wait()` propage la première erreur, `WithContext` annule les
-  autres tâches. Remplacer un canal de workers manuel quand la seule
-  mécanique est le fan-out borné.
+  `errgroup.Group` with `SetLimit(n)`: the limit bounds the active
+  goroutines, `Wait()` propagates the first error, `WithContext` cancels the
+  other tasks. Replace a manual worker channel when the only mechanic needed
+  is bounded fan-out.
 benefits: >-
-  Backpressure par construction, erreur propagée et première-erreur
-  respectée, annulation coordonnée, code court et testable
-  (voir recipe-worker-pool).
+  Backpressure by construction, propagated and first-error-respecting
+  error handling, coordinated cancellation, short and testable code (see
+  recipe-worker-pool).
 costs: >-
-  Pas de file d'attente intégrée (les tâches excédentaires attendent dans le
-  groupe) ; pour une file persistante ou un débit priorisé, un canal bufferisé
-  ou un worker dédié reste nécessaire.
+  No built-in queue (excess tasks wait inside the group); for a persistent
+  queue or prioritized throughput, a buffered channel or a dedicated worker
+  remains necessary.
 related: >-
-  Règles du kit : `rules/core/concurrency` (bounded fan-out). Recette :
-  recipe-worker-pool. Homologue négatif :
+  Kit rules: `rules/core/concurrency` (bounded fan-out). Recipe:
+  recipe-worker-pool. Negative counterpart:
   pattern:antipattern:go-goroutine-leak.
 relationships:
   references:

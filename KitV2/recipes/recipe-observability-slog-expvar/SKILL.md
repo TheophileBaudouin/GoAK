@@ -6,47 +6,47 @@ tags: [observability, slog, expvar, http, metrics, logging]
 last-verified: 2026-08-05
 ---
 
-# recipe-observability-slog-expvar — logs JSON et métriques privées
+# recipe-observability-slog-expvar — JSON logs and private metrics
 
-## Objectif et cas d'utilisation
+## Goal and use case
 
-Ajouter l'observabilité minimale d'un service `net/http` : un ID aléatoire
-généré côté serveur, un log JSON `slog` injecté et des compteurs atomiques de
-requêtes, erreurs, requêtes en vol et somme de latence. Le handler `expvar`
-expose les valeurs sur un listener d'administration privé uniquement.
+Add the minimal observability of a `net/http` service: a server-generated
+random ID, an injected `slog` JSON log, and atomic request, error, in-flight
+request, and latency-sum counters. The `expvar` handler exposes the values on
+a private admin listener only.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-Créer un `*slog.Logger` avec un `JSONHandler`, une instance `Metrics`, appeler
-`Publish` une fois au démarrage et monter `AdminHandler` sur un port/interface
-non publique (mTLS, socket locale ou réseau d'administration isolé). `expvar`
-expose aussi des informations runtime standard : il ne doit jamais être routé
-par le serveur Internet principal.
+Create a `*slog.Logger` with a `JSONHandler`, a `Metrics` instance, call
+`Publish` once at startup, and mount `AdminHandler` on a non-public
+port/interface (mTLS, local socket, or isolated admin network). `expvar` also
+exposes standard runtime information: it must never be routed by the main
+internet-facing server.
 
-Le middleware ne met pas de logger dans `context.Context`; il y dépose seulement
-l'ID de corrélation, et ne journalise ni query string, ni header, ni corps.
+The middleware does not put a logger into `context.Context`; it only stores
+the correlation ID there, and it never logs query strings, headers, or bodies.
 
-## Composants et choix
+## Components and choices
 
-- `log/slog` — logs structurés JSON standard, logger injecté.
-- `expvar` — exposition stdlib, volontairement locale et sans exporteur.
-- `sync/atomic` — compteurs sans lock, sans labels ni dimensions à cardinalité
-  forte.
-- `crypto/rand` — ID corrélation non contrôlé par le client.
+- `log/slog` — standard structured JSON logs, injected logger.
+- `expvar` — stdlib exposure, deliberately local and without an exporter.
+- `sync/atomic` — lock-free counters, no labels or high-cardinality
+  dimensions.
+- `crypto/rand` — correlation ID not controlled by the client.
 
-Pattern : `pattern:observability:structured-logging`.
+Pattern: `pattern:observability:structured-logging`.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- Logger dans le contexte : dépendance cachée et propagation inutile.
-- ID fourni par le client : permet collision/usurpation ; cette recipe génère le
-  sien puis le retourne dans `X-Request-ID`.
-- Prometheus, OpenTelemetry et exporteurs : besoins d'infrastructure distincts,
-  hors de cette couche minimale.
-- `/debug/vars` public ou métriques avec user ID/path dynamique : exposition ou
-  cardinalité non bornée.
+- Logger in the context: hidden dependency and needless propagation.
+- Client-provided ID: allows collision/spoofing; this recipe generates its own
+  and returns it in `X-Request-ID`.
+- Prometheus, OpenTelemetry, and exporters: distinct infrastructure needs,
+  outside this minimal layer.
+- Public `/debug/vars` or metrics with dynamic user ID/path: unbounded
+  exposure or cardinality.
 
-## Exemple complet
+## Complete example
 
 ```go
 metrics := &observability.Metrics{}
@@ -61,36 +61,36 @@ publicServer := &http.Server{Addr: ":8080", Handler: middleware(app)}
 privateServer := &http.Server{Addr: "127.0.0.1:9090", Handler: observability.AdminHandler()}
 ```
 
-Ne pas remplacer `127.0.0.1:9090` par une adresse publique sans une décision de
-sécurité et un contrôle d'accès explicite.
+Do not replace `127.0.0.1:9090` with a public address without an explicit
+security decision and access control.
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- N'enregistrer que des champs bornés : ID, méthode, statut et durée ; aucun
-  secret, query string, corps, token ou user ID.
-- Une `Snapshot` atomique n'est pas une transaction : l'observation peut couvrir
-  des instants légèrement différents.
-- N'appeler `Publish` qu'une fois ; une seconde inscription est une erreur.
-- Tester sous `-race` les requêtes concurrentes comme le test de la recipe.
+- Log only bounded fields: ID, method, status, and duration; no secrets,
+  query strings, bodies, tokens, or user IDs.
+- An atomic `Snapshot` is not a transaction: the observation may cover
+  slightly different instants.
+- Call `Publish` only once; a second registration is an error.
+- Test concurrent requests under `-race`, like the recipe's test.
 
-## Limites et extensions
+## Limits and extensions
 
-Pas de traces distribuées, histogrammes, export, dashboards, alertes ni métrique
-par route/utilisateur. Ajouter ce niveau d'observabilité via une recipe dédiée,
-avec politique de cardinalité, coût et exposition.
+No distributed traces, histograms, export, dashboards, alerts, or
+per-route/per-user metrics. Add this level of observability via a dedicated
+recipe, with a cardinality, cost, and exposure policy.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test -race ./recipes/recipe-observability-slog-expvar/...
 go run ./probes/observability
 ```
 
-La probe réalise une requête, vérifie l'ID et la métrique `expvar`, puis affiche
-`observability: PASS`.
+The probe makes a request, verifies the ID and the `expvar` metric, then
+prints `observability: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [log/slog](https://pkg.go.dev/log/slog) — logs structurés et `JSONHandler`.
-- [expvar](https://pkg.go.dev/expvar) — registre global et `/debug/vars`.
-- [sync/atomic](https://pkg.go.dev/sync/atomic) — compteurs concurrents.
+- [log/slog](https://pkg.go.dev/log/slog) — structured logs and `JSONHandler`.
+- [expvar](https://pkg.go.dev/expvar) — global registry and `/debug/vars`.
+- [sync/atomic](https://pkg.go.dev/sync/atomic) — concurrent counters.

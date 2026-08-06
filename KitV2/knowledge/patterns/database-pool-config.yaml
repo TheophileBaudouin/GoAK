@@ -1,5 +1,5 @@
 id: pattern:database:pool-config
-title: Pool de connexions explicite et mesuré
+title: Explicit and measured connection pool
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les défauts du pool (connexions illimitées, jamais recyclées, fuites)
-  épuisent le SGBD ou figent l'application sous charge (voir
+  Pool defaults (unlimited connections, never recycled, leaks) exhaust the
+  DBMS or freeze the application under load (see
   pattern:antipattern:db-pool-misconfig).
 context: >-
-  S'applique à toute application qui ouvre un `*sql.DB` : serveur, worker,
-  CLI de traitement.
+  Applies to any application that opens a `*sql.DB`: server, worker,
+  processing CLI.
 solution: >-
-  Configurer explicitement après `sql.Open` : `SetMaxOpenConns` (borné selon
-  le SGBD et l'app), `SetMaxIdleConns` (≤ MaxOpen), `SetConnMaxIdleTime` et
-  `SetConnMaxLifetime` (recyclage). Surveiller avec `db.Stats()` (InUse,
-  Idle, WaitCount) sous charge de test et ajuster par mesure.
+  Configure explicitly after `sql.Open`: `SetMaxOpenConns` (bounded
+  according to the DBMS and the app), `SetMaxIdleConns` (≤ MaxOpen),
+  `SetConnMaxIdleTime` and `SetConnMaxLifetime` (recycling). Monitor with
+  `db.Stats()` (InUse, Idle, WaitCount) under test load and adjust by
+  measurement.
 benefits: >-
-  Charge prévisible sur le SGBD, connexions recyclées (pas de zombie après
-  failover/firewall), et détection des fuites via les stats.
+  Predictable load on the DBMS, recycled connections (no zombie after
+  failover/firewall), and leak detection via the stats.
 costs: >-
-  Un MaxOpen trop bas crée des files d'attente (WaitCount qui monte) ; les
-  valeurs justes dépendent du SGBD et du profil d'accès — la règle est
-  d'en fixer et mesurer, pas une valeur universelle.
+  A too-low MaxOpen creates wait queues (WaitCount rising); the right values
+  depend on the DBMS and the access profile — the rule is to set and measure
+  them, not a universal value.
 related: >-
-  Recette : recipe-sqlite-sqlc. Homologue négatif :
+  Recipe: recipe-sqlite-sqlc. Negative counterpart:
   pattern:antipattern:db-pool-misconfig.
 relationships:
   references:

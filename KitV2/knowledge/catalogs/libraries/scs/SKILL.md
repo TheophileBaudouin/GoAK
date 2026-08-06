@@ -6,7 +6,7 @@ tags: [security, sessions, cookies, authentication, web, middleware]
 last-verified: 2026-08-05
 ---
 
-# scs — sessions serveur
+# scs — server-side sessions
 
 ## Selection
 
@@ -54,37 +54,32 @@ CSRF policy.
 | Cookie/session implementation | Possible for a tiny controlled case, but requires correct renewal, signing, expiry, and store policy. |
 | Full auth framework | Choose only when login, password reset, OAuth, and email workflows justify its larger contract. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A classic browser app uses `net/http`/chi and needs server-side revocable
   session state.
 - Logout/invalidation and shared Postgres/Redis/SQLite stores matter.
 - Cookie transport plus application-owned authentication handlers is the desired
   boundary.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A mobile, REST, or service-to-service API needs stateless tokens instead.
 - The project needs login/password/OAuth/email workflows from one framework.
 - The application cannot provide a secure store or CSRF policy.
 
-## Avantages
-
+## Advantages
 - Server-side data keeps the cookie small and allows revocation/destroy.
 - Pluggable stores preserve the same manager API across deployments.
 - `LoadAndSave`, `RenewToken`, `IdleTimeout`, `Lifetime`, and `Destroy` cover
   the session lifecycle without hiding authentication policy.
 
-## Inconvénients
-
+## Disadvantages
 - Shared server state and store operations are required for multi-instance apps.
 - It does not implement identity verification, passwords, OAuth, or CSRF.
 - Cookie-store deployments have different visibility/revocation trade-offs than
   server stores.
 - Token hashing and cookie security options require deliberate configuration.
 
-## Pièges connus
-
+## Known pitfalls
 - Set `Secure=true` for HTTPS production, `HttpOnly=true`, and an explicit
   `SameSite` policy suited to the application.
 - Renew the token after login to prevent session fixation; destroy it at logout.
@@ -95,8 +90,7 @@ CSRF policy.
 - Consider `HashTokenInStore` when the store's confidentiality boundary requires
   protection of session tokens at rest.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official scs repository](https://github.com/alexedwards/scs) — API,
   maintenance, license, checked 2026-08-05.
 - [scs releases](https://github.com/alexedwards/scs/releases) — v2.9.0 current

@@ -1,17 +1,17 @@
 {
  "counts": {
-  "anti-pattern": 54,
+  "anti-pattern": 58,
   "catalog": 74,
-  "pattern": 39,
+  "pattern": 46,
   "prompt": 3,
   "recipe": 15,
-  "rule": 13,
+  "rule": 14,
   "skill": 8,
   "snippet": 3,
-  "source": 41,
+  "source": 54,
   "template": 3
  },
- "index_sha256": "e7f90a3ea76caf24796793948233420a4e85182669f9bba9f04a8e8bbec06ab4",
+ "index_sha256": "dca41f98064de1ed938f6c47e4934ab4e41619945051f2d502842dcfb14c83c3",
  "schema": 1,
  "stopwords": [
   "a",
@@ -84,5 +84,5 @@
   "you",
   "your"
  ],
- "version": "2.4.1"
+ "version": "2.5.0"
 }

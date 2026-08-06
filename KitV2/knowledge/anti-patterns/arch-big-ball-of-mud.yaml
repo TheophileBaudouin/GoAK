@@ -1,5 +1,5 @@
 id: pattern:antipattern:arch-big-ball-of-mud
-title: Big Ball of Mud — architecture sans frontières
+title: Big Ball of Mud — architecture without boundaries
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Un système dont la structure est dictée par l'expédience : packages qui
-  s'importent librement, couches mélangées (HTTP dans le domaine, SQL dans les
-  handlers), « glue code » omniprésent.
+  A system whose structure is dictated by expedience: packages that import
+  each other freely, mixed layers (HTTP in the domain, SQL in the handlers),
+  omnipresent "glue code".
 detect: >-
-  - Dépendances circulaires entre packages (outil d'analyse d'imports).
-  - Aucune règle de dépendance ; les packages « util » partagés grossissent.
-  - Chaque changement touche plusieurs couches sans relation directe.
+  - Circular dependencies between packages (import analysis tool).
+  - No dependency rule; shared "util" packages keep growing.
+  - Every change touches several layers without a direct relationship.
 problem: >-
-  Le papier fondateur (Foote & Yoder, PLoP 1997) décrit la BBoM comme une
-  architecture « de facto » : chaque décision locale est rapide, mais le coût
-  d'entretien et de compréhension croît sans borne, la testabilité chute, et
-  les refactors majeurs deviennent impossibles sans réécriture.
+  The founding paper (Foote & Yoder, PLoP 1997) describes the BBoM as a
+  "de facto" architecture: every local decision is fast, but the cost of
+  maintenance and comprehension grows without bound, testability drops, and
+  major refactors become impossible without a rewrite.
 fix: >-
-  Tracer des frontières explicites : le domaine ne dépend pas de
-  l'infrastructure (ports/adapters légers), l'import direction est contraint
-  (`internal/`), les dépendances entre packages sont acycliques et vérifiées
-  (voir rules/core). Introduire une règle de dépendance simple et la faire
-  respecter par la structure, pas par la discipline.
+  Draw explicit boundaries: the domain does not depend on the infrastructure
+  (lightweight ports/adapters), the import direction is constrained
+  (`internal/`), package dependencies are acyclic and verified (see
+  rules/core). Introduce a simple dependency rule and enforce it through the
+  structure, not through discipline.
 when_ok: >-
-  Un prototype ou un script unique peut être « dégueulasse » à dessein ; la
-  BBoM devient intolérable quand deux développeurs ou plus maintiennent le
-  système simultanément.
+  A prototype or a single script may be deliberately "messy"; the BBoM becomes
+  intolerable when two or more developers maintain the system simultaneously.
 relationships:
   references:
     - https://www.plopcon.org/pastplops/plop97/Proceedings/foote.pdf

@@ -6,7 +6,7 @@ tags: [api, openapi, openapi3, validation, spec, rest]
 last-verified: 2026-08-05
 ---
 
-# kin-openapi — contrat OpenAPI et validation
+# kin-openapi — OpenAPI contract and validation
 
 ## Selection
 
@@ -53,37 +53,32 @@ path.
 | `swaggo/swag` | Code-annotation-to-spec generation; different direction from contract loading/validation. |
 | Manual JSON/schema checks | Prefer only for a deliberately non-OpenAPI contract; otherwise loses executable OpenAPI semantics. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - An OpenAPI 3 contract is the source of truth for spec and HTTP validation.
 - A Go HTTP service needs request/response validation middleware.
 - The application needs to load, validate, or convert an OpenAPI document before
   generating or serving an API.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The actual requirement is client/server code generation.
 - A generic JSON Schema validator is sufficient and OpenAPI adds no value.
 - Authentication policy can be left implicit or fail-open.
 - The project needs broad source-location preservation and libopenapi's diff/
   overlay model instead.
 
-## Avantages
-
+## Advantages
 - OpenAPI 3.0/3.1 loading and validation with a standard Go API.
 - `openapi3filter` integrates with `net/http` and chi request boundaries.
 - Maintained active release stream and a mature Go contract ecosystem.
 
-## Inconvénients
-
+## Disadvantages
 - Rich filter configuration creates security and resource-policy decisions.
 - It is not a generator and does not manage authentication or authorization.
 - The v0.x API evolves quickly; exact version pinning and upgrade tests matter.
 - Parsing is not a substitute for preserving source locations or a full diff
   model when those are required.
 
-## Pièges connus
-
+## Known pitfalls
 - Configure `AuthenticationFunc` explicitly; never assume `ValidationHandler`
   authenticates by default.
 - Pin v0.146.0 or a later patched release; current advisories include fail-open
@@ -94,8 +89,7 @@ path.
 - Treat validation errors as an HTTP boundary concern and avoid leaking spec or
   internal parser details to clients.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official kin-openapi repository](https://github.com/getkin/kin-openapi) —
   maintenance, API, license, checked 2026-08-05.
 - [v0.146.0 release](https://github.com/getkin/kin-openapi/releases/tag/v0.146.0)

@@ -1,5 +1,5 @@
 id: pattern:antipattern:test-sleep-based
-title: Tests basés sur le temps réel (sleep)
+title: Tests based on real time (sleep)
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `time.Sleep(100 * time.Millisecond)` avant une assertion (attente d'une
-  goroutine, d'un événement, d'un timeout) et conditions de course tolérées
-  « ça marche généralement ».
+  `time.Sleep(100 * time.Millisecond)` before an assertion (waiting for a
+  goroutine, an event, a timeout) and race conditions tolerated as "it
+  usually works".
 detect: >-
-  - `time.Sleep` dans les tests (grep).
-  - Tests intermittents en CI chargée (flaky par timing).
-  - Assertions sans synchronisation explicite (attendre un canal, un signal).
+  - `time.Sleep` in tests (grep).
+  - Intermittent tests on a loaded CI (flaky by timing).
+  - Assertions without explicit synchronization (waiting on a channel, a
+    signal).
 problem: >-
-  Un sleep est un délai arbitraire : trop court → flaky, trop long → suite
-  lente ; il n'apporte aucune garantie de synchronisation. Les tests de
-  concurrence basés sur le temps masquent les races au lieu de les révéler —
-  `go test -race` ne suffit pas si l'assertion n'attend rien.
+  A sleep is an arbitrary delay: too short → flaky, too long → slow suite; it
+  provides no synchronization guarantee. Time-based concurrency tests mask
+  races instead of revealing them — `go test -race` is not enough if the
+  assertion waits for nothing.
 fix: >-
-  Synchroniser par événement : attendre la réception sur un canal, un
-  `sync.WaitGroup`, un poll borné avec deadline (retry avec timeout court et
-  intervalle), ou tester le seam temporel (injecter l'horloge). Pour le code
-  temporel, utiliser un fake clock (passer `time.Now`/timer en dépendance) ou
-  `testing/synctest` (Go 1.25+) pour les goroutines liées au temps.
+  Synchronize by event: wait for reception on a channel, a `sync.WaitGroup`,
+  a bounded poll with deadline (retry with short timeout and interval), or
+  test the time seam (inject the clock). For time-based code, use a fake
+  clock (pass `time.Now`/timer as a dependency) or `testing/synctest`
+  (Go 1.25+) for time-bound goroutines.
 when_ok: >-
-  Un sleep borné en attendant un système externe (base, réseau) peut rester
-  dans un test d'intégration — toujours avec une deadline globale et jamais
-  dans un test unitaire.
+  A bounded sleep while waiting for an external system (database, network)
+  may stay in an integration test — always with a global deadline and never
+  in a unit test.
 relationships:
   references:
     - http://xunitpatterns.com/Slow%20Tests.html

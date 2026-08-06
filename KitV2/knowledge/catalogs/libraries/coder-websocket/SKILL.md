@@ -6,7 +6,7 @@ tags: [websocket, real-time, streaming, networking, mcp, transport]
 last-verified: 2026-08-05
 ---
 
-# coder/websocket — transport WebSocket
+# coder/websocket — WebSocket transport
 
 ## Selection
 
@@ -59,31 +59,27 @@ the contract; origins are rejected by default.
 | HTTP streaming/SSE | Prefer when the protocol is one-way and WebSocket bidirectionality is unnecessary. |
 | Raw TCP framing | Rejected unless the project explicitly owns WebSocket semantics, close codes, and ping/pong. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go service needs bidirectional real-time events, tool feedback, or token
   streaming over WebSocket.
 - Context cancellation, standard HTTP integration, and a small pure-Go transport
   matter.
 - The application is prepared to define authentication and event semantics.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - One-way HTTP streaming or SSE is sufficient.
 - The project needs MCP or another complete application protocol: use its SDK
   and select a transport deliberately.
 - The project expects built-in state synchronization, authorization, or durable
   message delivery.
 
-## Avantages
-
+## Advantages
 - Pure Go, context-aware, standard HTTP server/client boundary.
 - Client and server APIs share the same connection model and close codes.
 - `wsjson` and `wspb` helpers cover common typed message encodings.
 - Origin checks are restrictive by default on server acceptance.
 
-## Inconvénients
-
+## Disadvantages
 - The library is transport only; event schema, auth, heartbeats, and recovery
   remain application responsibilities.
 - Only one reader and one writer may operate on a connection at a time; design
@@ -92,8 +88,7 @@ the contract; origins are rejected by default.
   level graceful partial shutdown.
 - The v2 boundary is still a future compatibility concern; pin v1.8.15.
 
-## Pièges connus
-
+## Known pitfalls
 - Check `Accept` before using the connection, and treat `Close` as an operation
   whose error may matter at the boundary.
 - Set a read limit and validate Origin/subprotocols for the trust boundary.
@@ -101,8 +96,7 @@ the contract; origins are rejected by default.
 - Define application-level events and authorization; WebSocket framing is not
   state synchronization or authentication.
 
-## Sources vérifiées
-
+## Verified sources
 - [coder/websocket repository](https://github.com/coder/websocket) — API,
   maintenance, license, checked 2026-08-05.
 - [v1.8.15 release](https://github.com/coder/websocket/releases/tag/v1.8.15)

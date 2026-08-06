@@ -59,66 +59,65 @@ results, err := index.Search(searchReq)
 + For code search specifically, consider pairing bleve (full-text) with
   tree-sitter (structure) once tree-sitter reaches ≥1.0 (see pointer).
 
-## Utiliser cette librairie quand
+## When to use this library
 
-+ Un service Go a besoin de recherche plein-texte locale (documents, code,
-  logs) sans moteur externe ni serveur à déployer.
-+ L'index doit être embarqué dans le processus, avec zéro-CGO et
-  cross-compilation simple.
-+ Le ranking BM25, le faceting, le highlight ou les requêtes géo sont
-  nécessaires, avec une API Go idiomatique.
-+ Le volume d'écriture est maîtrisable par lots (batching).
++ A Go service needs local full-text search over documents, code, or logs
+  without an external engine or a server to deploy.
++ The index must live in-process, with zero-CGO and simple cross-compilation.
++ BM25 ranking, faceting, highlighting, or geo queries are needed, with an
+  idiomatic Go API.
++ The write volume can be handled in batches.
 
-## Ne pas utiliser cette librairie quand
+## When NOT to use this library
 
-+ Les données vivent déjà dans SQLite : FTS5 couvre le besoin sans index
-  séparé à synchroniser.
-+ Le besoin est la similarité vectorielle, pas le plein-texte (sqlite-vec est
-  complémentaire, pas un remplaçant).
-+ Une recherche distribuée multi-nœuds est exigée (Elasticsearch apporte
-  l'infra serveur, pas bleve).
-+ L'ingestion est un flux continu de documents isolés sans batching possible :
-  Scorch accumule les segments et amplifie les écritures (voir Pièges).
++ The data already lives in SQLite: FTS5 covers the need without a separate
+  index to keep in sync.
++ The need is vector similarity, not full-text (sqlite-vec is complementary,
+  not a replacement).
++ Distributed multi-node search is required (Elasticsearch brings the server
+  infrastructure, bleve does not).
++ Ingestion is a continuous stream of isolated documents with no batching
+  possible: Scorch accumulates segments and amplifies writes (see Known
+  pitfalls).
 
-## Avantages
+## Advantages
 
-+ Pur-Go, zéro-CGO, embarquable : `bleve.Open` / `index.Search` sans serveur.
-+ Vrai index inversé (format Scorch) avec ranking BM25, faceting, highlight,
-  géo.
-+ Maintenance active (v2.6.0, 2026-08, ~11.2k★, 11 contributeurs) et usage
-  réel (écosystème Couchbase).
-+ API v2 stable : le churn API historique (RFC v1.0.0 #1350, v2.0.0 #1495)
-  est résolu — pinner `v2`.
++ Pure-Go, zero-CGO, embeddable: `bleve.Open` / `index.Search` with no server.
++ Real inverted index (Scorch format) with BM25 ranking, faceting,
+  highlighting, and geo.
++ Active maintenance (v2.6.0, 2026-08, ~11.2k★, 11 contributors) and real
+  usage (Couchbase ecosystem).
++ Stable v2 API: the historical API churn (RFC v1.0.0 #1350, v2.0.0 #1495) is
+  resolved — pin `v2`.
 
-## Inconvénients
+## Disadvantages
 
-+ Index séparé de la source : double écriture à maintenir en synchronisation.
-+ Scorch (segments append-only + merges) : amplification d'écriture et
-  accumulation de segments en mémoire sur ingestion continue non batchée
-  (issue #1783, docs/persister.md).
-+ Pas de recherche vectorielle native — pairing nécessaire (sqlite-vec,
-  tree-sitter) pour les besoins structurels/vectoriels.
-+ 858 issues ouvertes, majoritairement des demandes de fonctionnalités.
++ Index separate from the source: a second write path to keep in sync.
++ Scorch (append-only segments + merges): write amplification and in-memory
+  segment accumulation on unbatched continuous ingestion (issue #1783,
+  docs/persister.md).
++ No native vector search — pairing is needed (sqlite-vec, tree-sitter) for
+  structural/vector needs.
++ 858 open issues, mostly feature requests.
 
-## Pièges connus
+## Known pitfalls
 
-+ Écrire document par document dégrade fortement les écritures : batcher
-  (1–200 docs par lot, guidance issue #1783) ou régler `scorchMergePlanOptions`
-  si le batching est impossible.
-+ Sur flux continu, surveiller l'accumulation de segments en mémoire et la
-  fréquence des merges (docs/persister.md) — dimensionner l'index avant mise
-  en prod, pas après.
-+ Pinner `v2` explicitement : l'API a connu du churn majeur avant la
-  stabilisation.
++ Writing document by document degrades writes heavily: batch (1–200 docs per
+  batch, guidance issue #1783) or tune `scorchMergePlanOptions` when batching
+  is impossible.
++ On continuous streams, watch in-memory segment accumulation and merge
+  frequency (docs/persister.md) — size the index before production, not
+  after.
++ Pin `v2` explicitly: the API saw major churn before stabilization.
 
-## Sources vérifiées
+## Verified sources
 
 + [blevesearch/bleve (README, v2.6.0)](https://github.com/blevesearch/bleve)
-  — vérifié 2026-08-04 (repo officiel)
+  — verified 2026-08-04 (official repository)
 + [index/scorch/README.md — segmented index](https://github.com/blevesearch/bleve/blob/master/index/scorch/README.md)
-  — vérifié 2026-08-04 (docs officielles)
+  — verified 2026-08-04 (official docs)
 + [docs/persister.md — memory management](https://github.com/blevesearch/bleve/blob/master/docs/persister.md)
-  — vérifié 2026-08-04 (docs officielles)
+  — verified 2026-08-04 (official docs)
 + [Issue #1783 — batching guidance](https://github.com/blevesearch/bleve/issues/1783)
-  — vérifié 2026-08-04 (issue officielle)
-+ Artefact interne : `source:search:index-merge` (performance/Scorch)
+  — verified 2026-08-04 (official issue)
++ Internal artifact: `source:search:index-merge` (performance/Scorch)

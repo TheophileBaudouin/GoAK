@@ -1,0 +1,23 @@
+---
+id: source:go:encoding-json
+title: Go encoding/json — struct-tagged JSON marshaling
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, json, encoding, serialization]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/encoding/json
+selection: >-
+  Load when mapping Go values to and from JSON: struct tags, marshaling and
+  unmarshaling, streaming with Encoder/Decoder, number and time handling,
+  and the Marshaler/Unmarshaler interfaces.
+limits: >-
+  Pointer-only routing; it does not decide the JSON schema contract or the
+  wire format. omitempty can hide significant zero values — see
+  pattern:antipattern:go-json-omitempty-zero.
+relationships:
+  references:
+    - https://pkg.go.dev/encoding/json

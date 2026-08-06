@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:sec-missing-csrf
-title: Sessions cookies sans protection CSRF
+title: Cookie sessions without CSRF protection
 kind: Pattern
 version: 1
 status: active
@@ -10,31 +10,30 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-05
 symptom: >-
-  Une app web avec authentification par cookie (scs, gorilla/sessions) expose
-  des endpoints state-changing (POST /delete, /transfer, /settings) sans
-  jeton CSRF ni vérification d'origine ; le cookie de session n'a pas
-  SameSite configuré.
+  A web app with cookie-based authentication (scs, gorilla/sessions) exposes
+  state-changing endpoints (POST /delete, /transfer, /settings) without a
+  CSRF token or origin check; the session cookie has no SameSite configured.
 detect: >-
-  - Formulaires POST sans jeton CSRF (double-submit ou synchronizer token).
-  - Aucune validation de l'en-tête Origin/Referer sur les mutations.
-  - Cookie de session sans `SameSite` (ou SameSite=None sans besoin).
-  - Tests manquants : une requête cross-origin forgée réussit.
+  - POST forms without a CSRF token (double-submit or synchronizer token).
+  - No Origin/Referer header validation on mutations.
+  - Session cookie without `SameSite` (or SameSite=None without need).
+  - Missing tests: a forged cross-origin request succeeds.
 problem: >-
-  Un site tiers peut déclencher des requêtes cross-site qui portent le cookie
-  de session (le navigateur l'envoie automatiquement) : suppression, transfert,
-  changement de mot de passe à l'insu de l'utilisateur (attaque CSRF,
-  cheat sheet OWASP dédiée). SameSite=Strict atténue mais ne
-  couvre pas tous les contextes (subdomains, SameSite=Lax sur GET).
+  A third-party site can trigger cross-site requests that carry the session
+  cookie (the browser sends it automatically): deletion, transfer, password
+  change without the user's knowledge (CSRF attack, dedicated OWASP cheat
+  sheet). SameSite=Strict mitigates but does not cover every context
+  (subdomains, SameSite=Lax on GET).
 fix: >-
-  Toujours : cookie `Secure` + `HttpOnly` + `SameSite=Strict` (ou Lax si
-  navigation externe nécessaire). Sur les endpoints state-changing : jeton
-  CSRF (synchronizer token ou double-submit) ou validation stricte
-  Origin/Referer ; valider sur le serveur, jamais seulement côté client.
-  Tester avec une requête cross-origin forgée.
+  Always: cookie `Secure` + `HttpOnly` + `SameSite=Strict` (or Lax when
+  external navigation is needed). On state-changing endpoints: a CSRF token
+  (synchronizer token or double-submit) or strict Origin/Referer validation;
+  validate on the server, never client-side only. Test with a forged
+  cross-origin request.
 when_ok: >-
-  API à token porteur (JWT en header, jamais en cookie) : pas de cookie
-  automatique → surface CSRF réduite. Formulaires GET-only sans effet de
-  bord : pas de mutation à protéger.
+  Bearer-token API (JWT in a header, never in a cookie): no automatic cookie
+  → reduced CSRF surface. GET-only forms without side effects: no mutation
+  to protect.
 relationships:
   references:
     - https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html

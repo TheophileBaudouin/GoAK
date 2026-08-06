@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:sec-ssh-host-key-reuse
-title: Clé hôte SSH partagée entre instances ou régénérée à chaque boot
+title: SSH host key shared across instances or regenerated at every boot
 kind: Pattern
 version: 1
 status: active
@@ -10,33 +10,32 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  La même clé hôte SSH est embarquée dans chaque instance, conteneur ou image
-  (ou committée dans le dépôt) ; ou elle est régénérée à chaque démarrage ;
-  wish avec `WithHostKeyPath` absent régénère une clé auto par défaut sur les
-  hôtes éphémères.
+  The same SSH host key is embedded in every instance, container, or image
+  (or committed to the repository); or it is regenerated at every startup;
+  wish without `WithHostKeyPath` regenerates a default auto key on ephemeral
+  hosts.
 detect: >-
-  - Une clé privée hôte dans le contrôle de version ou l'image Docker.
-  - Instances clonées/immutables avec une clé hôte identique (comparer les
-    empreintes dans known_hosts des clients).
-  - Clé absente du stockage persistant pour un hôte dont les clients
-    épinglent l'identité.
+  - A private host key in version control or the Docker image.
+  - Cloned/immutable instances with an identical host key (compare
+    fingerprints in clients' known_hosts).
+  - Key absent from persistent storage for a host whose clients pin the
+    identity.
 problem: >-
-  Une clé privée partagée est « d'autant moins privée qu'elle est
-  partagée » : compromettre une instance permet d'usurper toutes les autres
-  (MITM indétectable pour les clients qui ont épinglé cette clé). Une clé
-  régénérée à chaque boot casse le pinning (TOFU) et ouvre la porte à un
-  premier-contact frauduleux ; un sshd refuse d'ailleurs les fichiers de clé
-  accessibles au groupe/monde.
+  A shared private key is "only as private as it is shared": compromising one
+  instance allows impersonating all the others (undetectable MITM for clients
+  that pinned this key). A key regenerated at every boot breaks pinning
+  (TOFU) and opens the door to a fraudulent first contact; sshd also refuses
+  key files accessible to group/world.
 fix: >-
-  Une clé hôte par hôte : générer à la première installation, persister avec
-  permissions propriétaire uniquement (0600), et injecter via gestion de
-  secrets dans les infrastructures éphémères (jamais dans l'image ou le
-  dépôt). Pour wish, fournir `WithHostKeyPath` pointant vers la clé persistée
-  plutôt que la génération auto par défaut.
+  One host key per host: generate at first install, persist with owner-only
+  permissions (0600), and inject via secret management in ephemeral
+  infrastructures (never in the image or repository). For wish, provide
+  `WithHostKeyPath` pointing to the persisted key instead of the default
+  auto-generation.
 when_ok: >-
-  Des hôtes éphémères sans clients qui épinglent l'identité peuvent
-  régénérer leur clé à chaque boot — documenter explicitement que la
-  continuité d'identité n'est pas garantie.
+  Ephemeral hosts without clients that pin the identity may regenerate their
+  key at every boot — explicitly document that identity continuity is not
+  guaranteed.
 relationships:
   references:
     - https://security.stackexchange.com/questions/41380/are-duplicate-ssh-server-host-keys-a-problem

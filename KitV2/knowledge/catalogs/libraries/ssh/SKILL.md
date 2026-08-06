@@ -6,7 +6,7 @@ tags: [ssh, server, pty, sessions, remote]
 last-verified: 2026-08-05
 ---
 
-# ssh — API serveur SSH Go
+# ssh — Go SSH server API
 
 ## Selection
 
@@ -52,37 +52,32 @@ production identity policy.
 | gliderlabs/ssh | Predecessor/superseded boundary; verify before retaining in existing code. |
 | SSH client | Use `x/crypto/ssh` client APIs; this package is server-only. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Go application needs an SSH server with sessions, PTY allocation, window
   size, signals, and an explicit handler.
 - Wish is too high-level but raw x/crypto/ssh would duplicate session plumbing.
 - Host keys, authentication, timeout, and connection lifecycle can be configured
   as explicit server policy.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - The application is an SSH client.
 - Full protocol control or custom transport semantics are required.
 - A complete SSH application framework is desired; use Wish or compose one.
 - Host key persistence, authentication, and session limits cannot be managed.
 
-## Avantages
-
+## Advantages
 - High-level session/PTY API with the standard SSH cryptographic base.
 - Current Charm import path and active patch releases.
 - Hooks for authentication, connection lifecycle, PTY, proxy protocol, and
   panic recovery per connection.
 
-## Inconvénients
-
+## Disadvantages
 - Server-only; auth policy, host keys, limits, and application authorization
   remain the consumer's responsibility.
 - Depends on x/crypto/ssh and its security lifecycle.
 - PTY/signal behavior varies by platform and terminal client.
 
-## Pièges connus
-
+## Known pitfalls
 - Use `charm.land/ssh`; the old GitHub import is a migration boundary.
 - Configure public-key authentication with an allowlist; do not enable password
   auth without rate limiting, lockout, and audit policy.
@@ -92,8 +87,7 @@ production identity policy.
 - Keep writes and `Exit` errors at the session boundary; never hide auth or
   protocol failures in application code.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Charm SSH repository](https://github.com/charmbracelet/ssh) — API,
   maintenance, license, checked 2026-08-05.
 - [SSH v0.4.2 release](https://github.com/charmbracelet/ssh/releases/tag/v0.4.2)

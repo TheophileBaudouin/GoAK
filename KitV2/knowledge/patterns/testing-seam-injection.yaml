@@ -1,5 +1,5 @@
 id: pattern:testing:seam-injection
-title: Seams testables — purifier la logique des effets
+title: Testable seams — separate logic from effects
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,30 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  La logique mêlée aux effets (terminal, horloge, framework) est impossible à
-  tester sans harnais lourds, et les tests deviennent fragiles (voir
-  pattern:antipattern:test-sleep-based et
+  Logic mixed with effects (terminal, clock, framework) is impossible to
+  test without heavy harnesses, and the tests become fragile (see
+  pattern:antipattern:test-sleep-based and
   pattern:antipattern:test-implementation-details).
 context: >-
-  S'applique à toute logique à décision (état, transformation, choix) adossée
-  à un effet externe : TUI, CLI, handler, job.
+  Applies to any decision logic (state, transformation, choice) backed by
+  an external effect: TUI, CLI, handler, job.
 solution: >-
-  Séparer la logique pure (fonction de données en entrée → décision en
-  sortie) des effets : `handleKey(string)`, `render()`, `execute(command)`
-  purs, testés directement ; l'effet (tea.Program, os.Args, time.Now) reste
-  un fil fin autour du seam. Injecter l'horloge et les dépendances comme
-  paramètres (voir pattern:go:constructor-injection).
+  Separate the pure logic (data in → decision out) from the effects:
+  `handleKey(string)`, `render()`, `execute(command)` pure, tested
+  directly; the effect (tea.Program, os.Args, time.Now) stays a thin
+  thread around the seam. Inject the clock and dependencies as parameters
+  (see pattern:go:constructor-injection).
 benefits: >-
-  Tests déterministes sans sleep ni terminal, refactors internes sans casser
-  les tests (le contrat est le seam), et couverture des chemins d'erreur
-  simples (voir recipe-cli-interactive pour l'exemple canonique).
+  Deterministic tests without sleep or terminal, internal refactors
+  without breaking the tests (the contract is the seam), and simple
+  error-path coverage (see recipe-cli-interactive for the canonical
+  example).
 costs: >-
-  Exige de concevoir les seams dès l'écriture ; un seam trop fin (tout pur)
-  déplace la complexité dans le fil d'effets — garder le fil minimal et non
-  testé.
+  Requires designing the seams from the start; an overly thin seam
+  (everything pure) moves the complexity into the effect thread — keep the
+  thread minimal and untested.
 related: >-
-  Recette : recipe-cli-interactive (seam handleKey). Homologue négatif :
+  Recipe: recipe-cli-interactive (seam handleKey). Negative counterpart:
   pattern:antipattern:test-sleep-based,
   pattern:antipattern:test-implementation-details.
 relationships:

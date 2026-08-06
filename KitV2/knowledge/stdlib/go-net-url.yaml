@@ -1,0 +1,23 @@
+---
+id: source:go:net-url
+title: Go net/url — URL parsing, escaping, and query handling
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, url, http, parsing, security]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/net/url
+selection: >-
+  Load when parsing, building, or comparing URLs, handling query parameters,
+  escaping path segments, or resolving relative references — never parse or
+  build URLs with string concatenation.
+limits: >-
+  url.Parse accepts inputs that are not strictly valid (hosts, schemes);
+  always validate the scheme/host you expect, and escape user input before
+  embedding it in a URL. Pointer-only routing to the official docs.
+relationships:
+  references:
+    - https://pkg.go.dev/net/url

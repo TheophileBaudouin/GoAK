@@ -1,5 +1,5 @@
 id: pattern:antipattern:rest-ignoring-http-semantics
-title: API qui ignore les sémantiques HTTP (statuts, cache, types)
+title: API that ignores HTTP semantics (statuses, cache, types)
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Toutes les réponses renvoient 200 (ou 500 pour tout échec), pas
-  d'en-têtes de cache ni ETag, Content-Type incohérent avec le corps,
-  authentification ajoutée après coup sous forme de paramètre.
+  All responses return 200 (or 500 for any failure), no cache headers or
+  ETag, Content-Type inconsistent with the body, authentication added
+  afterwards as a parameter.
 detect: >-
-  - `http.Error` générique systématique (200/500) sans mapping d'erreur.
-  - Aucun `Cache-Control`/`ETag`/`Vary` sur les ressources publiques.
-  - Négociation de type ignorée (`Accept`), corps JSON renvoyé en text/plain.
+  - Systematic generic `http.Error` (200/500) without error mapping.
+  - No `Cache-Control`/`ETag`/`Vary` on public resources.
+  - Type negotiation ignored (`Accept`), JSON body returned as text/plain.
 problem: >-
-  Les statuts et en-têtes sont le contrat du protocole : les ignorer casse les
-  clients standards (caches, proxies, libs), masque les erreurs réelles
-  (impossible de distinguer 4xx de 5xx), et force chaque client à inventer sa
-  propre détection d'erreur.
+  Statuses and headers are the protocol contract: ignoring them breaks
+  standard clients (caches, proxies, libs), hides real errors (4xx cannot be
+  distinguished from 5xx), and forces every client to invent its own error
+  detection.
 fix: >-
-  Mapper les erreurs aux statuts (400 validation, 401/403 auth, 404, 409
-  conflit, 429 rate limit, 5xx serveur), renvoyer `Cache-Control`/`ETag`/
-  `If-None-Match` pour le cache, fixer `Content-Type: application/json` et
-  honorer `Accept`. Exposer une réponse d'erreur structurée
+  Map errors to statuses (400 validation, 401/403 auth, 404, 409 conflict,
+  429 rate limit, 5xx server), return `Cache-Control`/`ETag`/`If-None-Match`
+  for caching, set `Content-Type: application/json` and honor `Accept`.
+  Expose a structured error response
   (`{"error": {"code": …, "message": …}}`).
 when_ok: >-
-  Les microservices internes peuvent alléger la négociation de contenu ; les
-  statuts et le cache restent obligatoires dès qu'un client externe existe.
+  Internal microservices may lighten content negotiation; statuses and
+  caching remain mandatory as soon as an external client exists.
 relationships:
   references:
     - https://www.infoq.com/articles/rest-anti-patterns

@@ -1,5 +1,5 @@
 id: pattern:antipattern:sec-fail-open
-title: Échec ouvert — sécurité désactivée par défaut ou sur erreur
+title: Fail open — security disabled by default or on error
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Les contrôles de sécurité sont conditionnels à un flag activable, les
-  erreurs d'autorisation échouent en « accès autorisé », l'authentification
-  est contournée quand le fournisseur d'identité est indisponible.
+  Security controls are conditional on an enable flag, authorization errors
+  fail as 'access allowed', authentication is bypassed when the identity
+  provider is unavailable.
 detect: >-
-  - `if authEnabled { … }` autour des contrôles, défaut = désactivé.
-  - Sur erreur de vérification, le chemin par défaut continue (le deny n'est
-    pas explicite).
-  - OWASP A10 2025 « Mishandling of Exceptional Conditions » : les chemins
-    d'erreur doivent échouer fermé.
+  - `if authEnabled { … }` around the controls, default = disabled.
+  - On verification error, the default path continues (deny is not explicit).
+  - OWASP A10 2025 'Mishandling of Exceptional Conditions': error paths must
+    fail closed.
 problem: >-
-  Un échec ouvert transforme une panne en brèche : la moindre erreur (timeout
-  du IdP, bug du middleware, config oubliée) laisse passer des accès non
-  authentifiés. Les défauts permissifs sont la classe d'erreur la plus
-  dangereuse car silencieuse jusqu'à l'incident.
+  A fail-open turns an outage into a breach: the smallest error (IdP
+  timeout, middleware bug, forgotten config) lets unauthenticated access
+  through. Permissive defaults are the most dangerous error class because
+  they stay silent until the incident.
 fix: >-
-  Défaut fermé : refuser par défaut, autoriser explicitement ; toute erreur
-  de vérification → rejeter (401/403) et logger. Ne jamais conditionner un
-  contrôle à un flag désactivé par défaut. Tester explicitement les chemins
-  d'erreur du contrôle (IdP down, token invalide, timeout).
+  Fail closed: deny by default, allow explicitly; any verification error →
+  reject (401/403) and log. Never gate a control on a flag that defaults to
+  disabled. Explicitly test the control's error paths (IdP down, invalid
+  token, timeout).
 when_ok: >-
-  Un mode « dégradé » ouvert se justifie seulement avec une décision produit
-  explicite et un risque accepté documenté (ex. lecture publique) — jamais
-  par accident.
+  An open 'degraded' mode is justified only with an explicit product decision
+  and a documented accepted risk (e.g. public read) — never by accident.
 relationships:
   references:
     - https://owasp.org/Top10/2025/A10_2025-Mishandling_of_Exceptional_Conditions/

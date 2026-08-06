@@ -1,0 +1,23 @@
+---
+id: source:go:time
+title: Go time — monotonic clocks, durations, and formatting
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, time, durations, clocks]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/time
+selection: >-
+  Load when representing instants and durations, measuring elapsed time with
+  the monotonic clock (time.Since/time.Until), scheduling with Ticker and
+  After, or formatting/parsing with the reference layout.
+limits: >-
+  time.Time comparisons and serialization ignore the monotonic part; wall
+  clocks drift and jump — do not use them for elapsed-time decisions.
+  Pointer-only routing to the official docs.
+relationships:
+  references:
+    - https://pkg.go.dev/time

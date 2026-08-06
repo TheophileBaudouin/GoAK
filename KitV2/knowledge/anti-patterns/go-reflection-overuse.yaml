@@ -1,0 +1,41 @@
+---
+id: pattern:antipattern:go-reflection-overuse
+title: Reflection overuse — dynamic dispatch where concrete code suffices
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, reflection, generics, performance, anti-pattern]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+symptom: >-
+  reflect.TypeOf/ValueOf scattered through business code: hand-written
+  generic marshaling, copying structs by reflection, dynamic method
+  calls where the type set is actually known.
+detect: >-
+  - grep for `reflect\.` outside a small boundary (encoding, testing,
+    tooling).
+  - Check whether a generic helper (pattern:go:generics-when-worth) or
+    concrete code could replace the call.
+  - Benchmarks or profiles showing allocations in the reflect path.
+problem: >-
+  Reflection moves type errors from compile time to runtime, is slow
+  (allocations, dynamic dispatch), and defeats readability and compiler
+  optimization. The official guide concludes: "It's a powerful tool that
+  should be used with care and avoided unless strictly necessary."
+fix: >-
+  Prefer generics, concrete types, or a minimal interface for the specific
+  need; confine reflect to boundary code where the type set is genuinely
+  open (JSON encoding, deep equality in tests, plugins). When reflection is
+  required, hide it behind a small, tested API with a documented contract.
+when_ok: >-
+  Reflection is justified at boundaries with an open type set — encoding,
+  debuggers, test utilities — where concrete or generic code cannot express
+  the operation. "Avoided unless strictly necessary" does not mean "never".
+relationships:
+  references:
+    - https://go.dev/blog/laws-of-reflection
+    - pattern:go:generics-when-worth
+  uses: []
+  validated_by: []

@@ -1,0 +1,41 @@
+---
+id: pattern:antipattern:concurrency-close-from-receiver
+title: Receiver closes the channel — double-close and send-on-closed panics
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, concurrency, channels, panics, anti-pattern]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+symptom: >-
+  A goroutine that only ranges over a channel also closes it; two senders
+  each close on their exit path; close(ch) appears in more than one
+  goroutine. Result: "close of closed channel" or "send on closed channel"
+  panics, typically under load or during shutdown.
+detect: >-
+  - Review: find every close(ch) and every sender; if the receiver closes,
+    or more than one goroutine closes, ownership is violated.
+  - A panic that only appears under load or after shutdown is the
+    signature of a close race.
+problem: >-
+  Channel close races are logic errors, not subtle race conditions: they
+  exist because nobody agreed who owns the channel. The runtime panics on
+  double close and on send after close, crashing the whole program.
+fix: >-
+  Apply the ownership rule (pattern:concurrency:channel-ownership): one
+  goroutine sends and closes; receivers range until closed and never
+  close. For broadcast-style stop signals, close a dedicated done channel
+  from a single owner, or cancel a context instead of closing the data
+  channel.
+when_ok: >-
+  A receiver may close a channel only when it is also its sole sender —
+  that is, when it is the owner. The rule is about ownership, not about
+  goroutine position.
+relationships:
+  references:
+    - https://go.dev/blog/pipelines
+    - pattern:concurrency:channel-ownership
+  uses: []
+  validated_by: []

@@ -1,5 +1,5 @@
 id: pattern:antipattern:test-brittle-tests
-title: Tests fragiles — échecs sur refactor légitime
+title: Brittle tests — failures on legitimate refactors
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,29 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Les tests échouent sans changement de comportement : ordre d'itération d'une
-  map, format d'un message, implémentation interne, timing. La suite devient
-  « flaky » et sa confiance s'érode.
+  Tests fail without a behavior change: map iteration order, message format,
+  internal implementation, timing. The suite becomes "flaky" and its trust
+  erodes.
 detect: >-
-  - Tests qui dépendent de l'ordre d'une map ou de la valeur exacte d'un
-    message non contractuel.
-  - Échecs intermittents en CI (relancer passe).
-  - Tests cassés par un refactor qui ne change pas le comportement observé
-    (fausse alerte).
+  - Tests depending on map order or on the exact value of a non-contractual
+    message.
+  - Intermittent CI failures (rerunning passes).
+  - Tests broken by a refactor that does not change the observed behavior
+    (false alarm).
 problem: >-
-  Un test fragile coûte plus qu'il ne rapporte : il bloque des changements
-  légitimes, enseigne à ignorer la suite (et donc les vraies régressions) et
-  consomme du temps d'équipe. La littérature des test smells (xUnit Test
-  Patterns) classe la fragilité parmi les pires défauts de tests.
+  A brittle test costs more than it brings: it blocks legitimate changes,
+  teaches the team to ignore the suite (and therefore real regressions), and
+  consumes team time. The test smells literature (xUnit Test Patterns) ranks
+  brittleness among the worst test defects.
 fix: >-
-  Asserter le comportement observable, pas l'implémentation : trier les
-  itérations de map, comparer via des égaliteurs structurels
-  (`assert.ElementsMatch`),
-  éviter les assertions de timing (voir test-sleep-based), ne pas dépendre du
-  format des messages d'erreur. Un test doit changer seulement quand le
-  contrat change.
+  Assert observable behavior, not implementation: sort map iterations,
+  compare with structural equality matchers (`assert.ElementsMatch`), avoid
+  timing assertions (see test-sleep-based), do not depend on error message
+  format. A test should change only when the contract changes.
 when_ok: >-
-  Une assertion stricte se justifie quand le format est le contrat (API
-  publique, snapshot) ; le reste du temps, l'assertion doit tolérer les
-  détails d'implémentation.
+  A strict assertion is justified when the format is the contract (public
+  API, snapshot); the rest of the time, the assertion should tolerate
+  implementation details.
 relationships:
   references:
     - http://xunitpatterns.com/TestSmells.html

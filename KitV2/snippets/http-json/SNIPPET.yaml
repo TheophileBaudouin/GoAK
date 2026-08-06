@@ -7,6 +7,7 @@ dependencies: [stdlib]
 when_to_use: When a net/http handler returns a JSON body.
 avoid_when: When the endpoint streams a different media type.
 source: ../../recipes/recipe-rest-chi/SKILL.md
+last_verified: 2026-08-05
 complexity: low
 files: [example.go]
 tests: [check.sh]

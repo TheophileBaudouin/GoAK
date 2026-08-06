@@ -1,5 +1,5 @@
 id: pattern:architecture:ports-adapters
-title: Ports & adaptateurs — domaine découplé de l'infrastructure
+title: Ports & adapters — domain decoupled from infrastructure
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  La logique métier mêlée à l'infrastructure (HTTP, SQL, files) rend le
-  domaine impossible à tester isolément et couplé à chaque technologie (voir
+  Business logic mixed with infrastructure (HTTP, SQL, files) makes the domain
+  impossible to test in isolation and coupled to every technology (see
   pattern:antipattern:arch-big-ball-of-mud).
 context: >-
-  S'applique aux services qui interagissent avec plusieurs systèmes externes
-  ou exposent plusieurs entrées (HTTP, gRPC, CLI, worker) ; surdimensionné
-  pour du CRUD simple.
+  Applies to services that interact with several external systems or expose
+  several entry points (HTTP, gRPC, CLI, worker); overkill for simple CRUD.
 solution: >-
-  Le domaine ne dépend que de **ports** (interfaces consommateur) ; les
-  **adaptateurs** (handlers HTTP, repository SQL, producteur Kafka)
-  implémentent ces interfaces. En Go : interfaces petites définies côté
-  consommateur (voir pattern:go:concrete-returns), câblage explicite dans le
-  constructeur (pattern:go:constructor-injection), `context.Context` aux
-  frontières I/O.
+  The domain depends only on **ports** (consumer interfaces); the **adapters**
+  (HTTP handlers, SQL repository, Kafka producer) implement those interfaces.
+  In Go: small interfaces defined on the consumer side (see
+  pattern:go:concrete-returns), explicit wiring in the constructor
+  (pattern:go:constructor-injection), `context.Context` at I/O boundaries.
 benefits: >-
-  Domaine testable sans infrastructure (fakes sur les ports, voir
-  pattern:testing:fakes-over-mocks), remplacement de technologie localisé,
-  et extraction vers un service (voir pattern:architecture:modular-monolith).
+  Domain testable without infrastructure (fakes on the ports, see
+  pattern:testing:fakes-over-mocks), localized technology replacement, and
+  extraction into a service (see pattern:architecture:modular-monolith).
 costs: >-
-  Indirection et nombre de fichiers ; chaque port doit refléter un vrai
-  besoin du domaine — des ports calqués sur les libs réintroduisent le
-  couplage (voir pattern:antipattern:go-interface-everywhere).
+  Indirection and file count; each port must reflect a real domain need —
+  ports modeled on the libraries reintroduce coupling (see
+  pattern:antipattern:go-interface-everywhere).
 related: >-
-  Homologue négatif : pattern:antipattern:arch-big-ball-of-mud.
+  Negative counterpart: pattern:antipattern:arch-big-ball-of-mud.
 relationships:
   references:
     - https://softwarepatternslexicon.com/go/architectural-patterns-in-go/hexagonal-architecture-ports-and-adapters/

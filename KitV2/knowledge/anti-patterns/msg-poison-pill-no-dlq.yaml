@@ -1,5 +1,5 @@
 id: pattern:antipattern:msg-poison-pill-no-dlq
-title: Poison pill sans file de messages morts (DLQ)
+title: Poison pill without a dead-letter queue (DLQ)
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Un message qui échoue toujours à être consommé (désérialisation, validation,
-  logique) est retenté indéfiniment ou bloque la partition : le consommateur
-  boucle en erreur et le lag s'accumule.
+  A message that always fails to be consumed (deserialization, validation,
+  logic) is retried indefinitely or blocks the partition: the consumer
+  loops on error and lag accumulates.
 detect: >-
-  - Consommateur en retry infini sur une partition (lag constant + erreurs
-    répétées).
-  - Aucune destination pour les messages non processables (pas de DLQ/topic
-    d'échec).
-  - Erreurs de désérialisation traitées comme des erreurs transitoires.
+  - Consumer in infinite retry on a partition (constant lag + repeated errors).
+  - No destination for unprocessable messages (no DLQ/failure topic).
+  - Deserialization errors treated as transient errors.
 problem: >-
-  Une poison pill arrête la progression de toute la partition : les messages
-  suivants (valides) ne sont jamais traités, les retries sans fin gaspillent
-  la CPU et l'ordre de traitement est perdu. Le retry automatique ne résout
-  pas un message structurellement invalide.
+  A poison pill halts the progress of the whole partition: the following
+  (valid) messages are never processed, endless retries waste CPU, and
+  processing order is lost. Automatic retry does not fix a structurally
+  invalid message.
 fix: >-
-  Séparer les erreurs : transitoires → retry borné avec backoff ; définitives
-  (validation, désérialisation) → routage immédiat vers une DLQ (dead letter
-  topic) avec les métadonnées de cause. Consommer la DLQ régulièrement
-  (réparation, rejeu, alerte). Définir clairement la frontière retry/DLQ.
+  Separate the errors: transient → bounded retry with backoff; permanent
+  (validation, deserialization) → immediate routing to a DLQ (dead letter
+  topic) with cause metadata. Consume the DLQ regularly (repair, replay,
+  alert). Define the retry/DLQ boundary clearly.
 when_ok: >-
-  Un système sans DLQ peut exister si chaque message est garanti processable
-  (contrat strict en amont) ; l'absence de DLQ doit être une décision, pas un
-  oubli.
+  A system without a DLQ can exist if every message is guaranteed processable
+  (strict upstream contract); the absence of a DLQ must be a decision, not an
+  oversight.
 relationships:
   references:
     - https://www.confluent.io/blog/spring-kafka-can-your-kafka-consumers-handle-a-poison-pill/

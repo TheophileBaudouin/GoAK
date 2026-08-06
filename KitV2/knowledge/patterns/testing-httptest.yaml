@@ -1,5 +1,5 @@
 id: pattern:testing:httptest
-title: httptest — tester handlers et clients HTTP sans port
+title: httptest — test HTTP handlers and clients without a port
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Tester du code HTTP en ouvrant un vrai port est lent, fragile en CI et ne
-  teste pas le handler comme le ferait un client réel.
+  Testing HTTP code by opening a real port is slow, fragile in CI, and does
+  not test the handler as a real client would.
 context: >-
-  S'applique aux handlers (réponses/statuts) et aux clients HTTP (requêtes
-  émises, réponses interprétées) de toute application.
+  Applies to the handlers (responses/statuses) and HTTP clients (emitted
+  requests, interpreted responses) of any application.
 solution: >-
-  Deux outils de la stdlib : `httptest.NewRequest` + `httptest.ResponseRecorder`
-  pour exécuter un handler sans réseau ; `httptest.NewServer(handler)` pour
-  fournir une URL réelle à un client — il implémente le vrai cycle
-  requête/réponse, y compris les erreurs de transport. Tester statuts, corps,
-  en-têtes et, côté client, les cas d'erreur (500, timeout).
+  Two stdlib tools: `httptest.NewRequest` + `httptest.ResponseRecorder`
+  to run a handler without network; `httptest.NewServer(handler)` to
+  provide a real URL to a client — it implements the real
+  request/response cycle, including transport errors. Test statuses,
+  bodies, headers and, client-side, the error cases (500, timeout).
 benefits: >-
-  Tests déterministes sans port ni conflit, handlers et clients testés dans
-  leur vrai contrat, et base des fakes HTTP (voir
+  Deterministic tests without a port or conflicts, handlers and clients
+  tested against their real contract, and the basis for HTTP fakes (see
   pattern:testing:fakes-over-mocks).
 costs: >-
-  Un handler testé isolément ne couvre pas le routage complet — combiner avec
-  un test de route (chi via httptest) ; `NewServer` démarre un vrai serveur
-  (coût léger, fermer avec `defer srv.Close()`).
+  A handler tested in isolation does not cover full routing — combine with
+  a route test (chi via httptest); `NewServer` starts a real server (light
+  cost, close with `defer srv.Close()`).
 related: >-
-  Recette : recipe-rest-chi. Homologue négatif :
+  Recipe: recipe-rest-chi. Negative counterpart:
   pattern:antipattern:test-over-mocking.
 relationships:
   references:

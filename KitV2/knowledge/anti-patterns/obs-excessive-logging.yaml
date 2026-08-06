@@ -1,5 +1,5 @@
 id: pattern:antipattern:obs-excessive-logging
-title: Logging excessif — bruit sans signal
+title: Excessive logging — noise without signal
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Chaque opération loggue plusieurs lignes (début/fin/chaque étape), des logs
-  en boucle chaude (par requête, par message), des valeurs à haute
-  cardinalité (IDs non agrégés, corps entiers) et des messages cryptiques sans
-  contexte.
+  Every operation logs several lines (start/end/each step), hot-loop logs
+  (per request, per message), high-cardinality values (unaggregated IDs, full
+  bodies) and cryptic messages without context.
 detect: >-
-  - Volume de logs démesuré par rapport au trafic ; coût de stockage qui
-    domine.
-  - Logs en boucle (débit élevé) sans agrégation — voir la discussion
-    « too much logging breaks debugging ».
-  - Impossibilité de retrouver un incident : le signal est noyé.
+  - Log volume disproportionate to traffic; storage cost dominates.
+  - Loop logs (high rate) without aggregation — see the 'too much logging
+    breaks debugging' discussion.
+  - Incidents cannot be found: the signal is drowned.
 problem: >-
-  Le bruit coûte cher (stockage, I/O, CPU) et dégrade le débogage : plus on
-  loggue, moins on lit les logs. Les chemins chauds ralentissent sous
-  charge, et les logs à haute cardinalité cassent les systèmes de collecte
-  (indexation).
+  Noise is expensive (storage, I/O, CPU) and degrades debugging: the more you
+  log, the less logs are read. Hot paths slow down under load, and
+  high-cardinality logs break collection systems (indexing).
 fix: >-
-  Logger à des niveaux utiles : info pour les événements métier rares, debug
-  pour le détail ; jamais par défaut en production. Éviter les logs en boucle
-  (agréger avec des compteurs de métriques), limiter la cardinalité (pas de
-  corps de requête ni d'IDs inutiles), et corréler par request ID. Une ligne
-  de log doit permettre une action, pas documenter chaque étape.
+  Log at useful levels: info for rare business events, debug for detail;
+  never by default in production. Avoid loop logs (aggregate with metric
+  counters), limit cardinality (no request bodies or unnecessary IDs), and
+  correlate by request ID. A log line must enable an action, not document
+  every step.
 when_ok: >-
-  Le détail devient acceptable en mode debug ou lors d'un incident ciblé ;
-  la règle concerne le niveau de production par défaut.
+  Detail becomes acceptable in debug mode or during a targeted incident; the
+  rule concerns the default production level.
 relationships:
   references:
     - https://observability-antipatterns.github.io/

@@ -1,0 +1,24 @@
+---
+id: source:go:go-generate
+title: Go generate — code generation from //go:generate directives
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, tooling, codegen, go-generate]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/cmd/go
+selection: >-
+  Load when generating Go source from definitions — stringer, protobuf,
+  sqlc, mock generation — and when wiring a repeatable generate step into
+  the build: //go:generate directives, -run filters, and the rule that go
+  generate is never run automatically by go build or go test.
+limits: >-
+  go generate runs arbitrary commands — the directives must be hermetic and
+  reproducible (pinned tool versions, no network at generation time where
+  possible). Pointer-only routing to the go command docs.
+relationships:
+  references:
+    - https://pkg.go.dev/cmd/go

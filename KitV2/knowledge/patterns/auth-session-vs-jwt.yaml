@@ -1,6 +1,6 @@
 ---
 id: pattern:security:auth-session-vs-jwt
-title: Choix du mécanisme d'auth — sessions cookies vs JWT vs OAuth2
+title: Authentication mechanism choice — cookie sessions vs JWT vs OAuth2
 kind: Pattern
 version: 1
 status: active
@@ -10,37 +10,36 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-05
 problem: >-
-  Le choix du mécanisme d'auth conditionne révocation, CSRF, mobilité et
-  complexité. Le JWT est souvent choisi par réflexe (« stateless »)
-  alors que les sessions cookies sont plus simples et révocables pour
-  une app web classique ; inversement, des sessions par cookie pour
-  une API mobile multiplient les pièges (CORS, CSRF, fixation).
+  The choice of the auth mechanism drives revocation, CSRF, mobility, and
+  complexity. JWT is often chosen by reflex ("stateless") while cookie
+  sessions are simpler and revocable for a classic web app; conversely,
+  cookie sessions for a mobile API multiply the pitfalls (CORS, CSRF,
+  fixation).
 context: >-
-  S'applique au choix d'un mécanisme pour une nouvelle application ou un
-  endpoint : navigateur web (templates/SPA servies), API REST, mobile, ou
-  login tiers (Google/GitHub/entreprise).
+  Applies when choosing a mechanism for a new application or an endpoint:
+  web browser (templates/SPA served), REST API, mobile, or third-party login
+  (Google/GitHub/enterprise).
 solution: >-
-  Choisir selon le client et les besoins de révocation :
-  - App web classique (navigateur) → **sessions cookies côté serveur**
-    (`scs`) : révocables, HttpOnly, SameSite ; CSRF obligatoire.
-  - API REST / mobile / service-service → **JWT** (`golang-jwt`) : stateless,
-    token court (exp) + rotation ; jamais de données sensibles dans les claims.
-  - Login tiers / entreprise → **OAuth2/OIDC** (`golang.org/x/oauth2`)
-    : déléguer l'authentification, ne jamais stocker de mots de passe.
-  - Mots de passe (login interne) : hash memory-hard **argon2id** (ou bcrypt
-    pour compat) via `golang.org/x/crypto`, jamais en clair ni SHA-256.
+  Choose according to the client and the revocation needs:
+  - Classic web app (browser) → **server-side cookie sessions** (`scs`):
+    revocable, HttpOnly, SameSite; CSRF mandatory.
+  - REST API / mobile / service-to-service → **JWT** (`golang-jwt`):
+    stateless, short token (exp) + rotation; never sensitive data in claims.
+  - Third-party / enterprise login → **OAuth2/OIDC** (`golang.org/x/oauth2`):
+    delegate authentication, never store passwords.
+  - Passwords (internal login): memory-hard **argon2id** hash (or bcrypt for
+    compatibility) via `golang.org/x/crypto`, never in cleartext or SHA-256.
 benefits: >-
-  Mécanisme aligné sur le client (révocabilité, CSRF, mobilité) ; moins de
-  pièges de sécurité par construction ; décision explicite et documentée au
-  lieu d'un réflexe (« JWT partout »).
+  Mechanism aligned with the client (revocability, CSRF, mobility); fewer
+  security pitfalls by construction; an explicit, documented decision instead
+  of a reflex ("JWT everywhere").
 costs: >-
-  Les besoins mixtes (SPA + mobile + web) demandent souvent deux mécanismes
-  (sessions pour le web, JWT pour l'API) et une gestion de clés/expiration
-  soignée ; OAuth2 ajoute le coût d'un IdP et du stockage d'identités
-  locales.
+  Mixed needs (SPA + mobile + web) often require two mechanisms (sessions for
+  the web, JWT for the API) and careful key/expiration management; OAuth2
+  adds the cost of an IdP and of storing local identities.
 related: >-
-  Homologues négatifs : pattern:antipattern:sec-fail-open,
-  pattern:antipattern:sec-missing-csrf ; voir aussi
+  Negative counterparts: pattern:antipattern:sec-fail-open,
+  pattern:antipattern:sec-missing-csrf; see also
   pattern:security:secrets-management.
 relationships:
   references:

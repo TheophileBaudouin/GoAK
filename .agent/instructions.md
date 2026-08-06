@@ -38,3 +38,18 @@ a named mechanical control (validator C2 or Pi gate), or be recorded here as
 | Absolute instruction | Carrier | Mechanical control | Status (2026-08-05) |
 | --- | --- | --- | --- |
 | The `kit-resource-routing` skill requires calling `search_kit_resources` "MANDATORY before technical work" (SKILL.md §When to search) | `KitV2/.pi/skills/kit-resource-routing/SKILL.md` | None (callable tool, non-blocking) | Guidance only — Pi gate specified (plan 2026-08-05-metaproject, annexe B), implementation next pass; audit C9 verifies each audit |
+| "Read and follow `references/behavioral-rules.md` in every phase" (MUST); "Do NOT restart from Phase 0 when `docs/progress/MASTER.md` exists" (NEVER); "Phase 6 archive always executed" | `KitV2/.pi/skills/spec-driven-dev/SKILL.md` | None (process workflow) | Guidance only — workflow-level discipline, no mechanical gate; recorded 2026-08-06 (KVA-106) |
+| "NEVER put secrets in `.pi/settings.json`"; "never assume the standard memory set exists — verify which `.pi/memory/` files are present" | `KitV2/.pi/prompts/workflow-memory.md` (memory rule also in `KitV2/AGENTS.md`) | None (consumer-project convention) | Guidance only — encoded as durable text; recorded 2026-08-06 (KVA-106) |
+| "Present findings before any summary; never bury a bug under a summary" | `KitV2/.pi/skills/go-code-review/SKILL.md` (§4) | None (review discipline) | Guidance only — findings-first review protocol; recorded 2026-08-06 (KVA-106) |
+| "Never claim an unexecuted scenario passed or treat static checks as proof of user intent"; "Always preserve errors, cancellation, input validation, and observable evidence"; "Ask before adding dependencies or changing the manifest contract" | `KitV2/AGENTS.md` (§Limits) | None (product guardrails; kit-audit C6/C15 review control) | Guidance only — review control, no mechanical gate; recorded 2026-08-06 (charter §16.1.4) |
+| Rule bodies ("always wrap with `%w`", "never log the same error twice", …) | `KitV2/rules/**` | Named control: golangci-lint (staticcheck/errcheck) + Z1 "Verification" section + review | Rule-content boundary (Z1 semantic elements), NOT a process absolute — interpretation decision 2026-08-06 (KVA-106): only skills/prompts/AGENTS.md/recipe process instructions enter this registry; rule boundaries carry their own verification path |
+
+## Interpretation note (2026-08-06, KVA-106)
+
+The audit inventoried 31 consumer surfaces carrying `MANDATORY`/`MUST`/
+`ALWAYS`/`NEVER` lexemes. Decided: **rule-content boundaries** (a rule stating
+what generated code must never do, with its own Z1 `Verification` section) are
+not "absolute instructions" for this registry; only **process instructions**
+carried by skills/prompts/AGENTS.md/recipes that tell the agent how to behave
+are recorded above. The planned deterministic C2 lexeme check (annexe C) will
+still be scoped to the process-instruction set, not to rule bodies.

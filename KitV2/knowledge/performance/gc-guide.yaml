@@ -1,0 +1,23 @@
+---
+id: source:go:gc-guide
+title: Go garbage collector guide — GOGC, GOMEMLIMIT, and GC behavior
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, gc, memory, performance]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://go.dev/doc/gc-guide
+selection: >-
+  Load when tuning memory behavior — GOGC or GOMEMLIMIT decisions,
+  allocation-heavy workloads, container memory limits — or when explaining
+  GC pauses, heap growth, and the cost of live heap size.
+limits: >-
+  The guide explains the GC and its knobs; it does not justify a tuning
+  change without profiling (source:go:profiling) and a measured baseline.
+relationships:
+  references:
+    - https://go.dev/doc/gc-guide
+    - source:go:profiling

@@ -6,7 +6,7 @@ tags: [gui, desktop, mobile, embedded, fyne, cgo]
 last-verified: 2026-08-05
 ---
 
-# fyne — toolkit GUI Go
+# fyne — Go GUI toolkit
 
 ## Selection
 
@@ -47,37 +47,32 @@ at the edge.
 | Gio | Consider for an immediate-mode GPU GUI when its ecosystem and API fit. |
 | Web application | Prefer when browser deployment or web accessibility matters more than a native window. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A native desktop, mobile, or embedded GUI is required without a browser UI.
 - The project accepts OpenGL/GLFW, CGO, platform toolchains, and native packaging.
 - Widgets, canvas objects, notifications, and platform windows are the desired
   abstraction.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Zero-CGO cross-compilation is a hard requirement.
 - A web frontend is desired: use Wails or a browser deployment boundary.
 - The application is primarily a server/service with no native GUI.
 - The target platform is outside Fyne's tested driver and packaging support.
 
-## Avantages
-
+## Advantages
 - One Go API across desktop, mobile, and embedded targets.
 - Widget and canvas abstractions avoid hand-building native event loops.
 - v2.8 adds richer canvas objects, scheduled notifications, accessibility
   support, window positioning, and default Wayland support.
 
-## Inconvénients
-
+## Disadvantages
 - OpenGL/GLFW makes CGO and a native compiler part of the build/deployment
   story.
 - Cross-compilation requires `CGO_ENABLED=1` and a target C compiler.
 - Platform behavior and GUI rendering need host-level tests beyond portable
   `go test`.
 
-## Pièges connus
-
+## Known pitfalls
 - Do not claim a Fyne package is zero-CGO: the rendering driver uses OpenGL and
   GLFW.
 - Keep Fyne imports at the UI boundary; test validation and domain logic
@@ -87,8 +82,7 @@ at the edge.
 - Treat accessibility as an explicit feature decision; v2.8 support is off by
   default and requires its documented build configuration.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Fyne repository](https://github.com/fyne-io/fyne) — maintenance,
   architecture, license, checked 2026-08-05.
 - [Fyne v2.8.0 release](https://github.com/fyne-io/fyne/releases/tag/v2.8.0)

@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-interface-everywhere
-title: Interface pour chaque dépendance (over-abstraction)
+title: Interface for every dependency (over-abstraction)
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Chaque dépendance a une interface définie avant son implémentation unique :
-  couches repository/factory/service qui ne font que relayer vers une seule
-  implémentation concrète.
+  Every dependency has an interface defined before its single implementation:
+  repository/factory/service layers that only relay to one concrete
+  implementation.
 detect: >-
-  - Interface avec une seule implémentation dans le même package.
-  - Pour comprendre un flux, il faut traverser 4-5 fichiers qui s'appellent
-    sans ajouter de comportement.
-  - `grep -c interface` anormalement élevé pour la taille du projet.
+  - Interface with a single implementation in the same package.
+  - Understanding a flow requires traversing 4-5 files that call each other
+    without adding behavior.
+  - `grep -c interface` abnormally high for the project size.
 problem: >-
-  L'interface ajoute de l'indirection sans bénéfice : navigation coûteuse,
-  tests plus complexes, et une surface d'API plus large à maintenir. Le wiki Go
-  recommande de définir une interface là où elle est consommée, quand une
-  abstraction est réellement nécessaire — pas par défaut.
+  The interface adds indirection without benefit: costly navigation, more
+  complex tests, and a larger API surface to maintain. The Go wiki recommends
+  defining an interface where it is consumed, when an abstraction is really
+  needed — not by default.
 fix: >-
-  Retourner des types concrets ; définir une interface du côté du consommateur
-  (petite, avec les méthodes réellement utilisées) uniquement quand un mock ou
-  une seconde implémentation est justifié. Laisser le compilateur vérifier la
-  conformité (`var _ Interface = (*Concrete)(nil)`). Privilégier l'injection de
-  dépendances concrètes et les fonctions.
+  Return concrete types; define an interface on the consumer side (small,
+  with the methods actually used) only when a mock or a second implementation
+  is justified. Let the compiler check conformance (`var _ Interface =
+  (*Concrete)(nil)`). Prefer injecting concrete dependencies and functions.
 when_ok: >-
-  Une interface se justifie pour découpler un package consommateur d'une
-  implémentation instable (I/O, réseau, horloge) ou quand des implémentations
-  multiples existent réellement. Philosophie du kit : `rules/core/philosophy`.
+  An interface is justified to decouple a consumer package from an unstable
+  implementation (I/O, network, clock) or when multiple implementations
+  really exist. Kit philosophy: `rules/core/philosophy`.
 relationships:
   references:
     - https://100go.co/

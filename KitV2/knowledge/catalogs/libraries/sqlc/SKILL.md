@@ -6,7 +6,7 @@ tags: [database, sql, codegen, type-safety]
 last-verified: 2026-08-05
 ---
 
-# sqlc — génération de code depuis SQL
+# sqlc — code generation from SQL
 
 ## Selection
 
@@ -69,36 +69,31 @@ sqlc generates **static queries only**. Decide this boundary before adopting it:
 | Squirrel/query builder | Choose for dynamic SQL construction; it does not replace schema-aware code generation. |
 | GORM/Ent | Choose only when an ORM/data-model abstraction is an explicit product decision. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - SQL is the source of truth and query shapes are known at build time.
 - Generated methods should expose typed rows/errors without runtime reflection.
 - The project wants the same generated query contract across `*sql.DB` and
   `*sql.Tx` through its driver boundary.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - WHERE, ORDER BY, columns, or joins change dynamically at runtime.
 - The application needs an ORM's model lifecycle, migrations, or associations.
 - The selected database engine does not support the SQL syntax being generated.
 - Generated nullability cannot be reviewed for outer joins.
 
-## Avantages
-
+## Advantages
 - SQL remains visible/auditable and schema errors surface during generation.
 - Generated code has no sqlc runtime dependency or reflection requirement.
 - Plugin architecture supports multiple output languages and database engines.
 - Generated query interfaces fit transaction boundaries explicitly.
 
-## Inconvénients
-
+## Disadvantages
 - Static-only query model is a hard adoption boundary.
 - Generated output must be regenerated and reviewed with schema/query changes.
 - Engine differences and nullable joins still require database-specific testing.
 - Plugin/codegen versions become part of the build reproducibility policy.
 
-## Pièges connus
-
+## Known pitfalls
 - Resolve static versus dynamic SQL before writing the first query; do not force
   dynamic filters into malformed static workarounds.
 - Inspect generated nullability for `LEFT`/`RIGHT` joins and `embed` usage.
@@ -107,8 +102,7 @@ sqlc generates **static queries only**. Decide this boundary before adopting it:
 - Validate SQLite/PostgreSQL/MySQL-specific features against the actual target
   engine rather than the SQL parser alone.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official sqlc repository](https://github.com/sqlc-dev/sqlc) — API,
   maintenance, license, checked 2026-08-05.
 - [sqlc v1.31.1 release](https://github.com/sqlc-dev/sqlc/releases/tag/v1.31.1)

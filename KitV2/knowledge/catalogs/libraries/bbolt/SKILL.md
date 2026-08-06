@@ -6,7 +6,7 @@ tags: [storage, embedded, key-value, bbolt, btree, acid]
 last-verified: 2026-08-05
 ---
 
-# bbolt — base clé-valeur embarquée
+# bbolt — embedded key-value store
 
 ## Selection
 
@@ -58,36 +58,31 @@ bytes before returning them to the caller.
 | Pebble | Choose for storage-engine workloads that justify a much larger dependency. |
 | Redis/PostgreSQL | Choose when a server, replication, or multi-process access is required. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - One process needs durable local key-value state, metadata, or a compact state
   machine.
 - ACID transactions and simple bucket/key access matter more than SQL queries.
 - A pure-Go, single-file binary is desirable.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - Multiple processes must write the same file or the workload is write-heavy and
   highly concurrent.
 - SQL, secondary indexes, replication, sharding, or a server API is required.
 - The application cannot plan manual compaction for high data turnover.
 
-## Avantages
-
+## Advantages
 - Pure Go, single-file storage with ACID transactions and stable API.
 - Simple bucket/cursor model and no external server.
 - v1.5.0 adds options such as `MaxSize` and `NoStatistics` for operational
   control.
 
-## Inconvénients
-
+## Disadvantages
 - One write transaction at a time; long transactions hold the file lock.
 - No SQL or secondary indexes, replication, or built-in server mode.
 - Memory-mapped files and free pages require platform and compaction planning.
 - Data is not encrypted by default.
 
-## Pièges connus
-
+## Known pitfalls
 - Keep `Update` callbacks short and never retain a transaction after its callback.
 - Copy bytes obtained from `Get` before leaving the read transaction.
 - Check `Open`, transaction, bucket, and close errors; do not teach `_` as the
@@ -96,8 +91,7 @@ bytes before returning them to the caller.
 - Encrypt sensitive data at the file/application boundary; bbolt provides
   integrity checks, not confidentiality.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official bbolt repository](https://github.com/etcd-io/bbolt) — maintenance,
   API, license, checked 2026-08-05.
 - [bbolt v1.5.0 package](https://pkg.go.dev/go.etcd.io/bbolt@v1.5.0) — exact

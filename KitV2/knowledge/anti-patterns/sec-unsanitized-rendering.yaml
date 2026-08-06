@@ -1,6 +1,6 @@
 ---
 id: pattern:antipattern:sec-unsanitized-rendering
-title: Rendu HTML non sanitisé — markdown et templates sur entrée non contrôlée
+title: Unsanitized HTML rendering — markdown and templates on uncontrolled input
 kind: Pattern
 version: 1
 status: active
@@ -10,33 +10,31 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-05
 symptom: >-
-  Du markdown ou un template est converti en HTML et injecté tel quel dans une
-  page, y compris pour du contenu utilisateur (commentaires, profils, tickets).
-  Le code passe du markdown brut au DOM sans étape de nettoyage.
+  Markdown or a template is converted to HTML and injected as-is into a page,
+  including for user content (comments, profiles, tickets). The content goes
+  from raw markdown to the DOM without a cleaning step.
 detect: >-
-  - `goldmark.Convert(...)` (ou équivalent) sans sanitizer en aval sur la
-    sortie ; blocs HTML du markdown rendus (`<script>`, `onclick=…`).
-  - Templates (html/template est sûr par défaut, mais) un rendu assemblé
-    depuis des fragments non échappés ou `template.HTML(...)` sur entrée
-    non contrôlée.
-  - Advisory CVE-2026-5160 / GO-2026-5320 (goldmark, fix ≥ 1.7.17) : la classe
-    de bug est récurrente dans les parseurs markdown.
+  - `goldmark.Convert(...)` (or equivalent) without a downstream sanitizer on
+    the output; markdown HTML blocks rendered (`<script>`, `onclick=…`).
+  - Templates (html/template is safe by default, but) a render assembled from
+    unescaped fragments or `template.HTML(...)` on uncontrolled input.
+  - Advisory CVE-2026-5160 / GO-2026-5320 (goldmark, fix ≥ 1.7.17): this bug
+    class is recurrent in markdown parsers.
 problem: >-
-  Le rendu d'entrées non contrôlées en HTML sans sanitisation est une porte
-  XSS ouverte : un utilisateur peut injecter du script exécuté dans le
-  contexte d'autres utilisateurs (session, CSRF, exfiltration). Les parseurs
-  markdown rendent par défaut les blocs HTML bruts — c'est un contrat du
-  format, pas un bug du parser.
+  Rendering uncontrolled input as HTML without sanitization is an open XSS
+  door: a user can inject script executed in other users' contexts (session,
+  CSRF, exfiltration). Markdown parsers render raw HTML blocks by default —
+  this is a format contract, not a parser bug.
 fix: >-
-  Sanitiser la sortie avec une liste blanche (bluemonday) ou désactiver le
-  rendu des blocs HTML quand le markdown ne doit pas les contenir ; ne jamais
-  convertir du markdown non contrôlé directement en `template.HTML`. Vérifier
-  la version minimale du parser (goldmark ≥ 1.7.17). Tester avec des entrées
-  adverses (`<img onerror=…>`, `<script>`, attributs event).
+  Sanitize the output with a whitelist (bluemonday) or disable HTML block
+  rendering when the markdown must not contain them; never convert
+  uncontrolled markdown directly to `template.HTML`. Check the parser's
+  minimum version (goldmark ≥ 1.7.17). Test with adversarial inputs
+  (`<img onerror=…>`, `<script>`, event attributes).
 when_ok: >-
-  Une entrée de confiance (contenu éditorial interne, markdown contrôlé à
-  l'écriture) peut être rendue sans sanitizer — la frontière de confiance
-  doit être explicite et documentée.
+  A trusted input (internal editorial content, markdown controlled at write
+  time) may be rendered without a sanitizer — the trust boundary must be
+  explicit and documented.
 relationships:
   references:
     - https://osv.dev/vulnerability/GO-2026-5320

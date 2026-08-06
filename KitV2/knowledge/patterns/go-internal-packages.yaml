@@ -1,0 +1,44 @@
+---
+id: pattern:go:internal-packages
+title: internal/ packages — hide API that is not for external consumers
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, packages, internal, api-boundary, layout]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  Every exported package is a promise: consumers can import it, so changing
+  it later breaks them. Helper and cross-cutting packages end up exported by
+  default even when only the module itself uses them.
+context: >-
+  Applies when a package exists for internal use only — shared helpers,
+  wire formats, adapters — inside a module that also publishes a public API.
+solution: >-
+  Place non-public packages under an internal/ directory: the go tool
+  rejects imports from outside the parent tree, so the API can be
+  refactored freely without breaking consumers. Official module guidance:
+  start by putting supporting packages into internal/ to prevent other
+  modules from depending on packages the module does not want to expose.
+  Prefer a few internal packages with a clear boundary over one deep
+  internal tree.
+benefits: >-
+  Free refactoring inside the boundary, a smaller documented public surface,
+  and enforcement by the compiler rather than by convention.
+costs: >-
+  internal/ packages cannot be imported by other modules at all — a consumer
+  must copy the code or the package must be promoted; an over-deep internal
+  tree hides structure instead of clarifying it.
+related: >-
+  Complements the minimal layout (pattern:go:minimal-layout); the official
+  module-layout shapes are guidance, not a universal standard
+  (rules/core/philosophy).
+relationships:
+  references:
+    - https://go.dev/doc/modules/layout
+    - https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface
+    - pattern:go:minimal-layout
+  uses: []
+  validated_by: []

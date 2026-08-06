@@ -1,0 +1,24 @@
+---
+id: source:go:cross-compilation
+title: Go cross-compilation — GOOS, GOARCH, CGO_ENABLED
+kind: Source
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, official, build, cross-compilation, tooling]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+source: https://pkg.go.dev/cmd/go
+selection: >-
+  Load when building for another platform: setting GOOS/GOARCH, the
+  CGO_ENABLED=0 default for cross-compilation, build constraints for
+  platform-specific files, and when binary portability matters.
+limits: >-
+  cgo and platform-specific code (syscall, assembly) break naive
+  cross-compilation; runtime behavior (paths, signals) still varies per
+  platform. Pointer-only routing to the go and cgo command docs.
+relationships:
+  references:
+    - https://pkg.go.dev/cmd/go
+    - https://pkg.go.dev/cmd/cgo

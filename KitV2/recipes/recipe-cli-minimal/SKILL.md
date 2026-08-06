@@ -1,101 +1,101 @@
 ---
 name: recipe-cli-minimal
-description: "Analyse minimale et testable des drapeaux CLI en Go via le package flag de la bibliothèque standard (flag.NewFlagSet + flag.ContinueOnError + io.Writer). Utiliser pour une CLI à commande unique sans sous-commandes."
+description: "Minimal and testable CLI flag parsing in Go with the standard library flag package (flag.NewFlagSet + flag.ContinueOnError + io.Writer). Use for a single-command CLI without subcommands."
 category: recipe
 tags: [cli, flag, stdlib, config, args]
 last-verified: 2026-08-05
 ---
 
-# recipe-cli-minimal — CLI minimale avec le package stdlib flag
+# recipe-cli-minimal — minimal CLI with the stdlib flag package
 
-## Objectif et cas d'utilisation
+## Goal and use case
 
-Construire un parseur de drapeaux de ligne de commande testable pour une application à commande unique en utilisant uniquement le package `flag` de la bibliothèque standard Go, sans fuite d'état global ni appels irrécupérables à `os.Exit`.
+Build a testable command-line flag parser for a single-command application using only the `flag` package of the Go standard library, without global state leaks or unrecoverable `os.Exit` calls.
 
-Utiliser cette recette pour toute CLI simple à drapeaux plats nécessitant zéro dépendance externe.
+Use this recipe for any simple flat-flag CLI that needs zero external dependencies.
 
-## Prérequis et architecture
+## Prerequisites and architecture
 
-- Go 1.25+ (stdlib uniquement)
-- Le pivot de testabilité (hinge) :
-  - `flag.Parse()` opère sur le singleton global `flag.CommandLine` avec `ExitOnError`, appelant `os.Exit(2)` en cas d'erreur. C'est non testable.
-  - La solution consiste à créer une fonction `ParseTo(args []string, w io.Writer) (Config, error)`.
-  - Instancier un `*flag.FlagSet` dédié avec `flag.ContinueOnError`.
-  - Rediriger la sortie avec `fs.SetOutput(w)` (passer `io.Discard` dans les tests).
-  - Parser le slice d'arguments explicite `args` au lieu d'accéder à `os.Args`.
+- Go 1.25+ (stdlib only)
+- The testability hinge:
+  - `flag.Parse()` operates on the global `flag.CommandLine` singleton with `ExitOnError`, calling `os.Exit(2)` on error. That is not testable.
+  - The solution is a `ParseTo(args []string, w io.Writer) (Config, error)` function.
+  - Instantiate a dedicated `*flag.FlagSet` with `flag.ContinueOnError`.
+  - Redirect output with `fs.SetOutput(w)` (pass `io.Discard` in tests).
+  - Parse the explicit `args` slice instead of accessing `os.Args`.
 
-## Composants et choix
+## Components and choices
 
-- `flag.NewFlagSet("app", flag.ContinueOnError)` — crée un jeu de drapeaux isolé qui renvoie les erreurs au lieu de tuer le processus.
-- `fs.NArg()` — permet d'interdire les arguments positionnels inattendus.
+- `flag.NewFlagSet("app", flag.ContinueOnError)` — creates an isolated flag set that returns errors instead of killing the process.
+- `fs.NArg()` — rejects unexpected positional arguments.
 
-## Alternatives rejetées
+## Rejected alternatives
 
-- `flag.Parse()` global : utilise `ExitOnError` et `os.Args`, rendant les tests unitaires impossibles.
-- `spf13/cobra` / `urfave/cli` : sur-ingénierie inutile pour les CLI simples sans sous-commandes.
-- `spf13/pflag` : ajoute la syntaxe POSIX (drapeaux courts/longs), mais introduit une dépendance externe non requise pour les besoins simples.
+- Global `flag.Parse()`: uses `ExitOnError` and `os.Args`, making unit tests impossible.
+- `spf13/cobra` / `urfave/cli`: unnecessary over-engineering for simple CLIs without subcommands.
+- `spf13/pflag`: adds POSIX syntax (short/long flags), but introduces an external dependency not required for simple needs.
 
-## Exemple complet
+## Complete example
 
 ```go
 package cli
 
 import (
-	"flag"
-	"fmt"
-	"io"
-	"os"
+ "flag"
+ "fmt"
+ "io"
+ "os"
 )
 
 type Config struct {
-	Host    string
-	Port    int
-	Verbose bool
+ Host    string
+ Port    int
+ Verbose bool
 }
 
 func Parse(args []string) (Config, error) {
-	return ParseTo(args, os.Stderr)
+ return ParseTo(args, os.Stderr)
 }
 
 func ParseTo(args []string, w io.Writer) (Config, error) {
-	var c Config
-	if w == nil {
-		w = io.Discard
-	}
-	fs := flag.NewFlagSet("app", flag.ContinueOnError)
-	fs.SetOutput(w)
-	fs.StringVar(&c.Host, "host", "127.0.0.1", "listen host")
-	fs.IntVar(&c.Port, "port", 8080, "listen port")
-	fs.BoolVar(&c.Verbose, "verbose", false, "enable verbose logging")
-	if err := fs.Parse(args); err != nil {
-		return c, err
-	}
-	if fs.NArg() != 0 {
-		return c, fmt.Errorf("unexpected positional arguments: %q", fs.Args())
-	}
-	return c, nil
+ var c Config
+ if w == nil {
+  w = io.Discard
+ }
+ fs := flag.NewFlagSet("app", flag.ContinueOnError)
+ fs.SetOutput(w)
+ fs.StringVar(&c.Host, "host", "127.0.0.1", "listen host")
+ fs.IntVar(&c.Port, "port", 8080, "listen port")
+ fs.BoolVar(&c.Verbose, "verbose", false, "enable verbose logging")
+ if err := fs.Parse(args); err != nil {
+  return c, err
+ }
+ if fs.NArg() != 0 {
+  return c, fmt.Errorf("unexpected positional arguments: %q", fs.Args())
+ }
+ return c, nil
 }
 ```
 
-## Bonnes pratiques et pièges
+## Best practices and pitfalls
 
-- Distinguer l'aide (`flag.ErrHelp`) des erreurs de parsing : `ParseTo` renvoie `flag.ErrHelp` quand `-h` ou `-help` est utilisé, permettant au `main` d'avoir un exit 0.
-- Transmettre `io.Discard` dans les tests pour ne pas polluer les journaux de test avec le texte d'aide du FlagSet.
+- Distinguish help (`flag.ErrHelp`) from parsing errors: `ParseTo` returns `flag.ErrHelp` when `-h` or `-help` is used, letting `main` exit 0.
+- Pass `io.Discard` in tests so the FlagSet help text does not pollute the test logs.
 
-## Limites et extensions
+## Limits and extensions
 
-Si l'application évolue vers une structure complexe avec sous-commandes (`app build`, `app deploy`), migrer vers `recipe-cli-cobra`.
+If the application grows into a complex structure with subcommands (`app build`, `app deploy`), migrate to `recipe-cli-cobra`.
 
-## Scénario observable et vérification
+## Observable scenario and verification
 
 ```sh
 go test ./recipes/recipe-cli-minimal/...
 go run ./probes/cli-minimal
 ```
 
-La probe exécute `ParseTo` avec des arguments explicites, vérifie la structure `Config` résultante et affiche `cli-minimal: PASS`.
+The probe executes `ParseTo` with explicit arguments, checks the resulting `Config` structure, and prints `cli-minimal: PASS`.
 
-## Sources primaires
+## Primary sources
 
-- [Go flag package](https://pkg.go.dev/flag) — documentation officielle du package stdlib `flag`.
-- [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments#flag-packages) — recommandations d'utilisation du package flag.
+- [Go flag package](https://pkg.go.dev/flag) — official documentation of the stdlib `flag` package.
+- [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments#flag-packages) — flag package usage recommendations.

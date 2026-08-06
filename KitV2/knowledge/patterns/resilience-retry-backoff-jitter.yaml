@@ -1,5 +1,5 @@
 id: pattern:resilience:retry-backoff-jitter
-title: Retry avec backoff exponentiel et jitter
+title: Retry with exponential backoff and jitter
 kind: Pattern
 version: 1
 status: active
@@ -9,28 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Les erreurs transitoires (timeout, 5xx, connexion) sont fréquentes ; sans
-  retry le système est fragile, avec une retry agressive il s'effondre
-  (voir pattern:antipattern:msg-retry-storm).
+  Transient errors (timeout, 5xx, connection) are frequent; without retry
+  the system is fragile, with aggressive retry it collapses (see
+  pattern:antipattern:msg-retry-storm).
 context: >-
-  S'applique aux appels réseau vers des services qui peuvent échouer
-  temporairement, en distinguant les erreurs transitoires des erreurs
-  définitives (4xx, validation).
+  Applies to network calls to services that can fail temporarily,
+  distinguishing transient errors from definitive ones (4xx, validation).
 solution: >-
-  Retry bornée : petit nombre de tentatives (2-3), délai exponentiel
-  (`base * 2^n`), **jitter aléatoire** pour désynchroniser les clients,
-  et arrêt immédiat sur erreur définitive ou `ctx.Done()`. Respecter
-  `Retry-After`/429. Combiner avec timeouts (voir
-  pattern:resilience:timeout-deadlines) et circuit breaker.
+  Bounded retry: a small number of attempts (2-3), exponential delay
+  (`base * 2^n`), **random jitter** to desynchronize clients, and immediate
+  stop on a definitive error or `ctx.Done()`. Honor `Retry-After`/429.
+  Combine with timeouts (see pattern:resilience:timeout-deadlines) and
+  circuit breaker.
 benefits: >-
-  Les pannes transitoires passent inaperçues, la charge de reprise reste
-  lissée (jitter), et l'échec définitif est rapide.
+  Transient failures go unnoticed, recovery load stays smoothed (jitter),
+  and definitive failure is fast.
 costs: >-
-  Ajoute de la latence en cas d'échec répété ; une retry sans backoff ni
-  plafond transforme une panne en déluge — c'est le jitter et la borne qui
-  font la différence.
+  Adds latency on repeated failure; retry without backoff or cap turns an
+  outage into a deluge — jitter and the bound are what make the difference.
 related: >-
-  Homologue négatif : pattern:antipattern:msg-retry-storm.
+  Negative counterpart: pattern:antipattern:msg-retry-storm.
 relationships:
   references:
     - https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/retry-backoff.html

@@ -6,7 +6,7 @@ tags: [ssh, tui, server, remote, middleware]
 last-verified: 2026-08-05
 ---
 
-# wish — framework d'applications SSH
+# wish — SSH application framework
 
 ## Selection
 
@@ -55,37 +55,32 @@ infrastructure/application boundary.
 | gliderlabs/ssh | Predecessor/legacy boundary; do not choose for new work without a fresh decision. |
 | Local Bubble Tea | Prefer when remote access is not a product requirement. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - A Bubble Tea TUI or Go command must run in remote SSH sessions.
 - Middleware for auth, access control, logging, metrics, rate limits, and panic
   recovery should compose around each session.
 - The product has an explicit remote workbench/SSH trust model.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A plain local TUI or one-off SSH handler is sufficient.
 - The project needs an SSH client or low-level protocol implementation.
 - The public listener cannot provide host-key persistence, authentication,
   timeouts, rate limiting, and connection/resource limits.
 
-## Avantages
-
+## Advantages
 - High-level SSH application composition over maintained session/PTY APIs.
 - Bubble Tea integration plus auth, access-control, rate-limit, logging,
   recovery, metrics, and Git middleware.
 - v2 keeps a clear Charm module path and recent panic containment.
 
-## Inconvénients
-
+## Disadvantages
 - Opinionated middleware/application framework with SSH and Bubble Tea coupling.
 - No inherent connection-count cap; goroutine/file-descriptor/memory limits need
   explicit design.
 - Security defaults are not a complete deployment policy; allowlists and rate
   limiting must be wired by the consumer.
 
-## Pièges connus
-
+## Known pitfalls
 - Persist a dedicated host key and never reuse a client key as a server key.
 - Configure public-key/trusted-CA authentication before exposing a server; do
   not rely on “valid SSH key” as application authorization.
@@ -96,8 +91,7 @@ infrastructure/application boundary.
 - Pin v2.0.3 and the underlying `charm.land/ssh` version together during
   upgrades.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Wish repository](https://github.com/charmbracelet/wish) — API,
   maintenance, license, checked 2026-08-05.
 - [Wish v2.0.3 release](https://github.com/charmbracelet/wish/releases/tag/v2.0.3)

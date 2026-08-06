@@ -1,5 +1,5 @@
 id: pattern:http:rest-cursor-pagination
-title: Pagination par curseur — listes stables et bornées
+title: Cursor pagination — stable and bounded lists
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  Une collection non paginée dégénère en réponses énormes ; la pagination par
-  offset dérive quand les données changent entre pages (voir
+  An unpaginated collection degenerates into huge responses; offset
+  pagination drifts when data changes between pages (see
   pattern:antipattern:api-no-pagination).
 context: >-
-  S'applique à tout endpoint de liste sur des données qui changent ou peuvent
-  grossir (recommandé par défaut pour les API externes).
+  Applies to any list endpoint over data that changes or can grow
+  (recommended by default for external APIs).
 solution: >-
-  Pagination par curseur : paramètre `cursor` (opaque, encodé), requête
-  `WHERE (sort_key, id) > (?, ?) ORDER BY sort_key, id LIMIT n+1`, réponse
-  avec `next_cursor` (ou RFC 8288 `Link` header). Le curseur fige la position
-  : pas de dérive si des lignes sont insérées/supprimées entre pages.
+  Cursor pagination: `cursor` parameter (opaque, encoded), query
+  `WHERE (sort_key, id) > (?, ?) ORDER BY sort_key, id LIMIT n+1`, response
+  with `next_cursor` (or RFC 8288 `Link` header). The cursor freezes the
+  position: no drift if rows are inserted/deleted between pages.
 benefits: >-
-  Listes stables sous écritures concurrentes, pages de taille fixe, requêtes
-  indexées (pas de OFFSET coûteux), et navigation avant/arrière simple.
+  Stable lists under concurrent writes, fixed-size pages, indexed queries
+  (no costly OFFSET), and simple forward/backward navigation.
 costs: >-
-  Impossible d'accéder directement à la page n (le curseur est opaque) ;
-  exige une clé de tri unique stable (id) ; les besoins « aller à la page 5 »
-  d'un admin restent en offset.
+  Direct access to page n is impossible (the cursor is opaque); requires a
+  unique stable sort key (id); the admin "go to page 5" need remains
+  offset-based.
 related: >-
-  Homologue négatif : pattern:antipattern:api-no-pagination.
+  Negative counterpart: pattern:antipattern:api-no-pagination.
 relationships:
   references:
     - https://github.com/microsoft/api-guidelines

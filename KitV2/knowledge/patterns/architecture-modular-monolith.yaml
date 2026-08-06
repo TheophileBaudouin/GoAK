@@ -1,5 +1,5 @@
 id: pattern:architecture:modular-monolith
-title: Monolithe modulaire — frontières internes fortes
+title: Modular monolith — strong internal boundaries
 kind: Pattern
 version: 1
 status: active
@@ -9,31 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  La décomposition en microservices prématurée ajoute de la latence et de
-  l'opération sans frontières métier réelles (voir
-  pattern:antipattern:arch-distributed-monolith) ; le monolithe spaghetti,
-  lui, devient ingérable.
+  Premature microservice decomposition adds latency and operational cost
+  without real business boundaries (see
+  pattern:antipattern:arch-distributed-monolith); the spaghetti monolith, for
+  its part, becomes unmanageable.
 context: >-
-  S'applique comme choix par défaut pour les équipes de petite taille et les
-  systèmes monolithiques existants : un seul binaire, des frontières
-  modulaires.
+  Applies as the default choice for small teams and existing monolithic
+  systems: a single binary with modular boundaries.
 solution: >-
-  Un déployable unique avec des modules à frontières fortes : packages
-  `internal/<module>` (le compilateur bloque les imports externes), accès
-  entre modules uniquement par API publique du module (fonctions et types
-  exportés), données possédées par un module. Les bounded contexts (DDD) se
-  matérialisent en packages.
+  A single deployable with strong-boundary modules: `internal/<module>`
+  packages (the compiler blocks external imports), access between modules only
+  through the module's public API (exported functions and types), data owned
+  by one module. DDD bounded contexts materialize as packages.
 benefits: >-
-  Les bénéfices de couplage d'un monolithe (déploiement simple, transactions
-  locales, zéro latence réseau) avec des frontières compilateur-vérifiées qui
-  permettent une extraction future vers des services si besoin.
+  The coupling benefits of a monolith (simple deployment, local transactions,
+  zero network latency) with compiler-verified boundaries that allow future
+  extraction into services if needed.
 costs: >-
-  Les frontières sont logiques : elles exigent discipline et lint (pas de
-  bypass via des packages partagés) ; l'extraction d'un module en service
-  reste un chantier (voir pattern:architecture:ports-adapters pour faciliter
-  cette évolution).
+  The boundaries are logical: they require discipline and linting (no bypass
+  through shared packages); extracting a module into a service remains a
+  project (see pattern:architecture:ports-adapters to ease that evolution).
 related: >-
-  Homologue négatif : pattern:antipattern:arch-distributed-monolith,
+  Negative counterpart: pattern:antipattern:arch-distributed-monolith,
   pattern:antipattern:arch-big-ball-of-mud.
 relationships:
   references:

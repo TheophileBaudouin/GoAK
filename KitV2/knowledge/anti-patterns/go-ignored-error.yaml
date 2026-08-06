@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-ignored-error
-title: Erreur ignorée — valeur de retour jetée
+title: Ignored error — return value discarded
 kind: Pattern
 version: 1
 status: active
@@ -9,27 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  `_ = f()`, `f()` sans affectation alors que f renvoie une erreur, ou
-  `defer db.Close()` sans consommation de la valeur de retour.
+  `_ = f()`, `f()` without assignment while f returns an error, or
+  `defer db.Close()` without consuming the return value.
 detect: >-
-  - `errcheck` (golangci-lint) signale toute erreur non vérifiée — le gate du
-    kit exige 0 issue.
-  - Chercher `_ = ` sur des appels dont l'erreur est significative (write,
-  close,
+  - `errcheck` (golangci-lint) flags every unchecked error — the kit gate
+    requires 0 issues.
+  - Look for `_ = ` on calls whose error is significant (write, close,
     commit).
 problem: >-
-  Go traite les erreurs comme des valeurs ; les jeter produit des échecs
-  silencieux (écriture tronquée, transaction non commitée, sous-facturation) qui
-  ne se manifestent que plus tard, sans lien avec la cause.
+  Go treats errors as values; discarding them produces silent failures
+  (truncated write, uncommitted transaction, under-billing) that only
+  manifest later, with no link to the cause.
 fix: >-
-  Toujours consommer l'erreur : la propager (`return err`), la logger avec
-  contexte, ou la gérer explicitement. Pour les fermetures : `defer func() { _ =
-  rows.Close() }()` (consommation explicite, satisfait errcheck et gosec G104).
-  Ne masquer que si l'erreur est réellement sans conséquence — documenté.
+  Always consume the error: propagate it (`return err`), log it with context,
+  or handle it explicitly. For closures: `defer func() { _ =
+  rows.Close() }()` (explicit consumption, satisfies errcheck and gosec G104).
+  Mask only if the error is truly inconsequential — documented.
 when_ok: >-
-  Certaines fermetures en lecture seule peuvent ignorer l'erreur si le résultat
-  a déjà été entièrement consommé et vérifié ; le `_ =` doit alors être
-  intentionnel et commenté.
+  Some read-only closures may ignore the error if the result has already been
+  fully consumed and verified; the `_ =` must then be intentional and
+  commented.
 relationships:
   references:
     - https://100go.co/

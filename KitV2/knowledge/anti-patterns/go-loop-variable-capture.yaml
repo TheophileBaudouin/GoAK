@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-loop-variable-capture
-title: Capture de la variable de boucle dans une goroutine
+title: Loop variable capture in a goroutine
 kind: Pattern
 version: 1
 status: active
@@ -9,26 +9,26 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Une goroutine (ou closure différée) lancée dans une boucle `for` utilise la
-  variable de boucle directement : `for i := range items { go func() {
+  A goroutine (or deferred closure) launched in a `for` loop uses the loop
+  variable directly: `for i := range items { go func() {
   fmt.Println(i) }() }`.
 detect: >-
-  - `go func() { ... }()` dans une boucle utilisant la variable itérée.
-  - `go test -race` détecte la course (pré-1.22) ; revue des closures de boucle.
-  - Depuis Go 1.22 la variable de boucle est ré-initialisée par itération — la
-    règle concerne le code ciblant des toolchains antérieures ou la portabilité.
+  - `go func() { ... }()` in a loop using the iterated variable.
+  - `go test -race` detects the race (pre-1.22); review of loop closures.
+  - Since Go 1.22 the loop variable is re-initialized per iteration — the
+    rule concerns code targeting earlier toolchains or portability.
 problem: >-
-  Avant Go 1.22, toutes les itérations partagent la même variable : les
-  goroutines lisent la valeur finale ou une valeur concurrente — sorties
-  dupliquées, données fausses, course de données.
+  Before Go 1.22, all iterations share the same variable: goroutines read the
+  final value or a concurrent value — duplicated outputs, wrong data, data
+  race.
 fix: >-
-  Sur une toolchain < 1.22 : `i := i` en tête de boucle ou passer la valeur en
-  argument (`go func(i int) { ... }(i)`). Sur Go 1.22+ : comportement corrigé
-  par itération, mais rester explicite quand la boucle capture d'autres
-  variables mutées (même règle qu'avant).
+  On a toolchain < 1.22: `i := i` at the top of the loop or pass the value as
+  an argument (`go func(i int) { ... }(i)`). On Go 1.22+: behavior fixed per
+  iteration, but stay explicit when the loop captures other mutated variables
+  (same rule as before).
 when_ok: >-
-  Sur Go 1.22+ la capture simple est sûre ; la vigilance reste requise pour les
-  variables déclarées hors boucle et mutées dans l'itération.
+  On Go 1.22+ simple capture is safe; vigilance remains required for variables
+  declared outside the loop and mutated in the iteration.
 relationships:
   references:
     - https://go.dev/wiki/CodeReviewConcurrency

@@ -6,7 +6,7 @@ tags: [config, koanf, viper-alternative, env, flags]
 last-verified: 2026-08-05
 ---
 
-# koanf — cascade de configuration explicite
+# koanf — explicit configuration cascade
 
 ## Selection
 
@@ -52,35 +52,30 @@ override earlier ones. Use `StrictMerge` when incompatible types must fail.
 | envconfig | Env-only configuration; not a replacement for a multi-provider cascade. |
 | Typed configuration package | Consider when strict compile-time schema and validation are more important than provider flexibility. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Defaults, files, environment, and flags need a visible precedence cascade.
 - Providers/parsers should be selected independently with typed decoding.
 - A new Go service wants an alternative to Viper's broader/global model.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A single value or small flag set is enough for stdlib.
 - The project needs implicit case-insensitive keys or a global singleton.
 - File watching will run concurrently with `Get`/`Load` without synchronization.
 - The project is not prepared to pin and migrate the v2 module/provider paths.
 
-## Avantages
-
+## Advantages
 - Provider/parser separation keeps dependencies deliberate.
 - Load order and override semantics are explicit.
 - Typed unmarshal and strict merge options expose configuration failures early.
 - Modular integrations cover file, env, flags, cloud, and secret providers.
 
-## Inconvénients
-
+## Disadvantages
 - Case-sensitive keys and no automatic load order require discipline.
 - Providers/parsers add separate modules and their own operational behavior.
 - Watching/reloading needs a synchronization policy owned by the application.
 - v2.3.6 requires Go 1.23+ and has evolving provider integrations.
 
-## Pièges connus
-
+## Known pitfalls
 - Establish and test one cascade order; later loads override earlier values.
 - Synchronize reloads with concurrent readers; the library does not make the
   whole application configuration immutable for you.
@@ -90,8 +85,7 @@ override earlier ones. Use `StrictMerge` when incompatible types must fail.
 - Do not store secrets in logs or use unbounded environment/file inputs without
   validation at the configuration boundary.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official koanf repository](https://github.com/knadh/koanf) — maintenance,
   architecture, license, checked 2026-08-05.
 - [koanf v2 on pkg.go.dev](https://pkg.go.dev/github.com/knadh/koanf/v2) — API,

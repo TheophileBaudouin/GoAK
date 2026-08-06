@@ -1,5 +1,5 @@
 id: pattern:antipattern:go-over-structuring
-title: Surcharge de structure — copie de golang-standards/project-layout
+title: Over-structuring — copy of golang-standards/project-layout
 kind: Pattern
 version: 1
 status: active
@@ -9,30 +9,28 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 symptom: >-
-  Arborescence `cmd/`, `internal/`, `pkg/`, `scripts/`, `configs/`, `deploy/`,
-  `docs/`… copiée d'un template générique pour un projet qui tient en quelques
-  packages, avec des packages vides ou à un seul fichier.
+  A `cmd/`, `internal/`, `pkg/`, `scripts/`, `configs/`, `deploy/`, `docs/`…
+  tree copied from a generic template for a project that fits in a few
+  packages, with empty or single-file packages.
 detect: >-
-  - Dossiers avec un seul fichier ou des ré-exportations.
-  - `pkg/` contenant du code utilisé uniquement en interne.
-  - Import circulaires évités en créant des packages « util » fourre-tout.
+  - Directories with a single file or re-exports.
+  - `pkg/` containing code used only internally.
+  - Circular imports avoided by creating catch-all "util" packages.
 problem: >-
-  `golang-standards/project-layout` n'est pas un standard officiel (Go team) :
-  la doc officielle d'organisation d'un module recommande de rester simple et
-  de ne créer que les packages nécessaires. La sur-structuration augmente le
-  coût de navigation, encourage les packages fourre-tout et dilue les
-  responsabilités.
+  `golang-standards/project-layout` is not an official standard (Go team):
+  the official module organization doc recommends staying simple and creating
+  only the needed packages. Over-structuring increases the navigation cost,
+  encourages catch-all packages, and dilutes responsibilities.
 fix: >-
-  Commencer minimal : tout à la racine du module ou dans un package racine, des
-  sous-packages uniquement quand une frontière d'import est réelle (utiliser
-  `internal/` pour le code privé, `cmd/` pour les binaires multiples).
-  Structurer
-  par responsabilité de code, pas par copie de template. Ajouter des dossiers
-  quand la taille le justifie, jamais par anticipation.
+  Start minimal: everything at the module root or in a root package,
+  sub-packages only when an import boundary is real (use `internal/` for
+  private code, `cmd/` for multiple binaries). Structure by code
+  responsibility, not by copying a template. Add directories when size
+  justifies it, never in anticipation.
 when_ok: >-
-  Les templates de démarrage (monolith, api-service) du kit fournissent une
-  structure de départ raisonnable ; l'anti-pattern est d'en garder les dossiers
-  vides au-delà du besoin. Philosophie du kit : `rules/core/philosophy`.
+  The kit's starter templates (monolith, api-service) provide a reasonable
+  starting structure; the anti-pattern is keeping their empty directories
+  beyond the need. Kit philosophy: `rules/core/philosophy`.
 relationships:
   references:
     - https://go.dev/doc/modules/layout

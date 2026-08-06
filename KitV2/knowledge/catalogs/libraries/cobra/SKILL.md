@@ -6,7 +6,7 @@ tags: [cli, cobra, subcommands, completion, help]
 last-verified: 2026-08-05
 ---
 
-# cobra — CLI multi-commandes
+# cobra — multi-command CLI
 
 ## Selection
 
@@ -38,35 +38,30 @@ return failures through `RunE`, not terminate the process through `CheckErr`.
 | `urfave/cli` | A valid alternative when its API and command model match the project; compare maintenance and dependency policy directly. |
 | Custom parsing | Avoid when help, completion, and command validation are required; it recreates Cobra's boundary. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - The CLI has multiple or nested commands, persistent/local flags, aliases,
   generated help, or shell completion.
 - POSIX short/long flag behavior and command-level validation are required.
 - A command factory and explicit execution boundary can be maintained in tests.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A single command with a few flat flags is fully covered by stdlib `flag`.
 - The binary must remain dependency-free and does not need generated help or
   completion.
 - The code is a reusable library that must never own process exit behavior.
 
-## Avantages
-
+## Advantages
 - Composable command tree with persistent and local flags.
 - Generated help, aliases, validation hooks, and shell completion.
 - `RunE` plus `ExecuteC` keeps application errors testable and injectable.
 
-## Inconvénients
-
+## Disadvantages
 - Adds Cobra and pflag dependencies and a command model to learn.
 - Mutable command options make package-global trees prone to order-dependent
   tests.
 - Its feature set is unnecessary overhead for a flat command.
 
-## Pièges connus
-
+## Known pitfalls
 - Use `RunE` and handle the returned error at the process boundary; avoid
   `CheckErr` in reusable command code.
 - Build a fresh command tree per test and per execution when mutable state could
@@ -76,8 +71,7 @@ return failures through `RunE`, not terminate the process through `CheckErr`.
   them. Use a protected configuration source.
 - Pin Cobra and inspect pflag/transitive changes during upgrades.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official Cobra repository](https://github.com/spf13/cobra) — maintenance,
   API, and security policy, checked 2026-08-05.
 - [Cobra v1.10.2 releases](https://github.com/spf13/cobra/releases) — current

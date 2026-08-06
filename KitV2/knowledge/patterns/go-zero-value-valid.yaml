@@ -1,0 +1,45 @@
+---
+id: pattern:go:zero-value-valid
+title: Zero value usable — design types so the zero value is ready to use
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, zero-value, struct-design, api, idiomatic]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  A type whose zero value panics or misbehaves forces every user to remember
+  an initialization ritual; the zero value becomes a trap instead of the
+  default, and constructors proliferate to hide it.
+context: >-
+  Applies to every exported type that can be declared without a constructor:
+  structs, options, buffers, and synchronization-like primitives.
+solution: >-
+  Design the zero value to be immediately usable: fields default to safe
+  values (nil slice/pointer means empty, zero means no-op), and constructors
+  exist only to set non-zero options. Document the guarantee when it is not
+  obvious, following the stdlib precedent: bytes.Buffer's zero value is "an
+  empty buffer ready to use", sync.Mutex has no constructor. Effective Go
+  makes it a design rule: arrange data structures so the zero value can be
+  used without further initialization.
+benefits: >-
+  Users declare and use the type directly; fewer constructors to remember;
+  the zero value composes naturally in tests and nested structs; matches
+  stdlib conventions that readers already know.
+costs: >-
+  Some configurations are not expressible at the zero value (a non-zero
+  threshold must be a field); a "usable but silently no-op" zero value can
+  mask a forgotten configuration — prefer an explicit error or panic for
+  states that are truly invalid, and say so in the doc comment.
+related: >-
+  Method-set decisions interact with this pattern:
+  pattern:go:value-vs-pointer-receivers.
+relationships:
+  references:
+    - https://go.dev/doc/effective_go
+    - https://dave.cheney.net/2013/01/19/what-is-the-zero-value-and-why-is-it-useful
+    - pattern:go:value-vs-pointer-receivers
+  uses: []
+  validated_by: []

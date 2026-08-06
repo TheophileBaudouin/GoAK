@@ -1,5 +1,5 @@
 id: pattern:cache:stale-while-revalidate
-title: Stale-while-revalidate — fraîcheur sans pointe de charge
+title: Stale-while-revalidate — freshness without load spikes
 kind: Pattern
 version: 1
 status: active
@@ -9,29 +9,27 @@ go_version: "1.22+"
 dependencies: []
 last_verified: 2026-08-04
 problem: >-
-  L'expiration d'une entrée populaire provoque un pic de misses simultanés
-  (stampede, voir pattern:antipattern:cache-stampede) et l'invalidation
-  aveugle sert des données périmées sans contrôle (voir
-  pattern:antipattern:cache-stale).
+  Expiration of a popular entry causes a spike of simultaneous misses
+  (stampede, see pattern:antipattern:cache-stampede) and blind invalidation
+  serves stale data without control (see pattern:antipattern:cache-stale).
 context: >-
-  S'applique aux données à lecture fréquente dont la fraîcheur tolère une
-  fenêtre de dérive (contenu, agrégats, référentiels).
+  Applies to frequently-read data whose freshness tolerates a drift window
+  (content, aggregates, reference data).
 solution: >-
-  Servir la valeur périmée pendant qu'une revalidation asynchrone recharge la
-  source : TTL court (fraîcheur) + TTL long (validité maxi) ; le premier
-  lecteur après expiration déclenche le refresh (verrouillé par
-  pattern:concurrency:singleflight) et les autres reçoivent la valeur
-  existante. Ajouter du jitter sur les TTL pour désynchroniser les
-  expirations.
+  Serve the stale value while an asynchronous revalidation reloads the
+  source: short TTL (freshness) + long TTL (maximum validity); the first
+  reader after expiration triggers the refresh (locked by
+  pattern:concurrency:singleflight) and the others receive the existing
+  value. Add jitter to the TTLs to desynchronize expirations.
 benefits: >-
-  Latence de lecture constante (jamais de miss qui frappe la source en
-  masse), fraîcheur bornée et contrôlée, et dégradation douce de la source.
+  Constant read latency (never a miss that hits the source in mass),
+  bounded and controlled freshness, and graceful degradation of the source.
 costs: >-
-  Complexité (deux TTL, revalidation, état du refresh) ; la valeur servie
-  peut être périmée de la fenêtre — inacceptable pour les données critiques
-  (prix en temps réel) où l'invalidation à l'écriture reste nécessaire.
+  Complexity (two TTLs, revalidation, refresh state); the served value can
+  be stale by the window — unacceptable for critical data (real-time
+  prices) where write-through invalidation remains necessary.
 related: >-
-  Homologue négatif : pattern:antipattern:cache-stampede,
+  Negative counterpart: pattern:antipattern:cache-stampede,
   pattern:antipattern:cache-stale.
 relationships:
   references:

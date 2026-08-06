@@ -1,0 +1,46 @@
+---
+id: pattern:go:semantic-import-versioning
+title: Semantic import versioning — /vN module path for breaking changes
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags: [go, modules, versioning, api-compatibility, semver]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-06
+problem: >-
+  A breaking API change inside the same module path silently breaks
+  consumers: one module path means one API, and the import path cannot
+  express "this is v2" without the /vN convention.
+context: >-
+  Applies to every published module: how to grow the API without breaking
+  existing consumers, and what to do when a breaking change is unavoidable.
+solution: >-
+  Treat the module path as a compatibility contract. Within a major version,
+  keep the API backward compatible — add, do not remove or change semantics.
+  For a breaking change, publish a new major version whose module path ends
+  in /vN (v2, v3, …): a distinct module that may coexist with v1. Official
+  guidance ("Keeping Your Modules Compatible", "Go Modules: v2 and Beyond"):
+  the import compatibility rule requires the /vN suffix for major version 2
+  and higher; plan it before the first release when a v2 is foreseeable.
+benefits: >-
+  Multiple major versions can be imported side by side; the module system
+  resolves the right version mechanically; consumers upgrade on their own
+  schedule; the compatibility promise is enforced, not editorial.
+costs: >-
+  A new major version is a new module (tags, maintenance, two codebases);
+  adding /vN later is disruptive — decide the path early; fixing a flawed
+  v2 API requires a v3.
+related: >-
+  Module mechanics: source:go:modules; compatibility window:
+  source:go:release-policy.
+relationships:
+  references:
+    - https://go.dev/blog/module-compatibility
+    - https://go.dev/blog/v2-go-modules
+    - https://go.dev/ref/mod
+    - source:go:modules
+    - source:go:release-policy
+  uses: []
+  validated_by: []

@@ -6,7 +6,7 @@ tags: [ansi, terminal, parsing, tui, sequences]
 last-verified: 2026-08-05
 ---
 
-# sequin — inspection de séquences ANSI
+# sequin — ANSI sequence inspection
 
 ## Selection
 
@@ -43,36 +43,31 @@ higher-level styling package when code must parse/produce ANSI programmatically.
 | Golden/teatest tools | Use for testing rendered TUI output; sequin helps inspect what the output contains. |
 | Regex over escape bytes | Reject: it misses OSC/CSI/hyperlink and multi-byte edge cases. |
 
-## Utiliser cette librairie quand
-
+## When to use this library
 - Debugging a CLI/TUI whose output contains ANSI sequences.
 - Inspecting a command's terminal protocol, colors, hyperlinks, cursor, or mode
   changes in a readable form.
 - Comparing piped/golden output with what a terminal parser sees.
 
-## Ne pas utiliser cette librairie quand
-
+## When NOT to use this library
 - A Go service needs a reusable parser or writer API.
 - The task is producing styles: use Lip Gloss/colorprofile.
 - ANSI is absent and ordinary text measurement is sufficient.
 - The application requires complete Kitty graphics/APC interpretation.
 
-## Avantages
-
+## Advantages
 - Human-readable inspection instead of manual escape-byte decoding.
 - Fake-TTY command execution helps debug output that depends on terminal mode.
 - Handles common CSI/OSC/DCS/SGR and terminal control sequences through Charm's
   maintained parser stack.
 
-## Inconvénients
-
+## Disadvantages
 - CLI-only; it is not a library dependency with a stable embedding API.
 - APC/Kitty graphics sequences are not fully supported.
 - It explains sequences; it does not render or normalize terminal text for an
   application's layout policy.
 
-## Pièges connus
-
+## Known pitfalls
 - Do not infer that a parsed byte length equals visible terminal width; use the
   appropriate width/parser policy for layout.
 - Treat unknown sequences as unknown rather than silently discarding them.
@@ -81,8 +76,7 @@ higher-level styling package when code must parse/produce ANSI programmatically.
 - Keep `sequin` as a debugging tool and use `x/ansi`, Lip Gloss, or colorprofile
   for program code.
 
-## Sources vérifiées
-
+## Verified sources
 - [Official sequin repository](https://github.com/charmbracelet/sequin) — README,
   CLI scope, maintenance, license, checked 2026-08-05.
 - [sequin v0.3.1 release](https://github.com/charmbracelet/sequin/releases/tag/v0.3.1)
