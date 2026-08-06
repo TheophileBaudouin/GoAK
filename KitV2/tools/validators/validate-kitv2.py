@@ -30,7 +30,9 @@ def _load_module(name: str, path: Path) -> ModuleType:
 
 
 # Layer 5.1 drift gate for templates (shared with tools/generators).
-structure_md = _load_module("structure_md", ROOT / "tools" / "generators" / "structure_md.py")
+structure_md = _load_module(
+    "structure_md", ROOT / "tools" / "generators" / "structure_md.py"
+)
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 CATEGORIES = {"recipe", "rule", "pattern", "library", "reference-project", "checklist"}
@@ -688,7 +690,15 @@ def check_no_metaproject_paths() -> list[str]:
     does not exist (KVA-102 regression guard)."""
     errors: list[str] = []
     extensions = {
-        ".md", ".yaml", ".yml", ".ts", ".json", ".go", ".sh", ".txt", ".py",
+        ".md",
+        ".yaml",
+        ".yml",
+        ".ts",
+        ".json",
+        ".go",
+        ".sh",
+        ".txt",
+        ".py",
     }
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix not in extensions:

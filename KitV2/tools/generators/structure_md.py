@@ -60,7 +60,9 @@ def derive_tree_facts(project_dir: Path) -> TreeFacts:
     """Derive the machine-checkable tree side of a project."""
     root = Path(project_dir)
     top_dirs = sorted(
-        entry.name for entry in root.iterdir() if entry.is_dir() and entry.name != ".git"
+        entry.name
+        for entry in root.iterdir()
+        if entry.is_dir() and entry.name != ".git"
     )
     packages: dict[str, str] = {}
     for dirpath, dirnames, _ in os.walk(root):
@@ -114,7 +116,9 @@ def generate(project_dir: Path, title: str | None = None) -> str:
             "the application's reading path"
         )
     if not roles:
-        roles.append("- (flat layout) — no top-level directories; the package is the boundary")
+        roles.append(
+            "- (flat layout) — no top-level directories; the package is the boundary"
+        )
     return f"""# {heading} — reading map
 
 This map explains how to navigate this project. The **Tree facts** section
@@ -125,11 +129,11 @@ content and are not machine-verifiable by design.
 ## Tree facts (machine-checked; do not edit)
 
 ```text
-top_dirs: {_format_list(facts['top_dirs'])}
-packages: {_package_lines(facts['packages'])}
-entry_points: {'; '.join('(root)' if p == '.' else p for p in facts['entry_points'])}
-test_files: {_format_list(facts['test_files'])}
-internal_boundary: {facts['internal_boundary']}
+top_dirs: {_format_list(facts["top_dirs"])}
+packages: {_package_lines(facts["packages"])}
+entry_points: {"; ".join("(root)" if p == "." else p for p in facts["entry_points"])}
+test_files: {_format_list(facts["test_files"])}
+internal_boundary: {facts["internal_boundary"]}
 ```
 
 ## Directory roles
@@ -204,8 +208,7 @@ def check(project_dir: Path, text: str) -> list[str]:
             root_pkg = facts["packages"]["."]
             if f"`{root_pkg}`" not in role_text:
                 defects.append(
-                    "directory roles: no entry mentioning the "
-                    f"`{root_pkg}` package"
+                    f"directory roles: no entry mentioning the `{root_pkg}` package"
                 )
 
     boundary_section = re.search(

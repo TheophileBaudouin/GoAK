@@ -62,7 +62,9 @@ class StructureMdCheckTest(unittest.TestCase):
     def test_tampered_fact_is_caught(self) -> None:
         project = ROOT / "templates" / "rest-api"
         text = (project / "structure.md").read_text(encoding="utf-8")
-        tampered = text.replace("internal_boundary: present", "internal_boundary: absent")
+        tampered = text.replace(
+            "internal_boundary: present", "internal_boundary: absent"
+        )
         defects = structure_md.check(project, tampered)
         self.assertTrue(
             any("internal_boundary" in d for d in defects),

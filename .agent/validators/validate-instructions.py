@@ -117,8 +117,7 @@ def check_absolute_instructions_registry() -> list[str]:
         return errors
     text = registry.read_text(encoding="utf-8")
     recorded = {
-        path.removeprefix("KitV2/")
-        for path in re.findall(r"`(KitV2/[^`]+)`", text)
+        path.removeprefix("KitV2/") for path in re.findall(r"`(KitV2/[^`]+)`", text)
     }
     strong = ("mandatory",)
     for path in PROCESS_SURFACES:

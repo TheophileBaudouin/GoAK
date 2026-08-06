@@ -213,7 +213,9 @@ if __name__ == "__main__":
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             marker = "." + "agent/"  # built dynamically: the string is the check target
-            write(root / "router" / "README.md", f"run `{marker}router/x` from the root\n")
+            write(
+                root / "router" / "README.md", f"run `{marker}router/x` from the root\n"
+            )
             write(root / "tools" / "ok.py", "print('clean')\n")
             with mock.patch.object(module, "ROOT", root):
                 errors = module.check_no_metaproject_paths()
