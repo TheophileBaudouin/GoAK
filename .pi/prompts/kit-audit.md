@@ -95,6 +95,10 @@ recommendation:
 - `§14`: Quality Gates;
 - `§15`: Definition of Done;
 - `§16`: fundamental Kit principles;
+- `§16.1` + Layer 5.1: verifiable governance constraints (relation
+  resolvability, router as sole entry, category justification,
+  absolute-instruction validation) and the structure.md project reading-map
+  contract;
 - any applicable zone contract in `.agent/kit-governance/`;
 - any universal or specialized rule in `KitV2/rules/` applicable to the file.
 
@@ -280,6 +284,51 @@ against contract Z12:
   format) without exceeding 500 lines;
 - router indexed (skills spec-driven-dev, deep-discuss) and `--check` green.
 
+#### C11. structure.md mechanism (Layer 5.1)
+
+Verify that the structure.md contract is attached to the template machinery:
+every sourced template (Z5) declares it in `template.yaml` or its README
+(structure.md generation or validation), and `templates/TEMPLATES.md` or a
+template-contract document records the mechanism — generation-first default,
+drift gate, semantic exception per Layer 5.1. Absence of any conforming
+declaration is `NON CONFORM` and drives the KitV2 implementation pass; no
+resource may claim a generated project is complete without the mechanism
+declared.
+
+#### C12. Relation resolvability (§16.1.1)
+
+Sample and verify every `related:`/`source:` declared between knowledge
+layers: the target must exist and be neither proposed, missing, nor inactive.
+The check must be tool-backed — validate-cognitive.py for graph relations and
+statuses/targets, the snippet date-chain check (D-2026-08-06-03) for `source:`
+chains, router index coverage. A relation verifiable only by prose is
+`NON CONFORM`; a relation that fails to resolve is a finding (`KVA-###`).
+
+#### C13. Router as sole entry (§16.1.2)
+
+Verify that every resource in an indexable zone (rules/, recipes/, knowledge/,
+snippets/, .pi/prompts/, .pi/skills/) appears in `router/index.json`
+(coverage), that `build_index.py --check` is green, and that no parallel
+hand-maintained discovery index exists anywhere in KitV2 (Z11). A
+bypass — unindexed resource or parallel index — is a `NON CONFORM` finding.
+
+#### C14. Category justification (§16.1.3)
+
+Verify that every template/recipe category present in KitV2 carries documented
+real usage — observed consumer demand or a real, maintained project, never
+theoretical utility — recorded at admission (Z5 admission record; Z3 recipe
+admission) in a machine-readable usage-evidence field. A category admitted
+without usage evidence is a finding; absence of the field for a new category
+is `NON CONFORM`.
+
+#### C15. Absolute-instruction validation (§16.1.4)
+
+Extends C9: every "always", "never", or "MANDATORY" in consumer instruction
+surfaces (skills, prompts, AGENTS.md, recipes) must cite the named mechanical
+validator that enforces it, or be recorded "guidance only, not enforced" in
+`.agent/instructions.md` §Enforcement. An absolute without citation or
+recording is `NON CONFORM` — the D-2026-08-05-15 obligation is normative.
+
 ### Phase D — Decide "metaproject or Kit?"
 
 This dimension is mandatory for **every file**, including supporting files.
@@ -439,6 +488,34 @@ The table contains at minimum, at each audit:
 - the "spec-driven-dev workflow (Z12)" row: zone conformity to contract
   Z12 — LOCAL_ONLY, S.U.P.E.R boundary, adaptive control, archive, memory
   rule, absence of residual workflow-* prompts (D-2026-08-05-16).
+- the "structure.md mechanism (C11)" row: every sourced template and the
+  template machinery declare the structure.md contract (template.yaml/README
+  reference; TEMPLATES.md or template-contract.md documents generation-first
+  default, drift gate, semantic exception) — currently a review control;
+  recommended check: a deterministic validator assertion for the presence of
+  the declaration, reason: the declaration is a stable structural property;
+- the "relation resolvability (C12)" row: validate-cognitive.py covers graph
+  relations and statuses/targets, the snippet date-chain check
+  (D-2026-08-06-03) covers `source:` chains — the gap is cross-layer
+  `related:` sampling left to review; recommended check: extend
+  validate-cognitive.py with a deterministic cross-layer `related:` scan,
+  reason: relations are graph properties a validator can assert;
+- the "router coverage (C13)" row: already covered by `build_index.py --check`
+  and the coverage check — the gap is "parallel index" detection (a second
+  hand-maintained discovery index elsewhere in KitV2); recommended check: a
+  deterministic scan of indexable zones for index-like files outside
+  `router/`, reason: build_index cannot detect an index it does not build;
+- the "absolute instructions (C15)" row: extends the MANDATORY row above — the
+  gap is verifying that each cited validator actually exists and enforces the
+  claim; recommended check: extend validate-instructions.py to resolve cited
+  validator names against real validators/scripts, reason: §16.1.4 makes the
+  citation obligation normative.
+- the "category justification (C14)" row: no validator asserts the
+  usage-evidence field today (§16.1.3) — the gap is presence-checking the
+  machine-readable field at admission; recommended check: extend
+  validate-kitv2.py with a presence assertion for the usage-evidence field on
+  new template/recipe categories, reason: §16.1.3 makes the field normative
+  at the first new category admission.
 
 ### F. Verdict and next steps
 

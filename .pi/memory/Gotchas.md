@@ -165,6 +165,22 @@ specific criterion and evidence.
 - **2025-07-31** — *golangci-lint v2 changed config & invocation* → v2 uses
   `golangci-lint run` and the product's deliberate opt-in `.golangci.yml`.
   Avoid v1-style `linters.enable-all`; keep the enabled set explicit.
+- **2026-08-06** — *Go directories carry no machine-readable role metadata* →
+  a deterministic generator can list top-level directories and package names
+  (`go list`), but the *role* of a custom directory (and any reading-path
+  explanation) encodes human intent — the generator can only draft the tree
+  side; semantic enrichment is a human step. No off-the-shelf Go tool
+  generates a one-line-per-directory role map (gomarkdoc/dirtree focus on
+  API/dependency docs). → **When generating structure docs, generate the tree
+  side deterministically and treat role lines/reading paths as human-enriched
+  content that must NOT be claimed machine-verifiable.**
+- **2026-08-06** — *"Generated docs cannot lie" holds only for structural
+  facts* → for semantic content the generator cannot verify itself; the
+  freshness guarantee must come from a drift gate (regenerate + `git diff
+  --exit-code`) or a completeness check (every top-level directory has an
+  entry), never from trust in the writer. → **A hand-written structure.md is
+  acceptable only when a mechanical drift/completeness check runs in CI —
+  trust is not a freshness mechanism.**
 
 ## Lessons
 
