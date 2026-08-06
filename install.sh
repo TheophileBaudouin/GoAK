@@ -2,10 +2,10 @@
 # Go Agent Kit — one-command installer (bootstrap, tree-based version).
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.2.0/install.sh | sh -s -- [target-dir]
+#   curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.5.0/install.sh | sh -s -- [target-dir]
 #
 # Environment:
-#   GAK_REF    git ref to install (default: v2.2.0). Use GAK_REF=main for the
+#   GAK_REF    git ref to install (default: v2.5.0). Use GAK_REF=main for the
 #              latest branch head, or any tag/commit for a pinned install.
 #   GAK_SKIP_VERIFY   set to 1 to skip the product verification step.
 #   NO_COLOR          set to any value to disable colored output.
@@ -19,7 +19,7 @@
 set -eu
 
 repo="TheophileBaudouin/GoAK"
-ref="${GAK_REF:-v2.2.1}"
+ref="${GAK_REF:-v2.5.0}"
 target="${1:-./go-agent-kit}"
 
 # --- output helpers: minimal, portable (POSIX sh), auto-disabled ---
