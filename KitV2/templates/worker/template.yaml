@@ -4,5 +4,11 @@ purpose: MIT-sourced dependency-free bounded worker pool with graceful draining.
 source: >-
   https://github.com/sangianpatrick/go-workerpool@5d5c611c47489dda3b6e97cd277131d05c814bad
 license: MIT
+usage-evidence: >-
+  Real, maintained, dependency-free worker pool (sangianpatrick/go-workerpool,
+  v1.0.1, MIT, releases since 2026-05). Young repository with limited public
+  adoption (low star count); admission rests on single responsibility, tests,
+  and functional releases, not popularity — recorded honestly per §16.1.3.
+structure.md: generated-with-semantic-review
 validation: go test -race ./...; go vet ./...
-last_verified: 2026-08-05
+last_verified: 2026-08-06

@@ -15,9 +15,9 @@ security warning, or usage rule. Do not restate the same fact in another
 language, section, table, or paraphrase merely to fill the fiche format.
 Remove an optional section when it adds no distinct information.
 
-Use one coherent language for the body of a file. The mandatory French decision
-headings are labels, not a reason to translate and repeat the preceding English
-content.
+Use one coherent language for the body of a file. English is the mandatory
+project language (fundamental rule D-2026-08-05-21): headings are labels, not
+a reason to translate and repeat the same content in another language.
 
 ## Section boundaries
 

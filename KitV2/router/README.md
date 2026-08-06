@@ -38,16 +38,15 @@ off-domain queries that must be rejected (`offDomain: true`, empty-over-noise
 rule). Every expected id must exist in the index — `validate-kitv2.py`
 enforces this schema and linkage check on every gate.
 
-The ranking verification itself runs in the metaproject gate with the REAL
-runtime scoring — `.agent/router/run_scenarios.mjs` imports
-`kit-resource-router-scoring.ts`, the exact module the tool uses, so the
-gate and the agent cannot diverge. It requires Node ≥ 23.6 (native `.ts`
-type stripping; on 22.x add `--experimental-strip-types`). Run it from the
-metaproject root:
-
-```sh
-node --no-warnings .agent/router/run_scenarios.mjs   # exit 0 = routing contract holds
-```
+The ranking verification itself runs in the **metaproject gate** with the
+REAL runtime scoring: the gate runner imports `kit-resource-router-scoring.ts`
+(the exact module the tool uses), so the gate and the agent cannot diverge.
+The runner, its sources, and the Node runtime requirement (≥ 23.6) are
+metaproject-only and are **not shipped** with this product — the installed
+kit is verified by `validate-kitv2.py` (schema + id linkage) and ships the
+index read-only. Metaproject maintainers run the ranking gate from the
+repository root with the metaproject runner (`run_scenarios.mjs`); exit 0
+means the routing contract holds.
 
 The gate verifies the scoring layer: for off-domain scenarios it asserts
 the `offDomain` guard fires (the tool then renders the empty-result
@@ -64,6 +63,13 @@ The agent calls the native `search_kit_resources` tool with a technical query
 compact top-K: `kind`, `id`, path, matched terms (the match reason), and a
 short description. The `kit-resource-routing` skill (`.pi/skills/`) explains
 when and how to use it.
+
+> `kind` is the **routing resource class**, not the charter artifact kind.
+> The index groups resources by the surface an agent routes to (recipe,
+> rule, pattern, anti-pattern, catalog, source, snippet, prompt, skill,
+> template); a catalog-layer YAML pointer declares `kind: Source` in its own
+> metadata yet routes as class `catalog`. The artifact file itself stays the
+> authority for its charter kind.
 
 ## Schema
 

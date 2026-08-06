@@ -149,3 +149,53 @@ func copyTree(source, destination string) error {
 		return os.WriteFile(target, data, 0o644)
 	})
 }
+
+func TestResolverSetters(t *testing.T) {
+	r, err := Open(fixture(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.goBin != "go" {
+		t.Fatalf("default goBin = %q, want go", r.goBin)
+	}
+	r.SetGoCommand("/custom/go")
+	if r.goBin != "/custom/go" {
+		t.Fatalf("goBin after SetGoCommand = %q", r.goBin)
+	}
+	before := len(r.env)
+	r.SetEnvironment([]string{"A=B"})
+	if len(r.env) != 1 || r.env[0] != "A=B" {
+		t.Fatalf("env after SetEnvironment = %v", r.env)
+	}
+	if before == 0 {
+		t.Fatal("fixture resolver started with an empty environment")
+	}
+}
+
+func TestRankOrdering(t *testing.T) {
+	records := []indexRecord{
+		{unit: "zebra"},
+		{unit: "error-handling"},
+		{unit: "errors"},
+		{unit: "errors-go"},
+	}
+	// Prefix "err": every matched unit has prefix rank 1, ties broken by
+	// unit name; non-matching units are excluded from the result.
+	got := search(records, "err", ModePrefix)
+	want := []string{"error-handling", "errors", "errors-go"}
+	for i := range want {
+		if got[i].unit != want[i] {
+			t.Fatalf("search order[%d] = %q, want %q (got %v)", i, got[i].unit, want[i], got)
+		}
+	}
+	// Exact mode matches only the exact unit (rank 0).
+	exact := search(records, "errors", ModeExact)
+	if len(exact) != 1 || exact[0].unit != "errors" {
+		t.Fatalf("exact search = %v", exact)
+	}
+	// Contains mode matches mid-string tokens (non-prefix rank).
+	contains := search(records, "handling", ModeContains)
+	if len(contains) != 1 || contains[0].unit != "error-handling" {
+		t.Fatalf("contains search = %v", contains)
+	}
+}

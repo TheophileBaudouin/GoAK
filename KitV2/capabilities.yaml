@@ -69,6 +69,8 @@ coverage:
   product_skills: 72
   rules: 14
   recipes: 15
+  # 43 = catalog SKILL.md fiches; router meta.json counts all catalog-kind
+  # resources (74, incl. YAML pointers) — two scopes, both recomputed by gate.
   knowledge_catalogs: 43
   probes: 15
   project_templates: 3

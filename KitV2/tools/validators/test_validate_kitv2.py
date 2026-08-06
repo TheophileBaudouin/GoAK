@@ -88,7 +88,7 @@ class ValidatorTests(unittest.TestCase):
                 errors = module.check_coverage()
         self.assertTrue(any("coverage.product_skills" in error for error in errors))
         # The shipped file is untouched.
-        self.assertIn("product_skills: 71", original.read_text(encoding="utf-8"))
+        self.assertIn("product_skills: 72", original.read_text(encoding="utf-8"))
 
     def test_template_build_fails_on_broken_template(self) -> None:
         if shutil.which("go") is None:
@@ -207,3 +207,15 @@ class ValidatorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_no_metaproject_paths_catches_leakage(self) -> None:
+        """KVA-102 — a shipped file referencing the metaproject marker fails."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            marker = "." + "agent/"  # built dynamically: the string is the check target
+            write(root / "router" / "README.md", f"run `{marker}router/x` from the root\n")
+            write(root / "tools" / "ok.py", "print('clean')\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_no_metaproject_paths()
+        self.assertTrue(any("README.md" in error for error in errors), errors)
+        self.assertFalse(any("ok.py" in error for error in errors), errors)

@@ -4,5 +4,11 @@ purpose: MIT-sourced standard-library-first HTTP REST service foundation.
 source: >-
   https://github.com/leeprovoost/go-rest-api-template@4f2d17f700be3b355ff88986ca37c70ad2145cef
 license: MIT
+usage-evidence: >-
+  Real, maintained single-purpose REST foundation (leeprovoost/go-rest-api-template,
+  MIT, active since 2015, ~177 stars); stdlib-first with only x/time + testify;
+  the shape the kit's rest-chi recipe exercises. Evidence of real usage, not
+  theoretical utility.
+structure.md: generated-with-semantic-review
 validation: go test -race ./...; go vet ./...; go run ./cmd/api-service
-last_verified: 2026-08-05
+last_verified: 2026-08-06

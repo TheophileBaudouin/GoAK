@@ -1,5 +1,6 @@
 # CI — the KitV2 verification gate, machine-enforced.
-# Any non-zero exit fails the job.
+# Any non-zero exit fails the job. It mirrors the local gate: metaproject
+# validators, router checks, Go gate, probes, and the routing-quality gate.
 name: gate
 
 on:
@@ -13,9 +14,6 @@ permissions:
 jobs:
   gate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: KitV2
     steps:
       # Actions pinned to full commit SHAs (supply-chain hardening: tags
       # can be repointed). SHAs resolved from the release tags below.
@@ -29,6 +27,23 @@ jobs:
           go-version: "1.26"
           cache: true
 
+      # Validators and the router builder are Python (stdlib + PyYAML, pinned
+      # in .agent/validators/requirements.txt); the routing-quality gate
+      # needs Node >= 23.6 (native .ts type stripping).
+      - name: Install validator dependencies
+        run: >-
+          python3 -m pip install --quiet
+          -r .agent/validators/requirements.txt
+      # setup-python v5.6.0
+      - uses: actions/setup-python@39cd49dd4469e97acce8a2b72c82d8bdd9b1b6e9
+        with:
+          python-version: "3.12"
+
+      # setup-node v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+
       # gosec/govulncheck are not provided by setup-go; pinned to audited
       # releases so CI matches what the local gate uses.
       - name: Install gate tools
@@ -36,15 +51,34 @@ jobs:
           go install github.com/securego/gosec/v2/cmd/gosec@v2.28.0
           go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
 
-      # 1. gofmt — must report no files. `gofmt -l` exits 0 even when dirty,
-      #    so test -z is required to turn output into a failure.
+      # ---- metaproject validators (read-only; structure + registry gates) ----
+      - name: validate-instructions
+        run: python3 .agent/validators/validate-instructions.py
+
+      - name: validate-cognitive
+        run: python3 .agent/validators/validate-cognitive.py
+
+      - name: product validator
+        working-directory: KitV2
+        run: python3 tools/validators/validate-kitv2.py
+
+      - name: router index check
+        run: python3 .agent/router/build_index.py --check
+
+      - name: routing-quality gate (real runtime scoring)
+        run: node --no-warnings .agent/router/run_scenarios.mjs
+
+      # ---- Go gate (from KitV2) ----
       - name: gofmt
+        working-directory: KitV2
         run: test -z "$(gofmt -l .)"
 
       - name: go vet
+        working-directory: KitV2
         run: go vet ./...
 
       - name: go mod verify
+        working-directory: KitV2
         run: go mod verify
 
       - name: golangci-lint
@@ -54,18 +88,33 @@ jobs:
           version: v2.12.2
           working-directory: KitV2
 
-      - name: go test -race
-        run: go test -race -coverprofile=coverage.out ./...
+      # The coverage aggregate measures the testable library surface
+      # (recipes, snippets, tools/offline) — D-2026-08-06-13. The probe
+      # mains are executable observable scenarios verified by probes/run.sh
+      # below, not unit-testable library code; counting them at 0% would
+      # make the floor uninformative.
+      - name: go test -race (library surface)
+        working-directory: KitV2
+        run: >-
+          go test -race -coverprofile=coverage.out
+          $(go list ./... | grep -v '/probes/')
 
       - name: coverage floor (70%)
+        working-directory: KitV2
         run: |
           pct=$(go tool cover -func=coverage.out | tail -1 \
             | grep -oE '[0-9]+\.[0-9]+%$' | tr -d '%')
           echo "aggregate coverage: ${pct}% (floor: 70%)"
           awk -v p="$pct" 'BEGIN { exit !(p+0 >= 70) }'
 
+      - name: probes (observable scenarios)
+        working-directory: KitV2
+        run: bash probes/run.sh
+
       - name: gosec
+        working-directory: KitV2
         run: gosec ./...
 
       - name: govulncheck
+        working-directory: KitV2
         run: govulncheck ./...

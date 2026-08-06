@@ -29,7 +29,9 @@ templates/<shape>/
 │                        # adaptations (diff + reasons)
 ├── README.md            # status, source, observable scenario, modifications,
 │                        # project structure and justification (D-2026-08-05-13)
-└── template.yaml        # name, status, purpose, source, validation
+├── structure.md         # reading map (Layer 5.1); tree side machine-checked
+└── template.yaml        # name, status, purpose, source, validation,
+                         # usage-evidence (D-2026-08-06-12), structure.md
 ```
 
 ## 4. Statuses
@@ -66,6 +68,8 @@ The current `legacy` scaffolds (rest-api, grpc, cli, worker, microservice, monol
 ## 8. Validation criteria (C2)
 
 - [ ] Every non-legacy template: `LICENSE` (MIT) + `ATTRIBUTION.md` (source, version, adaptations, **technical scope**) + `README.md` + `template.yaml` present.
+- [ ] `template.yaml` carries `usage-evidence` (documented real usage, charter §16.1.3 — C2 presence check) and `structure.md` (mechanism declaration, Layer 5.1 — C2).
+- [ ] Every sourced template ships `structure.md`; `validate-kitv2.py` checks the tree facts against the real tree (completeness + conformity; generator `tools/generators/structure_md.py` + its tests).
 - [ ] `ATTRIBUTION.md` attests a single technology and the absence of ancillary technology (review control; C2 verifies the section presence).
 - [ ] Size bound respected (bounded source file/line count, no heavy vendored/generated tree) — C2.
 - [ ] Compile + tests + traced observable scenario.

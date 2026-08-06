@@ -4,5 +4,11 @@ purpose: MIT-sourced tested Markdown table-of-contents command-line application.
 source: >-
   https://github.com/danjdewhurst/go-toc@1f93495652ca789a75251f3cd6028b8f3adfc624
 license: MIT
+usage-evidence: >-
+  Real, maintained single-purpose CLI (danjdewhurst/go-toc, v0.3.0, MIT);
+  stdlib-only, consumed as a binary via pkg.go.dev; adopted here for the CLI
+  shape that the kit's cli recipes exercise. Evidence of real usage, not
+  theoretical utility.
+structure.md: generated-with-semantic-review
 validation: go test -race ./...; go vet ./...; go run . --help
-last_verified: 2026-08-05
+last_verified: 2026-08-06

@@ -30,8 +30,9 @@ do not call the tool.
 
 - One concern per query. Split "I need a REST API with auth and a worker
   pool" into `rest api chi` and `bounded worker pool`.
-- 3–8 technical terms, in English (the kit descriptions are English). French
-  terms have partial synonym coverage; prefer English.
+- 3–8 technical terms, in English — the kit descriptions and index terms are
+  English-only (fundamental language rule D-2026-08-05-21); a non-English
+  query rarely matches.
 - Name the concrete artifacts: `sqlc`, `errgroup`, `slog`, `wails`,
   `graceful shutdown`, `chi middleware`.
 - Skip filler: `build a service with go` is weak; `chi rest api json` is

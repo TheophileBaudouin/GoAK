@@ -80,3 +80,62 @@ func TestListFoos(t *testing.T) {
 		}
 	}
 }
+
+func TestOpenDefaultsAndErrors(t *testing.T) {
+	if _, err := Open(""); err != nil {
+		t.Fatalf("Open with empty DSN (default :memory:) failed: %v", err)
+	}
+	if _, err := Open("file:/no/such/directory-xyz/db.sqlite"); err == nil {
+		t.Fatal("Open accepted an unreachable file DSN")
+	}
+}
+
+func TestWithTxCommitAndRollback(t *testing.T) {
+	db, err := Open(":memory:")
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	defer func() { _ = db.Close() }()
+	ctx := context.Background()
+	q := New(db)
+
+	// Committed transaction: the row is visible after Commit.
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatalf("Begin: %v", err)
+	}
+	tq := q.WithTx(tx)
+	if _, err := tq.CreateFoo(ctx, "in-tx"); err != nil {
+		t.Fatalf("CreateFoo in tx: %v", err)
+	}
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("Commit: %v", err)
+	}
+	rows, err := q.ListFoos(ctx)
+	if err != nil {
+		t.Fatalf("ListFoos: %v", err)
+	}
+	if len(rows) != 1 || rows[0].Name != "in-tx" {
+		t.Fatalf("after commit: %+v, want one in-tx row", rows)
+	}
+
+	// Rolled-back transaction: the row must not be visible.
+	tx, err = db.Begin()
+	if err != nil {
+		t.Fatalf("Begin: %v", err)
+	}
+	tq = q.WithTx(tx)
+	if _, err := tq.CreateFoo(ctx, "rolled-back"); err != nil {
+		t.Fatalf("CreateFoo in tx: %v", err)
+	}
+	if err := tx.Rollback(); err != nil {
+		t.Fatalf("Rollback: %v", err)
+	}
+	rows, err = q.ListFoos(ctx)
+	if err != nil {
+		t.Fatalf("ListFoos: %v", err)
+	}
+	if len(rows) != 1 || rows[0].Name == "rolled-back" {
+		t.Fatalf("after rollback: %+v, want only the committed row", rows)
+	}
+}

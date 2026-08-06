@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -12,10 +13,24 @@ import subprocess
 import sys
 from datetime import date
 from pathlib import Path
+from types import ModuleType
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _load_module(name: str, path: Path) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+# Layer 5.1 drift gate for templates (shared with tools/generators).
+structure_md = _load_module("structure_md", ROOT / "tools" / "generators" / "structure_md.py")
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 CATEGORIES = {"recipe", "rule", "pattern", "library", "reference-project", "checklist"}
@@ -304,9 +319,19 @@ def check_template_status() -> list[str]:
             for field in ("source", "license", "last_verified"):
                 if not template.get(field):
                     errors.append(f"{path}: sourced template missing {field}")
+            if not template.get("usage-evidence"):
+                errors.append(
+                    f"{path}: sourced template missing usage-evidence "
+                    "(charter §16.1.3: documented real usage at admission)"
+                )
+            if not template.get("structure.md"):
+                errors.append(
+                    f"{path}: sourced template missing structure.md declaration "
+                    "(charter Layer 5.1: generation or validation mechanism)"
+                )
             if template.get("license") != "MIT":
                 errors.append(f"{path}: sourced template license must be MIT")
-            for required in ("LICENSE", "ATTRIBUTION.md", "README.md"):
+            for required in ("LICENSE", "ATTRIBUTION.md", "README.md", "structure.md"):
                 if not path.parent.joinpath(required).exists():
                     errors.append(f"{path.parent}: sourced template missing {required}")
             attribution = path.parent / "ATTRIBUTION.md"
@@ -314,6 +339,14 @@ def check_template_status() -> list[str]:
                 encoding="utf-8"
             ):
                 errors.append(f"{attribution}: missing Technical scope section")
+            structure_file = path.parent / "structure.md"
+            if structure_file.exists():
+                errors.extend(
+                    f"{structure_file}: {defect}"
+                    for defect in structure_md.check(
+                        path.parent, structure_file.read_text(encoding="utf-8")
+                    )
+                )
     return errors
 
 
@@ -647,6 +680,26 @@ def check_empty_markdown() -> list[str]:
     return errors
 
 
+def check_no_metaproject_paths() -> list[str]:
+    """A shipped file must never reference a metaproject-only path.
+
+    The installed product is KitV2 alone: a consumer copy has no `.agent/`,
+    so any `.agent/` occurrence in a shipped file points at something that
+    does not exist (KVA-102 regression guard)."""
+    errors: list[str] = []
+    extensions = {
+        ".md", ".yaml", ".yml", ".ts", ".json", ".go", ".sh", ".txt", ".py",
+    }
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or path.suffix not in extensions:
+            continue
+        if path.name == "validate-kitv2.py":
+            continue  # the checker itself legitimately names the marker
+        if ".agent/" in path.read_text(encoding="utf-8", errors="replace"):
+            errors.append(f"{path}: metaproject path .agent/ must not ship")
+    return errors
+
+
 INDEXABLE_GLOBS = (
     "rules/**/SKILL.md",
     "recipes/**/SKILL.md",
@@ -861,6 +914,7 @@ def main() -> int:
     errors.extend(check_template_status())
     errors.extend(check_template_build(warnings))
     errors.extend(check_bundle())
+    errors.extend(check_no_metaproject_paths())
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1

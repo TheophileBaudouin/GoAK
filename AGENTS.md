@@ -58,7 +58,10 @@ Never bypass this approval boundary by silently expanding scope.
 
 ## Validation
 
-From `KitV2/`, run:
+The Python validators require PyYAML (pinned in
+`.agent/validators/requirements.txt`; `python3 -m pip install -r
+.agent/validators/requirements.txt` once per environment). From `KitV2/`,
+run:
 
 ```sh
 export PATH="$PATH:$(go env GOPATH)/bin"

@@ -33,8 +33,10 @@ KIT = ROOT / "KitV2"
 
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 
-# Small bilingual stopword list (data, not logic): both the builder and the
+# Small English stopword list (data, not logic): both the builder and the
 # runtime use the copy shipped in meta.json so they cannot drift apart.
+# English-only per the fundamental language rule (D-2026-08-05-21); the
+# French tokens of the pre-2026-08-05 bilingual era were pruned (D-2026-08-06-14).
 STOPWORDS = {
     "a",
     "an",
@@ -79,32 +81,6 @@ STOPWORDS = {
     "with",
     "you",
     "your",
-    "un",
-    "une",
-    "des",
-    "les",
-    "la",
-    "le",
-    "et",
-    "de",
-    "du",
-    "que",
-    "qui",
-    "est",
-    "pas",
-    "pour",
-    "dans",
-    "sur",
-    "ce",
-    "cette",
-    "dun",
-    "au",
-    "aux",
-    "en",
-    "par",
-    "son",
-    "ses",
-    "avec",
 }
 
 MAX_DETAIL = 400  # truncate knowledge YAML details to keep the index compact

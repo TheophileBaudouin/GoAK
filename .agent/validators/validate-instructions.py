@@ -87,6 +87,66 @@ def check_links(path: Path) -> list[str]:
     return errors
 
 
+ABSOLUTE_LEXEMES = ("mandatory", "must", "always", "never")
+PROCESS_SURFACES = (
+    ROOT / "AGENTS.md",
+    *((ROOT / ".pi" / "prompts").glob("*.md")),
+    *((ROOT / ".pi" / "skills").glob("*/SKILL.md")),
+    *((ROOT / ".pi" / "extensions").glob("*.ts")),
+)
+
+
+def check_absolute_instructions_registry() -> list[str]:
+    """Charter §16.1.4 (D-2026-08-05-15): every absolute instruction on a
+    consumer process surface must be recorded in the enforcement registry
+    (.agent/instructions.md), and every recorded carrier must exist.
+
+    Forward direction: a process surface (AGENTS.md, prompts, workflow
+    SKILL.md, extension promptGuidelines) carrying a MANDATORY lexeme must
+    have a registry row naming its path (rules/ rule bodies are excluded by
+    the KVA-106 interpretation: rule-content boundaries are not process
+    absolutes).
+    Reverse direction: every non-wildcard registry carrier path must exist
+    (a cited validator/carrier that does not exist is itself a defect).
+    """
+    errors: list[str] = []
+    meta_root = Path(__file__).resolve().parents[2]
+    registry = meta_root / ".agent" / "instructions.md"
+    if not registry.exists():
+        errors.append(f"{registry}: enforcement registry missing (§16.1.4)")
+        return errors
+    text = registry.read_text(encoding="utf-8")
+    recorded = {
+        path.removeprefix("KitV2/")
+        for path in re.findall(r"`(KitV2/[^`]+)`", text)
+    }
+    strong = ("mandatory",)
+    for path in PROCESS_SURFACES:
+        if not path.exists():
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        if any(lexeme in content.lower() for lexeme in strong):
+            relative = str(path.relative_to(ROOT))
+            if relative not in recorded:
+                errors.append(
+                    f"{path}: MANDATORY instruction not recorded in "
+                    f"the enforcement registry ({registry.name}) — charter §16.1.4"
+                )
+    for relative in sorted(recorded):
+        if relative.endswith("**") or "/**" in relative:
+            continue  # rules/** wildcard row
+        carrier = ROOT / relative
+        if not carrier.exists():
+            errors.append(f"{registry}: registry carrier does not exist: {relative}")
+            continue
+        content = carrier.read_text(encoding="utf-8", errors="replace").lower()
+        if not any(lexeme in content for lexeme in ABSOLUTE_LEXEMES):
+            errors.append(
+                f"{registry}: registry carrier has no absolute lexeme: {relative}"
+            )
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     paths = [
@@ -112,6 +172,7 @@ def main() -> int:
                 errors.append(f"{path}: prompt description is required")
         except ValueError as error:
             errors.append(str(error))
+    errors.extend(check_absolute_instructions_registry())
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1

@@ -1,0 +1,5 @@
+# Metaproject validators dependencies.
+# The validators (validate-instructions.py, validate-cognitive.py,
+# validate-kitv2.py) and the router builder (build_index.py) parse YAML with
+# PyYAML. Everything else they use is the Python standard library.
+PyYAML==6.0.2

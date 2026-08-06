@@ -1,90 +1,132 @@
 {
-	"$comment": "Routing-quality contract (Z11). Each scenario maps a realistic task intent to the kit resources that MUST surface in the top-K when the agent calls search_kit_resources. The metaproject gate (.agent/router/test_router_scenarios.py) verifies every expectation with the exact runtime scoring (kit-resource-router-scoring.ts), so a future skill with weak terms, a duplicate, or a wrong description degrades the gate. offDomain: true means the query must be rejected as outside the kit (empty-over-noise rule).",
+	"$comment": "Routing-quality contract (Z11). Each scenario maps a realistic task intent to the kit resources that MUST surface in the top-K when the agent calls search_kit_resources. The metaproject gate runner verifies every expectation with the exact runtime scoring (kit-resource-router-scoring.ts), so a future skill with weak terms, a duplicate, or a wrong description degrades the gate. offDomain: true means the query must be rejected as outside the kit (empty-over-noise rule).",
 	"schema": 1,
 	"scenarios": [
 		{
 			"query": "go naming conventions package names",
-			"expect": ["naming"]
+			"expect": [
+				"naming"
+			]
 		},
 		{
 			"query": "zero value struct ready to use without init",
-			"expect": ["pattern:go:zero-value-valid"]
+			"expect": [
+				"pattern:go:zero-value-valid"
+			]
 		},
 		{
 			"query": "value receiver pointer receiver method semantics",
-			"expect": ["pattern:go:value-vs-pointer-receivers"]
+			"expect": [
+				"pattern:go:value-vs-pointer-receivers"
+			]
 		},
 		{
 			"query": "when to use generics type parameters",
-			"expect": ["pattern:go:generics-when-worth"]
+			"expect": [
+				"pattern:go:generics-when-worth"
+			]
 		},
 		{
 			"query": "internal packages hide api from external consumers",
-			"expect": ["pattern:go:internal-packages"]
+			"expect": [
+				"pattern:go:internal-packages"
+			]
 		},
 		{
 			"query": "semantic import versioning major version v2 module path",
-			"expect": ["pattern:go:semantic-import-versioning"]
+			"expect": [
+				"pattern:go:semantic-import-versioning"
+			]
 		},
 		{
 			"query": "black box tests external test package foo_test",
-			"expect": ["pattern:testing:blackbox-package-tests"]
+			"expect": [
+				"pattern:testing:blackbox-package-tests"
+			]
 		},
 		{
 			"query": "avoid reflection dynamic type inspect performance",
-			"expect": ["pattern:antipattern:go-reflection-overuse"]
+			"expect": [
+				"pattern:antipattern:go-reflection-overuse"
+			]
 		},
 		{
 			"query": "random token secret crypto rand math rand predictable",
-			"expect": ["pattern:antipattern:sec-weak-randomness"]
+			"expect": [
+				"pattern:antipattern:sec-weak-randomness"
+			]
 		},
 		{
 			"query": "constant time comparison secret hash timing attack",
-			"expect": ["pattern:antipattern:sec-timing-unsafe-comparison"]
+			"expect": [
+				"pattern:antipattern:sec-timing-unsafe-comparison"
+			]
 		},
 		{
 			"query": "benchmark testing.B benchstat compare implementations",
-			"expect": ["source:performance:benchmarking"]
+			"expect": [
+				"source:performance:benchmarking"
+			]
 		},
 		{
 			"query": "garbage collector tuning gogc memory",
-			"expect": ["source:go:gc-guide"]
+			"expect": [
+				"source:go:gc-guide"
+			]
 		},
 		{
 			"query": "cross compilation goos goarch cgo",
-			"expect": ["source:go:cross-compilation"]
+			"expect": [
+				"source:go:cross-compilation"
+			]
 		},
 		{
 			"query": "go generate code generation directives",
-			"expect": ["source:go:go-generate"]
+			"expect": [
+				"source:go:go-generate"
+			]
 		},
 		{
 			"query": "json marshal unmarshal struct tags",
-			"expect": ["source:go:encoding-json"]
+			"expect": [
+				"source:go:encoding-json"
+			]
 		},
 		{
 			"query": "graceful shutdown http server signal",
-			"expect": ["recipe-graceful-shutdown"]
+			"expect": [
+				"recipe-graceful-shutdown"
+			]
 		},
 		{
 			"query": "rest api chi middleware routes",
-			"expect": ["recipe-rest-chi"]
+			"expect": [
+				"recipe-rest-chi"
+			]
 		},
 		{
 			"query": "bounded worker pool errgroup cancellation",
-			"expect": ["recipe-worker-pool"]
+			"expect": [
+				"recipe-worker-pool"
+			]
 		},
 		{
 			"query": "error wrapping errors.Is chain wrap",
-			"expect": ["pattern:go:error-wrapping-chain"]
+			"expect": [
+				"pattern:go:error-wrapping-chain"
+			]
 		},
 		{
 			"query": "channel close sender ownership pipeline",
-			"expect": ["pattern:concurrency:channel-ownership"]
+			"expect": [
+				"pattern:concurrency:channel-ownership"
+			]
 		},
 		{
 			"query": "chi router library",
-			"expect": ["chi"],
+			"expect": [
+				"chi"
+			],
 			"top": 3
 		},
 		{

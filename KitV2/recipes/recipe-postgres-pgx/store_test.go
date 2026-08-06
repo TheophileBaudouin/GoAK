@@ -42,3 +42,11 @@ func TestStoreValidatesBeforeQuery(t *testing.T) {
 		t.Fatal("Widget accepted a closed store")
 	}
 }
+
+func TestCloseIsSafeOnNilAndClosedStore(t *testing.T) {
+	t.Parallel()
+	var nilStore *Store
+	nilStore.Close()   // nil receiver: must not panic
+	(&Store{}).Close() // pool == nil: must not panic
+	(&Store{pool: nil}).Close()
+}
