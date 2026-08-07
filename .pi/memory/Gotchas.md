@@ -202,3 +202,43 @@ specific criterion and evidence.
   is explicitly NOT a justification. State the actual reason (idiomatic, single
   responsibility, testable, maintained). A repo failing even one criterion is
   rejected and logged here with the reason.
+
+- **2026-08-07** — *`npx ui-agent-kit` first-run failure* (reproduced on a fresh
+  Wails `frontend/`): `cli/index.js` runs `ensureBase()` (step 3, spawns
+  `npx shadcn@latest add --all --yes`) BEFORE `applyConfigs()` (step 5)
+  creates `tsconfig.json`, so shadcn fails with "Failed to load
+  tsconfig.json. Couldn't find tsconfig.json". `ensureBase` swallows the
+  failure (`{installed:false}`), install continues and prints "Done ✔ …
+  base failed", and **the process exits 0** — agents/CI cannot detect the
+  failure from the exit code. A second run succeeds (tsconfig exists).
+  → **Never trust exit codes alone for SDK installer scripts that catch their
+  own step failures; treat "Done ✔ (… failed …)" as failure. The GoAK side
+  uses GitHub-direct pinned sourcing (git archive/clone) instead, per the
+  integration mandate.**
+- **2026-08-07** — *ui-agent-kit has no git tags*; npm `0.1.0` (published
+  2026-08-06) tarball `sdk/` is byte-identical to the repo `sdk/` at HEAD
+  `f9bdd9b`. → **Pin GitHub content by commit SHA, never by npm version or
+  repo name; verify the pinned tree against the published artifact when one
+  exists (diff -rq).**
+- **2026-08-07** — *Pi's extension loader auto-discovers every direct `*.ts` in
+  `.pi/extensions/` and one-level `index.ts`* (verified in
+  `dist/core/extensions/loader.js`); a shared module with no factory export
+  produces "Extension does not export a valid factory function" and ABORTS
+  headless `pi -p` runs (reproduced on the pre-mission baseline). The
+  pre-existing `kit-resource-router-scoring.ts` at top level was already
+  affected. → **Never put a non-extension shared module at the top level of
+  `.pi/extensions/`; keep shared runtime+gate modules in a subdirectory
+  (e.g. `shared/`) that the loader does not discover, and import them from
+  both the extension (jiti `.js` specifier) and the node gate (`.ts`
+  specifier) — type-only imports are erased in both runtimes.**
+- **2026-08-07** — *A 3-item `edit` multi on a fresh file silently corrupted
+  the tail* (duplicated `fail()` fragment, "t.Fprintln" garbage) after two
+  items had landed, and a separate 2-item multi dropped one item while
+  reporting "Edited". → **After any multi-edit: re-read the file tail and
+  grep each expected marker; when a file is corrupted, rewrite it wholly
+  with `write` instead of patching fragments.**
+- **2026-08-07** — *Validator `check_no_metaproject_paths` scans the LITERAL
+  string `.agent/`* — a PIN.md verification note saying "no `.agent/`
+  occurrences" failed the gate. → **When documenting a metaproject-path
+  guard inside shipped files, never write the literal marker; reword
+  ("metaproject control-directory markers").**

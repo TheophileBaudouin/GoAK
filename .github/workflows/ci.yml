@@ -72,6 +72,13 @@ jobs:
       - name: routing-quality gate (real runtime scoring)
         run: node --no-warnings .agent/router/run_scenarios.mjs
 
+      - name: UI routing-quality gate (real runtime scoring, Z13)
+        run: node --no-warnings .agent/router/run_ui_scenarios.mjs
+
+      - name: router gate tests (tripwires + validator checks)
+        working-directory: .agent
+        run: python3 -m pytest router/ -q
+
       # ---- Go gate (from KitV2) ----
       - name: gofmt
         working-directory: KitV2

@@ -291,6 +291,15 @@ class UiKitChecksFixture(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (self.kit / "ui-kit" / "AGENTS.md").write_text(
+            "# ui-agent-kit SDK\n",
+            encoding="utf-8",
+        )
+        (self.kit / "ui-kit" / "PIN.md").write_text(
+            "| Pinned commit (SHA) | `f9bdd9b5237a9154f86050e0f5df583c66e2496e` |\n"
+            "| Sync date | 2026-08-07 |\n",
+            encoding="utf-8",
+        )
         self.index = {
             "schema": 1,
             "resources": [
@@ -315,6 +324,22 @@ class UiKitChecksFixture(unittest.TestCase):
 
     def test_ui_skills_positive(self) -> None:
         self.assertEqual(validate.check_ui_kit_skills(), [])
+
+    def test_ui_pin_positive(self) -> None:
+        self.assertEqual(validate.check_ui_kit_pin(), [])
+
+    def test_ui_pin_missing_record(self) -> None:
+        (self.kit / "ui-kit" / "PIN.md").unlink()
+        errors = validate.check_ui_kit_pin()
+        self.assertTrue(any("missing pin record" in e for e in errors))
+
+    def test_ui_pin_malformed_sha(self) -> None:
+        (self.kit / "ui-kit" / "PIN.md").write_text(
+            "| Pinned commit (SHA) | `not-a-sha` |\n| Sync date | 2026-08-07 |\n",
+            encoding="utf-8",
+        )
+        errors = validate.check_ui_kit_pin()
+        self.assertTrue(any("well-formed 40-hex" in e for e in errors))
 
     def test_ui_skills_missing_description(self) -> None:
         path = self.kit / "ui-kit" / "skills" / "frontend-design" / "SKILL.md"

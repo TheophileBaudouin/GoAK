@@ -870,6 +870,26 @@ def check_router_scenarios() -> list[str]:
     return errors
 
 
+def check_ui_kit_pin() -> list[str]:
+    """Z13 §7.1 — the ui-kit zone must carry a valid pin record and the SDK's
+    own AGENTS.md, so the vendored content stays attributable and the zone
+    stays self-contained."""
+    errors: list[str] = []
+    zone = ROOT / "ui-kit"
+    agents = zone / "AGENTS.md"
+    if not agents.exists():
+        errors.append(f"{agents}: missing — the ui-kit zone must ship the SDK AGENTS.md")
+    pin = zone / "PIN.md"
+    if not pin.exists():
+        return errors + [f"{pin}: missing pin record (Z13)"]
+    text = pin.read_text(encoding="utf-8", errors="replace")
+    if not re.search(r"\| Pinned commit \(SHA\) \| `[0-9a-f]{40}` \|", text):
+        errors.append(f"{pin}: missing a well-formed 40-hex pinned SHA")
+    if not re.search(r"\| Sync date \| \d{4}-\d{2}-\d{2} \|", text):
+        errors.append(f"{pin}: missing a YYYY-MM-DD sync date")
+    return errors
+
+
 def check_ui_kit_skills() -> list[str]:
     """Z13 §7.2 — ui-kit skills must stay Pi-discoverable as instructions.
 
@@ -1055,6 +1075,7 @@ def main() -> int:
     errors.extend(check_router())
     errors.extend(check_router_scenarios())
     errors.extend(check_ui_kit_skills())
+    errors.extend(check_ui_kit_pin())
     errors.extend(check_ui_corpus_disjointness())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())

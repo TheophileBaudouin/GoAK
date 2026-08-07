@@ -713,3 +713,34 @@ questions utilisateur.
 - **D-2026-08-07-01 (premise check: no general anti-CGO/Objective-C rule exists)**: the request asked for an "exception" to a supposed kit rule avoiding CGO/Objective-C/native bindings. Verified against the tree: no such rule exists — zero-CGO appears only as a library-selection preference in catalog fiche decision sections and as factual cross-compilation guidance (`stdlib/go-cross-compilation.yaml`); `rules/core/philosophy` says "Prefer the standard library or platform capability". The "exception" would qualify a rule that does not exist. The intent (agents must not refuse native Apple APIs for computer use) is served by explicit positive guidance in the new artifacts, with no existing artifact modified.
 - **D-2026-08-07-02 (RobotGo admitted as vetted fiche)**: github.com/go-vgo/robotgo passes the 9-criteria admission gate with actual reasons — v1.0.0 (2025-12-04), v1.0.2 (2026-03-30), v2.0.0-beta2 (2026-07-29), CI `.github/workflows/go.yml`, 9 `_test.go`, 10.7k stars, Apache-2.0. macOS: cgo by default (`robotgo_mac.go`, CoreGraphics), purego opt-in via `-tags purego` ("no Xcode required", CGO_ENABLED=0 compatible). Fiche: `knowledge/catalogs/libraries/robotgo/SKILL.md`.
 - **D-2026-08-07-03 (Computer Use macOS scope: pattern + fiche, no recipe)**: user decision (2026-08-07). One architecture pattern `knowledge/architecture/macos-computer-use.yaml` (AXUIElement primary semantic layer, RobotGo execution layer, ScreenCaptureKit visual complement; native-API guidance; darwinkit mentioned with stale-maintenance caveat only — not admitted, last release 2024-07) + the RobotGo vetted fiche. No runnable recipe (no cgo code in the gate), no new category (pattern lives in the existing `architecture/` domain). Router regenerated (280 resources), capabilities 73/44, gate PASS (validators, 22/22 scenarios, gofmt/vet/lint/test/gosec/govulncheck, probes 15/15), fresh-context review APPROVE-WITH-NITS (nits: router classifies architecture YAMLs as kind "source" — pre-existing builder behavior; memory update). Plan `docs/plans/2026-08-07-computer-use-macos.md`; evidence `docs/evidence/2026-08-07/computer-use-macos/sources.md`.
+
+## ui-agent-kit integration (2026-08-07)
+
+- **D-2026-08-07-04 (native first-class zone, owner decision)**: the ui-agent-kit
+  SDK is integrated as a first-class KitV2 zone (`ui-kit/`), mirror of upstream
+  `sdk/` at pinned commit `f9bdd9b` (byte-identical to npm `ui-agent-kit@0.1.0`
+  tarball `sdk/`), with its own AGENTS.md shipped verbatim. The owner explicitly
+  superseded mission rule 5's literal "no trace" reading: non-pollution is
+  achieved behaviorally — no UI skill in `.pi/settings.json`, Go router never
+  reads the zone, the sync tool refuses without `wails.json` + `frontend/`,
+  and the two routing corpora are gate-checked disjoint. UI queries route via
+  the second read-only tool `search_ui_kit_resources`; the shared scoring
+  module is reused (single scoring implementation), stopwords come from the
+  shipped `router/meta.json`. Reports follow GoAK `docs/` conventions.
+- **D-2026-08-07-05 (shared modules relocate to `.pi/extensions/shared/`)**: the
+  Pi extension loader auto-discovers direct `*.ts` files and one-level
+  `index.ts` only; top-level shared modules (`kit-resource-router-scoring.ts`)
+  were mis-discovered as extensions and aborted headless `pi -p` runs
+  (reproduced on the pre-mission baseline). The scoring core and the new UI
+  index core now live in `shared/` (not discovered), imported by the two
+  extension files (jiti `.js` specifier) and the metaproject gates (plain
+  node `.ts` specifier). Behavior-preserving; the 22 Go scenarios and 9 UI
+  scenarios pass identically.
+- **D-2026-08-07-06 (Wails-only sync tool + manual gated updates)**: consumer
+  materialization is a shipped `tools/sync-ui-kit.sh` (detects `wails.json` +
+  `frontend/`, copies the zone + code pieces per the SDK copy rules, merges
+  `.pi/settings.json`, refuses with exit 1 otherwise) verified by probe
+  `ui-kit-sync`. Zone updates are manual and gated via
+  `.agent/sync-ui-kit-from-upstream.sh <sha>` (Z13 §4) — never automatic.
+  The ui-agent-kit CLI first-run ordering bug (`shadcn` before `tsconfig.json`,
+  exit 0 on failure) is a separate upstream proposal (mission rule 2).

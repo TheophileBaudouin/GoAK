@@ -43,6 +43,20 @@ ownership, zero-value design); treat those as pre-loaded even when the user
 does not name them. Catalog fiches are routed on demand and are deliberately
 absent from the always-visible skill surface.
 
+## Wails projects (conditional)
+
+This kit stays Go-generalist, but a real subset of projects are Wails desktop
+apps (Go backend + React frontend in `frontend/`). Detect: `wails.json` at the
+project root AND a `frontend/` directory. When both are present, the UI work
+is governed by the **ui-agent-kit SDK zone** (`ui-kit/`) — read
+`ui-kit/AGENTS.md` before any interface task, and call
+`search_ui_kit_resources` (the UI routing tool) for UI resources instead of
+`search_kit_resources`. The zone is a pinned, separate corpus: it never mixes
+with the Go index, its skills are never auto-loaded into a Pi session, and
+nothing is copied into a project's `frontend/` unless the Wails layout is
+detected (`tools/sync-ui-kit.sh` does that job). For non-Wails Go projects
+none of this applies — no UI rule, skill, or router entry is active.
+
 ## Memory (consumer projects)
 
 Pi initializes `.pi/memory/` with a minimal default set — `Decisions.md` is
@@ -91,14 +105,5 @@ Bubble Tea recipe, Pi discovery internals, or non-Go domains other than the
 Wails/React frontend surface that the pinned `ui-kit/` zone governs — check
 the catalog, the Go router (`search_kit_resources`) and the UI router
 (`search_ui_kit_resources`) before expecting a kit resource for a technology.
-
-Always preserve errors, cancellation, input validation, and observable evidence. Ask before adding dependencies or changing the manifest contract. Never claim an unexecuted scenario passed or treat static checks as proof of user intent.
-aproject gate and
-`templates/_kit-ci-workflow.yml`) additionally enforce an aggregate coverage
-floor of 70%; the local gate does not.
-
-## Limits
-
-The kit does not claim to cover: full desktop-application wiring (Wails), TUI development beyond the kit's interactive Bubble Tea recipe, Pi discovery internals, or non-Go domains — check the catalog and the router before expecting a kit resource for a technology.
 
 Always preserve errors, cancellation, input validation, and observable evidence. Ask before adding dependencies or changing the manifest contract. Never claim an unexecuted scenario passed or treat static checks as proof of user intent.
