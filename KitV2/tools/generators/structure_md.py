@@ -218,10 +218,9 @@ def check(project_dir: Path, text: str) -> list[str]:
     )
     if not boundary_section:
         defects.append("missing '## Public vs internal boundary' section")
-    elif (
-        facts["internal_boundary"] == "present"
-        and "internal/" not in boundary_section.group(1)
-    ):
+    elif facts[
+        "internal_boundary"
+    ] == "present" and "internal/" not in boundary_section.group(1):
         defects.append("boundary section does not mention the `internal/` boundary")
 
     evidence_section = re.search(

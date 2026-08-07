@@ -10,6 +10,4 @@
 title = "GoAK gitleaks allowlist (documented false positives)"
 
 [allowlist]
-regexes = [
-    '''github\.com/sourcegraph/conc''',
-]
+regexes = ['''github\.com/sourcegraph/conc''']
