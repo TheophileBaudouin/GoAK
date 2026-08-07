@@ -22,14 +22,16 @@ not ship with this product).
 
 - `diff -rq <upstream sdk/> <KitV2/ui-kit/>` — empty (before PIN.md was added).
 - No `.go` files (the zone adds no Go surface to the module).
-- No `.agent/` occurrences (product validator `check_no_metaproject_paths`).
+- No metaproject control-directory markers (product validator
+  `check_no_metaproject_paths`).
 - No zero-byte `.md` files (product validator `check_empty_markdown`).
 - No accented-French content (fundamental language rule D-2026-08-05-21).
 - Skill frontmatter: all 7 `skills/*/SKILL.md` carry `name` + `description`.
 
 ## Update path (manual, gated — never automatic)
 
-1. Run `.agent/sync-ui-kit-from-upstream.sh <new-sha>` from the metaproject root.
+1. Run the metaproject re-sync helper (`sync-ui-kit-from-upstream.sh
+   <new-sha>`) from the metaproject root (metaproject-only, not shipped).
 2. The script pins the new SHA, diffs `sdk/` vs `KitV2/ui-kit/`, updates this
    file, and prints the verification checklist.
 3. Run the FULL validation gate (validators, Go scenarios 22/22, UI scenarios,
