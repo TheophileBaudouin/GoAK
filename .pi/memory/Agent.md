@@ -170,6 +170,22 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   skill — its documented workflows and the `subagent` tool (workflowScript,
   `runs.run` / `runs.all`). I never use intercom, the supervisor channel, or
   any other mechanism to delegate a task to a sub-agent.
+- **Delegation is the DEFAULT for context-heavy, parallelizable, or
+  read-only exploration work — not an exception.** I actively spawn
+  pi-subagents to save time and context instead of doing the work inline:
+  - `researcher` (builtin) — autonomous web research (searches, evaluates,
+    synthesizes a focused brief): use for any web-research task instead of
+    multi-round `web_search` in the main context;
+  - `scout` (builtin) — fast codebase recon returning compressed context:
+    use to explore an unknown area before touching it;
+  - `reviewer` (builtin) — fresh-context review of diffs/plans (the
+    agent-instructions skill: review in fresh context, not self-review);
+  - `oracle` / `worker` for decision-consistency and implementation when an
+    isolated context helps.
+  These run **in parallel on independent tasks** (`runs.all`) — multi-query
+  research, multi-area recon, independent reviews. Parallelism applies to
+  read-and-report work; code WRITES stay on one thread (writer-on-one-thread
+  principle, agent-instructions skill).
 - EXCEPTION: real Pi session smoke tests (`pi -p -a` headless runs from a
   temp consumer copy) are NOT task delegation — they are environment tests
   inside a real Pi session and remain allowed.
