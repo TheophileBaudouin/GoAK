@@ -56,6 +56,19 @@ A skill with weak terms, a duplicate question, or a misleading description
 degrades this gate — that is the tripwire that keeps routing precise as the
 kit grows.
 
+## The UI corpus (separate routing domain)
+
+`search_ui_kit_resources` (`.pi/extensions/kit-ui-router.ts`) is a second
+read-only tool for the **ui-kit SDK zone** (Wails/React interface work). It
+builds its index on the fly from `ui-kit/` with the same shared scoring
+implementation (`kit-resource-router-scoring.ts`) and the stopwords shipped
+in this directory's `meta.json` — it never reads this Go index, and this Go
+index never contains a `ui-kit/` path (corpus disjointness is gate-checked
+both ways, the non-pollution proof). Its authored routing-quality contract
+is `ui-kit/scenarios.json` (Z13), verified by `validate-kitv2.py`
+(node-free) and ranked by the metaproject gate runner
+(`run_ui_scenarios.mjs`).
+
 ## Usage
 
 The agent calls the native `search_kit_resources` tool with a technical query

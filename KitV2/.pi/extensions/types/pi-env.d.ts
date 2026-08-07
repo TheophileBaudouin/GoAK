@@ -51,4 +51,21 @@ declare module "typebox" {
 
 declare module "node:fs" {
 	export function readFileSync(path: string | URL, encoding: "utf-8"): string;
+	export function existsSync(path: string | URL): boolean;
+	export function statSync(
+		path: string | URL,
+	): { isDirectory(): boolean; isFile(): boolean };
+	export function readdirSync(
+		path: string | URL,
+		options?: { withFileTypes?: boolean },
+	): Array<{ name: string; isDirectory(): boolean; isFile(): boolean }>;
+}
+
+declare module "node:path" {
+	export function basename(path: string, suffix?: string): string;
+	export function dirname(path: string): string;
+	export function extname(path: string): string;
+	export function join(...paths: string[]): string;
+	export function relative(from: string, to: string): string;
+	export const sep: string;
 }

@@ -922,6 +922,86 @@ def check_ui_corpus_disjointness() -> list[str]:
     return errors
 
 
+def ui_kit_index_ids() -> set[str]:
+    """Id convention of the UI index builder (Z13 §7, kit-ui-router-core.ts):
+    skills use their frontmatter name; ui-rules/patterns/ux/docs .md files use
+    their filename stem (docs/authoring-guides/ excluded); the components
+    index is the fixed id components-index. The metaproject gate verifies the
+    REAL builder output; this node-free mirror keeps the contract's id
+    linkage checkable anywhere. Convention drift is caught by the gate."""
+    ids: set[str] = set()
+    for path in (ROOT / "ui-kit" / "skills").rglob("SKILL.md"):
+        try:
+            values = parse_frontmatter(path)
+        except ValueError:
+            continue
+        name = values.get("name")
+        if isinstance(name, str) and name:
+            ids.add(name)
+    for zone in ("ui-rules", "patterns", "ux"):
+        for path in (ROOT / "ui-kit" / zone).rglob("*.md"):
+            ids.add(path.stem)
+    for sub in ("docs", Path("ui-sdk") / "docs"):
+        for path in (ROOT / "ui-kit" / sub).rglob("*.md"):
+            if "authoring-guides" in path.parts:
+                continue
+            ids.add(path.stem)
+    ids.add("components-index")
+    return ids
+
+
+def check_ui_router_scenarios() -> list[str]:
+    """Z13 §7.3 — node-free integrity check of the UI routing-quality
+    contract (ui-kit/scenarios.json): well-formed {query → expected ids}
+    list, every expected id produced by the UI index builder, off-domain
+    scenarios expect nothing. The actual ranking verification is the
+    metaproject gate (run_ui_scenarios.mjs, node) — same two-layer split as
+    the Go scenarios contract (Z11)."""
+    errors: list[str] = []
+    scenarios_path = ROOT / "ui-kit" / "scenarios.json"
+    if not scenarios_path.exists():
+        return [f"{scenarios_path}: missing UI routing-quality contract (Z13)"]
+    try:
+        contract = json.loads(scenarios_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        return [f"{scenarios_path}: invalid JSON: {error}"]
+    if not isinstance(contract, dict) or contract.get("schema") != 1:
+        return [f"{scenarios_path}: expected schema-1 contract mapping"]
+    scenarios = contract.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        return [f"{scenarios_path}: scenarios list is empty or missing"]
+    known_ids = ui_kit_index_ids()
+    for number, scenario in enumerate(scenarios, start=1):
+        where = f"{scenarios_path}: scenario #{number}"
+        if not isinstance(scenario, dict):
+            errors.append(f"{where}: expected a mapping")
+            continue
+        query = scenario.get("query")
+        if not isinstance(query, str) or not 3 <= len(query) <= 300:
+            errors.append(f"{where}: query must be a 3..300 char string")
+        expect = scenario.get("expect")
+        if not isinstance(expect, list) or not all(
+            isinstance(item, str) and item for item in expect
+        ):
+            errors.append(f"{where}: expect must be a non-empty list of ids")
+            expect = []
+        top = scenario.get("top")
+        if top is not None and (not isinstance(top, int) or not 1 <= top <= 8):
+            errors.append(f"{where}: top must be an int in 1..8")
+        off_domain = scenario.get("offDomain")
+        if off_domain is not None and not isinstance(off_domain, bool):
+            errors.append(f"{where}: offDomain must be a boolean")
+        if off_domain and expect:
+            errors.append(f"{where}: off-domain scenario must expect no ids")
+        for expected_id in expect:
+            if expected_id not in known_ids:
+                errors.append(
+                    f"{where}: expected id {expected_id!r} not produced by the "
+                    "UI index builder"
+                )
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
@@ -976,6 +1056,7 @@ def main() -> int:
     errors.extend(check_router_scenarios())
     errors.extend(check_ui_kit_skills())
     errors.extend(check_ui_corpus_disjointness())
+    errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())
     errors.extend(check_template_build(warnings))

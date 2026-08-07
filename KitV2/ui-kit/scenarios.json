@@ -1,0 +1,65 @@
+{
+ "$comment": "UI routing-quality contract (Z13). Each scenario maps a realistic UI task intent to the ui-kit resources that MUST surface in the top-K when the agent calls search_ui_kit_resources. The metaproject gate runner (run_ui_scenarios.mjs) verifies every expectation by building the UI index with the same shared core the runtime tool uses (kit-ui-router-core.ts) and scoring with the exact shared runtime scoring (kit-resource-router-scoring.ts), so the gate and the agent cannot diverge. offDomain: true means the query must be rejected as outside the UI SDK (empty-over-noise rule) — used for Go-only intents that must never surface UI resources. The product validator also checks this file's schema and id linkage node-free; expected ids must be produced by the UI index builder (skills: frontmatter name; rules/patterns/ux/docs: filename stem; components-index).",
+ "schema": 1,
+ "scenarios": [
+  {
+   "query": "wails desktop app login screen design",
+   "expect": [
+    "login",
+    "09-desktop"
+   ]
+  },
+  {
+   "query": "macos native design guidelines menu bar keyboard shortcuts",
+   "expect": [
+    "macos-design-guidelines",
+    "09-desktop"
+   ]
+  },
+  {
+   "query": "accessibility keyboard navigation dialogs focus",
+   "expect": [
+    "10-dialogs",
+    "05-accessibility"
+   ]
+  },
+  {
+   "query": "spacing scale typography colors visual consistency",
+   "expect": [
+    "01-spacing",
+    "03-typography",
+    "02-colors"
+   ]
+  },
+  {
+   "query": "shadcn add component registry preset",
+   "expect": [
+    "shadcn"
+   ]
+  },
+  {
+   "query": "review interface compliance ui rules accessibility audit",
+   "expect": [
+    "ui-review",
+    "web-design-guidelines"
+   ]
+  },
+  {
+   "query": "settings page preferences form layout",
+   "expect": [
+    "settings-page",
+    "preferences"
+   ]
+  },
+  {
+   "query": "bounded worker pool errgroup goroutines context cancellation",
+   "offDomain": true,
+   "expect": []
+  },
+  {
+   "query": "sqlc sqlite migrations database schema generation",
+   "offDomain": true,
+   "expect": []
+  }
+ ]
+}

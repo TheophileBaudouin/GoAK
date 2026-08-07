@@ -9,5 +9,5 @@
 		"noEmit": true,
 		"skipLibCheck": true
 	},
-	"include": ["*.ts", "types/*.d.ts"]
+	"include": ["*.ts", "shared/*.ts", "types/*.d.ts"]
 }

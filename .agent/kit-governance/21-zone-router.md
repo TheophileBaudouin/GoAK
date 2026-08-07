@@ -26,7 +26,7 @@ files; it never replaces them.
 | `.agent/router/build_index.py` | Builder (build / --check) — outside the kit | metaproject |
 | `.agent/router/run_scenarios.mjs` | Quality-gate runner — imports the REAL runtime scoring (Node ≥ 23.6) | metaproject |
 | `.agent/router/test_router_scenarios.py` (+ router validator tests) | Gate + contract tests | metaproject |
-| `.pi/extensions/kit-resource-router-scoring.ts` | **Single source of the ranking logic**: pure BM25 core, zero Pi/typebox imports | kit (runtime) |
+| `.pi/extensions/shared/kit-resource-router-scoring.ts` | **Single source of the ranking logic**: pure BM25 core, zero Pi/typebox imports; lives in `shared/` so Pi's extension loader (direct `*.ts` + one-level `index.ts` only) never mistakes it for an extension | kit (runtime) |
 | `.pi/extensions/kit-resource-router.ts` | Native Pi tool `search_kit_resources`, read-only; imports the scoring core | kit (runtime) |
 | `.pi/skills/kit-resource-routing/SKILL.md` | Usage skill (when/how) | kit (runtime) |
 | `validate-kitv2.py` `check_router_scenarios()` | Node-free schema + expected-id linkage check on scenarios.json | kit (product validator) |

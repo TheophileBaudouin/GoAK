@@ -360,6 +360,40 @@ class UiKitChecksFixture(unittest.TestCase):
         errors = validate.check_ui_corpus_disjointness()
         self.assertTrue(any("corpora must stay disjoint" in e for e in errors))
 
+    def _write_ui_contract(self, scenarios: list[dict]) -> None:
+        (self.kit / "ui-kit" / "scenarios.json").write_text(
+            json.dumps({"schema": 1, "scenarios": scenarios}),
+            encoding="utf-8",
+        )
+
+    def test_ui_scenarios_positive(self) -> None:
+        self._write_ui_contract(
+            [
+                {
+                    "query": "wails desktop app login screen design",
+                    "expect": ["frontend-design"],
+                },
+                {"query": "go worker pool errgroup", "offDomain": True, "expect": []},
+            ]
+        )
+        self.assertEqual(validate.check_ui_router_scenarios(), [])
+
+    def test_ui_scenarios_unresolved_id(self) -> None:
+        self._write_ui_contract(
+            [
+                {
+                    "query": "wails desktop app login screen design",
+                    "expect": ["does-not-exist"],
+                }
+            ]
+        )
+        errors = validate.check_ui_router_scenarios()
+        self.assertTrue(any("does-not-exist" in e for e in errors))
+
+    def test_ui_scenarios_missing_contract(self) -> None:
+        errors = validate.check_ui_router_scenarios()
+        self.assertTrue(any("missing UI routing-quality contract" in e for e in errors))
+
 
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parent))

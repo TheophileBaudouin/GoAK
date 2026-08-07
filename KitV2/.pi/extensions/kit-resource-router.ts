@@ -22,7 +22,7 @@ import {
 	runSearch,
 	type IndexFile,
 	type MetaFile,
-} from "./kit-resource-router-scoring.js";
+} from "./shared/kit-resource-router-scoring.js";
 
 function loadIndex(dir: URL): { index: IndexFile; meta: MetaFile } {
 	let index: IndexFile;

@@ -25,7 +25,7 @@ Wails layout (`wails.json` + `frontend/`) is detected.
 | `ui-kit/**` | Pinned mirror of upstream `sdk/` (AGENTS.md, skills/, ui-rules/, patterns/, ux/, docs/, ui-sdk/) | upstream ui-agent-kit (content); metaproject (pin) |
 | `ui-kit/PIN.md` | Pin record: source repo, commit SHA, npm equivalence, license, sync verification, update path | metaproject (written at sync) |
 | `ui-kit/scenarios.json` | **Authored** UI routing-quality contract (intent → expected top-K UI resources) | product; maintained under metaproject gate |
-| `.pi/extensions/kit-ui-router-core.ts` | **Single source of the UI index construction** (walk ui-kit tree → IndexFile) | kit (runtime) |
+| `.pi/extensions/shared/kit-ui-router-core.ts` | **Single source of the UI index construction** (walk ui-kit tree → IndexFile); lives in `shared/` (not auto-discovered by the Pi extension loader) | kit (runtime) |
 | `.pi/extensions/kit-ui-router.ts` | Native Pi tool `search_ui_kit_resources`, read-only; reuses the shared scoring module | kit (runtime) |
 | `tools/sync-ui-kit.sh` | Shipped consumer helper: materialize the zone into a Wails project's `frontend/` (detect, copy, wire, never destructive) | kit (product) |
 | `probes/ui-kit-sync/` | Observable probe: fixture → sync → assertions (PASS/FAIL) | kit (product) |

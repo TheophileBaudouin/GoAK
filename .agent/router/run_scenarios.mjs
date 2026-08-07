@@ -24,7 +24,7 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
-import { runSearch } from "../../KitV2/.pi/extensions/kit-resource-router-scoring.ts";
+import { runSearch } from "../../KitV2/.pi/extensions/shared/kit-resource-router-scoring.ts";
 
 const ROOT = new URL("../../KitV2/router/", import.meta.url);
 const scenariosArg = process.argv[2];
