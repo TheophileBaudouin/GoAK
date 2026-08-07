@@ -1,0 +1,14 @@
+[
+ {
+  "src": "ui-sdk/components",
+  "dst": "src/components"
+ },
+ {
+  "src": "ui-sdk/blocks/blocks-so",
+  "dst": "src/components"
+ },
+ {
+  "src": "ui-sdk/examples/preferences-screen",
+  "dst": "src/components/example"
+ }
+]

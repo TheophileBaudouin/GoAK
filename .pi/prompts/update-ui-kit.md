@@ -63,7 +63,11 @@ gosec/govulncheck, probes).
 ## Phase 2 — Review and commit (manual, never automatic)
 
 1. `git diff --stat KitV2/ui-kit` — confirm the change matches the upstream
-   jump (added/removed/modified SDK files; `PIN.md` SHA + dates).
+   jump (added/removed/modified SDK files; `PIN.md` SHA + dates). Pay
+   attention to `ui-kit/copy-rules.json` (local-owned): it is regenerated
+   from the upstream `cli/manifest.json`, so a NEW upstream folder appears
+   here and the consumer sync tool will copy it without a code change — if
+   the rules changed, review the new mapping explicitly.
 2. Inspect the diff for anomalies (unexpected deletions, binaries, secrets).
 3. Commit with a message naming the new SHA and summarizing the change, e.g.:
    `feat(ui-kit): re-pin zone to ui-agent-kit <short-sha> — <what changed>`.

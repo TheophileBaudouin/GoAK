@@ -892,6 +892,37 @@ def check_ui_kit_pin() -> list[str]:
     return errors
 
 
+def check_ui_kit_copy_rules() -> list[str]:
+    """Z13 §7.7 — copy-rules.json (local-owned) drives the consumer sync tool.
+
+    The file must be a list of {src, dst} with every src present inside the
+    ui-kit zone (a rule pointing at a missing folder = stale rules that would
+    make the consumer tool abort or copy nothing)."""
+    errors: list[str] = []
+    rules_path = ROOT / "ui-kit" / "copy-rules.json"
+    if not rules_path.exists():
+        return [f"{rules_path}: missing copy rules (Z13 §7.7)"]
+    try:
+        rules = json.loads(rules_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        return [f"{rules_path}: invalid JSON: {error}"]
+    if not isinstance(rules, list):
+        return [f"{rules_path}: expected a list of {{src, dst}} rules"]
+    for number, rule in enumerate(rules, start=1):
+        if not isinstance(rule, dict) or not isinstance(rule.get("src"), str) \
+                or not isinstance(rule.get("dst"), str) or not rule["src"] or not rule["dst"]:
+            errors.append(f"{rules_path}: rule #{number} must carry non-empty src and dst")
+            continue
+        src_dir = ROOT / "ui-kit" / rule["src"]
+        if not src_dir.is_dir():
+            errors.append(
+                f"{rules_path}: rule #{number} src {rule['src']!r} missing in the zone "
+                "(stale copy rules — regenerate via the re-sync helper)"
+            )
+    return errors
+
+
+
 def check_ui_kit_skills() -> list[str]:
     """Z13 §7.2 — ui-kit skills must stay Pi-discoverable as instructions.
 
@@ -1076,6 +1107,7 @@ def main() -> int:
     errors.extend(check_empty_markdown())
     errors.extend(check_router())
     errors.extend(check_router_scenarios())
+    errors.extend(check_ui_kit_copy_rules())
     errors.extend(check_ui_kit_skills())
     errors.extend(check_ui_kit_pin())
     errors.extend(check_ui_corpus_disjointness())

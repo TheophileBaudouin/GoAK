@@ -300,6 +300,11 @@ class UiKitChecksFixture(unittest.TestCase):
             "| Sync date | 2026-08-07 |\n",
             encoding="utf-8",
         )
+        (self.kit / "ui-kit" / "ui-sdk" / "components").mkdir(parents=True)
+        (self.kit / "ui-kit" / "copy-rules.json").write_text(
+            json.dumps([{"src": "ui-sdk/components", "dst": "src/components"}]),
+            encoding="utf-8",
+        )
         self.index = {
             "schema": 1,
             "resources": [
@@ -340,6 +345,22 @@ class UiKitChecksFixture(unittest.TestCase):
         )
         errors = validate.check_ui_kit_pin()
         self.assertTrue(any("well-formed 40-hex" in e for e in errors))
+
+    def test_ui_copy_rules_positive(self) -> None:
+        self.assertEqual(validate.check_ui_kit_copy_rules(), [])
+
+    def test_ui_copy_rules_missing_file(self) -> None:
+        (self.kit / "ui-kit" / "copy-rules.json").unlink()
+        errors = validate.check_ui_kit_copy_rules()
+        self.assertTrue(any("missing copy rules" in e for e in errors))
+
+    def test_ui_copy_rules_stale_source(self) -> None:
+        (self.kit / "ui-kit" / "copy-rules.json").write_text(
+            json.dumps([{"src": "ui-sdk/does-not-exist", "dst": "src/x"}]),
+            encoding="utf-8",
+        )
+        errors = validate.check_ui_kit_copy_rules()
+        self.assertTrue(any("missing in the zone" in e for e in errors))
 
     def test_ui_skills_missing_description(self) -> None:
         path = self.kit / "ui-kit" / "skills" / "frontend-design" / "SKILL.md"

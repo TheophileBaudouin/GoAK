@@ -31,7 +31,7 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 UI_KIT="$ROOT/KitV2/ui-kit"
 UPSTREAM="https://github.com/TheophileBaudouin/ui-agent-kit"
-LOCAL_OWNED="PIN.md scenarios.json" # never overwritten by a sync
+LOCAL_OWNED="PIN.md scenarios.json copy-rules.json" # never overwritten by a sync
 GATE_HINT="(cd KitV2 && python3 tools/validators/validate-kitv2.py) && node .agent/router/run_scenarios.mjs && node .agent/router/run_ui_scenarios.mjs && (cd .agent && python3 -m pytest router/ -q) && (cd KitV2 && gofmt/vet/lint/test-race/gosec/govulncheck + bash probes/run.sh)"
 
 rollback() {
@@ -51,8 +51,9 @@ if [ "${1:-}" = "--check" ]; then
 		echo "sync-ui-kit: no pinned SHA found in PIN.md" >&2
 		exit 1
 	}
-	if ! git -C "$ROOT" diff --quiet -- KitV2/ui-kit; then
-		echo "sync-ui-kit: working tree has ui-kit changes — re-sync pending or local drift" >&2
+	if [ -n "$(git -C "$ROOT" status --porcelain -- KitV2/ui-kit)" ]; then
+		echo "sync-ui-kit: working tree has ui-kit changes (tracked or untracked) — re-sync pending or local drift" >&2
+		git -C "$ROOT" status --short -- KitV2/ui-kit >&2
 		exit 1
 	fi
 	echo "sync-ui-kit: pin check OK (zone committed, tree clean)"
@@ -96,8 +97,9 @@ if [ "${#new_sha}" -ne 40 ]; then
 	exit 2
 fi
 
-if ! git -C "$ROOT" diff --quiet -- KitV2/ui-kit; then
-	echo "sync-ui-kit: ABORT — KitV2/ui-kit has uncommitted changes; commit or restore them first (the sync would clobber local drift)." >&2
+if [ -n "$(git -C "$ROOT" status --porcelain -- KitV2/ui-kit)" ]; then
+	echo "sync-ui-kit: ABORT — KitV2/ui-kit has uncommitted or untracked changes; commit or restore them first (the sync would clobber local drift)." >&2
+	git -C "$ROOT" status --short -- KitV2/ui-kit >&2
 	exit 1
 fi
 
@@ -126,10 +128,39 @@ src="$tmp/repo/sdk"
 # SYNC (writes only inside KitV2/ui-kit/)
 # ---------------------------------------------------------------------------
 echo "sync-ui-kit: diffing upstream sdk/ vs KitV2/ui-kit/ (excluding $LOCAL_OWNED)"
-diff -rq --exclude=PIN.md --exclude=scenarios.json "$src" "$UI_KIT" || true
+diff -rq --exclude=PIN.md --exclude=scenarios.json --exclude=copy-rules.json "$src" "$UI_KIT" || true
 
 echo "sync-ui-kit: copying upstream sdk/ -> KitV2/ui-kit/"
-rsync -a --exclude="PIN.md" --exclude="scenarios.json" "$src"/ "$UI_KIT"/
+rsync -a --exclude="PIN.md" --exclude="scenarios.json" --exclude="copy-rules.json" "$src"/ "$UI_KIT"/
+
+# generate copy-rules.json (local-owned) from the upstream SDK's own manifest
+# — structure evolution is handled HERE, the consumer tool never hardcodes a
+# path. Rules map zone-relative source -> frontend-relative destination.
+manifest="$tmp/repo/cli/manifest.json"
+if [ -f "$manifest" ]; then
+	python3 - "$manifest" "$UI_KIT/copy-rules.json" <<'PY'
+import json, sys
+src_manifest, out = sys.argv[1], sys.argv[2]
+with open(src_manifest, encoding="utf-8") as f:
+    m = json.load(f)
+rules = []
+for r in m.get("copyRules", []):
+    frm = r.get("from", "")
+    if frm == "sdk":
+        continue  # the zone mirror itself, implicit in the consumer tool
+    if not frm.startswith("sdk/"):
+        print(f"sync-ui-kit: ERROR unexpected copy rule source {frm!r} (outside sdk/)", file=sys.stderr)
+        sys.exit(1)
+    rules.append({"src": frm[len("sdk/"):], "dst": r.get("to", "")})
+with open(out, "w", encoding="utf-8") as f:
+    json.dump(rules, f, indent=1)
+    f.write("\n")
+print(f"sync-ui-kit: wrote copy-rules.json ({len(rules)} code rules)")
+PY
+else
+	echo "sync-ui-kit: WARNING upstream cli/manifest.json missing — copy-rules.json not regenerated (zone keeps the previous one)" >&2
+fi
+
 
 # update the pin record (single-quoted perl: no shell interpolation/backticks)
 today=$(date +%Y-%m-%d)
@@ -143,11 +174,35 @@ echo
 echo "sync-ui-kit: post-sync structural checks"
 postfail=0
 
-remaining=$(diff -rq --exclude=PIN.md --exclude=scenarios.json "$src" "$UI_KIT" || true)
+remaining=$(diff -rq --exclude=PIN.md --exclude=scenarios.json --exclude=copy-rules.json "$src" "$UI_KIT" || true)
 if [ -n "$remaining" ]; then
 	echo "sync-ui-kit: FAIL — upstream sdk/ and KitV2/ui-kit/ differ beyond local-owned files:" >&2
 	echo "$remaining" >&2
 	postfail=1
+fi
+
+
+# required shape + copy-rule sources must exist in the zone (structure
+# evolution tripwire: upstream restructured sdk/ -> adapt the GoAK side
+# before shipping, never ship a broken zone)
+for required in AGENTS.md skills ui-sdk; do
+	if [ ! -e "$UI_KIT/$required" ]; then
+		echo "sync-ui-kit: FAIL — zone missing '$required' (upstream restructured sdk/); adapt the GoAK side before shipping." >&2
+		postfail=1
+	fi
+done
+if [ -f "$UI_KIT/copy-rules.json" ]; then
+	if ! python3 - "$UI_KIT/copy-rules.json" <<'PY'
+import json, os, sys
+rules = json.load(open(sys.argv[1], encoding="utf-8"))
+missing = [r["src"] for r in rules if not os.path.isdir(os.path.join(sys.argv[1].rsplit("/", 1)[0], r["src"]))]
+if missing:
+    print("sync-ui-kit: FAIL — copy-rule sources missing in the zone: " + ", ".join(missing), file=sys.stderr)
+    sys.exit(1)
+PY
+	then
+		postfail=1
+	fi
 fi
 
 if find "$UI_KIT" -name '*.go' | grep -q .; then
