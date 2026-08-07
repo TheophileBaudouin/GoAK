@@ -15,6 +15,9 @@
  * `router/meta.json`.
  */
 
+/// <reference lib="es2022" />
+/// <reference path="./types/pi-env.d.ts" />
+
 import { readFileSync } from "node:fs";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";

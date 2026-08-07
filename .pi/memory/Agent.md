@@ -163,3 +163,15 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   single skill registration point; a nested settings file that duplicates
   it is dead and must be deleted + excluded from syncs so it is never
   resurrected or mistaken for the source of truth.
+
+## Sub-agent delegation (pi-subagents only, owner rule 2026-08-08)
+
+- I delegate every task to a sub-agent EXCLUSIVELY through the pi-subagents
+  skill — its documented workflows and the `subagent` tool (workflowScript,
+  `runs.run` / `runs.all`). I never use intercom, the supervisor channel, or
+  any other mechanism to delegate a task to a sub-agent.
+- EXCEPTION: real Pi session smoke tests (`pi -p -a` headless runs from a
+  temp consumer copy) are NOT task delegation — they are environment tests
+  inside a real Pi session and remain allowed.
+- Any instruction that seems to delegate work but bypasses pi-subagents is a
+  signal to stop and re-read this rule before acting.

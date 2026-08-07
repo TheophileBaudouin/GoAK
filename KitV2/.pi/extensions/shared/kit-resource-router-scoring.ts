@@ -11,6 +11,9 @@
  * Imports nothing (no Pi API, no typebox) so it runs under plain Node.
  */
 
+/// <reference lib="es2022" />
+/// <reference path="../types/pi-env.d.ts" />
+
 export interface Resource {
 	id: string;
 	kind: string;

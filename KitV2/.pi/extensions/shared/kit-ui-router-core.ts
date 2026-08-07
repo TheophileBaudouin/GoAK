@@ -18,12 +18,10 @@
  * (single source), read by the caller.
  */
 
-import {
-	existsSync,
-	readFileSync,
-	readdirSync,
-	statSync,
-} from "node:fs";
+/// <reference lib="es2022" />
+/// <reference path="../types/pi-env.d.ts" />
+
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
 import type { IndexFile, Resource } from "./kit-resource-router-scoring.js";
 
@@ -40,10 +38,7 @@ export interface UiKitIndex {
  *   native type stripping).
  * Type-only imports are erased at runtime in both runtimes.
  */
-export type Tokenizer = (
-	text: string,
-	stopwords: Set<string>,
-) => string[];
+export type Tokenizer = (text: string, stopwords: Set<string>) => string[];
 
 interface Frontmatter {
 	name?: string;
@@ -59,7 +54,10 @@ export function frontmatterOf(text: string): Frontmatter {
 	const name = /^name:\s*(.+)$/m.exec(block)?.[1]?.trim();
 	const description = /^description:\s*(.+)$/m.exec(block)?.[1]?.trim();
 	const strip = (value?: string) =>
-		value?.replace(/^["']|["']$/g, "").replace(/\\n/g, " ").trim();
+		value
+			?.replace(/^["']|["']$/g, "")
+			.replace(/\\n/g, " ")
+			.trim();
 	return { name: name?.trim(), description: strip(description) };
 }
 
@@ -117,7 +115,8 @@ export function buildUiIndex(
 	): void => {
 		const rel = relative(root, absPath).split(sep).join("/");
 		const rid =
-			id ?? (kind === "skill" ? rel.split("/")[2] : basename(rel, extname(rel)));
+			id ??
+			(kind === "skill" ? rel.split("/")[2] : basename(rel, extname(rel)));
 		const tags: string[] = [];
 		const terms = tokenize(`${rid} ${description} ${tags.join(" ")}`, stop);
 		resources.push({
@@ -150,7 +149,11 @@ export function buildUiIndex(
 		for (const file of listFiles(join(uiKitDir, zone))) {
 			if (!file.endsWith(".md")) continue;
 			const text = readFileSync(file, "utf-8");
-			add(kind, file, `${firstHeading(text)} — ${intro(text, MARKDOWN_DESC_INDEX)}`);
+			add(
+				kind,
+				file,
+				`${firstHeading(text)} — ${intro(text, MARKDOWN_DESC_INDEX)}`,
+			);
 		}
 	}
 
@@ -167,7 +170,11 @@ export function buildUiIndex(
 				continue;
 			}
 			const text = readFileSync(file, "utf-8");
-			add("doc", file, `${firstHeading(text)} — ${intro(text, MARKDOWN_DESC_INDEX)}`);
+			add(
+				"doc",
+				file,
+				`${firstHeading(text)} — ${intro(text, MARKDOWN_DESC_INDEX)}`,
+			);
 		}
 	}
 

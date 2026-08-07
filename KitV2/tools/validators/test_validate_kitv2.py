@@ -273,9 +273,7 @@ if __name__ == "__main__":
                 '{\n  "skills": ["../rules", "../recipes"]\n}\n',
             )
             errors = module.check_ui_kit_registration(root)
-        self.assertTrue(
-            any("../ui-kit/skills" in error for error in errors), errors
-        )
+        self.assertTrue(any("../ui-kit/skills" in error for error in errors), errors)
 
     def test_ui_kit_registration_fails_on_nested_settings_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -301,6 +299,4 @@ if __name__ == "__main__":
                 '{\n  "skills": ["../ui-kit/skills"]\n}\n',
             )
             errors = module.check_ui_kit_registration(root)
-        self.assertTrue(
-            any("../rules" in error for error in errors), errors
-        )
+        self.assertTrue(any("../rules" in error for error in errors), errors)
