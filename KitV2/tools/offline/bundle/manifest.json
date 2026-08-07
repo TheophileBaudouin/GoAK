@@ -87,7 +87,7 @@
     },
     {
       "path": "golang.org/x/text",
-      "version": "v0.28.0"
+      "version": "v0.40.0"
     },
     {
       "path": "github.com/inconshreveable/mousetrap",
@@ -103,7 +103,7 @@
     },
     {
       "path": "github.com/knadh/koanf/v2",
-      "version": "v2.3.5"
+      "version": "v2.3.6"
     },
     {
       "path": "github.com/spf13/cobra",
