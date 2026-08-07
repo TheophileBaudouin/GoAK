@@ -1,0 +1,77 @@
+---
+id: pattern:architecture:macos-computer-use
+title: macOS computer use — native accessibility, input, and screen capture
+kind: Pattern
+version: 1
+status: active
+owner: go-agent-kit
+tags:
+  - macos
+  - computer-use
+  - desktop-automation
+  - accessibility
+  - axuielement
+  - screencapturekit
+  - robotgo
+  - agent
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-07
+problem: >-
+  Building an autonomous computer-use agent on macOS (semantic UI
+  understanding, simulated mouse/keyboard input, screen analysis) with
+  pixel-coordinate clicks only produces fragile automation that breaks on
+  layout changes and cannot read UI state. How do you structure the
+  perception and action layers so they are robust enough for production
+  computer use?
+context: >-
+  Applies when implementing autonomous computer use, a desktop agent, macOS
+  automation, or simulated user interaction in Go on macOS (Apple Silicon).
+  The most reliable macOS APIs for understanding and controlling the UI are
+  exposed through native Apple frameworks, so the implementation crosses the
+  cgo/Objective-C boundary.
+solution: >-
+  Layer the system on three native-first capabilities, in preference order.
+  (1) AXUIElement, the Apple Accessibility API, is the primary semantic
+  layer: discover running applications, walk the accessibility tree, read
+  labels and values, and trigger actions (AXPress) on identified elements —
+  "click the Send button", not "click at (500, 300)". (2) RobotGo
+  (github.com/go-vgo/robotgo, v1.x stable) is the physical input layer:
+  mouse movement, clicks, typing, and screenshots. On macOS it defaults to
+  cgo (CoreGraphics) and supports a purego build via `-tags purego` ("no
+  Xcode required", CGO_ENABLED=0 compatible). (3) ScreenCaptureKit is the
+  complementary visual-perception layer: low-latency full-screen or window
+  capture feeding visual analysis; treat it as a complement to AXUIElement,
+  never as the primary source of truth. The kit's zero-CGO preference is a
+  library-selection bias, not a ban on writing native code: for computer-use
+  features, cgo, Objective-C, and native Apple APIs are allowed and
+  recommended, because pure-Go substitutes cannot match their reliability.
+  Handle macOS permissions explicitly (TCC: Accessibility for AXUIElement
+  and input synthesis, Screen Recording for ScreenCaptureKit), keep the
+  native boundary thin and documented, and do not substitute a less reliable
+  pure-Go solution for an adapted native API out of over-respect for the
+  general rules.
+benefits: >-
+  Semantic UI interaction that survives layout changes, official Apple APIs
+  optimized for Apple Silicon, a stable vetted Go execution library, and a
+  clearly documented native-code boundary that agents will not second-guess.
+costs: >-
+  macOS-only code paths (darwin build constraints), explicit TCC permission
+  handling, and a cgo/Objective-C bridge for AXUIElement — the main Go
+  binding darwinkit is not actively maintained (last release v0.5.0,
+  2024-07), so prefer a thin maintained bridge. Electron/WebView
+  applications can expose incomplete accessibility trees, and ScreenCaptureKit
+  requires screen-recording permission at runtime.
+related: >-
+  Execution library: `knowledge/catalogs/libraries/robotgo`. GUI sibling
+  (not computer use): `knowledge/catalogs/libraries/fyne` — pure-Go API with
+  a CGO/OpenGL rendering boundary.
+relationships:
+  references:
+    - https://developer.apple.com/documentation/accessibility
+    - https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Accessibility/cocoaAXOverview/cocoaAXOverview.html
+    - https://developer.apple.com/documentation/screencapturekit
+    - https://pkg.go.dev/github.com/go-vgo/robotgo
+    - https://github.com/go-vgo/robotgo
+  uses: []
+  validated_by: []

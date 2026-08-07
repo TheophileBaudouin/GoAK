@@ -1,17 +1,17 @@
 {
  "counts": {
   "anti-pattern": 58,
-  "catalog": 74,
+  "catalog": 75,
   "pattern": 46,
   "prompt": 3,
   "recipe": 15,
   "rule": 14,
   "skill": 8,
   "snippet": 3,
-  "source": 54,
+  "source": 55,
   "template": 3
  },
- "index_sha256": "a80deb62bbc8b89ea262127f3103edc2f4c2a059bb3f45874eb1225b6c85ca4f",
+ "index_sha256": "56ab438b3eef8d9c7c15014e0a0dc855764b47062353213eefae49899b2b7c5c",
  "schema": 1,
  "stopwords": [
   "a",
