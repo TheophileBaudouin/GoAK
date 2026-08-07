@@ -82,7 +82,7 @@ coverage:
   # 44 = catalog SKILL.md fiches; router meta.json counts all catalog-kind
   # resources (75, incl. YAML pointers) — two scopes, both recomputed by gate.
   knowledge_catalogs: 44
-  probes: 15
+  probes: 16
   project_templates: 3
   ui_kit_skills: 7
 metadata_role: product capability catalog, not an instruction entrypoint
