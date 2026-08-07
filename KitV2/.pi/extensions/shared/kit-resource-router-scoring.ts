@@ -161,6 +161,7 @@ export function bm25(
 	queryTokens: string[],
 	k1: number,
 	b: number,
+	domainTokens: string[] = queryTokens,
 ): { results: Scored[]; offDomain: boolean } {
 	const n = resources.length;
 	if (n === 0) return { results: [], offDomain: false };
@@ -182,10 +183,16 @@ export function bm25(
 	const idf = (term: string): number =>
 		Math.log(1 + (n - (df.get(term) ?? 0) + 0.5) / ((df.get(term) ?? 0) + 0.5));
 
-	const zeroCoverage = queryTokens.filter((term) => !df.has(term)).length;
+	// Domain rejection is a property of the USER'S vocabulary, not of the
+	// recall-boosting synonym expansion: an expansion term that never occurs
+	// in the corpus (e.g. a Go-flavored synonym of "message" queried against
+	// the UI corpus) must not flip a legitimate in-domain query to
+	// off-domain. runSearch therefore passes the raw (pre-expansion) tokens
+	// as domainTokens; direct bm25 callers keep the historical behavior.
+	const zeroCoverage = domainTokens.filter((term) => !df.has(term)).length;
 	const offDomain =
-		queryTokens.length > 0 &&
-		zeroCoverage / queryTokens.length > MAX_ZERO_COVERAGE;
+		domainTokens.length > 0 &&
+		zeroCoverage / domainTokens.length > MAX_ZERO_COVERAGE;
 
 	const results: Scored[] = [];
 	for (let i = 0; i < n; i++) {
@@ -225,12 +232,14 @@ export function runSearch(
 	meta: MetaFile,
 ): { results: Scored[]; offDomain: boolean } {
 	const stopwords = new Set(meta.stopwords);
-	const queryTokens = expandQuery(tokenize(query, stopwords));
+	const rawTokens = tokenize(query, stopwords);
+	const queryTokens = expandQuery(rawTokens);
 	const { results, offDomain } = bm25(
 		index.resources,
 		queryTokens,
 		BM25_K1,
 		BM25_B,
+		rawTokens,
 	);
 	return { results, offDomain };
 }

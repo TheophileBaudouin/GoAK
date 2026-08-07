@@ -124,6 +124,11 @@ jump.
   (same "cannot drift" pattern as the scoring core).
 - On-the-fly UI index (no committed generated artifact): the UI tree is the
   source of truth; nothing to regenerate, nothing to drift.
+- The component catalog table (`ui-sdk/components-index.md`) is the routing
+  surface for component NAMES: the builder indexes the table rows into the
+  single `components-index` resource so newly added families (agent/,
+  assistant-ui/) are discoverable by name without per-component resources
+  (D-2026-08-08).
 
 ## 6. Anti-patterns
 

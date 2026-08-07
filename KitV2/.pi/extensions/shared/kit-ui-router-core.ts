@@ -171,14 +171,27 @@ export function buildUiIndex(
 		}
 	}
 
-	// ui-sdk/components-index.md — single routing resource for the component catalog
+	// ui-sdk/components-index.md — single routing resource for the component
+	// catalog. The catalog TABLE is the routing surface for component names:
+	// it is appended to the description so every component — including newly
+	// added families (agent/, assistant-ui/) that live below the 300-char
+	// prose cap — is discoverable through the catalog resource, and queries
+	// naming a component stay in-domain instead of flipping off-domain
+	// (D-2026-08-08, agent-chat wave).
 	const componentsIndex = join(uiKitDir, "ui-sdk", "components-index.md");
 	if (existsSync(componentsIndex)) {
 		const text = readFileSync(componentsIndex, "utf-8");
+		const componentNames = text
+			.split("\n")
+			.filter((line) => line.startsWith("|") && !line.includes("---"))
+			.slice(1)
+			.map((line) => line.split("|")[1]?.trim())
+			.filter(Boolean)
+			.join(" ");
 		add(
 			"components",
 			componentsIndex,
-			`Components index — ${intro(text, MARKDOWN_DESC_INDEX)}`,
+			`Components index — ${intro(text, MARKDOWN_DESC_INDEX)} ${componentNames}`,
 			"components-index",
 		);
 	}

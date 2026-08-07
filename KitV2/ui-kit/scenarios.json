@@ -60,6 +60,19 @@
    "query": "sqlc sqlite migrations database schema generation",
    "offDomain": true,
    "expect": []
+  },
+  {
+   "query": "agent chat conversation thread assistant message composer",
+   "expect": [
+    "agent-chat",
+    "components-index"
+   ]
+  },
+  {
+   "query": "assistant modal attachment follow up suggestions",
+   "expect": [
+    "components-index"
+   ]
   }
  ]
 }
