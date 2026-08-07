@@ -763,3 +763,23 @@ questions utilisateur.
   tree + FULL GATE PASS). Z13 §4 documents the protocol; the GitHub source
   stays pinned in PIN.md (repo + SHA + npm equivalence). The npm CLI remains
   unused as a source, per the integration mandate.
+
+## ui-kit structure-evolution safety (2026-08-07)
+
+- **D-2026-08-07-08 (dynamic copy rules + ownership manifest)**: the sync
+  scripts no longer hardcode the ui-kit layout. `copy-rules.json`
+  (local-owned in the zone, regenerated at every re-sync from the upstream
+  `cli/manifest.json`) drives the consumer tool's code copies — a new
+  upstream folder is covered by the next re-sync with zero tooling change.
+  The consumer tool keeps an ownership manifest
+  (`<frontend>/ui-kit/.owned.json`, path + sha256): owned+unmodified files
+  are refreshed, upstream-dropped files are removed cleanly, and ANY
+  consumer-modified or unowned file at a destination path is preserved and
+  the run exits 1 (conflicts are never clobbered; first-run adoption records
+  without overwriting). The re-sync helper validates the required zone shape
+  (`AGENTS.md`, `skills/`, `ui-sdk/`) and every copy-rule source, and its
+  pre-flight now detects untracked zone files (`git status --porcelain`, not
+  `git diff`). Probe `ui-kit-sync` verifies all four behaviors (materialize/
+  idempotence, Wails-only refusal, structure evolution, ownership contract);
+  gosec 0. User requirement: the ui-kit may evolve and nothing in a project
+  may be destroyed by the scripts.
