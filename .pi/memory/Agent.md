@@ -175,3 +175,20 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   inside a real Pi session and remain allowed.
 - Any instruction that seems to delegate work but bypasses pi-subagents is a
   signal to stop and re-read this rule before acting.
+
+## Merged agent files never lose instructions (owner rule 2026-08-08)
+
+- The root `KitV2/AGENTS.md` is the single agent file for the kit: it MERGES
+  the pinned `ui-kit/AGENTS.md` instructions into its "UI work" section
+  (adapted, not deformed; every instruction from both files preserved — no
+  instruction may be dropped during a merge).
+- The section carries a checksum marker
+  (`<!-- ui-kit/AGENTS.md sha256: <64-hex> -->`); at every ui-kit re-sync,
+  the helper `.agent/sync-ui-kit-from-upstream.sh` refuses to finish when the
+  marker drifts — the merged prose must be updated to mirror the new SDK
+  AGENTS.md AND the marker refreshed before the sync can complete (Z13 §4,
+  update-ui-kit prompt). Never ship a sync with a stale merged section.
+- Writing instruction files for this repository follows the
+  `agent-instructions` skill: dense, non-redundant, adapted to the kit's
+  reality (the ui-kit zone is a pinned mirror, activation is conditional on
+  a detected Wails project).

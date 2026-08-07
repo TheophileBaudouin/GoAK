@@ -89,23 +89,33 @@ dirty zone would be clobbered — abort); upstream resolves the SHA and
 exposes `sdk/`.
 
 **Sync scope**: only `KitV2/ui-kit/` is written (rsync), with the local-owned
-files excluded (`PIN.md`, `scenarios.json`). Nothing outside the zone is
-touched; nothing is committed automatically.
+files excluded (`PIN.md`, `scenarios.json`, `copy-rules.json`) plus the dead
+`.pi` dir (D-2026-08-08-02). Nothing outside the zone is touched; nothing is
+committed automatically.
+
+**Merged root AGENTS.md (owner rule 2026-08-08)**: `KitV2/AGENTS.md` carries
+an "UI work" section merging the SDK's `ui-kit/AGENTS.md` instructions, with
+a checksum marker in its HTML comment. The helper's post-sync guardrails
+FAIL when `ui-kit/AGENTS.md` changed but the marker (and prose) were not
+updated — the merged section must mirror the new SDK instructions (never
+lose an instruction from either file) before the sync can finish.
 
 **Post-sync guardrails** (helper): upstream `sdk/` vs `ui-kit/` must differ
-only in local-owned files; no `.go` file may enter the zone (the Go gate
-would compile it); no metaproject path markers; no zero-byte `.md`;
-English-only. Then the FULL gate runs inside the helper: validators
-(instruction-artifacts, cognitive, kitv2), router index check, Go scenarios
-22/22, UI scenarios, router unit tests, gofmt, go vet, go test -race,
-probes. Any failure exits 1 with rollback instructions — the maintainer
-never commits a red gate.
+only in local-owned files; the merged AGENTS.md marker matches the synced
+`ui-kit/AGENTS.md`; no `.go` file may enter the zone (the Go gate would
+compile it); no metaproject path markers; no zero-byte `.md`; English-only.
+Then the FULL gate runs inside the helper: validators (instruction-artifacts,
+cognitive, kitv2), router index check, Go scenarios 22/22, UI scenarios,
+router unit tests (stdlib unittest), gofmt, go vet, golangci-lint,
+go test -race, gosec, govulncheck, probes. Any failure exits 1 with
+rollback instructions — the maintainer never commits a red gate.
 
-**After a green gate** (manual): review `git diff`, commit with the new SHA
-in the message, record a dated decision in `.pi/memory/Decisions.md` and raw
-evidence in `docs/evidence/YYYY-MM-DD/ui-kit-update/`, add Gotchas for any
-upstream surprise. A fresh-context review is required for any non-trivial
-jump.
+**After a green gate** (manual): review `git diff` (including
+`KitV2/AGENTS.md` — the merged UI section), commit with the new SHA in the
+message (include `KitV2/AGENTS.md` when its section changed), record a dated
+decision in `.pi/memory/Decisions.md` and raw evidence in
+`docs/evidence/YYYY-MM-DD/ui-kit-update/`, add Gotchas for any upstream
+surprise. A fresh-context review is required for any non-trivial jump.
 
 - **Add or change a UI scenario**: must be a realistic UI agent intent
   (3–8 technical terms, one concern), target an id produced by the UI index

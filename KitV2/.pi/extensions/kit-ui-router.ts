@@ -135,7 +135,11 @@ export default function (pi: ExtensionAPI) {
 			let index;
 			let counts;
 			try {
-				({ index, counts } = buildUiIndex(uiKitDir.pathname, loadStopwords(routerDir), tokenize));
+				({ index, counts } = buildUiIndex(
+					uiKitDir.pathname,
+					loadStopwords(routerDir),
+					tokenize,
+				));
 			} catch (error) {
 				throw new Error(
 					`cannot build the ui-kit index: ${
@@ -166,4 +170,3 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 }
-

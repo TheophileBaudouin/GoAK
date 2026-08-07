@@ -15,6 +15,9 @@
 #          files (PIN.md, scenarios.json, copy-rules.json) plus the dead
 #          .pi/settings.json exclusion (single registration point,
 #          D-2026-08-08-02);
+#          the merged UI section of KitV2/AGENTS.md must mirror the pinned
+#          ui-kit/AGENTS.md (checksum marker — a changed SDK AGENTS.md blocks
+#          the sync until the prose is updated, owner rule 2026-08-08);
 #          no .go file may enter the zone (the Go gate would compile it);
 #          no metaproject path markers, no zero-byte .md, English only;
 #          the FULL validation gate must pass: validators (instructions,
@@ -24,7 +27,8 @@
 #          go test -race, gosec, govulncheck, probes. Any failure exits 1
 #          with rollback instructions.
 #
-# The helper only ever writes inside KitV2/ui-kit/ (plus the pin record).
+# The helper only ever writes inside KitV2/ui-kit/ (plus the pin record and
+# the merged-AGENTS.md checksum marker in KitV2/AGENTS.md).
 # Nothing is committed automatically: the maintainer reviews `git diff` and
 # commits; a failed gate is rolled back with `git restore`.
 #
@@ -189,7 +193,7 @@ rsync -a $EXCLUDES "$src"/ "$UI_KIT"/
 # A failure here aborts with rollback: the zone is already modified.
 manifest="$tmp/repo/cli/manifest.json"
 if [ -f "$manifest" ]; then
-	python3 - "$manifest" "$UI_KIT/copy-rules.json" <<'PY' || { rollback; exit 1; }
+	python3 - "$manifest" "$UI_KIT/copy-rules.json" <<'PY' || {
 import json, sys
 src_manifest, out = sys.argv[1], sys.argv[2]
 with open(src_manifest, encoding="utf-8") as f:
@@ -208,6 +212,9 @@ with open(out, "w", encoding="utf-8") as f:
     f.write("\n")
 print(f"sync-ui-kit: wrote copy-rules.json ({len(rules)} code rules)")
 PY
+		rollback
+		exit 1
+	}
 else
 	echo "sync-ui-kit: WARNING upstream cli/manifest.json missing — copy-rules.json not regenerated (zone keeps the previous one)" >&2
 fi
@@ -217,7 +224,10 @@ fi
 # shellcheck disable=SC2016
 today="$(date +%Y-%m-%d)"
 export NEW_SHA="$new_sha" TODAY="$today"
-perl -0pi -e 's/\| Pinned commit \(SHA\) \| `[0-9a-f]{40}` \|/| Pinned commit (SHA) | `$ENV{NEW_SHA}` |/; s/\| Commit date \| \d{4}-\d{2}-\d{2} \|/| Commit date | $ENV{TODAY} |/; s/\| Sync date \| \d{4}-\d{2}-\d{2} \|/| Sync date | $ENV{TODAY} |/' "$UI_KIT/PIN.md" || { rollback; exit 1; }
+perl -0pi -e 's/\| Pinned commit \(SHA\) \| `[0-9a-f]{40}` \|/| Pinned commit (SHA) | `$ENV{NEW_SHA}` |/; s/\| Commit date \| \d{4}-\d{2}-\d{2} \|/| Commit date | $ENV{TODAY} |/; s/\| Sync date \| \d{4}-\d{2}-\d{2} \|/| Sync date | $ENV{TODAY} |/' "$UI_KIT/PIN.md" || {
+	rollback
+	exit 1
+}
 if ! grep -q "$new_sha" "$UI_KIT/PIN.md"; then
 	echo "sync-ui-kit: FAIL — PIN.md does not contain the new SHA $new_sha after the update (pin record format changed?)" >&2
 	rollback
@@ -273,6 +283,27 @@ if [ -e "$UI_KIT/.pi/settings.json" ]; then
 	postfail=1
 fi
 
+# merged AGENTS.md freshness (owner rule 2026-08-08): the "UI work" section
+# of KitV2/AGENTS.md mirrors the pinned ui-kit/AGENTS.md; the checksum marker
+# in its HTML comment must match the synced file. A drift means the SDK
+# instructions changed and the merged prose was not updated — the sync
+# blocks until the maintainer updates it (the marker refreshes on gate PASS).
+AGENTS_ROOT="$ROOT/KitV2/AGENTS.md"
+zone_agents_sha=$(shasum -a 256 "$UI_KIT/AGENTS.md" 2>/dev/null | awk '{print $1}')
+marker=$(sed -n 's/.*ui-kit\/AGENTS\.md sha256: \([0-9a-f]\{64\}\).*/\1/p' "$AGENTS_ROOT" 2>/dev/null | head -1)
+if [ -z "$zone_agents_sha" ]; then
+	echo "sync-ui-kit: FAIL — cannot checksum $UI_KIT/AGENTS.md (shasum missing?)" >&2
+	postfail=1
+elif [ -z "$marker" ]; then
+	echo "sync-ui-kit: FAIL — no ui-kit/AGENTS.md sha256 marker found in KitV2/AGENTS.md; add the marker to the merged UI section." >&2
+	postfail=1
+elif [ "$marker" != "$zone_agents_sha" ]; then
+	echo "sync-ui-kit: FAIL — the merged UI section of KitV2/AGENTS.md is STALE: ui-kit/AGENTS.md changed in this sync." >&2
+	echo "          Update the section prose to mirror the new SDK instructions (never lose an instruction from either file)" >&2
+	echo "          AND refresh its sha256 marker comment, then re-run." >&2
+	postfail=1
+fi
+
 if find "$UI_KIT" -name '*.go' | grep -q .; then
 	echo "sync-ui-kit: FAIL — a .go file entered the zone; the Go gate would compile it (zone must stay Go-free)." >&2
 	postfail=1
@@ -297,7 +328,7 @@ if [ "$postfail" = 1 ]; then
 	rollback
 	exit 1
 fi
-echo "sync-ui-kit: structural checks OK (diff clean, registration intact, no .go, no markers, no empty .md, English)"
+echo "sync-ui-kit: structural checks OK (diff clean, registration intact, merged AGENTS.md fresh, no .go, no markers, no empty .md, English)"
 
 if [ "$verify" = 0 ]; then
 	echo "sync-ui-kit: --no-verify given — FULL GATE SKIPPED. Do not commit before running it: $GATE_HINT"
@@ -345,7 +376,7 @@ fi
 echo
 echo "sync-ui-kit: FULL GATE PASS — the zone is clean and verified."
 echo "Next steps (manual):"
-echo "  1. git diff --stat KitV2/ui-kit   (review the upstream change)"
-echo "  2. git add KitV2/ui-kit && git commit"
+echo "  1. git diff --stat KitV2/ui-kit KitV2/AGENTS.md   (review the upstream change + the merged UI section)"
+echo "  2. git add KitV2/ui-kit KitV2/AGENTS.md && git commit"
 echo "  3. Record in .pi/memory/Decisions.md + docs/evidence/ (dated, per charter)"
 echo "Silent or automatic updates are forbidden (Z13)."

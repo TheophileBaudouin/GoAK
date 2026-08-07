@@ -9,10 +9,10 @@ metaproject that governs it (charter, source registry, plans, evidence).
 ## Installation — one command
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.5.0/install.sh | sh -s -- go-agent-kit
+curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.6.0/install.sh | sh -s -- go-agent-kit
 ```
 
-Installs the product into `./go-agent-kit` (default pinned ref `v2.5.0`;
+Installs the product into `./go-agent-kit` (default pinned ref `v2.6.0`;
 override with `GAK_REF=main` or `GAK_REF=<commit>` for another reference).
 The install is verified by the product validator; a missing tool is reported
 `PARTIAL`, never `PASS`.
@@ -72,6 +72,15 @@ the local gate does not.
 - `install.sh` — bootstrap installer for the tree-based version.
 
 ## Status
+
+**v2.6.0** — the ui-agent-kit integration release: the pinned `ui-kit/` SDK
+zone re-pinned to ui-agent-kit 0.1.1 (agent chat + assistant-ui component
+families), the UI skills registered through the root `.pi/settings.json`
+(single registration point, inert by description for non-Wails projects),
+the root `AGENTS.md` merged with the SDK instructions (checksum-enforced at
+each re-sync), a separate UI routing corpus with 11 quality scenarios, the
+hardened `sync-ui-kit-from-upstream.sh` re-sync helper, and zero pi-lens
+blocking errors in the shipped extensions.
 
 **v2.5.0** — the routing-guarantee release: 72 product skills, 15 runnable
 recipes, 3 sourced MIT templates (REST, CLI, worker), 3 verified snippets,

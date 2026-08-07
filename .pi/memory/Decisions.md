@@ -837,3 +837,25 @@ questions utilisateur.
   audit prompt detects pin drift (PIN.md SHA vs upstream HEAD) and routes
   the maintainer to the manual update workflow; it never syncs itself
   (audit safety contract + Z13 "no silent updates").
+
+## Merged root AGENTS.md + v2.6.0 (2026-08-08, owner mission)
+
+- **D-2026-08-08-04 (merged root AGENTS.md)**: `KitV2/AGENTS.md` is now the
+  single agent file for the kit — it merges the pinned `ui-kit/AGENTS.md`
+  instructions into a dedicated "UI work — Wails projects" section (adapted
+  to the kit's reality, never deformed; EVERY instruction from both files
+  preserved — no instruction may be dropped during a merge). The section
+  carries a checksum marker (`<!-- ui-kit/AGENTS.md sha256: … -->`); the
+  re-sync helper `.agent/sync-ui-kit-from-upstream.sh` refuses to finish when
+  the marker drifts, forcing the maintainer to update the merged prose +
+  marker at every SDK update (Z13 §4, update-ui-kit prompt updated). Written
+  per the agent-instructions skill (dense, non-redundant, layer-1
+  discipline). The pinned `ui-kit/AGENTS.md` stays untouched (Z13 verbatim
+  mirror).
+- **D-2026-08-08-05 (release v2.6.0)**: the ui-agent-kit integration release
+  — pinned ui-kit zone at cd00eb5d (0.1.1), single registration point in
+  root settings.json, merged root AGENTS.md, separate UI routing corpus
+  (11 scenarios), hardened re-sync helper, zero pi-lens blocking errors.
+  Version bumped 2.5.0 → 2.6.0 across manifest.yaml, capabilities.yaml,
+  install.sh, README.md; router meta regenerated. Full gate PASS; installer
+  verified end-to-end.
