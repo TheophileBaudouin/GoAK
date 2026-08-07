@@ -811,3 +811,29 @@ questions utilisateur.
 - KVA-103: `ui-kit/PIN.md` §Update path reworded to not name
   metaproject-only surfaces (`.pi/memory/Decisions.md`, `docs/evidence/`).
   KVA-104: `KitV2/.gitignore` now ignores `.pytest_cache/`.
+
+## ui-kit registration + re-sync (2026-08-08, owner mission)
+
+- **D-2026-08-08-01 (re-pin zone to cd00eb5d / ui-agent-kit 0.1.1)**: upstream
+  jumped f9bdd9b -> cd00eb5d (+5392 lines: agent chat + assistant-ui
+  component families, agent-chat pattern/example). Sourced GitHub-direct at
+  HEAD (no git tags upstream — pin by SHA per gotcha). npm 0.1.1 tarball
+  `sdk/` verified byte-identical to the pinned `sdk/` (diff -rq empty) but
+  npm is never the source. copy-rules.json regenerated from upstream
+  `cli/manifest.json` (4th rule: agent-chat example -> src/components/
+  example-agent). Full gate PASS inside the helper (validators, Go 22/22,
+  UI 9/9, 44 router tests, gofmt/vet/test-race, probes 16/16).
+- **D-2026-08-08-02 (single registration point — root settings.json)**: the
+  ui-kit skills are now declared in `KitV2/.pi/settings.json`
+  (`["../rules","../recipes","../ui-kit/skills"]`, additive). The SDK's
+  nested `ui-kit/.pi/settings.json` is DEAD: deleted from the zone and added
+  to the re-sync helper's exclusion list so upstream's copy is never
+  resurrected. This supersedes the earlier inert-by-default stance (Z13
+  §3.3/§6 updated, capabilities.yaml updated). Discoverability is
+  unconditional; ACTIVATION is conditional (skill descriptions + AGENTS.md
+  Wails section + router separation + Wails-only sync tool) — a plain Go
+  project never applies a UI rule or copies a UI file.
+- **D-2026-08-08-03 (kit-audit gains a read-only ui-kit dimension)**: the
+  audit prompt detects pin drift (PIN.md SHA vs upstream HEAD) and routes
+  the maintainer to the manual update workflow; it never syncs itself
+  (audit safety contract + Z13 "no silent updates").

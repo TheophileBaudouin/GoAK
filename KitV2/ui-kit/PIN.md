@@ -14,7 +14,7 @@ not ship with this product).
 | Pinned commit (SHA) | `cd00eb5d92d8044645ff3d6aca1922a473ecb804` |
 | Commit date | 2026-08-08 |
 | Pinned subtree | `sdk/` (the whole folder, hidden files included) |
-| Local-owned files | `PIN.md`, `scenarios.json`, `copy-rules.json` (never overwritten by a sync) |
+| Local-owned files | `PIN.md`, `scenarios.json`, `copy-rules.json` (never overwritten by a sync). `ui-kit/.pi/settings.json` is **dead by design**: the UI skills are registered in the root `KitV2/.pi/settings.json` (single registration point, owner decision 2026-08-08); the re-sync helper excludes `.pi/settings.json` so upstream's copy is never resurrected |
 | npm release equivalence | `ui-agent-kit@0.1.1` — tarball `sdk/` verified byte-identical to the pinned `sdk/` at cd00eb5d (2026-08-08; npm is never the source, GitHub-direct only) |
 | License | MIT (upstream `LICENSE` at repo root; `sdk/skills/*` carry their own license fields) |
 | Sync date | 2026-08-08 |

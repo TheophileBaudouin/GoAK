@@ -32,6 +32,11 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 UI_KIT="$ROOT/KitV2/ui-kit"
 UPSTREAM="https://github.com/TheophileBaudouin/ui-agent-kit"
 LOCAL_OWNED="PIN.md scenarios.json copy-rules.json" # never overwritten by a sync
+# .pi/settings.json is deliberately ABSENT from the zone: the UI skills are
+# registered in the root KitV2/.pi/settings.json (single registration point,
+# mission 2026-08-08). Upstream sdk/ still carries .pi/settings.json, so it
+# must stay excluded here or every re-sync would resurrect the dead file.
+EXCLUDES="--exclude=PIN.md --exclude=scenarios.json --exclude=copy-rules.json --exclude=.pi/settings.json"
 GATE_HINT="(cd KitV2 && python3 tools/validators/validate-kitv2.py) && node .agent/router/run_scenarios.mjs && node .agent/router/run_ui_scenarios.mjs && (cd .agent && python3 -m pytest router/ -q) && (cd KitV2 && gofmt/vet/lint/test-race/gosec/govulncheck + bash probes/run.sh)"
 
 rollback() {
@@ -128,10 +133,10 @@ src="$tmp/repo/sdk"
 # SYNC (writes only inside KitV2/ui-kit/)
 # ---------------------------------------------------------------------------
 echo "sync-ui-kit: diffing upstream sdk/ vs KitV2/ui-kit/ (excluding $LOCAL_OWNED)"
-diff -rq --exclude=PIN.md --exclude=scenarios.json --exclude=copy-rules.json "$src" "$UI_KIT" || true
+diff -rq $EXCLUDES "$src" "$UI_KIT" || true
 
 echo "sync-ui-kit: copying upstream sdk/ -> KitV2/ui-kit/"
-rsync -a --exclude="PIN.md" --exclude="scenarios.json" --exclude="copy-rules.json" "$src"/ "$UI_KIT"/
+rsync -a $EXCLUDES "$src"/ "$UI_KIT"/
 
 # generate copy-rules.json (local-owned) from the upstream SDK's own manifest
 # — structure evolution is handled HERE, the consumer tool never hardcodes a
@@ -174,7 +179,7 @@ echo
 echo "sync-ui-kit: post-sync structural checks"
 postfail=0
 
-remaining=$(diff -rq --exclude=PIN.md --exclude=scenarios.json --exclude=copy-rules.json "$src" "$UI_KIT" || true)
+remaining=$(diff -rq $EXCLUDES "$src" "$UI_KIT" || true)
 if [ -n "$remaining" ]; then
 	echo "sync-ui-kit: FAIL — upstream sdk/ and KitV2/ui-kit/ differ beyond local-owned files:" >&2
 	echo "$remaining" >&2

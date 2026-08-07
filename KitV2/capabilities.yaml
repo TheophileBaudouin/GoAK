@@ -70,8 +70,9 @@ capabilities:
     status: pinned-verbatim-sdk-zone-and-separate-routing-corpus
     criteria: >-
       the zone mirrors upstream ui-agent-kit sdk/ at a pinned commit (PIN.md
-      records the SHA and sync verification); its skills are inert by default
-      (never declared in .pi/settings.json); the UI routing corpus is
+      records the SHA and sync verification); its skills are registered in
+      .pi/settings.json but inert by description (single registration point,
+      conditional activation for Wails projects only); the UI routing corpus is
       disjoint from the Go index and contract-tested under the shared
       scoring; the sync tool materializes the SDK only into a detected Wails
       frontend and never destroys consumer files.

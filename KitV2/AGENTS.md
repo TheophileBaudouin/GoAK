@@ -52,10 +52,12 @@ is governed by the **ui-agent-kit SDK zone** (`ui-kit/`) — read
 `ui-kit/AGENTS.md` before any interface task, and call
 `search_ui_kit_resources` (the UI routing tool) for UI resources instead of
 `search_kit_resources`. The zone is a pinned, separate corpus: it never mixes
-with the Go index, its skills are never auto-loaded into a Pi session, and
-nothing is copied into a project's `frontend/` unless the Wails layout is
-detected (`tools/sync-ui-kit.sh` does that job). For non-Wails Go projects
-none of this applies — no UI rule, skill, or router entry is active.
+with the Go index, its skills are registered in `.pi/settings.json` but inert
+by description (they only apply to Wails/UI work — a plain Go project never
+uses them), and nothing is copied into a project's `frontend/` unless the
+Wails layout is detected (`tools/sync-ui-kit.sh` does that job). For
+non-Wails Go projects none of this applies — no UI rule, skill, or router
+entry is active.
 
 ## Memory (consumer projects)
 

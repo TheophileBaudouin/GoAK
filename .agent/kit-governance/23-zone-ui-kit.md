@@ -12,11 +12,14 @@
 
 Give a Pi agent working on a **Wails desktop project** (Go + React frontend)
 direct, complete access to the ui-agent-kit rules, components, and skills —
-without ever polluting the context of a non-Wails Go project. The zone ships
-with every install but is **inert until routed to**: no UI skill is loaded
-into a Pi session by default, the Go routing corpus never contains UI
-entries, and nothing is materialized into a project's `frontend/` unless a
-Wails layout (`wails.json` + `frontend/`) is detected.
+without polluting the context of a non-Wails Go project. The UI skills are
+**registered** in the root `KitV2/.pi/settings.json` (single registration
+point) so a Wails-project agent can discover them, but they are **inert by
+description**: their frontmatter scopes them to UI work and the product
+AGENTS.md "Wails projects" section tells the agent to ignore them for plain
+Go projects. The Go routing corpus never contains UI entries, and nothing is
+materialized into a project's `frontend/` unless a Wails layout
+(`wails.json` + `frontend/`) is detected.
 
 ## 2. Roles and boundaries (inviolable)
 
@@ -26,6 +29,7 @@ Wails layout (`wails.json` + `frontend/`) is detected.
 | `ui-kit/PIN.md` | Pin record: source repo, commit SHA, npm equivalence, license, sync verification, update path | metaproject (written at sync) |
 | `ui-kit/copy-rules.json` | **Local-owned** copy rules (zone-relative src -> frontend-relative dst), regenerated at every re-sync from the upstream `cli/manifest.json` — the consumer sync tool reads it instead of hardcoding paths | metaproject (written at sync) |
 | `ui-kit/scenarios.json` | **Authored** UI routing-quality contract (intent → expected top-K UI resources) | product; maintained under metaproject gate |
+| `KitV2/.pi/settings.json` | **Single Pi skill registration point**: declares `../rules`, `../recipes`, `../ui-kit/skills`. The nested `ui-kit/.pi/settings.json` is dead by design (excluded from re-syncs) — no second registration source | kit (product) |
 | `.pi/extensions/shared/kit-ui-router-core.ts` | **Single source of the UI index construction** (walk ui-kit tree → IndexFile); lives in `shared/` (not auto-discovered by the Pi extension loader) | kit (runtime) |
 | `.pi/extensions/kit-ui-router.ts` | Native Pi tool `search_ui_kit_resources`, read-only; reuses the shared scoring module | kit (runtime) |
 | `tools/sync-ui-kit.sh` | Shipped consumer helper: materialize the zone into a Wails project's `frontend/` (detect, copy, wire, never destructive) | kit (product) |
@@ -49,29 +53,25 @@ corpus.
    package is never used as a source. `PIN.md` records the SHA and the sync
    verification; a missing or inconsistent PIN is a validation error.
 3. **Structure evolution is a re-sync concern, not a tooling concern.** The shipped `tools/sync-ui-kit.sh` reads `ui-kit/copy-rules.json` (local-owned, generated at re-sync from the upstream SDK's own `cli/manifest.json`): new folders, renames, or a different `sdk/` layout are covered by the next re-sync — the tool itself never hardcodes a source path. Its ownership manifest (`<frontend>/ui-kit/.owned.json`, path + sha256) guarantees nothing is destroyed: owned+unmodified files are refreshed, owned files dropped upstream are removed cleanly, and ANY consumer-modified or unowned file at a destination path is preserved and reported (refused). A zone missing its required shape (`AGENTS.md`, `skills/`, `ui-sdk/`) aborts the sync.
-3. **Inert by default (context protection).** `ui-kit/skills` are NOT added
-   to `.pi/settings.json`; the Go builder and `search_kit_resources` never
-   index `ui-kit/`; the UI skills activate only when an agent works inside a
-   Wails `frontend/` where the sync tool wired them, or when routed there by
-   `search_ui_kit_resources` / the Wails section of the product AGENTS.md.
-4. **Two routing domains, one scoring.** UI routing reuses the shared
+4. **Registered once, inert by description (activation is conditional).** `ui-kit/skills` ARE declared in the root `KitV2/.pi/settings.json` (single registration point, owner decision 2026-08-08). The SDK's own nested `ui-kit/.pi/settings.json` is dead: deleted from the zone and excluded from re-syncs, so it can never be mistaken for a registration source. Discoverability is unconditional; ACTIVATION is conditional — skill descriptions scope them to Wails/UI work, the Go builder and `search_kit_resources` never index `ui-kit/`, and nothing is materialized into a project's `frontend/` unless the sync tool detects a Wails layout.
+5. **Two routing domains, one scoring.** UI routing reuses the shared
    scoring implementation (`kit-resource-router-scoring.ts`) and the shipped
    stopwords (read from `router/meta.json`). Re-implementing scoring or
    tokenization for the UI corpus is release-blocking. Query-time synonyms
    may be extended only in the shared module, and every extension re-runs the
    22 Go scenarios (tripwire).
-5. **Two-layer UI verification.** The product validator checks
+6. **Two-layer UI verification.** The product validator checks
    `ui-kit/scenarios.json` schema + expected-id linkage (node-free) and
    corpus disjointness; the metaproject gate verifies ranking under the real
    scoring. A UI scenario change must pass both.
-6. **Wails-only materialization.** `tools/sync-ui-kit.sh` refuses (exit 1)
+7. **Wails-only materialization.** `tools/sync-ui-kit.sh` refuses (exit 1)
    unless a Wails frontend is detected (`wails.json` present and `frontend/`
    with a package.json) or an explicit `--target` points at one. It never
    deletes consumer files; it only adds/overwrites SDK-owned paths and merges
    `.pi/settings.json` conservatively.
-7. **English only** (fundamental rule D-2026-08-05-21) and **no metaproject
+8. **English only** (fundamental rule D-2026-08-05-21) and **no metaproject
    path markers** in shipped files (KVA-102 guard), including `PIN.md`.
-8. **Update propagation is manual and gated** — see §4. Silent or automatic
+9. **Update propagation is manual and gated** — see §4. Silent or automatic
    re-sync is forbidden.
 
 ## 4. Maintenance
@@ -127,13 +127,18 @@ jump.
 
 ## 6. Anti-patterns
 
-- Adding `ui-kit/skills` to `.pi/settings.json` (loads UI skills into every
-  Go session — context pollution).
-- Adding `ui-kit/**` to the Go builder globs (`INDEXABLE_GLOBS`) — merges the
-  corpora.
+- Duplicating skill registration (a nested `ui-kit/.pi/settings.json` that
+  re-declares the skills, or any second settings file that claims to be the
+  registration source) — the root `KitV2/.pi/settings.json` is the single
+  registration point; the nested SDK file stays dead (deleted + excluded
+  from re-syncs).
+- Letting the UI corpus into the Go builder globs (`INDEXABLE_GLOBS`) or the
+  Go corpus into the UI index — the corpora never mix.
 - Editing SDK files in place, or re-syncing automatically/silently.
 - Shipping a UI index.json as a generated artifact (two artifacts to drift).
 - The sync tool overwriting consumer-owned files or skipping the Wails check.
+- Copying the SDK into `KitV2/` and stopping there — a folder with its own
+  AGENTS.md/.pi is invisible to Pi until registered (see §9).
 
 ## 7. Validation criteria (verifiable)
 
@@ -158,6 +163,27 @@ jump.
 8. The sync tool's ownership contract is probe-verified: idempotent refresh,
    clean removal of upstream-dropped SDK files, and preservation (refusal) of
    consumer-modified or unowned files at destination paths.
+9. Registration integrity: the root `KitV2/.pi/settings.json` declares
+   `../ui-kit/skills` and the zone contains NO nested `ui-kit/.pi/settings.json`
+   (single registration point; the re-sync helper excludes `.pi/settings.json`
+   so upstream's copy is never resurrected).
+
+## 9. Past mistake — do not repeat
+
+In a first attempt (2026-08-07, pre-native-integration) the ui-agent-kit
+SDK was copied into `KitV2/ui-kit/` with its own `AGENTS.md` and its own
+`.pi/` but **registered nowhere**. Pi performs NO automatic discovery by
+directory: a folder of skills is only loaded when an already-loaded
+`.pi/settings.json` references it (`{ "skills": ["../skills"] }`). The
+result was content that was invisible to the agent — the copy existed, but
+nothing could route to it. The native integration fixed this by registering
+the zone (router tool, AGENTS.md pointer section, and — since 2026-08-08 —
+the root `settings.json` fusion).
+
+**Rule: copying a folder that carries its own AGENTS.md and its own `.pi/`
+does NOT integrate it. Any integration of external content must include an
+explicit registration step (skills config, AGENTS.md entry, router entry)
+verified concretely afterwards — never assumed.**
 
 ## 8. Open questions
 

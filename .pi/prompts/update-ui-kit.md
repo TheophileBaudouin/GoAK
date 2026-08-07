@@ -48,7 +48,10 @@ bash .agent/sync-ui-kit-from-upstream.sh <new-sha>
 
 The helper performs its own pre-flight (SHA shape, clean zone, upstream
 reachable, `sdk/` present), copies only inside `KitV2/ui-kit/` (excluding
-`PIN.md` + `scenarios.json`), rewrites the pin record, runs the structural
+the local-owned files `PIN.md`, `scenarios.json`, `copy-rules.json` AND the
+dead `.pi/settings.json` — the UI skills' single registration point is the
+root `KitV2/.pi/settings.json`, which the helper never touches), rewrites
+the pin record, runs the structural
 checks (diff clean beyond local-owned files, no `.go`, no metaproject
 markers, no zero-byte `.md`, English-only), then runs the FULL gate
 (validators, router Go + UI gates, router tests, gofmt/vet/lint/test-race/
