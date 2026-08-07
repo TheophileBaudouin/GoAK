@@ -744,3 +744,22 @@ questions utilisateur.
   `.agent/sync-ui-kit-from-upstream.sh <sha>` (Z13 §4) — never automatic.
   The ui-agent-kit CLI first-run ordering bug (`shadcn` before `tsconfig.json`,
   exit 0 on failure) is a separate upstream proposal (mission rule 2).
+
+## ui-agent-kit maintenance workflow (2026-08-07)
+
+- **D-2026-08-07-07 (update workflow: one prompt + one gated helper)**: the
+  ui-kit update path is now a complete maintenance system. The metaproject
+  prompt `.pi/prompts/update-ui-kit.md` (phases 0-3: pre-flight, sync,
+  review/commit, record) drives the mechanical helper
+  `.agent/sync-ui-kit-from-upstream.sh`, which enforces guardrails instead of
+  printing a checklist: pre-flight (40-hex SHA, clean zone, upstream
+  reachable, sdk/ present), sync scope (only KitV2/ui-kit/, local-owned
+  files excluded), post-sync structural checks (diff clean beyond
+  local-owned, no .go, no metaproject markers, no empty .md, English), then
+  the FULL gate runs INSIDE the helper (validators, router Go+UI gates,
+  router tests, gofmt/vet/lint/test-race/gosec/govulncheck, probes). Any
+  failure exits 1 with `git restore` rollback instructions; nothing is
+  committed automatically. Verified end-to-end (same-pin re-sync → no-op
+  tree + FULL GATE PASS). Z13 §4 documents the protocol; the GitHub source
+  stays pinned in PIN.md (repo + SHA + npm equivalence). The npm CLI remains
+  unused as a source, per the integration mandate.

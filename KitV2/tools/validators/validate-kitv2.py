@@ -878,7 +878,9 @@ def check_ui_kit_pin() -> list[str]:
     zone = ROOT / "ui-kit"
     agents = zone / "AGENTS.md"
     if not agents.exists():
-        errors.append(f"{agents}: missing — the ui-kit zone must ship the SDK AGENTS.md")
+        errors.append(
+            f"{agents}: missing — the ui-kit zone must ship the SDK AGENTS.md"
+        )
     pin = zone / "PIN.md"
     if not pin.exists():
         return errors + [f"{pin}: missing pin record (Z13)"]

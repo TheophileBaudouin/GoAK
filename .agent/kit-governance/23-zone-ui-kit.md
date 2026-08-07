@@ -74,12 +74,37 @@ corpus.
 
 ## 4. Maintenance
 
-- **Refresh the pin** (upstream released new SDK content): run the metaproject
-  re-sync helper with the new SHA, which diffs upstream `sdk/` against
-  `ui-kit/`, updates `PIN.md`, and prints a verification checklist; then run
-  the FULL gate (validators, Go scenarios 22/22, UI scenarios, gofmt/vet/lint/
-  test/race/gosec/govulncheck, probes) and record the change in
-  `.pi/memory/Decisions.md` + `docs/evidence/`. Never automatic.
+The update path is **one workflow**: the metaproject prompt
+`.pi/prompts/update-ui-kit.md` (run it when the user asks to update ui-kit)
+drives the mechanical helper `.agent/sync-ui-kit-from-upstream.sh`, which
+enforces the guardrails below. The workflow is manual (the maintainer
+invokes it), gated (the helper RUNS the full gate), and reversible (a failed
+gate rolls back with `git restore`). Never automatic, never silent.
+
+**Pre-flight guardrails** (helper, before any write): the target SHA is a
+well-formed 40-hex commit; `KitV2/ui-kit/` is clean in the working tree (a
+dirty zone would be clobbered — abort); upstream resolves the SHA and
+exposes `sdk/`.
+
+**Sync scope**: only `KitV2/ui-kit/` is written (rsync), with the local-owned
+files excluded (`PIN.md`, `scenarios.json`). Nothing outside the zone is
+touched; nothing is committed automatically.
+
+**Post-sync guardrails** (helper): upstream `sdk/` vs `ui-kit/` must differ
+only in local-owned files; no `.go` file may enter the zone (the Go gate
+would compile it); no metaproject path markers; no zero-byte `.md`;
+English-only. Then the FULL gate runs inside the helper: validators
+(instruction-artifacts, cognitive, kitv2), router index check, Go scenarios
+22/22, UI scenarios, router unit tests, gofmt, go vet, go test -race,
+probes. Any failure exits 1 with rollback instructions — the maintainer
+never commits a red gate.
+
+**After a green gate** (manual): review `git diff`, commit with the new SHA
+in the message, record a dated decision in `.pi/memory/Decisions.md` and raw
+evidence in `docs/evidence/YYYY-MM-DD/ui-kit-update/`, add Gotchas for any
+upstream surprise. A fresh-context review is required for any non-trivial
+jump.
+
 - **Add or change a UI scenario**: must be a realistic UI agent intent
   (3–8 technical terms, one concern), target an id produced by the UI index
   builder, and be able to fail (padding is not admitted — same bar as Z11).
