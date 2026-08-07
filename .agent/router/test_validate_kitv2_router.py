@@ -274,6 +274,93 @@ class RouterScenariosFixture(unittest.TestCase):
         self.assertTrue(any("3..300 char" in e for e in errors))
 
 
+class UiKitChecksFixture(unittest.TestCase):
+    """Z13 checks: ui-kit skills keep Pi-compatible frontmatter (positive and
+    negative), and the Go routing corpus never contains a ui-kit path."""
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.kit = Path(self.tmp.name)
+        (self.kit / "ui-kit" / "skills" / "frontend-design").mkdir(parents=True)
+        (self.kit / "router").mkdir(parents=True)
+        (self.kit / "ui-kit" / "skills" / "frontend-design" / "SKILL.md").write_text(
+            SKILL.format(
+                name="frontend-design",
+                description="Distinctive visual design guidance for Wails apps.",
+                category="rule",
+            ),
+            encoding="utf-8",
+        )
+        self.index = {
+            "schema": 1,
+            "resources": [
+                {
+                    "id": "rule-errors",
+                    "kind": "rule",
+                    "path": "rules/core/SKILL.md",
+                    "description": "Handle errors once.",
+                    "tags": [],
+                    "terms": ["error"],
+                }
+            ],
+        }
+        (self.kit / "router" / "index.json").write_text(
+            json.dumps(self.index), encoding="utf-8"
+        )
+        validate.ROOT = self.kit  # type: ignore[attr-defined]
+
+    def tearDown(self) -> None:
+        self.tmp.cleanup()
+        validate.ROOT = KIT  # type: ignore[attr-defined]
+
+    def test_ui_skills_positive(self) -> None:
+        self.assertEqual(validate.check_ui_kit_skills(), [])
+
+    def test_ui_skills_missing_description(self) -> None:
+        path = self.kit / "ui-kit" / "skills" / "frontend-design" / "SKILL.md"
+        path.write_text(
+            SKILL.format(
+                name="frontend-design",
+                description="",
+                category="rule",
+            ),
+            encoding="utf-8",
+        )
+        errors = validate.check_ui_kit_skills()
+        self.assertTrue(any("description must be a 1..1024" in e for e in errors))
+
+    def test_ui_skills_name_mismatch(self) -> None:
+        path = self.kit / "ui-kit" / "skills" / "frontend-design" / "SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "name: frontend-design", "name: wrong-name"
+            ),
+            encoding="utf-8",
+        )
+        errors = validate.check_ui_kit_skills()
+        self.assertTrue(any("name does not match directory" in e for e in errors))
+
+    def test_disjointness_positive(self) -> None:
+        self.assertEqual(validate.check_ui_corpus_disjointness(), [])
+
+    def test_disjointness_rejects_ui_path_in_go_index(self) -> None:
+        self.index["resources"].append(
+            {
+                "id": "frontend-design",
+                "kind": "skill",
+                "path": "ui-kit/skills/frontend-design/SKILL.md",
+                "description": "UI design guidance.",
+                "tags": [],
+                "terms": ["design"],
+            }
+        )
+        (self.kit / "router" / "index.json").write_text(
+            json.dumps(self.index), encoding="utf-8"
+        )
+        errors = validate.check_ui_corpus_disjointness()
+        self.assertTrue(any("corpora must stay disjoint" in e for e in errors))
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     unittest.main()

@@ -525,6 +525,7 @@ def coverage_counts() -> dict[str, int]:
     catalogs = list((ROOT / "knowledge" / "catalogs").rglob("SKILL.md"))
     probes = list((ROOT / "probes").glob("*/main.go"))
     templates = list((ROOT / "templates").glob("*/template.yaml"))
+    ui_kit_skills = list((ROOT / "ui-kit" / "skills").rglob("SKILL.md"))
     return {
         "product_skills": len(rules) + len(recipes) + len(catalogs),
         "rules": len(rules),
@@ -532,6 +533,7 @@ def coverage_counts() -> dict[str, int]:
         "knowledge_catalogs": len(catalogs),
         "probes": len(probes),
         "project_templates": len(templates),
+        "ui_kit_skills": len(ui_kit_skills),
     }
 
 
@@ -868,6 +870,58 @@ def check_router_scenarios() -> list[str]:
     return errors
 
 
+def check_ui_kit_skills() -> list[str]:
+    """Z13 §7.2 — ui-kit skills must stay Pi-discoverable as instructions.
+
+    The vendored SDK owns its frontmatter schema (upstream ui-agent-kit), so
+    only the Pi-native minimum is checked here: name + description, kebab-case
+    name matching its directory. The kit facet fields (category/tags/
+    last-verified) are deliberately NOT required — adding them would mean
+    editing vendored SDK content (forbidden by Z13)."""
+    errors: list[str] = []
+    for path in sorted((ROOT / "ui-kit" / "skills").rglob("SKILL.md")):
+        try:
+            values = parse_frontmatter(path)
+        except ValueError as error:
+            errors.append(str(error))
+            continue
+        name = values.get("name")
+        description = values.get("description")
+        if not isinstance(name, str) or not NAME_RE.fullmatch(name):
+            errors.append(f"{path}: invalid or missing name")
+        if path.parent.name != name:
+            errors.append(f"{path}: name does not match directory")
+        if not isinstance(description, str) or not 1 <= len(description) <= 1024:
+            errors.append(f"{path}: description must be a 1..1024 char string")
+    return errors
+
+
+def check_ui_corpus_disjointness() -> list[str]:
+    """Z13 §3.4 — the two routing corpora never mix.
+
+    The Go index (router/index.json) must contain no path under ui-kit/, so a
+    Go query can never surface a UI resource. The reverse direction (the UI
+    index contains only ui-kit/ paths) is verified by the metaproject gate
+    (run_ui_scenarios.mjs), which builds the UI index with the same shared
+    core the runtime tool uses — node-free validator cannot build it here."""
+    errors: list[str] = []
+    index_path = ROOT / "router" / "index.json"
+    try:
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return [f"{index_path}: unreadable — index drift is check_router's job"]
+    for resource in index.get("resources", []):
+        if not isinstance(resource, dict):
+            continue
+        path = str(resource.get("path", ""))
+        if path.startswith("ui-kit/"):
+            errors.append(
+                f"{index_path}: Go corpus contains UI resource {path!r} "
+                f"(id {resource.get('id')!r}) — corpora must stay disjoint"
+            )
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
@@ -920,6 +974,8 @@ def main() -> int:
     errors.extend(check_empty_markdown())
     errors.extend(check_router())
     errors.extend(check_router_scenarios())
+    errors.extend(check_ui_kit_skills())
+    errors.extend(check_ui_corpus_disjointness())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())
     errors.extend(check_template_build(warnings))

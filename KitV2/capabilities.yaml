@@ -65,6 +65,16 @@ capabilities:
       tested by scenarios.json under the real runtime scoring (metaproject
       node gate), so the top resource for each documented intent stays
       verifiable as the kit grows.
+  ui-kit:
+    source: ui-kit/
+    status: pinned-verbatim-sdk-zone-and-separate-routing-corpus
+    criteria: >-
+      the zone mirrors upstream ui-agent-kit sdk/ at a pinned commit (PIN.md
+      records the SHA and sync verification); its skills are inert by default
+      (never declared in .pi/settings.json); the UI routing corpus is
+      disjoint from the Go index and contract-tested under the shared
+      scoring; the sync tool materializes the SDK only into a detected Wails
+      frontend and never destroys consumer files.
 coverage:
   product_skills: 73
   rules: 14
@@ -74,6 +84,7 @@ coverage:
   knowledge_catalogs: 44
   probes: 15
   project_templates: 3
+  ui_kit_skills: 7
 metadata_role: product capability catalog, not an instruction entrypoint
 known_limits:
   - id: pi-discovery-smoke-test

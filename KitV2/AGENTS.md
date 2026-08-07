@@ -14,6 +14,7 @@ KitV2 is the standalone consumable Go agent kit.
 | `probes/` | Product-facing runnable verification scenarios, including the offline retrieval probe | `probes/README.md` |
 | `tools/offline/` | Stdlib-only resolver, manifest, pinned source bundle, and attribution files | `tools/README.md` |
 | `router/` | Generated read-only routing index; `search_kit_resources` routes tasks to resources without loading the kit | `router/README.md` |
+| `ui-kit/` | Pinned ui-agent-kit SDK zone (Wails/React UI rules, patterns, skills, docs) — inert unless routed; `search_ui_kit_resources` for UI tasks | `ui-kit/AGENTS.md` |
 | `.pi/` | Native Pi settings, prompt templates, skills, and the `search_kit_resources` extension loaded after trust | `.pi/README.md` |
 
 If two files answer the same question, keep one canonical answer and replace the other with a pointer. Catalog updates require fresh primary-source research and dated `Verified sources`; fenced Go examples must handle returned errors or be marked `illustrative`. The source registry never overrides the kit charter or these rules; source-derived content remains subject to evidence and validation gates.
@@ -79,6 +80,20 @@ bash probes/run.sh
 
 If a consumer environment lacks a required tool, report the gate as `PARTIAL`,
 never as passing. The CI workflows (metaproject gate and
+`templates/_kit-ci-workflow.yml`) additionally enforce an aggregate coverage
+floor of 70%; the local gate does not.
+
+## Limits
+
+The kit does not claim to cover: Go-side desktop-application wiring beyond
+the `recipe-desktop-app` recipe, TUI development beyond the kit's interactive
+Bubble Tea recipe, Pi discovery internals, or non-Go domains other than the
+Wails/React frontend surface that the pinned `ui-kit/` zone governs — check
+the catalog, the Go router (`search_kit_resources`) and the UI router
+(`search_ui_kit_resources`) before expecting a kit resource for a technology.
+
+Always preserve errors, cancellation, input validation, and observable evidence. Ask before adding dependencies or changing the manifest contract. Never claim an unexecuted scenario passed or treat static checks as proof of user intent.
+aproject gate and
 `templates/_kit-ci-workflow.yml`) additionally enforce an aggregate coverage
 floor of 70%; the local gate does not.
 

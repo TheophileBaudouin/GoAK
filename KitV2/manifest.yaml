@@ -22,6 +22,7 @@ capabilities:
   - source-registry
   - offline-source-retrieval
   - resource-routing
+  - ui-kit
 canonical:
   rules: rules/
   knowledge: knowledge/
@@ -34,6 +35,7 @@ canonical:
   source-registry: knowledge/
   offline-source-retrieval: tools/offline/
   resource-routing: router/
+  ui-kit: ui-kit/
 product_status: standalone
 metadata_role: product manifest, not a Pi instruction entrypoint
 avoid:
