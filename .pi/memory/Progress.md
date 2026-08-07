@@ -125,8 +125,14 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed maintenance
 
+- [x] [2026-08-07] macOS Computer Use resources (pattern + fiche, D-2026-08-07-01..03) : prémisse « règle anti-CGO/Objective-C » vérifiée fausse (zéro-CGO = préférence de sélection, pas une règle) → guidance positive dans le pattern knowledge/architecture/macos-computer-use.yaml (AXUIElement primaire, RobotGo exécution, ScreenCaptureKit perception, caveat darwinkit stale 2024-07) ; RobotGo admis en fiche vétée catalogs/libraries/robotgo/SKILL.md (v1.0.2 stable 2026-03, macOS cgo par défaut / purego via -tags purego, 9 critères réels) ; router régénéré 280, capabilities 73/44, gate complet PASS (validators, 22/22 scénarios, gofmt/vet/lint 0, test race, gosec 0, govulncheck 0, probes 15/15) ; revue fresh-context APPROVE-WITH-NITS ; plan docs/plans/2026-08-07-computer-use-macos.md, évidence docs/evidence/2026-08-07/computer-use-macos/.
+
 - [x] Pi-native skill layer: four reusable skills added under `KitV2/.pi/skills/`.
 - [x] KIT_CHARTER correction wave: clarified the universal rules boundary,
+      added the approved four probes under `KitV2/probes/`, corrected root AGENTS.md
+      drift and duplication, added deterministic instruction validation, and captured
+      evidence. Remaining PARTIAL: no Git repository for VCS versioning and no
+      real non-probe consumer-project maturity evidence.
 - [x] Audit-fix wave KVA-001…KVA-011 (2026-08-05, produit 2.4.1)
 - [ ] [2026-08-05] Passe méta-projet « durcissement gouvernance » (5 findings Rodin fermés sans toucher KitV2) : C2/Z4/Z3/Z1 (déclenchement revue inter-fichiers par dates + tripwire, D-11), roadmap snippets déclarée saine (D-12), philosophie → Option 3 « naviguer par la raison » réponse Marie (D-13), dossier desktop-app aucun candidat Wails conforme + précision Z5 (D-14), principe instructions absolues étendu + registre + spec porte Pi (D-15) ; kit-audit phases B/C4/C9/§5-E évolué ; gates méta-projet PASS ; revue fresh-context APPROVE-WITH-NITS intégrée ; actions KitV2 en attente documentées (plan 2026-08-05-metaproject-governance-hardening.md).
 - [ ] [2026-08-05] Intégration spec-driven-dev (mise à jour majeure, D-16…20) : skill spec-driven-dev (phases 0-6 + 4 références + 5 templates, FR/EN, LOCAL_ONLY), skill deep-discuss, go-code-review augmenté (findings-first), ancienne chaîne workflow-clarify/plan/tasks/implement/verify supprimée (router régénéré prompt 8→3, skill 6→8), règle mémoire kit (vérifier les fichiers .pi/memory, Decisions.md absent au bootstrap), contrat Z12 + kit-audit C10, frontière S.U.P.E.R vs doctrine Go encodée ; analyse docs/research/2026-08-05-spec-driven-dev-analysis.md.
@@ -137,10 +143,6 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [ ] [2026-08-06] Routing guarantee wave (product 2.5.0, owner decisions 2026-08-06): routing-quality gate (scenarios.json 22 scénarios, scoring runtime partagé kit-resource-router-scoring.ts importé par l'extension ET le gate node .agent/router/run_scenarios.mjs — zéro divergence, 22/22 PASS), surface prompt réduite (catalogs retirés de .pi/settings.json → règles+recipes visibles, fiches routables), mandat renforcé (AGENTS.md « routing is mandatory » + promptGuidelines du tool nommant les patterns par défaut), validate-kitv2 check_router_scenarios (schéma+linkage, node-free), tests 25 passed, gate complet PASS (validators, probes 15/15, gofmt/vet/lint), revue fresh-context APPROVE (3 nits corrigés), plan docs/plans/2026-08-06-routing-guarantee.md.
 - [ ] [2026-08-06] Router maintainability hardening (metaproject rules): Z11 contract updated with the routing-quality system (roles table: scenarios.json authored contract, shared scoring core, two-layer gate; rules: single scoring implementation, two-layer verification, scenario admission "must be able to fail", scoring evolution protocol, node ≥ 23.6; anti-patterns: decorative scenarios, second scoring copy), negative gate tests added proving the tripwire fires (unreachable expectation → exit 1, stale id → exit 1 — run_scenarios.mjs gains optional scenarios path arg), Decisions.md D-2026-08-06-11 recorded, Agent.md new section "Router & scoring maintenance", gate 22/22 PASS, metaproject tests 27 passed, validators PASS.
 - [ ] [2026-08-06] Audit-fix wave + release v2.5.0 (KVA-101..110) : structure.md mechanism (Layer 5.1) implémenté (tools/generators/structure_md.py + 3 structure.md + hook validateur + champs template.yaml), registry instructions.md complété (2 carriers routage), scan .agent/ dans le produit (KVA-102), lexeme MANDATORY ↔ registry (KVA-103), PyYAML épinglé (requirements.txt + CI), CI = gate local complet (validators + build_index + run_scenarios + probes, coverage hors probes 81.5% ≥ 70%), tests coverage sqlite/offline/postgres, README anglais v2.5.0 + install.sh ref, commits 8757f6d/ced6285/685e74b, tag v2.5.0 poussé, install vérifiée de bout en bout (validateur PASS, probes 15/15, zéro fuite .agent/), revue fresh-context APPROVE après fixes.
-      added the approved four probes under `KitV2/probes/`, corrected root AGENTS.md
-      drift and duplication, added deterministic instruction validation, and captured
-      evidence. Remaining PARTIAL: no Git repository for VCS versioning and no
-      real non-probe consumer-project maturity evidence.
 
 ## KitV2 reference projects
 
@@ -194,15 +196,6 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 - [x] `KitV2/.pi/` ships reusable settings, prompts, and Pi-native skills; no
       pre-populated consumer memory is committed.
 - [x] `KitV2/.pi/prompts/workflow-memory.md` instructs fresh consumer projects to initialize local memory without copying metaproject history.
-- [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted.
-
-## Infrastructure
-
-- [x] KitV2 product tree, module `go-agent-kit-v2`, and native `.pi/` resources.
-- [x] Validation toolchain installed: gofmt, go vet, golangci-lint v2, gosec, govulncheck.
-- [x] Metaproject memory: root `.pi/memory/` Brief / Progress / Gotchas / Agent / Decisions.
-- [x] Publier le dépôt Git public du metaprojet — remote <https://github.com/TheophileBaudouin/GoAK>, branche main, commit initial 690aa35 (295 fichiers, 17 334 insertions), push OK après gh auth setup-git.
-s/workflow-memory.md` instructs fresh consumer projects to initialize local memory without copying metaproject history.
 - [x] Move source registry and prompt/skill source records to root .agent/sources/; keep source inputs out of KitV2 unless separately admitted.
 
 ## Infrastructure
