@@ -76,8 +76,16 @@ jobs:
         run: node --no-warnings .agent/router/run_ui_scenarios.mjs
 
       - name: router gate tests (tripwires + validator checks)
-        working-directory: .agent
-        run: python3 -m pytest router/ -q
+        working-directory: .agent/router
+        run: PYTHONPATH=.. python3 -m unittest discover -q
+
+      - name: product validator tests
+        working-directory: KitV2/tools/validators
+        run: python3 -m unittest discover -q
+
+      - name: structure.md generator tests
+        working-directory: KitV2/tools/generators
+        run: python3 -m unittest discover -q
 
       # ---- Go gate (from KitV2) ----
       - name: gofmt
