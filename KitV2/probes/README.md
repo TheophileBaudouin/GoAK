@@ -5,7 +5,7 @@ deterministic scenarios, LLM-free and external-service-free, that prove the
 Kit does what it claims. Each probe ends with an observable verdict and an
 exit code.
 
-## Inventory (15 probes)
+## Inventory (16 probes)
 
 | Probe | Recipe / capability exercised | Observable scenario |
 | --- | --- | --- |
@@ -23,6 +23,7 @@ exit code.
 | `openapi-validation` | recipe-openapi-validation | Request/response validation against the OpenAPI contract. |
 | `rest-chi` | recipe-rest-chi | In-process HTTP request, status and body verified. |
 | `sqlite-sqlc` | recipe-sqlite-sqlc | Write/read of one row in a local temporary database. |
+| `ui-kit-sync` | tools/sync-ui-kit.sh | Wails-only materialize/idempotence, structure evolution, ownership refusal. |
 | `worker-pool` | recipe-worker-pool | Valid bounded batch + cancellation on first error. |
 
 ## Rules

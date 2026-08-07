@@ -23,7 +23,7 @@ solution: >-
 benefits: >-
   Goroutines have a bounded, verifiable lifetime; cancellation propagates to
   blocking calls; the test can simulate shutdown by cancelling the context
-  (see pattern:go:concurrency-worker-pool for grouping).
+  (see pattern:concurrency:worker-pool for grouping).
 costs: >-
   Cost of one extra select and channel; forgetting a `cancel()` leaks
   cancellation (see pattern:go:private-context-keys for values).

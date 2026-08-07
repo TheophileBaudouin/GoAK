@@ -38,6 +38,7 @@ not ship with this product).
    file, and prints the verification checklist.
 3. Run the FULL validation gate (validators, Go scenarios 22/22, UI scenarios,
    gofmt/vet/lint/test/race/gosec/govulncheck, probes) before committing.
-4. Record the change in `.pi/memory/Decisions.md` and `docs/evidence/`.
+4. Record the change in the metaproject's decision record and evidence
+   directories.
 
 A silent or automatic update is forbidden (Z13).

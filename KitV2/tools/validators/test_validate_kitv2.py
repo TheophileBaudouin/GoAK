@@ -88,7 +88,7 @@ class ValidatorTests(unittest.TestCase):
                 errors = module.check_coverage()
         self.assertTrue(any("coverage.product_skills" in error for error in errors))
         # The shipped file is untouched.
-        self.assertIn("product_skills: 72", original.read_text(encoding="utf-8"))
+        self.assertIn("product_skills: 73", original.read_text(encoding="utf-8"))
 
     def test_template_build_fails_on_broken_template(self) -> None:
         if shutil.which("go") is None:
@@ -221,3 +221,34 @@ if __name__ == "__main__":
                 errors = module.check_no_metaproject_paths()
         self.assertTrue(any("README.md" in error for error in errors), errors)
         self.assertFalse(any("ok.py" in error for error in errors), errors)
+
+    def test_probe_inventory_out_of_sync_fails(self) -> None:
+        """KVA-102 — the probes README table must match the real probe tree."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "probes" / "run.sh", "for probe in \"$root\"/probes/*/; do\n")
+            write(root / "probes" / "alpha" / "main.go", "package main\n")
+            write(root / "probes" / "beta" / "main.go", "package main\n")
+            write(
+                root / "probes" / "README.md",
+                "## Inventory\n\n| Probe | Recipe |\n| --- | --- |\n"
+                "| `alpha` | recipe-alpha |\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_probe_runner()
+        self.assertTrue(any("out of sync" in error for error in errors), errors)
+        self.assertTrue(any("beta" in error for error in errors), errors)
+
+    def test_probe_inventory_in_sync_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "probes" / "run.sh", "for probe in \"$root\"/probes/*/; do\n")
+            write(root / "probes" / "alpha" / "main.go", "package main\n")
+            write(
+                root / "probes" / "README.md",
+                "## Inventory\n\n| Probe | Recipe |\n| --- | --- |\n"
+                "| `alpha` | recipe-alpha |\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_probe_runner()
+        self.assertEqual(errors, [])

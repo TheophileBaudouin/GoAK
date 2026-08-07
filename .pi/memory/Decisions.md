@@ -783,3 +783,31 @@ questions utilisateur.
   idempotence, Wails-only refusal, structure evolution, ownership contract);
   gosec 0. User requirement: the ui-kit may evolve and nothing in a project
   may be destroyed by the scripts.
+
+## Kit audit fixes (2026-08-07, KVA-101..105 + C12/README drift gates)
+
+- **D-2026-08-07-09 (KVA-105 — `_kit-*` files stay in the product, declared
+  kit machinery)**: `templates/_kit-ci-workflow.yml` and
+  `templates/_kit-skill-authoring.md` remain shipped inside `KitV2/templates/`
+  as explicitly declared "kit machinery" (TEMPLATES.md §Kit machinery +
+  templates/README.md). `_kit-ci-workflow.yml` is a consumer drop-in CI gate
+  (referenced by `rules/registry/testing` and `KitV2/AGENTS.md`);
+  `_kit-skill-authoring.md` is a self-contained contributor aid whose
+  authority remains the metaproject contract A1 (20-auteur-modules.md),
+  never shipped. No move to the metaproject; both files stay, documented.
+- **D-2026-08-07-10 (C12 prose-id gate)**: validate-cognitive.py now scans
+  product knowledge YAMLs and instruction surfaces for
+  `kind:domain:slug` prose tokens and fails on any token that does not
+  resolve to a known artifact id (audit finding KVA-101:
+  `go-contextual-worker.yaml` referenced the non-existent
+  `pattern:go:concurrency-worker-pool`; fixed to
+  `pattern:concurrency:worker-pool`). Zero false positives across 280 known
+  ids at implementation time.
+- **D-2026-08-07-11 (probe inventory gate)**: validate-kitv2.py
+  `check_probe_runner` now cross-checks the `probes/README.md` inventory
+  table against the real `probes/*/main.go` tree (audit finding KVA-102:
+  README claimed 15 probes and omitted `ui-kit-sync`; README updated to 16).
+  The old README drift is now a gate failure.
+- KVA-103: `ui-kit/PIN.md` §Update path reworded to not name
+  metaproject-only surfaces (`.pi/memory/Decisions.md`, `docs/evidence/`).
+  KVA-104: `KitV2/.gitignore` now ignores `.pytest_cache/`.

@@ -39,6 +39,10 @@ RELATIONS = {
 ID_RE = re.compile(
     r"^(?:rule|recipe|pattern|snippet|template|capability|evaluation|decision-record|source|memory):[^:]+:.+$"
 )
+ID_TOKEN_RE = re.compile(
+    r"`?(?<![A-Za-z0-9])((?:rule|recipe|pattern|snippet|template|capability|"
+    r"evaluation|decision-record|source|memory):[a-z0-9-]+:[^\s`.,;:()\[\]\"]+)`?"
+)
 
 
 def load(path: Path) -> dict:
@@ -86,6 +90,53 @@ def target_statuses(catalog: dict) -> dict[str, dict]:
                 if isinstance(target, str) and isinstance(metadata, dict):
                     statuses[target] = metadata
     return statuses
+
+
+def product_ids() -> set[str]:
+    """Every stable id declared by product knowledge YAMLs (charter §5)."""
+    ids: set[str] = set()
+    for path in sorted((PRODUCT / "knowledge").rglob("*.yaml")):
+        try:
+            artifact = load(path)
+        except (OSError, ValueError, yaml.YAMLError):
+            continue
+        if isinstance(artifact, dict) and isinstance(artifact.get("id"), str):
+            ids.add(artifact["id"])
+    return ids
+
+
+def check_prose_relations() -> list[str]:
+    """Charter §16.1.1 (C12) — cross-layer id references in prose must resolve.
+
+    Every `kind:domain:slug` token appearing outside fenced code in product
+    knowledge YAMLs and instruction surfaces must resolve to a known artifact
+    id. A relation written only in prose is still a relation: KVA-101 escaped
+    the graph checks because `go-contextual-worker.yaml` referenced the
+    non-existent `pattern:go:concurrency-worker-pool` in prose only.
+    """
+    errors: list[str] = []
+    known = product_ids()
+    if not known:
+        return errors
+    surfaces = [
+        *sorted((PRODUCT / "knowledge").rglob("*.yaml")),
+        *sorted((PRODUCT / "rules").rglob("SKILL.md")),
+        *sorted((PRODUCT / "recipes").rglob("SKILL.md")),
+        *sorted((PRODUCT / ".pi" / "skills").rglob("*.md")),
+        *sorted((PRODUCT / ".pi" / "prompts").glob("*.md")),
+        *sorted((PRODUCT / "snippets").rglob("SNIPPET.yaml")),
+    ]
+    agents = PRODUCT / "AGENTS.md"
+    if agents.exists():
+        surfaces.append(agents)
+    for path in surfaces:
+        text = re.sub(r"```.*?```", "", path.read_text(encoding="utf-8"), flags=re.S)
+        for line_number, line in enumerate(text.splitlines(), 1):
+            for token in ID_TOKEN_RE.findall(line):
+                token = token.strip("`")
+                if ID_RE.match(token) and token not in known:
+                    errors.append(f"{path}:{line_number}: unresolved prose id {token!r}")
+    return errors
 
 
 def main() -> int:
@@ -216,6 +267,8 @@ def main() -> int:
             errors.append(
                 f"{path}: product metadata must not depend on metaproject paths"
             )
+
+    errors.extend(check_prose_relations())
 
     product_manifest = PRODUCT / "tools" / "offline" / "bundle" / "manifest.json"
     if not product_manifest.exists():

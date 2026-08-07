@@ -300,6 +300,19 @@ def check_probe_runner() -> list[str]:
         errors.append(f"{runner}: must discover probes with a glob")
     if re.search(r"for\s+probe\s+in\s+(?:[a-z0-9-]+\s+){1,}[a-z0-9-]+", text):
         errors.append(f"{runner}: hardcoded probe list is forbidden")
+    readme = ROOT / "probes" / "README.md"
+    if readme.exists():
+        probes = sorted(probe.parent.name for probe in (ROOT / "probes").glob("*/main.go"))
+        inventory = sorted(
+            re.findall(r"^\| `([a-z0-9-]+)` \|", readme.read_text(encoding="utf-8"), re.M)
+        )
+        if inventory != probes:
+            missing = sorted(set(probes) - set(inventory))
+            extra = sorted(set(inventory) - set(probes))
+            errors.append(
+                f"{readme}: probe inventory out of sync "
+                f"(missing {missing or 'none'}, extra {extra or 'none'})"
+            )
     return errors
 
 
@@ -589,6 +602,25 @@ def check_bundle() -> list[str]:
                 errors.append(f"{blob}: exceeds 524288 bytes")
             if hashlib.sha256(blob.read_bytes()).hexdigest() != blob.name:
                 errors.append(f"{blob}: filename does not match SHA-256")
+    go_mod = ROOT / "go.mod"
+    required: dict[str, str] = {}
+    if go_mod.exists():
+        for match in re.finditer(
+            r"require\s*\((.*?)\)", go_mod.read_text(encoding="utf-8"), re.DOTALL
+        ):
+            for line in match.group(1).splitlines():
+                fields = line.split()
+                if len(fields) >= 2 and not fields[0].startswith("//"):
+                    required[fields[0]] = fields[1]
+    for module in manifest.get("modules", []):
+        path, version = module.get("path", ""), module.get("version", "")
+        pinned = required.get(path)
+        if pinned is None:
+            errors.append(f"{manifest_path}: module {path!r} is not required by go.mod")
+        elif pinned != version:
+            errors.append(
+                f"{manifest_path}: module {path!r} pinned {version}, go.mod requires {pinned}"
+            )
     return errors
 
 
@@ -909,9 +941,16 @@ def check_ui_kit_copy_rules() -> list[str]:
     if not isinstance(rules, list):
         return [f"{rules_path}: expected a list of {{src, dst}} rules"]
     for number, rule in enumerate(rules, start=1):
-        if not isinstance(rule, dict) or not isinstance(rule.get("src"), str) \
-                or not isinstance(rule.get("dst"), str) or not rule["src"] or not rule["dst"]:
-            errors.append(f"{rules_path}: rule #{number} must carry non-empty src and dst")
+        if (
+            not isinstance(rule, dict)
+            or not isinstance(rule.get("src"), str)
+            or not isinstance(rule.get("dst"), str)
+            or not rule["src"]
+            or not rule["dst"]
+        ):
+            errors.append(
+                f"{rules_path}: rule #{number} must carry non-empty src and dst"
+            )
             continue
         src_dir = ROOT / "ui-kit" / rule["src"]
         if not src_dir.is_dir():
@@ -920,7 +959,6 @@ def check_ui_kit_copy_rules() -> list[str]:
                 "(stale copy rules — regenerate via the re-sync helper)"
             )
     return errors
-
 
 
 def check_ui_kit_skills() -> list[str]:
