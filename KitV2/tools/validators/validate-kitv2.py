@@ -928,6 +928,46 @@ def check_ui_kit_pin() -> list[str]:
     return errors
 
 
+def check_ui_kit_registration(
+    root: Path | None = None,
+) -> list[str]:
+    """D-2026-08-08-02 — single registration point for the UI skills.
+
+    The root .pi/settings.json must declare ../ui-kit/skills (additive with
+    the Go skills), and the zone must contain NO nested
+    ui-kit/.pi/settings.json (dead by design: deleted from the zone and
+    excluded from re-syncs). A second registration source would resurrect
+    the pre-registration failure mode (copied-but-invisible content)."""
+    errors: list[str] = []
+    root = root or ROOT
+    settings = root / ".pi" / "settings.json"
+    if not settings.exists():
+        return [f"{settings}: missing — cannot verify the UI skill registration"]
+    try:
+        data = json.loads(settings.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        return [f"{settings}: invalid JSON: {error}"]
+    skills = data.get("skills") if isinstance(data, dict) else None
+    if not isinstance(skills, list) or "../ui-kit/skills" not in skills:
+        errors.append(
+            f"{settings}: the UI skill path '../ui-kit/skills' is not declared — "
+            "the ui-kit zone is invisible to Pi without this registration (D-2026-08-08-02)"
+        )
+    for original in ("../rules", "../recipes"):
+        if not isinstance(skills, list) or original not in skills:
+            errors.append(
+                f"{settings}: existing Go skill path {original!r} must be preserved "
+                "(registration is additive)"
+            )
+    nested = root / "ui-kit" / ".pi" / "settings.json"
+    if nested.exists():
+        errors.append(
+            f"{nested}: dead nested registration — the root .pi/settings.json is the "
+            "single registration point (D-2026-08-08-02)"
+        )
+    return errors
+
+
 def check_ui_kit_copy_rules() -> list[str]:
     """Z13 §7.7 — copy-rules.json (local-owned) drives the consumer sync tool.
 
@@ -1152,6 +1192,7 @@ def main() -> int:
     errors.extend(check_ui_kit_copy_rules())
     errors.extend(check_ui_kit_skills())
     errors.extend(check_ui_kit_pin())
+    errors.extend(check_ui_kit_registration())
     errors.extend(check_ui_corpus_disjointness())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())

@@ -329,6 +329,44 @@ validator that enforces it, or be recorded "guidance only, not enforced" in
 `.agent/instructions.md` §Enforcement. An absolute without citation or
 recording is `NON CONFORM` — the D-2026-08-05-15 obligation is normative.
 
+#### C16. ui-kit zone integrity (contract Z13) — read-only, never syncs
+
+The ui-kit zone is a pinned verbatim mirror of upstream ui-agent-kit `sdk/`.
+The audit is non-destructive (safety contract) — it DETECTS drift and routes
+to the manual update workflow; it never syncs, never rewrites `PIN.md`, never
+touches the zone.
+
+1. **Pin record**: `ui-kit/PIN.md` carries a well-formed 40-hex pinned SHA
+   and a sync date (validator `check_ui_kit_pin` enforces this — cite it,
+   do not rebuild it).
+2. **Zone drift (local)**: `git status --porcelain -- KitV2/ui-kit` must be
+   empty. A dirty zone is `NON CONFORM` (in-place edits or uncommitted
+   syncs are forbidden by Z13 §3.1/§9). If clean, run
+   `bash .agent/sync-ui-kit-from-upstream.sh --check` (read-only pin-vs-tree
+   check) and report its output.
+3. **Upstream drift (network, read-only)**: compare the pinned SHA to
+   upstream HEAD via `git ls-remote https://github.com/TheophileBaudouin/ui-agent-kit HEAD`
+   (do NOT clone). If HEAD differs from the pin, report the jump
+   (`git ls-remote` output, upstream log since the pin via the GitHub API or
+   a no-checkout clone is optional) as `TO VERIFY — update pending` and
+   instruct: run the `.pi/prompts/update-ui-kit.md` workflow (manual, gated
+   by `.agent/sync-ui-kit-from-upstream.sh <new-sha>`). The audit NEVER
+   performs the sync itself.
+4. **Registration integrity (single point)**: the root
+   `KitV2/.pi/settings.json` must declare `../ui-kit/skills` (additive,
+   keeping `../rules` + `../recipes`), and the zone must contain NO nested
+   `ui-kit/.pi/settings.json` (dead by design, excluded from re-syncs —
+   D-2026-08-08-02). A second registration source is `NON CONFORM`.
+5. **Automated checks to cite, not rebuild**: `validate-kitv2.py`
+   `check_ui_kit_skills` (frontmatter), `check_ui_kit_copy_rules` (rules
+   point at existing zone folders), `check_ui_kit_pin`,
+   `check_ui_corpus_disjointness` (Go index has no `ui-kit/` path),
+   `check_ui_router_scenarios` (schema + id linkage, node-free); the
+   metaproject gate `.agent/router/run_ui_scenarios.mjs` (ranking under the
+   real scoring + reverse disjointness + tripwire) and
+   `KitV2/probes/ui-kit-sync/` (Wails-only materialization + ownership
+   contract). Absence of a green result for any of these is a finding.
+
 ### Phase D — Decide "metaproject or Kit?"
 
 This dimension is mandatory for **every file**, including supporting files.
@@ -516,6 +554,17 @@ The table contains at minimum, at each audit:
   validate-kitv2.py with a presence assertion for the usage-evidence field on
   new template/recipe categories, reason: §16.1.3 makes the field normative
   at the first new category admission.
+- the "ui-kit integrity (C16)" row: local pin-vs-tree drift is covered by
+  `.agent/sync-ui-kit-from-upstream.sh --check` (metaproject script) and the
+  product validator (`check_ui_kit_pin`, `check_ui_kit_copy_rules`,
+  `check_ui_corpus_disjointness`, `check_ui_router_scenarios`) — the gaps are
+  (1) upstream HEAD drift, inherently network-dependent and therefore a
+  review control that routes to the manual `update-ui-kit.md` workflow, never
+  a silent sync; (2) registration integrity (root settings.json declares
+  `../ui-kit/skills`, no nested `ui-kit/.pi/settings.json`); recommended
+  check: extend validate-kitv2.py with a settings.json assertion, reason:
+  the single-registration-point rule (D-2026-08-08-02) is a stable
+  structural property a validator can assert.
 
 ### F. Verdict and next steps
 

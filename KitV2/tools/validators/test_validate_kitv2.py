@@ -252,3 +252,55 @@ if __name__ == "__main__":
             with mock.patch.object(module, "ROOT", root):
                 errors = module.check_probe_runner()
         self.assertEqual(errors, [])
+
+    def test_ui_kit_registration_passes_when_root_settings_declares_skills(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../rules", "../recipes", "../ui-kit/skills"]\n}\n',
+            )
+            errors = module.check_ui_kit_registration(root)
+        self.assertEqual(errors, [])
+
+    def test_ui_kit_registration_fails_without_ui_skill_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../rules", "../recipes"]\n}\n',
+            )
+            errors = module.check_ui_kit_registration(root)
+        self.assertTrue(
+            any("../ui-kit/skills" in error for error in errors), errors
+        )
+
+    def test_ui_kit_registration_fails_on_nested_settings_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../rules", "../recipes", "../ui-kit/skills"]\n}\n',
+            )
+            write(
+                root / "ui-kit" / ".pi" / "settings.json",
+                '{\n  "skills": ["../skills"]\n}\n',
+            )
+            errors = module.check_ui_kit_registration(root)
+        self.assertTrue(
+            any("single registration point" in error for error in errors), errors
+        )
+
+    def test_ui_kit_registration_fails_when_go_skill_paths_dropped(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../ui-kit/skills"]\n}\n',
+            )
+            errors = module.check_ui_kit_registration(root)
+        self.assertTrue(
+            any("../rules" in error for error in errors), errors
+        )
