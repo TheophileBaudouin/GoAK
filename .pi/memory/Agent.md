@@ -146,3 +146,20 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
 - The gate's tripwire is proven: negative tests assert exit 1 on an unreachable expectation and on a stale id. When I add or re-tag a knowledge artifact, I re-run the gate and check that existing scenarios still pass (a silent ranking shift is a routing regression, not a cosmetic change).
 - Two-layer verification: the product validator (node-free) checks scenarios schema + id linkage; the metaproject gate checks ranking under the real scoring. I never move the ranking check into the product validator (node dependency) and never move the contract file out of the product.
 - Ownership boundary: builder, gate runner, and router tests live in `.agent/router/`; the product ships index/meta/scenarios + the runtime tool only. Consumers never rebuild or re-gate.
+- Domain rejection (off-domain) is computed from the user's RAW query vocabulary, never from synonym-expanded tokens (a recall expansion with zero corpus coverage must not flip an in-domain query off-domain — D-2026-08-08). After any upstream content wave, re-verify that the new vocabulary is actually indexable (term-coverage grep on the built index) — existing scenario suites are narrow tripwires, not coverage proof.
+
+## External content registration (D-2026-08-08)
+
+- Copying a folder that carries its own AGENTS.md and its own `.pi/` does
+  NOT integrate it: Pi performs no automatic discovery by directory — a
+  skills folder is only loaded when an already-loaded `.pi/settings.json`
+  references it.
+- Every integration of external content (SDK, kit zone, skill pack) must
+  include an explicit registration step — skills config entry
+  (`.pi/settings.json`), AGENTS.md pointer section, router entry/tool — and
+  that registration must be verified concretely afterwards (validator
+  check, runtime discovery smoke, router query), never assumed.
+- One registration point per concern: the root `.pi/settings.json` is the
+  single skill registration point; a nested settings file that duplicates
+  it is dead and must be deleted + excluded from syncs so it is never
+  resurrected or mistaken for the source of truth.

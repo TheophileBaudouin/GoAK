@@ -1,0 +1,33 @@
+=== FULL GATE 2026-08-07T23:05:09Z — commit f5bc710 ===
+--- validators ---
+instruction-artifacts: PASS
+cognitive: PASS (35 catalog objects)
+kitv2: PASS (73 product skills, 3 snippets, standalone, offline bundle, router index 280 resources)
+--- router index check ---
+router index: up to date (/Users/theophilebaudouin/Documents/devellopement/Go/KitV2/router)
+--- Go scenarios ---
+router scenarios: 22/22 PASS (index v2.5.0, 280 resources)
+--- UI scenarios ---
+ui router scenarios: 11/11 PASS (36 ui-kit resources)
+--- router unit tests ---
+
+OK
+--- gofmt ---
+gofmt clean
+--- go vet ---
+vet OK
+--- golangci-lint ---
+0 issues.
+--- go test -race ---
+ok  	go-agent-kit-v2/snippets/http-json	(cached)
+ok  	go-agent-kit-v2/tools/offline	(cached)
+--- gosec ---
+  Nosec  : 12
+  Issues : [1;32m0[0m
+
+--- govulncheck ---
+No vulnerabilities found.
+--- probes ---
+--- probes/worker-pool ---
+worker-pool: PASS
+=== GATE EXIT: 0 ===
