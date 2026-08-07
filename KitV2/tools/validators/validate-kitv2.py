@@ -302,9 +302,13 @@ def check_probe_runner() -> list[str]:
         errors.append(f"{runner}: hardcoded probe list is forbidden")
     readme = ROOT / "probes" / "README.md"
     if readme.exists():
-        probes = sorted(probe.parent.name for probe in (ROOT / "probes").glob("*/main.go"))
+        probes = sorted(
+            probe.parent.name for probe in (ROOT / "probes").glob("*/main.go")
+        )
         inventory = sorted(
-            re.findall(r"^\| `([a-z0-9-]+)` \|", readme.read_text(encoding="utf-8"), re.M)
+            re.findall(
+                r"^\| `([a-z0-9-]+)` \|", readme.read_text(encoding="utf-8"), re.M
+            )
         )
         if inventory != probes:
             missing = sorted(set(probes) - set(inventory))

@@ -226,7 +226,7 @@ if __name__ == "__main__":
         """KVA-102 — the probes README table must match the real probe tree."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            write(root / "probes" / "run.sh", "for probe in \"$root\"/probes/*/; do\n")
+            write(root / "probes" / "run.sh", 'for probe in "$root"/probes/*/; do\n')
             write(root / "probes" / "alpha" / "main.go", "package main\n")
             write(root / "probes" / "beta" / "main.go", "package main\n")
             write(
@@ -242,7 +242,7 @@ if __name__ == "__main__":
     def test_probe_inventory_in_sync_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            write(root / "probes" / "run.sh", "for probe in \"$root\"/probes/*/; do\n")
+            write(root / "probes" / "run.sh", 'for probe in "$root"/probes/*/; do\n')
             write(root / "probes" / "alpha" / "main.go", "package main\n")
             write(
                 root / "probes" / "README.md",

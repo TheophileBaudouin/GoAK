@@ -135,7 +135,9 @@ def check_prose_relations() -> list[str]:
             for token in ID_TOKEN_RE.findall(line):
                 token = token.strip("`")
                 if ID_RE.match(token) and token not in known:
-                    errors.append(f"{path}:{line_number}: unresolved prose id {token!r}")
+                    errors.append(
+                        f"{path}:{line_number}: unresolved prose id {token!r}"
+                    )
     return errors
 
 
