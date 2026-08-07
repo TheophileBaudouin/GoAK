@@ -16,6 +16,12 @@ never deletes consumer files), detects your package manager and Wails `frontend/
 and verifies every `@/` import after copying. Flags: `--skip-base`, `--skip-deps`,
 `--target <dir>`, `--force`.
 
+**Robustness contract** — the install never aborts because of consumer-side state: npm/pnpm
+peer-dependency conflicts (ERESOLVE) are retried with tolerant resolution
+(`--legacy-peer-deps` / strict-peer-dependencies off) and then installed individually,
+skipping failures with a warning; a lockfile-picked package manager that is not installed
+falls back to npm; the import self-check only vets the kit's own copies, never your `src/`.
+
 **Install layout** — the **entire `sdk/` folder is mirrored to `ui-kit/`** (reference copy:
 components, blocks, rules, patterns, ux, skills, docs, configs — nothing is left out).
 On top of that, the code pieces are copied into `src/` so the `@/` imports resolve:
@@ -25,12 +31,15 @@ frontend/
 ├── ui-kit/               # full SDK mirror (ui-sdk/, ui-rules/, patterns/, ux/, skills/, docs/, configs)
 └── src/
     └── components/
-        ├── evilcharts/   # kit pieces, per origin (usable copy)
+        ├── assistant-ui/   # agent chat base (Thread, markdown, tool groups, reasoning, attachments)
+        ├── agent/          # agent components (AgentChat, ToolCallCard, ApprovalCard…)
+        ├── evilcharts/     # kit pieces, per origin (usable copy)
         ├── hextaui/
         ├── retab/
         ├── shadcncraft/
         ├── command-menu-02.tsx   # blocks-so (flat)
-        └── example/      # the Preferences example screen
+        ├── example/        # the Preferences example screen
+        └── example-agent/  # the AgentChat demo screen (mock runtime)
 ```
 
 The `ui-kit/` copy is the reference you read and keep; the `src/` copy is the code you
@@ -62,6 +71,41 @@ the kit dependency-free.
 | Keep `ThemeProvider` + `TooltipProvider` wrappers where the piece requires them | Documented per piece (tooltip-based pieces need the provider) |
 | Do not modify frozen-base files to make a piece work | Constitution, principle 1 — create a new named component instead |
 
+## Agent chat (assistant-ui base + agent components)
+
+The kit's agent chat is a two-layer contract:
+
+1. **Base** — the official assistant-ui registry components in `components/assistant-ui/`
+   (harvested from `https://r.assistant-ui.com/{thread,thread-list,assistant-modal}.json`, MIT).
+   They import the consumer's frozen base (`@/components/ui/*`, `@/lib/utils`) like any kit
+   piece. Vendored third-party code: relax `react-hooks`/`react-refresh` lint rules for this
+   folder (same contract as evilcharts/shadcncraft).
+2. **Agent components** — first-party, presentational, runtime-agnostic in
+   `components/agent/`. The full integration lives in `AgentChat` (Thread + tool cards +
+   approvals).
+
+To use an agent chat screen:
+
+```bash
+# the installer already copies components/assistant-ui + components/agent + the demo
+# 1. install the npm deps declared in the piece READMEs
+bun add @assistant-ui/react @assistant-ui/react-markdown remark-gfm tw-shimmer zustand
+# 2. add `@import "tw-shimmer";` to your app CSS (markdown dot styles)
+# 3. provide a runtime (AI SDK, LangGraph, custom transport) or the demo's mock
+```
+
+```tsx
+import { AssistantRuntimeProvider } from "@assistant-ui/react"
+import { AgentChat } from "@/components/agent/agent-chat"
+
+<AssistantRuntimeProvider runtime={runtime}>
+  <div className="h-[600px]"><AgentChat /></div>
+</AssistantRuntimeProvider>
+```
+
+See `examples/agent-chat/` for a buildable demo without a backend, and
+`sdk/patterns/agent-chat.md` for the full pattern + backend wiring.
+
 ## Example (adding the settings-preferences screen to an app)
 
 ```bash
@@ -88,6 +132,8 @@ export function SettingsScreen() {
 | `components/hextaui/` | Settings / auth / billing screens |
 | `components/retab/` | File upload primitives (dropzone, size format) + hook |
 | `components/shadcncraft/` | Marketing sections (hero, marquee, rating…) |
+| `components/assistant-ui/` | **Agent chat base** — assistant-ui registry (Thread, conversation history, copilot modal, markdown, tool groups, reasoning, attachments) |
+| `components/agent/` | **Agent components** — AgentChat, AgentMessage, AgentComposer, ThinkingIndicator, ToolCallCard, ToolResult, ApprovalCard, ExecutionTimeline, ArtifactPreview, useAgentStatus |
 | `blocks/blocks-so/` | Full page blocks (command menu, login, onboarding, stats…) |
 | `layouts/`, `templates/`, `examples/` | Reserved — populated in later phases |
 

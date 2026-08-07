@@ -10,10 +10,10 @@ This folder is the **SDK** — copy it into your project (or consume piece by pi
 
 | Folder | Role |
 | --- | --- |
-| `ui-sdk/` | 40 license-verified components & blocks (charts, settings, upload, sections, page blocks) + index + consumption guide |
+| `ui-sdk/` | 62 license-verified components & blocks: charts, settings, upload, page blocks + **agent chat kit** (assistant-ui base + AgentChat, ToolCallCard, ApprovalCard…) + index + consumption guide |
 | `ui-rules/` | Interface rules: spacing, colors, typography, animations, accessibility, layout, icons, keyboard, desktop, dialogs |
-| `patterns/` | How to organize recurring screens: settings-page, dashboard, wizard, login, file-explorer, preferences, search, table |
-| `ux/` | Product memory: personas, flows, navigation, screens, shortcuts, design decisions (filled with real product decisions) |
+| `patterns/` | How to organize recurring screens: settings-page, dashboard, wizard, login, file-explorer, preferences, search, table, **agent-chat** |
+| `ux/` | Product memory: personas, flows, navigation, screens, shortcuts, design decisions (filled with real product decisions — incl. assistant-ui base decision) |
 | `skills/` | AI skills: `ux-memory` (read/write the design memory), `ui-review` (review guard), shadcn + design-system references |
 | `docs/` | Wails constraints (static build), design-systems sourcing, authoring guides, consumption contract |
 

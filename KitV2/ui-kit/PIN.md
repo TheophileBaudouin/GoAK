@@ -11,13 +11,13 @@ not ship with this product).
 | Field | Value |
 | --- | --- |
 | Repository | `https://github.com/TheophileBaudouin/ui-agent-kit` |
-| Pinned commit (SHA) | `f9bdd9b5237a9154f86050e0f5df583c66e2496e` |
-| Commit date | 2026-08-07 |
+| Pinned commit (SHA) | `cd00eb5d92d8044645ff3d6aca1922a473ecb804` |
+| Commit date | 2026-08-08 |
 | Pinned subtree | `sdk/` (the whole folder, hidden files included) |
 | Local-owned files | `PIN.md`, `scenarios.json`, `copy-rules.json` (never overwritten by a sync) |
-| npm release equivalence | `ui-agent-kit@0.1.0` — tarball `sdk/` verified byte-identical to the pinned `sdk/` (2026-08-07) |
+| npm release equivalence | `ui-agent-kit@0.1.1` — tarball `sdk/` verified byte-identical to the pinned `sdk/` at cd00eb5d (2026-08-08; npm is never the source, GitHub-direct only) |
 | License | MIT (upstream `LICENSE` at repo root; `sdk/skills/*` carry their own license fields) |
-| Sync date | 2026-08-07 |
+| Sync date | 2026-08-08 |
 
 ## Verification performed at sync time
 

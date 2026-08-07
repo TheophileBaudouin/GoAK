@@ -10,5 +10,9 @@
  {
   "src": "ui-sdk/examples/preferences-screen",
   "dst": "src/components/example"
+ },
+ {
+  "src": "ui-sdk/examples/agent-chat",
+  "dst": "src/components/example-agent"
  }
 ]
