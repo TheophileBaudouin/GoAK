@@ -1,20 +1,22 @@
 ---
 name: go-agent-kit-v2
-version: 2.6.0
+version: 2.7.0
 status: standalone
 capabilities:
   rules:
     source: rules/
     status: complete
     criteria: >-
-      13 rule modules, each with an imperative, an explicit boundary, a
+      14 rule modules, each with an imperative, an explicit boundary, a
       verification path, and primary sources; frontmatter validated by the
       gate.
   knowledge:
     source: knowledge/
     status: catalog-and-sources
-    criteria: every knowledge YAML carries full metadata (artifact contract) with resolved
-      relationships; stdlib entries are pointer-only and resolved offline.
+    criteria: >-
+      every knowledge YAML carries full metadata (artifact contract)
+      with resolved relationships; stdlib entries are pointer-only and
+      resolved offline.
   recipes:
     source: recipes/
     status: complete

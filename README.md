@@ -1,48 +1,122 @@
 # Go Agent Development Kit (GoAK)
 
-A Go development kit for code agents: sourced rules, runnable recipes,
-verified snippets, MIT project templates, library catalogs, and executable
-probes — organized as a typed knowledge graph (not a snippet folder, not a
-framework). The consumable product is `KitV2/`; the repository root is the
-metaproject that governs it (charter, source registry, plans, evidence).
+A self-contained knowledge kit that makes a code agent reliably build idiomatic
+Go software. GoAK is a **typed knowledge graph** — sourced rules, runnable
+recipes, verified snippets, MIT project templates, library catalogs, executable
+probes, a semantic resource router, and a native Pi runtime surface. It is not
+a folder of snippets and not a framework: every reusable artifact has stable
+metadata, declared relationships, and a single responsibility, and every claim
+is backed by a primary source or an executable scenario.
+
+The consumable product is **`KitV2/`**: it installs standalone into any project
+directory and works with no other documentation. The repository root is the
+**metaproject** that builds and governs it — charter, construction contracts,
+source registry, plans, evidence — none of which ships to consumers.
+
+## What the kit gives you
+
+| Zone | Content | Use it for |
+| --- | --- | --- |
+| `rules/` | Universal, sourced Go rules: naming, errors, context, concurrency, validation, doc comments, logging, testing | Every Go implementation — loaded on demand |
+| `recipes/` | 15 runnable procedures with tests and observable scenarios: REST API (chi), CLI (cobra / minimal / interactive), SQLite (sqlc), PostgreSQL (pgx), worker pool, graceful shutdown, JWT + session auth, config (koanf/viper), slog+expvar observability, desktop service | Copy the shape, adapt, verify with the probe |
+| `knowledge/` | 195+ sourced patterns, anti-patterns, security/performance/observability guidance, stdlib pointers, architecture decisions, 44 library fiches with decision sections | Choosing libraries, avoiding pitfalls, understanding Go design |
+| `snippets/` | Focused, executable views (bounded worker, error wrapping, JSON HTTP) linked to their canonical source | A small, tested fragment instead of a full recipe |
+| `templates/` | 3 real MIT-sourced project bases (REST API, CLI, worker pool), each with a machine-checked `structure.md` reading map | Starting a new project from a proven, pinned base |
+| `probes/` | 16 executable product evaluations with explicit PASS verdicts and exit codes | Verifying the kit actually behaves as claimed |
+| `router/` | Generated read-only semantic index + routing-quality contract | Routing any task to the right resource without scanning the tree |
+| `ui-kit/` | Pinned desktop UI SDK for **Wails** projects: shadcn/ui components, interface rules, screen patterns, review skills — inert for plain Go projects | Wails/React interface work only |
+| `.pi/` | Prompts (`/goak-help`, `/checklist-api`, `/checklist-release`, `/workflow-memory`), workflow skills (`spec-driven-dev`, `deep-discuss`, `workspace-init`, `go-code-review`, …), routing extensions, onboarding banner, and the shipped **user guide** | Everything the agent does in a project |
 
 ## Installation — one command
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.6.0/install.sh | sh -s -- go-agent-kit
+curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.7.0/install.sh | sh -s -- go-agent-kit
 ```
 
-Installs the product into `./go-agent-kit` (default pinned ref `v2.6.0`;
-override with `GAK_REF=main` or `GAK_REF=<commit>` for another reference).
-The install is verified by the product validator; a missing tool is reported
-`PARTIAL`, never `PASS`.
+Installs the complete product into `./go-agent-kit` (default pinned ref
+`v2.7.0`). The installer downloads the release tarball, extracts only the
+consumable `KitV2/` tree (never the metaproject), and verifies the install
+with the product validator — a missing toolchain is reported `PARTIAL`, never
+`PASS`.
 
-## Getting started
+Options:
+
+- `GAK_REF=main` — install the latest branch head instead of the pinned tag;
+- `GAK_REF=<tag|commit>` — any pinned install;
+- `GAK_SKIP_VERIFY=1` — skip the post-install verification step.
+
+## Get started
 
 ```sh
 cd go-agent-kit
-pi                                  # loads AGENTS.md, .pi/prompts, .pi/skills
-pi --approve                        # non-interactive: approve the trusted project
-bash probes/run.sh                  # executable product probes (Go toolchain required)
+pi                          # loads AGENTS.md, .pi/prompts, .pi/skills, the router
+/goak-help                  # the agent reads the shipped user guide and explains the kit
 ```
 
-Routing is built in: the `search_kit_resources` tool (`.pi/extensions/`)
-routes any task to the relevant rules, recipes, patterns, and catalogs from a
-read-only index — no tree scanning. The `kit-resource-routing` skill explains
-when and how to call it. For large-scale transformations (rewrite, migration,
-overhaul, refactor), the `spec-driven-dev` workflow skill runs a seven-phase
-pipeline (intent, S.U.P.E.R analysis, decomposition, adaptive control,
-archive) — local-only, no GitHub dependency. `deep-discuss` handles structured
-problem analysis.
+1. **Verify the install** — `python3 tools/validators/validate-kitv2.py`
+   (product structure) and `bash probes/run.sh` (observable scenarios, needs a
+   Go toolchain). Both green means the kit works.
+2. **Initialize the project foundation** (recommended for a new project,
+   before the first feature) — run the `workspace-init` skill: one day-0
+   session that decides the kernel/modules boundary, pins the stack, and
+   writes `workspace/` (CONSTITUTION.md, ARCHITECTURE.md) plus a "Project
+   Foundation" section in your `AGENTS.md`.
+3. **Start a feature** — routing is mandatory: call `search_kit_resources`
+   with the task's technical terms and read the top matching resource (rule,
+   recipe, pattern, or catalog) **before writing code**. Follow the
+   `kit-resource-routing` skill for query formulation.
 
-## Product validation gate
+### Workflow selection
 
-From `KitV2/` (or the installed directory), with
-`PATH="$PATH:$(go env GOPATH)/bin"`:
+| Task | Use |
+| --- | --- |
+| Ordinary Go work | Route, then plan and implement directly |
+| Large-scale transformation (rewrite, migration, overhaul, whole-project refactor) | **`spec-driven-dev`** — seven-phase pipeline (intent, S.U.P.E.R deep analysis, grounded refinement, delivery batches, MASTER.md progress, adaptive control, archive), local-only |
+| Structured problem analysis / design decision | **`deep-discuss`** — multi-round discussion before proposing anything |
+| Code review | **`go-code-review`** (findings-first) + `/checklist-api`, `/checklist-release` |
+| New project, before the first feature | **`workspace-init`** — kernel-first day-0 foundation |
+| Wails/React interface work | `search_ui_kit_resources` + `ui-kit/AGENTS.md` (never `search_kit_resources`) |
+| "How do I use this kit?" | `/goak-help` — the agent reads `.pi/docs/GOAK.md` |
+
+## What the kit guarantees
+
+- **Sourced, evidence-based knowledge.** Every rule and pattern cites primary
+  sources (official docs, RFCs, maintained reference implementations). Every
+  catalog fiche records verified sources with dates; negative claims are
+  confirmed by at least two sources.
+- **Composition over duplication.** One canonical answer per question; layers
+  point to each other, never copy. A recipe composes patterns and snippets;
+  a template assembles recipes — each truth lives once.
+- **Deterministic validation.** The product gate (validators, Go toolchain,
+  probes, routing scenarios) is the only mechanical proof; observable probes
+  are the only behavioral proof. Never claim an unexecuted scenario passed.
+- **Routing quality you can trust.** The ranking of `search_kit_resources` is
+  contract-tested under the **real runtime scoring** — the gate verifies
+  exactly what the agent sees, and quality scenarios must be able to fail.
+- **Self-contained.** The consumer kit ships its own user guide, onboarding
+  banner, offline source bundle (Effective Go), and validation tools. It works
+  with no external documentation and no network.
+- **Stable contracts.** The published frontmatter schema and the product
+  manifest are immutable; breaking changes require a version increment, a
+  migration, and updated evaluations.
+
+## Repository structure
+
+| Path | What it is |
+| --- | --- |
+| `KitV2/` | The standalone consumable product — the only part that is installed |
+| `.agent/` | Metaproject control plane: governance contracts (`.agent/kit-governance/`), validators, router builder, source registry — **never installed** |
+| `.pi/memory/` | Metaproject memory — **never installed** |
+| `docs/` | Metaproject plans, research, raw evidence — **never installed** |
+| `install.sh` | The one-command bootstrap installer (tree-based, pinned to the latest release) |
+
+## Validation
+
+From the installed kit root, with `PATH="$PATH:$(go env GOPATH)/bin"`:
 
 ```sh
 python3 tools/validators/validate-kitv2.py
-KITV2_STRICT_CATALOG=1 python3 tools/validators/validate-kitv2.py  # catalog changes
+KITV2_STRICT_CATALOG=1 python3 tools/validators/validate-kitv2.py  # required for catalog changes
 go mod tidy && go mod verify
 test -z "$(gofmt -l .)"
 go vet ./...
@@ -53,39 +127,55 @@ govulncheck ./...
 bash probes/run.sh
 ```
 
-The CI gate (metaproject + `templates/_kit-ci-workflow.yml`) additionally
-enforces an aggregate coverage floor of 70% on the testable library surface;
-the local gate does not.
+Report the gate with exactly one status: **PASS** (all checks succeeded),
+**FAIL** (at least one failed), or **PARTIAL** (a required tool is missing —
+never present PARTIAL as PASS). The shipped CI workflow
+(`templates/_kit-ci-workflow.yml`) additionally enforces an aggregate coverage
+floor of 70% on the testable library surface; the local gate does not.
 
-## Repository structure
+## Current release — v2.7.0
 
-- `KitV2/` — the standalone consumable product: `rules/`, `recipes/`,
-  `snippets/`, `templates/` (MIT-sourced projects, each with a machine-checked
-  `structure.md` reading map), `knowledge/` (patterns, anti-patterns,
-  security, performance, catalogs, stdlib pointers), `probes/` (15 executable
-  observable scenarios), `tools/offline/` (offline resolver + pinned Effective
-  Go bundle), `tools/generators/` (deterministic structure.md drift gate),
-  `.pi/` (settings, prompts, workflow skills, routing extension), `router/`
-  (generated read-only index + routing-quality contract).
-- `.agent/`, `.pi/memory/`, `docs/` — metaproject governance only, never
-  installed for a consumer.
-- `install.sh` — bootstrap installer for the tree-based version.
+- **Consumer `AGENTS.md` mandatory top blocks**: the two owner-mandated
+  blocks (`## Before doing anything` — sub-agent delegation; `## Absolute
+  rules` — to-do list discipline) now sit at the top of the shipped
+  `AGENTS.md`, enforced mechanically by the product validator across every
+  future rewrite (presence, order, sentinel sentences).
+- **Kit-audit fixes (KVA-001…005)**: `.pi/README.md` registration wording
+  aligned with the single-registration model, capabilities count corrected,
+  `tools/README.md` documents the UI sync tool, the dead `ui-kit/.pi`
+  residue removed (re-sync helper now fails on any `.pi` presence), and the
+  absolute-instruction registry scan extended to recipes.
+- **Clean diagnostics**: zero pi-lens blocking errors (line-length fix,
+  Dependabot cooldown policy `default-days: 7`, Go test modernizations).
+- **Full README**: this document replaces the installer-only note with a
+  complete account of the project.
 
-## Status
+## Version history
 
-**v2.6.0** — the ui-agent-kit integration release: the pinned `ui-kit/` SDK
-zone re-pinned to ui-agent-kit 0.1.1 (agent chat + assistant-ui component
-families), the UI skills registered through the root `.pi/settings.json`
-(single registration point, inert by description for non-Wails projects),
-the root `AGENTS.md` merged with the SDK instructions (checksum-enforced at
-each re-sync), a separate UI routing corpus with 11 quality scenarios, the
-hardened `sync-ui-kit-from-upstream.sh` re-sync helper, and zero pi-lens
-blocking errors in the shipped extensions.
+- **v2.6.0** — ui-agent-kit integration: pinned `ui-kit/` SDK zone
+  (ui-agent-kit 0.1.1, agent chat + assistant-ui component families), single
+  skill registration point in `.pi/settings.json`, separate UI routing corpus
+  (11 quality scenarios), hardened re-sync helper with checksum-enforced
+  AGENTS.md section.
+- **v2.5.0** — routing-guarantee release: 72 product skills, 15 runnable
+  recipes, 3 sourced MIT templates (REST, CLI, worker), 3 verified snippets,
+  278 indexed resources, 22 routing-quality scenarios under the real runtime
+  scoring, offline source retrieval, and the structure.md reading-map
+  mechanism (charter Layer 5.1).
+- **v2.2.x** — semantic resource router release: 206 indexed resources, the
+  native `search_kit_resources` tool, and the improved installer with a
+  TTY spinner, retry, and a verified install summary.
 
-**v2.5.0** — the routing-guarantee release: 72 product skills, 15 runnable
-recipes, 3 sourced MIT templates (REST, CLI, worker), 3 verified snippets,
-278 indexed resources, 22 routing-quality scenarios verified under the real
-runtime scoring, offline source retrieval, and the structure.md mechanism
-(charter Layer 5.1). The canonical `gak` CLI (`init`, `update`, `doctor`,
-`validate`, `remove`, `info`), the published Go module, and the formal
-release pipeline remain on the roadmap; `install.sh` is the interim installer.
+## Roadmap
+
+The canonical **`gak` CLI** (`init`, `update`, `doctor`, `validate`, `remove`,
+`info`), the published Go module, and the formal release pipeline (checksums,
+provenance, atomic updates) remain on the roadmap; `install.sh` is the interim
+installer for the tree-based version.
+
+## License
+
+The sourced templates each carry their own **MIT** LICENSE + ATTRIBUTION.md
+(source, pinned version, adaptations, technical scope); the pinned `ui-kit/`
+zone is MIT (see `ui-kit/PIN.md`). Kit-authored content is provided under the
+repository's terms — see each artifact's metadata for provenance.
