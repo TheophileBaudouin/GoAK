@@ -1,6 +1,6 @@
 ---
 name: go-agent-kit-v2
-version: 2.7.1
+version: 2.7.3
 status: standalone
 capabilities:
   rules:

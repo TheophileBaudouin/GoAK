@@ -30,11 +30,11 @@ source registry, plans, evidence — none of which ships to consumers.
 ## Installation — one command
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.7.1/install.sh | sh -s -- go-agent-kit
+curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.7.3/install.sh | sh -s -- go-agent-kit
 ```
 
 Installs the complete product into `./go-agent-kit` (default pinned ref
-`v2.7.1`). The installer downloads the release tarball, extracts only the
+`v2.7.3`). The installer downloads the release tarball, extracts only the
 consumable `KitV2/` tree (never the metaproject), and verifies the install
 with the product validator — a missing toolchain is reported `PARTIAL`, never
 `PASS`.
@@ -133,9 +133,9 @@ never present PARTIAL as PASS). The shipped CI workflow
 (`templates/_kit-ci-workflow.yml`) additionally enforces an aggregate coverage
 floor of 70% on the testable library surface; the local gate does not.
 
-## Current release — v2.7.1
+## Current release — v2.7.3
 
-- **Installer default ref fixed**: `install.sh` now defaults to `v2.7.1`
+- **Installer default ref fixed**: `install.sh` now defaults to `v2.7.3`
   (the initial v2.7.0 tag shipped an installer whose default ref still
   pulled v2.6.0 — corrected and re-pinned).
 - **Consumer `AGENTS.md` mandatory top blocks**: the two owner-mandated
@@ -155,6 +155,11 @@ floor of 70% on the testable library surface; the local gate does not.
 
 ## Version history
 
+- **v2.7.2** — withdrawn tag: shipped without the installer default-ref bump
+  (would install v2.7.1); replaced by v2.7.3.
+- **v2.7.1** — installer default-ref fix (the initial v2.7.0 tag shipped an
+  installer still pulling v2.6.0); onboarding banner Get Started also points
+  to `/workflow-memory`.
 - **v2.7.0** — first cut of the release (superseded by v2.7.1 for the
   installer default-ref fix).
 - **v2.6.0** — ui-agent-kit integration: pinned `ui-kit/` SDK zone

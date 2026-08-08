@@ -34,7 +34,7 @@ software and keeps those decisions verifiable.
 
 Precondition: the kit is installed in your project root (installer:
 `curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/<ref>/install.sh | sh -s -- <dir>`,
-where `<ref>` is a release tag such as `v2.7.1` and `<dir>` your project).
+where `<ref>` is a release tag such as `v2.7.3` and `<dir>` your project).
 
 1. **Enter the project** — `cd <dir>`.
 2. **Open Pi** — run `pi`. Approve project trust when asked (headless:
