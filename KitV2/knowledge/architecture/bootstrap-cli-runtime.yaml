@@ -34,7 +34,7 @@ constraints:
     @latest is a convenience selector; reproducibility requires resolved
     versions and checksums in a project manifest.
   - >-
-    The metaproject governance control plane remains outside the consumer
+    Kit governance tooling remains outside the consumer
     runtime and is never installed as a competing runtime.
   - "Only the selected agent adapter is installed."
   - >-
@@ -51,6 +51,6 @@ notes: >-
   versioned release, select modules and one adapter, materialize a staged
   runtime, validate it, and commit atomically with ownership metadata. Until
   then, the root install.sh bootstrap installer materializes the standalone
-  KitV2 product into a consumer directory and verifies it; it is the interim
-  path for the first benchmarkable version and never installs metaproject
-  material (governance, memory, decisions, evaluations).
+  product into a consumer directory and verifies it; it is the interim
+  path for the first benchmarkable version and never installs governance
+  material (contracts, memory, decisions, evaluations).

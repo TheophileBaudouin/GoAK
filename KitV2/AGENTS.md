@@ -1,6 +1,6 @@
-# Go Agent Development Kit (KitV2)
+# Go Agent Development Kit
 
-KitV2 is the standalone consumable Go agent kit: rules, recipes, knowledge,
+This kit is the standalone consumable Go agent kit: rules, recipes, knowledge,
 snippets, templates, probes, and a pinned UI SDK zone — everything an agent
 needs to build idiomatic Go software, Go-generalist first.
 
@@ -9,7 +9,7 @@ needs to build idiomatic Go software, Go-generalist first.
 | Zone | Mission (one line) | Pointer |
 | --- | --- | --- |
 | `rules/` | Agent rules and principles (catalog freshness, single-source, example consistency) | `rules/core/`, `rules/registry/` |
-| `knowledge/` | Sourced product indexes and decision context; must not duplicate rule/recipe bodies or metaproject history | `knowledge/INDEX.md` |
+| `knowledge/` | Sourced product indexes and decision context; must not duplicate rule/recipe bodies or decision history | `knowledge/INDEX.md` |
 | `recipes/` | Runnable Go recipes, tests, and procedure documents | `recipes/README.md` |
 | `snippets/` | Metadata-bearing, focused examples linked to a canonical recipe or rule | `snippets/README.md` |
 | `templates/` | Runnable project bases or explicitly labelled partial contracts | `templates/README.md` |
@@ -72,7 +72,7 @@ the project's own `AGENTS.md`.
 
 ## UI work — Wails projects (merged ui-agent-kit SDK instructions)
 
-<!-- ui-kit/AGENTS.md sha256: ae432ca832839f98ba80eea058f626880facd77ab6392152bf7d191a8f36f1ad — this section mirrors the pinned SDK AGENTS.md; the re-sync helper (metaproject) fails when the checksum drifts. Update the prose at every ui-kit update, never lose an instruction from either file. -->
+<!-- ui-kit/AGENTS.md sha256: ae432ca832839f98ba80eea058f626880facd77ab6392152bf7d191a8f36f1ad — this section mirrors the pinned SDK AGENTS.md; the re-sync helper fails when the checksum drifts. Update the prose at every ui-kit update, never lose an instruction from either file. -->
 
 The kit stays Go-generalist, but a real subset of projects are **Wails
 desktop apps** (Go backend + React frontend in `frontend/`). Detect: a
@@ -120,8 +120,9 @@ duplicated or modified in the SDK.
   skill — see `docs/design-systems.md`).
 - No silent duplication: if a piece already exists in
   `ui-sdk/components-index.md`, reuse it; otherwise create a new named piece.
-- **The SDK folder is autonomous**: it never references the metaproject
-  (governance, references, meta skills) — everything it needs is inside
+- **The SDK folder is autonomous**: it never references external project
+  machinery (governance, references, meta skills) — everything it needs is
+  inside
   (`docs/`, `skills/`, `ui-sdk/docs/`). If a piece of content can only exist
   outside, it does not belong in the SDK: bring its source in or drop it.
 - **All files are written in English** — the ecosystem standard.
@@ -155,8 +156,8 @@ npx skills add <owner>/<repo> -a pi  # install a skill for Pi
 
 **Skills registration**: the SDK skills are declared to Pi through the root
 `.pi/settings.json` (`"skills": ["../ui-kit/skills"]` — the single
-registration point; the SDK's nested `.pi/settings.json` is dead by design,
-D-2026-08-08-02). A root `skills/` folder is never auto-discovered by Pi.
+registration point; the SDK's nested `.pi/settings.json` is dead by design).
+A root `skills/` folder is never auto-discovered by Pi.
 
 ## Memory (consumer projects)
 
@@ -166,8 +167,8 @@ memory files actually exist before relying on them:
 
 - inventory the real files under `.pi/memory/` (`Brief`, `Progress`,
   `Gotchas`, `Agent`, `Decisions`);
-- create the missing files in the host's expected format, without copying kit
-  or metaproject history;
+- create the missing files in the host's expected format, without copying
+  external history;
 - never assume the standard set is present; never write to a file that does
   not exist as if it did.
 
@@ -177,7 +178,7 @@ resolved memory surface.
 
 ## Validation
 
-From `KitV2/`, with `PATH="$PATH:$(go env GOPATH)/bin"` for the lint/security
+From the kit root, with `PATH="$PATH:$(go env GOPATH)/bin"` for the lint/security
 tools:
 
 ```sh
@@ -194,9 +195,9 @@ bash probes/run.sh
 ```
 
 If a consumer environment lacks a required tool, report the gate as `PARTIAL`,
-never as passing. The CI workflows (metaproject gate and
-`templates/_kit-ci-workflow.yml`) additionally enforce an aggregate coverage
-floor of 70%; the local gate does not.
+never as passing. The shipped CI workflow (`templates/_kit-ci-workflow.yml`)
+additionally enforces an aggregate coverage floor of 70%; the local gate does
+not.
 
 ## Limits
 

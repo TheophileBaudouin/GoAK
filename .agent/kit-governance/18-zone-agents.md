@@ -18,7 +18,19 @@ The product's **single entry point** for a consumer agent: what this Kit is, whe
 ## 3. Rules
 
 1. **Routing, not duplication**: AGENTS.md contains neither contract bodies nor rule bodies; each zone is described in one line + pointer.
-2. **Product autonomy**: AGENTS.md **never** references the metaproject (`.agent/`, `docs/`, `../` paths). Governance contracts are for contributors, via the metaproject.
+2. **Product autonomy**: the product **never** references the metaproject.
+   This covers every shipped file, not only `AGENTS.md`: no control-directory
+   paths (`.agent/`), no charter mention (`KIT_CHARTER`), no build-repository
+   vocabulary ("metaproject"), no dated decision or audit references
+   (`D-20xx-xx-xx-NN`, `KVA-…`), no repository-folder paths (`KitV2/`), no
+   governance-contract references (`Z1–Z14`, `A1`, `C2`, `N1`), no `../`
+   paths. Enforcement is mechanical: `validate-kitv2.py`
+   `check_no_metaproject_paths()` scans every shipped file (the ui-kit
+   mirror is excluded except its local-owned `PIN.md`/`scenarios.json`;
+   the checker and its test are exempt as they name the markers). A
+   consumer copy of the kit is a standalone project with no awareness of
+   the build repository — a reference to it is noise that must fail the
+   gate.
 3. Any zone or contract creation updates the map in the same commit.
 4. The listed gate is exact: all commands, or explicitly "PARTIAL if a tool is missing".
 

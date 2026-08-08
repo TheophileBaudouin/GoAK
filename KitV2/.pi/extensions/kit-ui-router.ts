@@ -5,12 +5,12 @@
  * ui-agent-kit SDK). It answers UI/interface queries (Wails/React screens,
  * components, styling, accessibility, UX) with a compact top-K of ui-kit
  * resources — NEVER Go resources. The two corpora are separate routing
- * domains (Z13): this tool only ever reads `ui-kit/`, and the Go tool only
+ * domains: this tool only ever reads `ui-kit/`, and the Go tool only
  * ever reads `router/`. It never writes, never rebuilds anything, and never
  * loads kit file contents into the index.
  *
  * Index construction lives in `kit-ui-router-core.ts` (single source, shared
- * with the metaproject gate); scoring reuses `kit-resource-router-scoring.ts`
+ * with the routing-quality gate); scoring reuses `kit-resource-router-scoring.ts`
  * (the ONE scoring implementation) with the shipped stopwords read from
  * `router/meta.json`.
  */

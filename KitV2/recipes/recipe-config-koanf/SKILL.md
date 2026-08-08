@@ -92,8 +92,8 @@ func validate(config Config) error {
 
 > The `validate` function is deliberately shared with
 > `recipe-config-viper` (separate packages that must compile independently;
-> an independent Go copy is kept in each recipe, decision
-> D-2026-08-05-09). Both recipes answer the same input-validation question:
+> an independent Go copy is kept in each recipe). Both recipes answer the same
+> input-validation question:
 > consult the other library's fiche for the koanf ↔ viper comparison.
 
 ## Best practices and pitfalls

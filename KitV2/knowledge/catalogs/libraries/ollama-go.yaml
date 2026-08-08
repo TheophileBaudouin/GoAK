@@ -17,7 +17,7 @@ selection: >-
 limits:
   - >-
     Local model serving is not a core Go runtime capability and is not
-    integrated as a KitV2 dependency or recipe; verify the current API and
+    integrated as a dependency or recipe; verify the current API and
     security requirements first.
 relationships:
   references:

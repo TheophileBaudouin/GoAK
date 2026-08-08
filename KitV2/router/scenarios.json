@@ -1,5 +1,5 @@
 {
-	"$comment": "Routing-quality contract (Z11). Each scenario maps a realistic task intent to the kit resources that MUST surface in the top-K when the agent calls search_kit_resources. The metaproject gate runner verifies every expectation with the exact runtime scoring (kit-resource-router-scoring.ts), so a future skill with weak terms, a duplicate, or a wrong description degrades the gate. offDomain: true means the query must be rejected as outside the kit (empty-over-noise rule).",
+	"$comment": "Routing-quality contract. Each scenario maps a realistic task intent to the kit resources that MUST surface in the top-K when the agent calls search_kit_resources. A separate gate runner verifies every expectation with the exact runtime scoring (kit-resource-router-scoring.ts), so a future skill with weak terms, a duplicate, or a wrong description degrades the gate. offDomain: true means the query must be rejected as outside the kit (empty-over-noise rule).",
 	"schema": 1,
 	"scenarios": [
 		{

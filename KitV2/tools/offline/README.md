@@ -2,7 +2,7 @@
 
 This tool resolves bounded, pinned official Go sources and local toolchain
 capabilities from the self-contained bundle under `bundle/`. It is product
-runtime code, not metaproject evidence or a network client.
+runtime code, not an evidence store or a network client.
 
 ## Inputs and outputs
 

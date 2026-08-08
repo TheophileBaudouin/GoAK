@@ -1,4 +1,4 @@
-// Probe ui-kit-sync — observable verification of tools/sync-ui-kit.sh (Z13 §6-8).
+// Probe ui-kit-sync — observable verification of tools/sync-ui-kit.sh.
 //
 // Scenarios:
 //  1. Wails fixture + real zone: SDK materialized, .pi skills wired, code

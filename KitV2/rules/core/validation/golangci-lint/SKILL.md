@@ -14,12 +14,12 @@ last-verified: 2026-08-02
 one of the **mandatory validation tools**: every code example in the registry
 must pass `golangci-lint run` with zero issues before its module is marked done.
 It aggregates many linters behind a single configurable run; with
-`linters.default: none` only the linters explicitly enabled in `KitV2/.golangci.yml`
-execute — nothing runs by accident.
+`linters.default: none` only the linters explicitly enabled in the kit's
+`.golangci.yml` execute — nothing runs by accident.
 
 ## Kit config (canonical)
 
-`KitV2/.golangci.yml` is the source of truth for the gate: this document describes
+The kit-root `.golangci.yml` is the source of truth for the gate: this document describes
 the config actually shipped, and any gate change must land in the config first.
 v2 changed the config schema and invocation vs v1 — do not copy v1 configs
 blindly.

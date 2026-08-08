@@ -38,15 +38,14 @@ off-domain queries that must be rejected (`offDomain: true`, empty-over-noise
 rule). Every expected id must exist in the index — `validate-kitv2.py`
 enforces this schema and linkage check on every gate.
 
-The ranking verification itself runs in the **metaproject gate** with the
+The ranking verification itself runs in a separate **quality gate** with the
 REAL runtime scoring: the gate runner imports `kit-resource-router-scoring.ts`
 (the exact module the tool uses), so the gate and the agent cannot diverge.
 The runner, its sources, and the Node runtime requirement (≥ 23.6) are
-metaproject-only and are **not shipped** with this product — the installed
-kit is verified by `validate-kitv2.py` (schema + id linkage) and ships the
-index read-only. Metaproject maintainers run the ranking gate from the
-repository root with the metaproject runner (`run_scenarios.mjs`); exit 0
-means the routing contract holds.
+**not shipped** with this product — the installed kit is verified by
+`validate-kitv2.py` (schema + id linkage) and ships the index read-only.
+Maintainers run the ranking gate with the runner (`run_scenarios.mjs`) from
+the repository that builds the kit; exit 0 means the routing contract holds.
 
 The gate verifies the scoring layer: for off-domain scenarios it asserts
 the `offDomain` guard fires (the tool then renders the empty-result
@@ -65,8 +64,8 @@ implementation (`kit-resource-router-scoring.ts`) and the stopwords shipped
 in this directory's `meta.json` — it never reads this Go index, and this Go
 index never contains a `ui-kit/` path (corpus disjointness is gate-checked
 both ways, the non-pollution proof). Its authored routing-quality contract
-is `ui-kit/scenarios.json` (Z13), verified by `validate-kitv2.py`
-(node-free) and ranked by the metaproject gate runner
+is `ui-kit/scenarios.json`, verified by `validate-kitv2.py`
+(node-free) and ranked by the gate runner
 (`run_ui_scenarios.mjs`).
 
 ## Usage

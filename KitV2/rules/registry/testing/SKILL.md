@@ -80,7 +80,7 @@ its channels / wait its WaitGroup / honour its context.
 
 ## 7. Coverage floor — 70%, enforced in CI
 
-The CI workflows (metaproject gate and the shipped `templates/_kit-ci-workflow.yml`)
+The shipped CI workflow (`templates/_kit-ci-workflow.yml`)
 run `go test -race -coverprofile=coverage.out ./...` and fail when the aggregate
 drops below a **70%** floor. The local gate (`AGENTS.md`) checks `-race` without
 a coverage floor. A 70% floor catches a wholly-untested package without

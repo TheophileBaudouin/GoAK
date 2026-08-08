@@ -53,8 +53,8 @@ re-explain it):
 2. **Surface inventory** (same discipline as spec-driven-dev): read the
    consumer's `AGENTS.md` (including any existing `## Project Foundation`
    section), and verify which `.pi/memory/` files exist (`Decisions.md`
-   may be missing from the Pi bootstrap — create it without copying kit or
-   metaproject history).
+   may be missing from the Pi bootstrap — create it without copying
+   external history).
 3. **Existing constraints**: note any user-provided or repository-level
    constraints (license, toolchain, existing README intent) before the
    interview — they become facts, not questions.

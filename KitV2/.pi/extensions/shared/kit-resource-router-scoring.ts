@@ -3,7 +3,7 @@
  *
  * Pure, dependency-free BM25 routing logic shared between:
  *  - the Pi extension `kit-resource-router.ts` (runtime tool), and
- *  - the metaproject routing-quality gate (`run_scenarios.mjs`).
+ *  - the routing-quality gate.
  *
  * Single source of truth for tokenize/expandQuery/bm25 and every constant
  * that influences ranking. The extension and the gate therefore CANNOT
@@ -42,7 +42,7 @@ export const BM25_B = 0.75;
 export const MAX_RESULTS = 8;
 export const DEFAULT_RESULTS = 5;
 export const DESC_SNIPPET = 200;
-// Canonical resources beat conditional catalogs for generic queries (Z11
+// Canonical resources beat conditional catalogs for generic queries
 // routing-quality bar): rules/recipes/patterns answer the task directly,
 // catalog/source entries often only document an explicitly requested library.
 export const KIND_WEIGHT: Record<string, number> = {

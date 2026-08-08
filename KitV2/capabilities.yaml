@@ -13,7 +13,7 @@ capabilities:
   knowledge:
     source: knowledge/
     status: catalog-and-sources
-    criteria: every knowledge YAML carries full metadata (Z10) with resolved
+    criteria: every knowledge YAML carries full metadata (artifact contract) with resolved
       relationships; stdlib entries are pointer-only and resolved offline.
   recipes:
     source: recipes/
@@ -62,8 +62,8 @@ capabilities:
     criteria: >-
       index.json matches meta.json checksum and covers every indexable
       resource; the runtime tool is read-only; routing quality is contract-
-      tested by scenarios.json under the real runtime scoring (metaproject
-      node gate), so the top resource for each documented intent stays
+      tested by scenarios.json under the real runtime scoring (node quality
+      gate), so the top resource for each documented intent stays
       verifiable as the kit grows.
   ui-kit:
     source: ui-kit/
@@ -106,6 +106,6 @@ known_limits:
     status: accepted
   - id: router-read-only-by-design
     impact: >-
-      Consumers never rebuild the router index; it is regenerated in the
-      metaproject and shipped read-only by design.
+      Consumers never rebuild the router index; it is regenerated outside
+      the product and shipped read-only by design.
     status: accepted

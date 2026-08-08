@@ -3,12 +3,12 @@
  *
  * Pure, dependency-free (node builtins only) builder shared between:
  *  - the Pi extension `kit-ui-router.ts` (runtime tool `search_ui_kit_resources`), and
- *  - the metaproject UI routing-quality gate (`run_ui_scenarios.mjs`).
+ *  - the UI routing-quality gate.
  *
  * Single source of truth for how the ui-kit zone (pinned ui-agent-kit SDK)
  * becomes a routing index: which files are indexed, their ids, kinds, and
  * descriptions. The Go corpus (`router/index.json`) is never touched — the
- * UI corpus is a separate routing domain by design (Z13 §3.4).
+ * UI corpus is a separate routing domain by design.
  *
  * The SCORING is not implemented here and the tokenizer is INJECTED by the
  * caller (see `Tokenizer` below), so this module imports nothing
@@ -34,7 +34,7 @@ export interface UiKitIndex {
  * The tokenizer comes from the shared scoring module
  * (`kit-resource-router-scoring.ts`), injected by each caller:
  * - the Pi extension imports it with a `.js` specifier (jiti maps to .ts);
- * - the metaproject gate imports it with a `.ts` specifier (node ≥ 23.6
+ * - the gate runner imports it with a `.ts` specifier (node ≥ 23.6
  *   native type stripping).
  * Type-only imports are erased at runtime in both runtimes.
  */
@@ -92,7 +92,7 @@ const MARKDOWN_DESC_INDEX = 300; // heading + capped intro for .md resources
 /**
  * Build the UI routing index from the ui-kit zone.
  *
- * Ids follow a documented convention (Z13 §7): skills use their frontmatter
+ * Ids follow a documented convention: skills use their frontmatter
  * `name`; knowledge .md files use their filename stem; the components index
  * is a single "components" resource. Paths are emitted relative to the
  * zone's parent (e.g. `ui-kit/skills/frontend-design/SKILL.md`) so the gate

@@ -1,8 +1,8 @@
 # templates/ci-workflow.yml — drop-in CI for new Go projects.
 # Copy this file into a new project's .github/workflows/ during setup.
-# Same gate as the KitV2 CI (.github/workflows/ci.yml at the metaproject
-# root), minus the monorepo working-directory: a new project's go.mod sits
-# at its root, so no working-directory is needed here.
+# Same checks as the kit's validation gate (AGENTS.md), minus the monorepo
+# working-directory: a new project's go.mod sits at its root, so no
+# working-directory is needed here.
 name: gate
 
 on:

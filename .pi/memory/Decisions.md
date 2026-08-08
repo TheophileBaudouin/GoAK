@@ -905,3 +905,19 @@ questions utilisateur.
   interview is adapted from the `grilling` primitive (mattpocock/skills),
   the kernel/modules definition cites Mark Richards, the SDK rationale
   cites Ousterhout (deep modules) — never home-made definitions.
+- **D-2026-08-08-11 (product autonomy — metaproject-reference cleanup)**: the
+  consumer kit must be a standalone project with no awareness of the build
+  repository. Removed ~30 references from KitV2/ (KIT_CHARTER, "metaproject",
+  dated decisions D-2026-08-0x, KVA-xxx, governance contracts Z1x/A1/N1,
+  repository-folder paths, `.agent/`) across AGENTS.md, extensions TS,
+  capabilities.yaml, ui-kit/PIN.md + scenarios.json, validateurs, recipes,
+  rules, skills, templates, probes, catalogs, router README — reworded
+  faithfully (merged UI section marker sha256 kept; the ui-kit mirror stays
+  a verbatim pin, its local-owned files were cleaned). Extended
+  `check_no_metaproject_paths` to 9 markers (IGNORECASE; `.agent/` escaped
+  after the regex-joker false positive; `KitV2/` with slash so the validator
+  name stays legal; ui-kit mirror exempt except PIN.md/scenarios.json;
+  checker+test exempt) and fixed `test_validate_kitv2.py`, whose
+  `unittest.main()` sat mid-file — 7 tests (KVA-102 check, probe inventory,
+  ui-kit registration) never ran; all pass now (19 tests). Z9 §3.2
+  generalized from AGENTS.md to the whole product. Full gate PASS.

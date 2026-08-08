@@ -15,7 +15,7 @@ selection: >-
   wants generated scaffolding and has reviewed the resulting architecture.
 limits:
   - >-
-    It is not integrated as a KitV2 runtime or template; generated scaffolding
+    It is not integrated as a runtime or template; generated scaffolding
     must pass the consumer project's own validation and architecture review.
 relationships:
   references:

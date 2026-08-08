@@ -18,6 +18,6 @@ This directory contains the native Pi runtime surface of the installed Kit.
   tool only reads `router/`, the UI tool only reads `ui-kit/`.
 
 The installed product is self-contained: these paths resolve after the
-installer strips the repository prefix and places KitV2 at the consumer root.
+installer strips the repository prefix and places the kit at the consumer root.
 Consumer projects create their own `.pi/memory/`; no consumer history ships
 with this product.

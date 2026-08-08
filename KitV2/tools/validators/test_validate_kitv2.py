@@ -205,8 +205,6 @@ class ValidatorTests(unittest.TestCase):
             self.assertEqual(module.check_snippet_chain(root=root), [])
 
 
-if __name__ == "__main__":
-    unittest.main()
 
     def test_no_metaproject_paths_catches_leakage(self) -> None:
         """KVA-102 — a shipped file referencing the metaproject marker fails."""
@@ -221,6 +219,30 @@ if __name__ == "__main__":
                 errors = module.check_no_metaproject_paths()
         self.assertTrue(any("README.md" in error for error in errors), errors)
         self.assertFalse(any("ok.py" in error for error in errors), errors)
+
+    def test_no_metaproject_markers_catch_build_repo_material(self) -> None:
+        """The consumer kit must never reference build-repository-only
+        material: charter, dated decisions, audit findings, the repository
+        folder name, or governance contracts."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name, snippet in (
+                ("a.md", "see KIT_CHARTER.md Layer 5.1\n"),
+                ("b.md", "recorded in the metaproject journal\n"),
+                ("c.md", "decision D-2026-08-08-06 applies\n"),
+                ("d.md", "audit finding KVA-102 closed\n"),
+                ("e.md", "read KitV2/AGENTS.md\n"),
+                ("f.md", "governed by the Z13 contract\n"),
+                ("g.md", "fundamental rule D-2026-08-05-21\n"),
+            ):
+                write(root / name, snippet)
+            write(root / "ok.md", "plain content\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_no_metaproject_paths()
+        self.assertEqual(len(errors), 7, errors)
+        self.assertTrue(any("a.md" in error for error in errors), errors)
+        self.assertTrue(any("g.md" in error for error in errors), errors)
+        self.assertFalse(any("ok.md" in error for error in errors), errors)
 
     def test_probe_inventory_out_of_sync_fails(self) -> None:
         """KVA-102 — the probes README table must match the real probe tree."""
@@ -300,3 +322,6 @@ if __name__ == "__main__":
             )
             errors = module.check_ui_kit_registration(root)
         self.assertTrue(any("../rules" in error for error in errors), errors)
+
+if __name__ == "__main__":
+    unittest.main()

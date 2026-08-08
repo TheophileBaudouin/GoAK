@@ -14518,7 +14518,7 @@
    ]
   },
   {
-   "description": "Initialize and maintain consumer-project memory without inheriting kit or metaproject history. Use at the start of a new project and after durable decisions, blockers, or verified milestones.",
+   "description": "Initialize and maintain consumer-project memory from scratch, without inheriting external history. Use at the start of a new project and after durable decisions, blockers, or verified milestones.",
    "id": "workflow-memory",
    "kind": "prompt",
    "path": ".pi/prompts/workflow-memory.md",
@@ -14531,10 +14531,10 @@
     "consumer",
     "project",
     "memory",
+    "scratch",
     "without",
     "inheriting",
-    "kit",
-    "metaproject",
+    "external",
     "history",
     "start",
     "new",

@@ -1,5 +1,5 @@
 ---
-description: Initialize and maintain consumer-project memory without inheriting kit or metaproject history. Use at the start of a new project and after durable decisions, blockers, or verified milestones.
+description: Initialize and maintain consumer-project memory from scratch, without inheriting external history. Use at the start of a new project and after durable decisions, blockers, or verified milestones.
 argument-hint: "[project state or event]"
 ---
 
@@ -19,10 +19,9 @@ project resources; it is not a sandbox and grants no permission isolation.
    `Decisions`) and never assume the standard set is present.
 3. Create the missing files in the host's expected format (use the host's
    memory bootstrap command when it provides one; otherwise create only the
-   minimal files the host expects). Never copy kit or metaproject history
-   into them.
-4. Read the local memory before acting. Never copy the kit's source ledger,
-   roadmap, research history, or metaproject tasks into it.
+   minimal files the host expects). Never copy external history into them.
+4. Read the local memory before acting. Never copy a pre-existing source
+   ledger, roadmap, or research history into it.
 5. Record the project's actual goal, stack, constraints, current progress, and
    known risks. Leave unknown details out until observed.
 
@@ -46,7 +45,7 @@ one. Keep it local and cite URLs or commands for durable claims.
 Do not store conversation transcripts, temporary reasoning, raw tool output,
 finished-task history, generic Go advice already present in the kit, or
 secrets — in particular, never put secrets in `.pi/settings.json`.
-Do not copy the metaproject's `.pi/memory/` into a consumer project.
+Do not copy another project's memory into this consumer project.
 
 ## Source refresh
 

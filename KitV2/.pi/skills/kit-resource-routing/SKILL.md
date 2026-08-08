@@ -31,7 +31,7 @@ do not call the tool.
 - One concern per query. Split "I need a REST API with auth and a worker
   pool" into `rest api chi` and `bounded worker pool`.
 - 3–8 technical terms, in English — the kit descriptions and index terms are
-  English-only (fundamental language rule D-2026-08-05-21); a non-English
+  English-only (fundamental language rule); a non-English
   query rarely matches.
 - Name the concrete artifacts: `sqlc`, `errgroup`, `slog`, `wails`,
   `graceful shutdown`, `chi middleware`.

@@ -49,11 +49,10 @@ Two `_kit-*` files ship inside `templates/` but are **not** sourced project
 templates — they are kit machinery, declared here to keep the catalog honest
 (Z5 §8: TEMPLATES.md coherent with the tree):
 
-- `_kit-ci-workflow.yml` — a drop-in CI gate for new Go projects (same gate
-  as the metaproject CI, minus the monorepo working-directory).
-- `_kit-skill-authoring.md` — the SKILL.md authoring matrix (A1: self-
-  contained contributor aid in the product; the metaproject contract A1
-  remains the authority).
+- `_kit-ci-workflow.yml` — a drop-in CI gate for new Go projects (same
+  checks as the kit's validation gate, minus the monorepo working-directory).
+- `_kit-skill-authoring.md` — the SKILL.md authoring matrix (self-contained
+  contributor aid in the product).
 
 ## structure.md (project reading map) — mechanism
 

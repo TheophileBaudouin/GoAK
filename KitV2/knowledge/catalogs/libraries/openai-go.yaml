@@ -15,7 +15,7 @@ selection: >-
   authentication, data handling, retries, and cost controls are specified.
 limits:
   - >-
-    The SDK is not a core Go runtime capability and is not integrated as a KitV2
+    The SDK is not a core Go runtime capability and is not integrated as a
     dependency or recipe; verify the current API and security
     requirements first.
 relationships:

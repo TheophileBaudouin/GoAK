@@ -38,8 +38,8 @@ documented experience.
 
 - General "debugging in Go" advice without a concrete failure (→ out of
   scope).
-- Copied documentation bodies; raw evidence outputs kept outside the product,
-  in the metaproject maintenance journal.
+- Copied documentation bodies; raw evidence outputs are kept outside the
+  product.
 - Duplication of an existing pattern/anti-pattern (`../patterns/`,
   `../anti-patterns/`) or rule (`../../rules/`) — point, do not duplicate.
 - Unverified hypothesis presented as fact.

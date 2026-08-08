@@ -1,7 +1,7 @@
 /**
  * Kit Resource Router — Pi native tool `search_kit_resources`.
  *
- * READ-ONLY runtime for the shipped router index (KitV2/router/). It finds
+ * READ-ONLY runtime for the shipped router index (router/). It finds
  * which kit resources (rules, recipes, catalogs, patterns, anti-patterns,
  * sources, snippets, prompts, skills) help with a task, returning a compact
  * top-K with paths, matched terms, and short descriptions. It NEVER writes,
@@ -9,7 +9,7 @@
  * truth stays the kit files, and this tool only routes to them.
  *
  * Scoring lives in `kit-resource-router-scoring.ts` (single source shared
- * with the metaproject routing-quality gate — see router/scenarios.json).
+ * with the routing-quality gate — see router/scenarios.json).
  */
 
 /// <reference lib="es2022" />

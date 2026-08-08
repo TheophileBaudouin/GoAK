@@ -16,7 +16,7 @@ language, section, table, or paraphrase merely to fill the fiche format.
 Remove an optional section when it adds no distinct information.
 
 Use one coherent language for the body of a file. English is the mandatory
-project language (fundamental rule D-2026-08-05-21): headings are labels, not
+project language (fundamental kit rule): headings are labels, not
 a reason to translate and repeat the same content in another language.
 
 ## Section boundaries

@@ -1,0 +1,23 @@
+# Gate evidence — metaproject-reference cleanup (product autonomy) — 2026-08-08
+
+## Validators (extended check_no_metaproject_paths active)
+instruction-artifacts: PASS
+cognitive: PASS (35 catalog objects)
+kitv2: PASS (73 product skills, 3 snippets, standalone, offline bundle, router index 281 resources)
+
+## Validator unit tests (unittest.main() fix revealed 7 dormant tests)
+Ran 19 tests ... OK
+
+## Router scenarios (real scoring)
+router scenarios: 23/23 PASS (index v2.6.0, 281 resources)
+
+## Go gate
+gofmt: clean
+go vet: clean
+golangci-lint: 0 issues
+go test -race: pass
+gosec: 0 issues
+govulncheck: no vulnerabilities
+
+## Probes
+16/16 PASS

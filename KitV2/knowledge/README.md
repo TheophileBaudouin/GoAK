@@ -1,7 +1,7 @@
 # Knowledge
 
-Knowledge is the explanation and routing layer. It is product knowledge, not
-metaproject memory or evaluation governance. Canonical rules live in
+Knowledge is the explanation and routing layer. It is product knowledge:
+canonical rules live in
 `../rules/`; canonical procedures live in `../recipes/`. Catalog entries here
 must explain selection, limits, evidence, and alternatives without copying
 those bodies.
