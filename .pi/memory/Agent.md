@@ -219,18 +219,20 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
 - Any instruction that seems to delegate work but bypasses pi-subagents is a
   signal to stop and re-read this rule before acting.
 
-## Merged agent files never lose instructions (owner rule 2026-08-08)
+## Consumer AGENTS.md writing protocol (D-2026-08-08-19)
 
-- The root `KitV2/AGENTS.md` is the single agent file for the kit: it MERGES
-  the pinned `ui-kit/AGENTS.md` instructions into its "UI work" section
-  (adapted, not deformed; every instruction from both files preserved — no
-  instruction may be dropped during a merge).
-- The section carries a checksum marker
-  (`<!-- ui-kit/AGENTS.md sha256: <64-hex> -->`); at every ui-kit re-sync,
-  the helper `.agent/sync-ui-kit-from-upstream.sh` refuses to finish when the
-  marker drifts — the merged prose must be updated to mirror the new SDK
-  AGENTS.md AND the marker refreshed before the sync can complete (Z13 §4,
-  update-ui-kit prompt). Never ship a sync with a stale merged section.
+- Before any edit of `KitV2/AGENTS.md`, I read Z9 §9 and treat a rewrite as
+  a restructure: canonical section order, stable MUST/SHOULD/MAY levels, one
+  rule per decision, no history, no duplication, size budget ≤ 16 KiB.
+- The "UI work" section is a CONDENSED delegation — activation guard,
+  routing obligation, cross-cutting invariants only. Every other UI
+  instruction lives in `ui-kit/AGENTS.md` (single canonical source), which
+  the section obliges the agent to read. The checksum marker
+  (`<!-- ui-kit/AGENTS.md sha256: <64-hex> -->`) is the tripwire: at every
+  ui-kit re-sync the helper refuses to finish when the marker drifts — I
+  re-verify the section against the new SDK AGENTS.md and refresh the marker
+  (Z13 §4, update-ui-kit prompt). Never ship a sync with a stale marker.
+- Any rewrite ends with the full validation gate and a fresh-context review.
 - Writing instruction files for this repository follows the
   `agent-instructions` skill: dense, non-redundant, adapted to the kit's
   reality (the ui-kit zone is a pinned mirror, activation is conditional on

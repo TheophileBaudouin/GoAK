@@ -280,6 +280,110 @@ class ValidatorTests(unittest.TestCase):
                 errors = module.check_workspace_init_placeholder()
         self.assertTrue(any("markers missing" in error for error in errors), errors)
 
+    def test_agents_md_contract_passes_with_canonical_structure(self) -> None:
+        """Z9 §9 (D-2026-08-08-19) — the canonical section set, small size,
+        and no history markers is the valid execution-contract state."""
+        sections = [
+            "## Normative levels",
+            "## Non-Negotiable Rules",
+            "## Repository map",
+            "## Task Routing",
+            "## Memory",
+            "## Validation",
+            "## Limits",
+        ]
+        body = "# Go Agent Development Kit\n\n" + "\n\n".join(
+            s + "\ncontent" for s in sections
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body + "\n")
+            warnings: list[str] = []
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract(warnings)
+        self.assertEqual(errors, [], errors)
+        self.assertEqual(warnings, [], warnings)
+
+    def test_agents_md_contract_fails_when_section_lost(self) -> None:
+        """Z9 §9 — a rewrite that drops a canonical section (e.g. the
+        Non-Negotiable Rules) fails the gate."""
+        body = "# Go Agent Development Kit\n\n## Task Routing\ncontent\n"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body)
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(
+            any("Non-Negotiable Rules" in error for error in errors), errors
+        )
+
+    def test_agents_md_contract_fails_when_sections_reordered(self) -> None:
+        """Z9 §9.1 — the canonical order is mechanically checked, not just
+        presence."""
+        body = (
+            "# Go Agent Development Kit\n\n"
+            "## Limits\ncontent\n"
+            "## Non-Negotiable Rules\ncontent\n"
+            "## Normative levels\ncontent\n"
+            "## Repository map\ncontent\n"
+            "## Task Routing\ncontent\n"
+            "## Memory\ncontent\n"
+            "## Validation\ncontent\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body)
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(any("canonical order" in error for error in errors), errors)
+
+    def test_agents_md_contract_fails_when_over_budget(self) -> None:
+        """Z9 §9.4 — the 16 KiB size budget stops the root from growing into
+        a manual."""
+        padding = "x" * 17000
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", padding + "\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(any("16 KiB" in error for error in errors), errors)
+
+    def test_agents_md_contract_fails_on_history_marker(self) -> None:
+        """Z9 §9.2 rule 14 — removed/former systems do not belong in
+        operational instructions."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", "the old chain (removed 2026-08-05)\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(
+            any("history" in error or "former" in error for error in errors), errors
+        )
+
+    def test_agents_md_contract_warns_near_budget(self) -> None:
+        """Z9 §9.4 — near-budget files warn instead of silently growing."""
+        sections = "\n\n".join(
+            f"## {title}\ncontent"
+            for title in (
+                "Normative levels",
+                "Non-Negotiable Rules",
+                "Repository map",
+                "Task Routing",
+                "Memory",
+                "Validation",
+                "Limits",
+            )
+        )
+        body = "# Go Agent Development Kit\n\n" + sections + "\n\n" + "y" * 13000
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body + "\n")
+            warnings: list[str] = []
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract(warnings)
+        self.assertEqual(errors, [], errors)
+        self.assertTrue(any("near the 16 KiB" in warning for warning in warnings))
+
     def test_probe_inventory_out_of_sync_fails(self) -> None:
         """KVA-102 — the probes README table must match the real probe tree."""
         with tempfile.TemporaryDirectory() as directory:

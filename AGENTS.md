@@ -67,7 +67,7 @@ Never bypass this approval boundary by silently expanding scope.
 
 ## Absolute rules
 
-You must always check which step of the to-do list you are at and strictly follow this to-do list. 
+You must always check which step of the to-do list you are at and strictly follow this to-do list.
 Every task you do, you do by strictly following this to-do list that you created.
 
 ## Validation
@@ -117,3 +117,24 @@ shipped source of truth, not an editorial afterthought. A future agent that
 modifies the kit must be naturally led to update documentation, banner, and
 audits; if a change touches these surfaces and the guide is left untouched,
 that is a defect.
+
+## Consumer AGENTS.md writing protocol (D-2026-08-08-19)
+
+- `KitV2/AGENTS.md` is the single agent file for the kit. Any rewrite MUST
+  follow Z9 §9: canonical section order, stable MUST/SHOULD/MAY levels, one
+  rule per decision, no history, no duplication, ≤ 16 KiB; preserve the
+  three marker sections (User guide, Project Foundation, UI work + sha256);
+  end with the full gate and a fresh-context review. Enforced by
+  `check_agents_md_contract` (validate-kitv2.py).
+- Its "UI work" section is a CONDENSED delegation: activation guard, routing
+  obligation, cross-cutting invariants only — every other UI instruction
+  lives in `ui-kit/AGENTS.md` (single canonical source). The checksum marker
+  (`<!-- ui-kit/AGENTS.md sha256: <64-hex> -->`) is the tripwire: at every
+  ui-kit re-sync the helper refuses to finish when the marker drifts — the
+  section must be re-verified against the new SDK AGENTS.md and the marker
+  refreshed before the sync completes (Z13 §4, update-ui-kit prompt). Never
+  ship a sync with a stale marker.
+- Writing instruction files for this repository follows the
+  `agent-instructions` skill: dense, non-redundant, adapted to the kit's
+  reality (the ui-kit zone is a pinned mirror, activation is conditional on
+  a detected Wails project).

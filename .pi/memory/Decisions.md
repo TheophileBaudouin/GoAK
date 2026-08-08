@@ -1029,3 +1029,64 @@ questions utilisateur.
   simplified to user-facing one-liners (Get Started / large change / small
   change + /goak-help pointer). Router regenerated (goak-help entry); full
   gate PASS; consumer smoke verified.
+
+## Consumer AGENTS.md rewrite protocol (2026-08-08, D-2026-08-08-19)
+
+The full critique of `KitV2/AGENTS.md` concluded: sound content, imperfect
+architecture (mixed normative levels, embedded UI manual, buried routing
+mandate, historical content, loose vocabulary). Fix in two parts:
+
+1. **Metaproject guardrails** so every future rewrite follows one protocol:
+   - Z9 §9 — "Consumer AGENTS.md writing protocol": canonical section
+     structure, 15 writing rules (execution-first, one rule per decision,
+     explicit triggers, stable MUST/SHOULD/MAY levels, explicit
+     prohibitions, point-don't-duplicate, one canonical source, domain-close
+     rules, deterministic workflows, explicit guards, evidence for success
+     claims, commands carry context, testable instructions, no history, no
+     "best practices"), rewrite procedure, Definition of Done.
+   - Z13 §4 revised — the root "UI work" section changed from full mirror of
+     `ui-kit/AGENTS.md` to condensed delegation (activation guard + routing
+     - cross-cutting invariants only); the checksum marker stays the
+     tripwire (re-verify + refresh on SDK change). Sync helper
+     (`sync-ui-kit-from-upstream.sh`) and `update-ui-kit` prompt wording
+     updated to match.
+   - Root `AGENTS.md` + `.pi/memory/Agent.md`: compact absolute rule
+     (rewrites follow Z9 §9, keep markers, gate + fresh review).
+   - `validate-kitv2.py` `check_agents_md_contract`: 16 KiB size budget
+     (warning > 12 KiB), required canonical headings + order, history-marker
+     ban, "best practices" ban; 6 unit tests.
+   - `.agent/instructions.md` enforcement registry rows updated to the new
+     section names (§Non-Negotiable Rules, §Task Routing).
+
+2. **The rewrite itself** (`KitV2/AGENTS.md`, 12.4 KiB → 12.2 KiB): canonical
+   order (Identity → Normative levels → User guide → Non-Negotiable Rules →
+   Repository map → Task Routing → Project Foundation → UI work → Memory →
+   Validation → Limits → closing invariants echo); routing promoted to an
+   entry rule; workflow decomposed into guarded task→skill selection;
+   removed prompt-chain history removed; PASS/PARTIAL/FAIL formalized;
+   UI detail delegated to `ui-kit/AGENTS.md`; all hard rules preserved
+   (verified old-vs-new by fresh-context review). No metaproject markers, no
+   unresolved prose ids, three marker sections + sha256 intact.
+
+Gate: validators ×3 PASS, 35/35 unit tests, router 23/23 + UI 11/11,
+gofmt/vet/lint/test-race/gosec/govulncheck clean, probes 16/16.
+Fresh-context review: 0 blockers, 0 worth-fixing, 3 nits (1 fixed: Z9 §9.1
+wording precision + mechanical order check).
+Evidence: `docs/evidence/2026-08-08/agents-md-rewrite/`,
+plan `docs/plans/2026-08-08-agents-md-rewrite-protocol.md`.
+
+## Onboarding banner workflow correction (2026-08-08, D-2026-08-08-20)
+
+Owner rewrote the onboarding banner; review confirmed 3/4 entries correct.
+The "large change" chain `deep-discuss -> spec-driven-dev` was removed:
+`spec-driven-dev` already contains its own grounded discussion (Phase 2
+"Intent Refinement & Confirmation", targeted questions after the codebase
+analysis) — a separate discussion step before it is redundant and less
+informed. `deep-discuss` keeps its distinct role: standalone problem
+analysis / design decision before any transformation is decided. Banner
+now: GET STARTED → workspace-init · large → spec-driven-dev · small →
+describe, agent guides · /goak-help (the built-in discussion is documented
+in the guide, not repeated in the banner). GOAK.md §3.3
+decision table updated (spec-driven-dev "do not run a separate discussion
+workflow before it" + new "Problem analysis / design decision" row for
+deep-discuss). Validators PASS (kitv2, cognitive).

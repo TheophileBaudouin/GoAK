@@ -71,13 +71,15 @@ gosec/govulncheck, probes).
    regenerated from the upstream `cli/manifest.json`, so a NEW upstream
    folder appears here and the consumer sync tool will copy it without a
    code change — if the rules changed, review the new mapping explicitly.
-2. **Merged root AGENTS.md (owner rule 2026-08-08)**: `KitV2/AGENTS.md`
-   carries a "UI work" section that merges the SDK's `ui-kit/AGENTS.md`
-   instructions (checksum marker in its HTML comment). If the sync changed
-   `ui-kit/AGENTS.md`, the helper refuses to finish until this section is
-   updated — adapt the prose to mirror the new SDK instructions (never lose
-   an instruction from either file) and refresh the sha256 marker. Review
-   the section even on a trivial jump.
+2. **Root AGENTS.md UI section (delegation, owner rule 2026-08-08, revised
+   2026-08-08, D-2026-08-08-19)**: `KitV2/AGENTS.md` carries a condensed
+   "UI work" section — activation guard, routing obligation, and
+   cross-cutting invariants; every other UI instruction is delegated to
+   `ui-kit/AGENTS.md` (the single canonical source, which the section
+   obliges the agent to read). If the sync changed `ui-kit/AGENTS.md`, the
+   helper refuses to finish until this section is re-verified against the
+   new SDK instructions and the sha256 marker is refreshed. Review the
+   section even on a trivial jump.
 3. **Project Foundation guard (Z14)**: `KitV2/AGENTS.md` also carries the
    "Project Foundation" pointer section, delimited by its own markers
    (`<!-- workspace-init section: begin -->` … `<!-- workspace-init
@@ -91,7 +93,7 @@ gosec/govulncheck, probes).
 4. Inspect the diff for anomalies (unexpected deletions, binaries, secrets).
 5. Commit with a message naming the new SHA and summarizing the change, e.g.:
    `feat(ui-kit): re-pin zone to ui-agent-kit <short-sha> — <what changed>`.
-   Include `KitV2/AGENTS.md` when its merged section changed.
+   Include `KitV2/AGENTS.md` when its UI section changed.
 6. Do NOT amend silently; keep the commit separate and reviewable.
 
 ## Phase 3 — Record (durable state)

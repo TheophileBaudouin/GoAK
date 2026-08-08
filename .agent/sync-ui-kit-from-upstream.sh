@@ -15,9 +15,12 @@
 #          files (PIN.md, scenarios.json, copy-rules.json) plus the dead
 #          .pi/settings.json exclusion (single registration point,
 #          D-2026-08-08-02);
-#          the merged UI section of KitV2/AGENTS.md must mirror the pinned
-#          ui-kit/AGENTS.md (checksum marker — a changed SDK AGENTS.md blocks
-#          the sync until the prose is updated, owner rule 2026-08-08);
+#          the condensed UI section of KitV2/AGENTS.md (activation guard +
+#          routing + cross-cutting invariants; every other UI instruction is
+#          delegated to ui-kit/AGENTS.md) carries the checksum marker of the
+#          pinned ui-kit/AGENTS.md — a changed SDK AGENTS.md blocks the sync
+#          until the section is re-verified and the marker refreshed, owner
+#          rule 2026-08-08 (revised D-2026-08-08-19);
 #          no .go file may enter the zone (the Go gate would compile it);
 #          no metaproject path markers, no zero-byte .md, English only;
 #          the FULL validation gate must pass: validators (instructions,
@@ -28,7 +31,7 @@
 #          with rollback instructions.
 #
 # The helper only ever writes inside KitV2/ui-kit/ (plus the pin record and
-# the merged-AGENTS.md checksum marker in KitV2/AGENTS.md).
+# the UI-section checksum marker in KitV2/AGENTS.md).
 # Nothing is committed automatically: the maintainer reviews `git diff` and
 # commits; a failed gate is rolled back with `git restore`.
 #
@@ -283,10 +286,11 @@ if [ -e "$UI_KIT/.pi/settings.json" ]; then
 	postfail=1
 fi
 
-# merged AGENTS.md freshness (owner rule 2026-08-08): the "UI work" section
-# of KitV2/AGENTS.md mirrors the pinned ui-kit/AGENTS.md; the checksum marker
-# in its HTML comment must match the synced file. A drift means the SDK
-# instructions changed and the merged prose was not updated — the sync
+# UI-section freshness (owner rule 2026-08-08, revised D-2026-08-08-19):
+# the "UI work" section of KitV2/AGENTS.md is a condensed delegation (guard +
+# routing + invariants; UI detail lives in ui-kit/AGENTS.md). The checksum
+# marker in its HTML comment must match the synced file. A drift means the
+# SDK instructions changed and the section was not re-verified — the sync
 # blocks until the maintainer updates it (the marker refreshes on gate PASS).
 AGENTS_ROOT="$ROOT/KitV2/AGENTS.md"
 zone_agents_sha=$(shasum -a 256 "$UI_KIT/AGENTS.md" 2>/dev/null | awk '{print $1}')
@@ -295,12 +299,12 @@ if [ -z "$zone_agents_sha" ]; then
 	echo "sync-ui-kit: FAIL — cannot checksum $UI_KIT/AGENTS.md (shasum missing?)" >&2
 	postfail=1
 elif [ -z "$marker" ]; then
-	echo "sync-ui-kit: FAIL — no ui-kit/AGENTS.md sha256 marker found in KitV2/AGENTS.md; add the marker to the merged UI section." >&2
+	echo "sync-ui-kit: FAIL — no ui-kit/AGENTS.md sha256 marker found in KitV2/AGENTS.md; add the marker to the condensed UI section." >&2
 	postfail=1
 elif [ "$marker" != "$zone_agents_sha" ]; then
-	echo "sync-ui-kit: FAIL — the merged UI section of KitV2/AGENTS.md is STALE: ui-kit/AGENTS.md changed in this sync." >&2
-	echo "          Update the section prose to mirror the new SDK instructions (never lose an instruction from either file)" >&2
-	echo "          AND refresh its sha256 marker comment, then re-run." >&2
+	echo "sync-ui-kit: FAIL — the condensed UI section of KitV2/AGENTS.md is STALE: ui-kit/AGENTS.md changed in this sync." >&2
+	echo "          Re-verify the section against the new SDK instructions (ui-kit/AGENTS.md is the single source;" >&2
+	echo "          the section keeps guard + routing + invariants only) AND refresh its sha256 marker, then re-run." >&2
 	postfail=1
 fi
 
@@ -376,7 +380,7 @@ fi
 echo
 echo "sync-ui-kit: FULL GATE PASS — the zone is clean and verified."
 echo "Next steps (manual):"
-echo "  1. git diff --stat KitV2/ui-kit KitV2/AGENTS.md   (review the upstream change + the merged UI section)"
+echo "  1. git diff --stat KitV2/ui-kit KitV2/AGENTS.md   (review the upstream change + the condensed UI section)"
 echo "  2. git add KitV2/ui-kit KitV2/AGENTS.md && git commit"
 echo "  3. Record in .pi/memory/Decisions.md + docs/evidence/ (dated, per charter)"
 echo "Silent or automatic updates are forbidden (Z13)."

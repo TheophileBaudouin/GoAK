@@ -1,0 +1,23 @@
+=== gate 2026-08-08 — KitV2/AGENTS.md rewrite + guardrails (D-2026-08-08-19) ===
+--- validators ---
+kitv2: PASS (73 product skills, 3 snippets, standalone, offline bundle, router index 287 resources)
+cognitive: PASS (35 catalog objects)
+instruction-artifacts: PASS
+--- unit tests ---
+
+OK
+--- router gates ---
+
+router scenarios: 23/23 PASS (index v2.6.0, 287 resources)
+ui router scenarios: 11/11 PASS (36 ui-kit resources)
+--- Go gate ---
+all modules verified
+gofmt clean
+vet ok
+0 issues.
+lint ok
+ok  	go-agent-kit-v2/tools/offline	(cached)
+  Issues : [1;32m0[0m
+No vulnerabilities found.
+--- probes ---
+16

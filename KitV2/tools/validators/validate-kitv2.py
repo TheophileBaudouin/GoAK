@@ -1031,6 +1031,72 @@ def check_workspace_init_placeholder() -> list[str]:
     return errors
 
 
+def check_agents_md_contract(warnings: list[str]) -> list[str]:
+    """Z9 §9 (D-2026-08-08-19) — the consumer AGENTS.md is an execution
+    contract with a frozen canonical structure, a size budget, and no
+    historical content. A rewrite must restructure, never append; these
+    anchors make the structure checkable so the file cannot silently drift
+    back into a manual."""
+    errors: list[str] = []
+    path = ROOT / "AGENTS.md"
+    if not path.exists():
+        return [f"{path}: missing"]
+    text = path.read_text(encoding="utf-8", errors="replace")
+    size = len(text.encode("utf-8"))
+    if size > 16384:
+        errors.append(
+            f"{path}: {size} bytes exceed the 16 KiB budget (Z9 §9.4) — "
+            "delegate detail to the zone sources instead of growing the root"
+        )
+    elif size > 12288:
+        warnings.append(
+            f"{path}: {size} bytes — near the 16 KiB budget (Z9 §9.4), "
+            "prefer delegation over addition"
+        )
+    for heading in (
+        "## Normative levels",
+        "## Non-Negotiable Rules",
+        "## Repository map",
+        "## Task Routing",
+        "## Memory",
+        "## Validation",
+        "## Limits",
+    ):
+        if f"\n{heading}" not in text:
+            errors.append(
+                f"{path}: required section {heading!r} missing (Z9 §9.1 "
+                "canonical structure)"
+            )
+    positions = [
+        text.find("\n" + heading)
+        for heading in (
+            "## Normative levels",
+            "## Non-Negotiable Rules",
+            "## Repository map",
+            "## Task Routing",
+            "## Memory",
+            "## Validation",
+            "## Limits",
+        )
+    ]
+    if all(index != -1 for index in positions) and positions != sorted(positions):
+        errors.append(
+            f"{path}: required sections out of canonical order (Z9 §9.1 — "
+            "Identity → Normative levels → … → Validation → Limits)"
+        )
+    for pattern, label in (
+        (r"\(removed \d{4}", "removed-system history"),
+        (r"replaces the former", "former-system history"),
+        (r"\bbest practices\b", "'best practices' substitution"),
+    ):
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            errors.append(
+                f"{path}: {label} must not appear (Z9 §9.2) — describe "
+                "the current state only"
+            )
+    return errors
+
+
 def check_consumer_onboarding() -> list[str]:
     """The consumer onboarding system (D-2026-08-08-14..18) — shipped user
     guide, /goak-help entry point, onboarding banner, AGENTS.md pointer.
@@ -1391,6 +1457,7 @@ def main() -> int:
     errors.extend(check_ui_kit_registration())
     errors.extend(check_ui_corpus_disjointness())
     errors.extend(check_workspace_init_placeholder())
+    errors.extend(check_agents_md_contract(warnings))
     errors.extend(check_consumer_onboarding())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())

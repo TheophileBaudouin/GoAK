@@ -93,15 +93,20 @@ files excluded (`PIN.md`, `scenarios.json`, `copy-rules.json`) plus the dead
 `.pi` dir (D-2026-08-08-02). Nothing outside the zone is touched; nothing is
 committed automatically.
 
-**Merged root AGENTS.md (owner rule 2026-08-08)**: `KitV2/AGENTS.md` carries
-an "UI work" section merging the SDK's `ui-kit/AGENTS.md` instructions, with
-a checksum marker in its HTML comment. The helper's post-sync guardrails
-FAIL when `ui-kit/AGENTS.md` changed but the marker (and prose) were not
-updated — the merged section must mirror the new SDK instructions (never
-lose an instruction from either file) before the sync can finish.
+**Root AGENTS.md UI section (delegation, owner rule 2026-08-08, revised
+2026-08-08, D-2026-08-08-19)**: `KitV2/AGENTS.md` carries a condensed "UI
+work" section that declares the activation guard, the routing obligation,
+and the cross-cutting invariants, and delegates every other UI instruction
+to `ui-kit/AGENTS.md` — the single canonical source; the root never mirrors
+the SDK. The section carries a checksum marker (hash of the pinned
+`ui-kit/AGENTS.md`) in its HTML comment. The helper's post-sync guardrails
+FAIL when `ui-kit/AGENTS.md` changed but the marker was not refreshed — the
+maintainer must re-verify the condensed section against the new SDK
+instructions before the sync can finish. Instructions are never lost: they
+live in `ui-kit/AGENTS.md`, which the root obliges the agent to read.
 
 **Post-sync guardrails** (helper): upstream `sdk/` vs `ui-kit/` must differ
-only in local-owned files; the merged AGENTS.md marker matches the synced
+only in local-owned files; the UI-section checksum marker matches the synced
 `ui-kit/AGENTS.md`; no `.go` file may enter the zone (the Go gate would
 compile it); no metaproject path markers; no zero-byte `.md`; English-only.
 Then the FULL gate runs inside the helper: validators (instruction-artifacts,
@@ -111,7 +116,7 @@ go test -race, gosec, govulncheck, probes. Any failure exits 1 with
 rollback instructions — the maintainer never commits a red gate.
 
 **After a green gate** (manual): review `git diff` (including
-`KitV2/AGENTS.md` — the merged UI section), commit with the new SHA in the
+`KitV2/AGENTS.md` — the condensed UI section), commit with the new SHA in the
 message (include `KitV2/AGENTS.md` when its section changed), record a dated
 decision in `.pi/memory/Decisions.md` and raw evidence in
 `docs/evidence/YYYY-MM-DD/ui-kit-update/`, add Gotchas for any upstream
