@@ -1,0 +1,35 @@
+---
+id: source:llm:llama-cpp
+title: llama.cpp — local LLM inference runtime (ggml)
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [llm, inference, ggml, gguf, local, cpp, runtime, metal, cuda, vulkan]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-08
+source: https://github.com/ggml-org/llama.cpp
+selection: >-
+  Pointer only — reference for embedding local LLM inference when a concrete
+  need materializes (offline/private agents, GGUF models, heterogeneous
+  CPU/GPU). NOT admitted as a vetted catalog library: C/C++ codebase (~123k
+  stars, 2k+ open issues), not readable end-to-end, no Go surface. Integrate
+  only through its HTTP server (OpenAI-compatible API) or bindings; never
+  vendor the C/C++ tree into a recipe.
+limits:
+  - >-
+    Non-Go (C/C++, ggml). The kit's decision order prefers the smallest
+    solution that satisfies the behavior: prefer a cloud provider when one
+    suffices, and MLX on Apple Silicon when the native path is available.
+  - >-
+    Runtime is a large C/C++ codebase with backends CPU, Metal, CUDA, Vulkan,
+    HIP — architecture to call through HTTP, not to study or copy into Go.
+  - >-
+    Local inference requires model, resource, and data-handling decisions
+    (quantization, memory budget, GPU vs CPU) — verify current release and
+    security posture before any use. Released as rolling b-tags, pin exact
+    versions.
+relationships:
+  references:
+    - https://github.com/ggml-org/llama.cpp/tree/master/docs

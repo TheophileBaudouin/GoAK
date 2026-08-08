@@ -940,3 +940,27 @@ questions utilisateur.
   content into AGENTS.md MUST use a delimited marker + a dedicated
   mechanical check — no generic framework (two cases do not justify one,
   owner arbitration). Full gate PASS.
+- **D-2026-08-08-13 (LLM/ML reference-technology pointers)**: owner-supplied
+  reference document (French) listing 5 proven non-Go LLM/ML technologies —
+  llama.cpp, MLX family (MLX/MLX-LM/MLX Swift LM), Outlines, DSPy, Langfuse —
+  as references for the kit's LLM/agent direction. Admitted as pointer-only
+  `source:*` entries (`status: proposed`, `kind: Source`) in
+  `KitV2/knowledge/catalogs/libraries/pointers/` (llama-cpp, mlx, outlines,
+  dspy, langfuse). None passes the 9-criteria Go admission gate (non-Go,
+  not readable end-to-end, no Go surface); all 5 repos verified live via
+  GitHub API 2026-08-08 (stars, license, latest release, push activity,
+  archived flag). Decision order UNCHANGED (Go-native first, smallest
+  effective solution first). Owner clarification 2026-08-08: there is NO
+  conflict — when stdlib/Go-native cannot satisfy a real need and the
+  reference technology is the best in its domain, taking it IS the smallest
+  effective solution (less code to develop, better quality). The pointer
+  `selection` records when each technology applies and `limits` records
+  when it does not; when the why-use conditions hold and no why-not blocks,
+  using the library is the correct decision. Nothing was baked into the
+  decision order.
+  Registry `.agent/sources/Go-dev-kit-sources-et-references.md` §18 updated
+  (English entries per D-2026-08-06-01) + Niveau B +6 pointer lines (ADK-Go
+  was missing from the Niveau B list; now consistent with §18); Z2
+  contract pointer count 5→10; router regenerated 281→286 resources. Gate
+  PASS: validators ×3, router scenarios 23/23, UI 11/11, probes 16/16,
+  unit tests 66/66. Plan: `docs/plans/2026-08-08-llm-reference-pointers.md`.

@@ -779,6 +779,53 @@ API Go pour modèles locaux.
   - Agents offline.
 - **Priorité :** Haute
 
+## llama.cpp (local LLM inference runtime)
+
+- **Link :** <https://github.com/ggml-org/llama.cpp> — docs <https://github.com/ggml-org/llama.cpp/tree/master/docs>
+- **Description :** Local LLM inference runtime (C/C++, ggml; backends CPU, Metal, CUDA, Vulkan, HIP). Embeddable library + OpenAI-compatible HTTP server, GGUF models. **Pointer only** — C/C++ codebase (~123k stars), no Go surface; integrate via HTTP, never vendor the C/C++ tree. Pointer catalog: `pointers/llama-cpp.yaml`.
+- **Potential use :**
+  - Local/offline/private LLM inference behind an interface.
+  - Fine control over performance, memory, quantization, hardware.
+- **Priority :** Medium
+- **Category :** IA / LLM / Inference
+
+## MLX family (Apple Silicon ML)
+
+- **Link :** <https://github.com/ml-explore/mlx> — MLX-LM <https://github.com/ml-explore/mlx-lm> — MLX Swift LM <https://github.com/ml-explore/mlx-swift-lm>
+- **Description :** Apple Research ML framework for Apple Silicon (unified memory, Metal). MLX-LM: LLM inference + fine-tuning; MLX Swift LM: Swift bindings for native Apple apps. **Pointer only** — C++/Swift/Python, Apple-Silicon-only, no Go surface. Pointer catalog: `pointers/mlx.yaml`.
+- **Potential use :**
+  - Native LLM/VLM inference on Apple Silicon.
+  - Apple-native app integration (Swift).
+- **Priority :** Low
+- **Category :** IA / LLM / Apple Silicon
+
+## Outlines (constrained LLM generation)
+
+- **Link :** <https://github.com/dottxt-ai/outlines> — docs <https://dottxt-ai.github.io/outlines/> — core <https://github.com/dottxt-ai/outlines-core>
+- **Description :** Constrained LLM generation (JSON Schema, types, regex, grammars). Python (+ Rust core). **Pointer only** — no Go surface; reference for the technique, not a dependency. Pointer catalog: `pointers/outlines.yaml`.
+- **Potential use :**
+  - Reliable structured output from LLMs for agents.
+- **Priority :** Low
+- **Category :** IA / LLM / Structured generation
+
+## DSPy (LLM workflow programming)
+
+- **Link :** <https://github.com/stanfordnlp/dspy> — docs <https://dspy.ai/>
+- **Description :** Declarative LLM programming and metric-driven prompt/example optimization (Stanford NLP). Python. **Pointer only** — methodological reference, no Go surface; not a framework dependency. Pointer catalog: `pointers/dspy.yaml`.
+- **Potential use :**
+  - Turning agent/prompt improvements into a measurable process.
+- **Priority :** Low
+- **Category :** IA / LLM / Workflow optimization
+
+## Langfuse (LLM observability)
+
+- **Link :** <https://github.com/langfuse/langfuse> — docs <https://langfuse.com/docs>
+- **Description :** Open-source LLM/agent observability and evaluation platform (tracing, metrics, datasets, evals, prompt management, OpenTelemetry, ClickHouse). TypeScript. **Pointer only** — no Go module in the product repo; Go consumers integrate via SDK/OTLP. Pointer catalog: `pointers/langfuse.yaml`.
+- **Potential use :**
+  - Observability and reproducible evaluation for complex LLM agents.
+- **Priority :** Low
+- **Category :** IA / LLM / Observability
+
 ---
 
 # 19. Templates projets
@@ -1181,3 +1228,9 @@ ultraviolet, x).
 - Playwright Go (pointeur)
 - Tree-sitter (pointeur)
 - sqlite-vec (pointeur)
+- ADK-Go (pointeur)
+- llama.cpp (pointeur)
+- MLX family (pointeur)
+- Outlines (pointeur)
+- DSPy (pointeur)
+- Langfuse (pointeur)

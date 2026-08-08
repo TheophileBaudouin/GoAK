@@ -1,0 +1,38 @@
+---
+id: source:llm:mlx
+title: MLX — Apple Silicon ML framework (MLX, MLX-LM, MLX Swift LM)
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [llm, ml, apple, silicon, metal, swift, inference, finetuning]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-08
+source: https://github.com/ml-explore/mlx
+selection: >-
+  Pointer only — reference for native LLM/VLM inference on Apple Silicon
+  (CPU/GPU/unified memory via Metal). NOT admitted as a vetted catalog
+  library: C++/Swift/Python codebases (mlx ~28k stars, mlx-lm ~6.5k,
+  mlx-swift-lm ~0.8k), Apple-Silicon-only, no Go surface. Relevant when a
+  consumer builds
+  Apple-native apps (Swift bindings) or needs the performance reference for
+  local inference on Apple hardware; integrate via its HTTP/CLI surfaces, never
+  vendor the C++ core.
+limits:
+  - >-
+    Non-Go (C++ core, Python for MLX-LM, Swift for MLX Swift LM). Apple
+    Silicon only — no portability; llama.cpp remains the heterogeneous-hardware
+    reference.
+  - >-
+    Not a Go capability and not integrated as a dependency or recipe; the kit's
+    decision order prefers the smallest solution — reach for MLX only when the
+    deployment target is actually Apple-native.
+  - >-
+    Three coupled repos (mlx, mlx-lm, mlx-swift-lm) with distinct release
+    trains (mlx v0.32, mlx-lm v0.31, swift-lm 3.31) — pin per repo and verify
+    current docs before use.
+relationships:
+  references:
+    - https://github.com/ml-explore/mlx-lm
+    - https://github.com/ml-explore/mlx-swift-lm

@@ -15,7 +15,7 @@ The "why / when to choose" layer: the Kit's sourced decision graph. A knowledge 
 | `anti-patterns/` | graph-YAML | sourced failures (negative schema) |
 | `stdlib/` | graph-YAML | **pointer-only** to official sources |
 | `catalogs/libraries/` | **SKILL.md** (vetted, 9-criteria admission) + graph-YAML Level-B Source | admitted selection decisions; Level B = active conditional sources, not yet vetted |
-| `catalogs/libraries/pointers/` | graph-YAML Source | `status: proposed` "consider" pointers (created 2026-08-05, 5 pointers) |
+| `catalogs/libraries/pointers/` | graph-YAML Source | `status: proposed` "consider" pointers (created 2026-08-05, 10 pointers) |
 | `catalogs/reference-projects/` | SKILL.md | **extract-only** projects |
 | `catalogs/*.yaml` (discovery) | graph-YAML Source | discovery indexes (awesome-go, …) |
 | `security/`, `performance/`, `observability/`, `architecture/`, `debugging/` | graph-YAML | sourced domain guidance |

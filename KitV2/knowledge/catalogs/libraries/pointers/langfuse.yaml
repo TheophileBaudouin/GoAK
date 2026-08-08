@@ -1,0 +1,35 @@
+---
+id: source:observability:langfuse
+title: Langfuse — LLM/agent observability and evaluation platform
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [llm, observability, tracing, evaluation, metrics, telemetry, python]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-08
+source: https://github.com/langfuse/langfuse
+selection: >-
+  Pointer only — reference for observing, analyzing and evaluating complex
+  LLM/agent systems (tracing, metrics, datasets, evals, prompt management,
+  OpenTelemetry, ClickHouse). NOT admitted as a vetted catalog library:
+  TypeScript platform (~33k stars) with an MIT core + EE directories, self-
+  hosted infrastructure (ClickHouse), no Go module in the product repo. Use
+  when an agent is complex enough that behavior, cost and latency must be
+  measured; Go consumers integrate via SDK/OTLP, not by importing the
+  platform.
+limits:
+  - >-
+    Non-Go (TypeScript platform + SDKs; no Go SDK in the main repo — verify
+    current OTLP/SDK story). The kit's decision order prefers the smallest
+    solution: plain structured logs suffice for simple applications.
+  - >-
+    Heavy platform: self-hosting requires ClickHouse and workers; a simple
+    logging system is NOT a substitute for its evals/tracing, and vice versa.
+  - >-
+    Mixed license surface (MIT core, EE/ directory) — review licensing and
+    the current self-host/cloud posture before adoption.
+relationships:
+  references:
+    - https://langfuse.com/docs

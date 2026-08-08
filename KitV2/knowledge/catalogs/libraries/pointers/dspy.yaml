@@ -1,0 +1,35 @@
+---
+id: source:llm:dspy
+title: DSPy — declarative LLM programming and prompt optimization
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [llm, agents, workflow, prompt, optimization, python, framework]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-08
+source: https://github.com/stanfordnlp/dspy
+selection: >-
+  Pointer only — methodological reference for optimizing LLM workflows
+  (declarative modules, signatures, metric-driven prompt/example
+  optimization). NOT admitted as a vetted catalog library: Python framework
+  (~37k stars), no Go surface, framework-level coupling. Relevant when a
+  consumer needs to turn prompt/agent improvements into a measurable,
+  reproducible process; the kit extracts the methodology, not a dependency.
+limits:
+  - >-
+    Non-Go (Python). The kit itself does not depend on frameworks (not a
+    framework), but when a workflow genuinely needs metric-driven prompt/
+    example optimization, DSPy is the reference to take — it IS the smallest
+    effective solution for that need (less code, better quality), not a
+    philosophy conflict.
+  - >-
+    Overkill for an isolated LLM call; value appears only when the workflow is
+    complex enough to justify an optimization loop.
+  - >-
+    Rapid version churn (v2 → v3.x, 2026) — pin exact versions and verify the
+    current API before any evaluation use.
+relationships:
+  references:
+    - https://dspy.ai/

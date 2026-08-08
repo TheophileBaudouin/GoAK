@@ -1,0 +1,36 @@
+---
+id: source:llm:outlines
+title: Outlines — constrained LLM generation (JSON Schema, regex, grammars)
+kind: Source
+version: 1
+status: proposed
+owner: go-agent-kit
+tags: [llm, structured, generation, json-schema, regex, grammar, python, rust]
+go_version: "1.25+"
+dependencies: []
+last_verified: 2026-08-08
+source: https://github.com/dottxt-ai/outlines
+selection: >-
+  Pointer only — reference for constrained/structured LLM generation (JSON
+  Schema, types, regex, grammars) when agents must emit machine-parseable
+  output. NOT admitted as a vetted catalog library: Python (+ Rust core
+  outlines-core), model-provider-dependent, no Go surface. Study the
+  constraint approach (guides, FSMs, grammar-backed sampling) as a reference;
+  for Go, prefer model-native structured output or server-side JSON Schema
+  when available.
+limits:
+  - >-
+    Non-Go (Python; Rust core in outlines-core). The kit's decision order
+    prefers the smallest solution: if the model already provides native
+    structured generation, Outlines adds nothing.
+  - >-
+    Provider-coupled (transformers, vLLM, llama.cpp, OpenAI-compatible
+    servers) — verify the current provider matrix and pin versions
+    (outlines v1.x, outlines-core separate repo).
+  - >-
+    Reference only: the value is the constrained-generation technique, not a
+    Go dependency. Prefer a JSON-Schema-typed Go layer over LLM output parsing
+    when the serving layer supports it.
+relationships:
+  references:
+    - https://dottxt-ai.github.io/outlines/
