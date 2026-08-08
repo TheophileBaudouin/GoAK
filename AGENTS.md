@@ -7,6 +7,15 @@ compact registry of sourced Go patterns, not a framework.
 Every change must reduce decisions, preserve public contracts, and remain
 verifiable by observable application behavior as well as code checks.
 
+## Before doing anything
+
+Always check the list of subagents available to you. 
+To search for files or information in the project, use Scoot.
+Subagents are designed to be used together and run in parallel, 
+allowing you to work faster and maintain a cleaner context. 
+Always use subagents. You are the orchestrator. 
+Except for implementations, you are not required.
+
 ## Decision order
 
 1. Smallest solution that satisfies the requested behavior.
