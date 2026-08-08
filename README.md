@@ -30,11 +30,11 @@ source registry, plans, evidence — none of which ships to consumers.
 ## Installation — one command
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.7.3/install.sh | sh -s -- go-agent-kit
+curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/v2.7.4/install.sh | sh -s -- go-agent-kit
 ```
 
 Installs the complete product into `./go-agent-kit` (default pinned ref
-`v2.7.3`). The installer downloads the release tarball, extracts only the
+`v2.7.4`). The installer downloads the release tarball, extracts only the
 consumable `KitV2/` tree (never the metaproject), and verifies the install
 with the product validator — a missing toolchain is reported `PARTIAL`, never
 `PASS`.
@@ -133,28 +133,27 @@ never present PARTIAL as PASS). The shipped CI workflow
 (`templates/_kit-ci-workflow.yml`) additionally enforces an aggregate coverage
 floor of 70% on the testable library surface; the local gate does not.
 
-## Current release — v2.7.3
+## Current release — v2.7.4
 
-- **Installer default ref fixed**: `install.sh` now defaults to `v2.7.3`
-  (the initial v2.7.0 tag shipped an installer whose default ref still
-  pulled v2.6.0 — corrected and re-pinned).
-- **Consumer `AGENTS.md` mandatory top blocks**: the two owner-mandated
-  blocks (`## Before doing anything` — sub-agent delegation; `## Absolute
-  rules` — to-do list discipline) now sit at the top of the shipped
-  `AGENTS.md`, enforced mechanically by the product validator across every
-  future rewrite (presence, order, sentinel sentences).
-- **Kit-audit fixes (KVA-001…005)**: `.pi/README.md` registration wording
-  aligned with the single-registration model, capabilities count corrected,
-  `tools/README.md` documents the UI sync tool, the dead `ui-kit/.pi`
-  residue removed (re-sync helper now fails on any `.pi` presence), and the
-  absolute-instruction registry scan extended to recipes.
-- **Clean diagnostics**: zero pi-lens blocking errors (line-length fix,
-  Dependabot cooldown policy `default-days: 7`, Go test modernizations).
-- **Full README**: this document replaces the installer-only note with a
-  complete account of the project.
+- **Project-memory v2**: all consumer memory surfaces now match the
+  platform's project-memory extension v2 — five files (`Brief`, `Progress`,
+  `Gotchas`, `Decisions`, `Agent`) auto-bootstrapped when missing, the
+  `memory_read` tool (omit `file` = all memory) as the only memory tool,
+  direct edits under the `memory-writing` skill, and refactoring only via
+  the `memory-refactor` skill. The stale "Decisions.md is not created by
+  the bootstrap" premise is gone from every instruction surface, and the
+  product validator now enforces the contract with `check_memory_contract`
+  (no removed-tool residue in shipped files, v2 facts required in the
+  memory instruction surfaces). Kit-audit gained dimension C19
+  (memory-system consistency). Migration plan and decision:
+  `docs/plans/2026-08-08-project-memory-v2-migration.md`, D-2026-08-08-22.
 
 ## Version history
 
+- **v2.7.3** — installer default-ref alignment (re-pinned after the v2.7.2
+  withdrawal), consumer `AGENTS.md` mandatory top blocks with mechanical
+  enforcement, kit-audit fixes (KVA-001…005), clean diagnostics, full
+  README.
 - **v2.7.2** — withdrawn tag: shipped without the installer default-ref bump
   (would install v2.7.1); replaced by v2.7.3.
 - **v2.7.1** — installer default-ref fix (the initial v2.7.0 tag shipped an
