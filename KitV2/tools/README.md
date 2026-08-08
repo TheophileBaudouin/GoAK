@@ -10,6 +10,7 @@ offline source resolution. They do not invent or duplicate Kit knowledge.
 | `validators/` | Enforce product structure, metadata, relationships, freshness, and packaging gates. | `python3 tools/validators/validate-kitv2.py` and its unittest suite. |
 | `offline/` | Resolve the pinned official-source bundle and local Go toolchain without network access. | `go test ./tools/offline/...` and `probes/offline`. |
 | `generators/` | Deterministic project-map generator and drift checker (`structure_md.py`, charter Layer 5.1): derives the tree side of a project's `structure.md` and verifies it against the real tree. | `python3 tools/generators/test_structure_md.py`; invoked by `validate-kitv2.py` on every sourced template. |
+| `sync-ui-kit.sh` | Materialize the pinned ui-agent-kit SDK zone into a Wails project's `frontend/` (detect, copy per `ui-kit/copy-rules.json`, wire skills, ownership manifest — never destructive). | `bash tools/sync-ui-kit.sh --dry-run` and `probes/ui-kit-sync`. |
 
 Tools are read-only with respect to product knowledge during validation. A
 mutating generator must document its output, be deterministic, and have a

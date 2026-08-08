@@ -97,11 +97,11 @@ func TestRunRejectsInvalidInputs(t *testing.T) {
 	if err := Run(context.Background(), []int{1}, 0, func(context.Context, int) error { return nil }); !errors.Is(err, ErrInvalidLimit) {
 		t.Fatalf("Run(limit 0) error = %v, want ErrInvalidLimit", err)
 	}
-	if err := Run[int](context.Background(), []int{1}, 1, nil); !errors.Is(err, ErrNilWorker) {
+	if err := Run(context.Background(), []int{1}, 1, nil); !errors.Is(err, ErrNilWorker) {
 		t.Fatalf("Run(nil worker) error = %v, want ErrNilWorker", err)
 	}
 	var nilCtx context.Context
-	if err := Run[int](nilCtx, []int{1}, 1, func(context.Context, int) error { return nil }); !errors.Is(err, ErrNilContext) {
+	if err := Run(nilCtx, []int{1}, 1, func(context.Context, int) error { return nil }); !errors.Is(err, ErrNilContext) {
 		t.Fatalf("Run(nil context) error = %v, want ErrNilContext", err)
 	}
 }

@@ -11,6 +11,8 @@ updates:
     directory: /KitV2
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "deps(go)"
     groups:
@@ -21,6 +23,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "deps(actions)"
     groups:

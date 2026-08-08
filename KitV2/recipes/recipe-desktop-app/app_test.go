@@ -76,10 +76,10 @@ func TestAddNote_concurrentSafety(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(writers)
-	for w := 0; w < writers; w++ {
+	for range writers {
 		go func() {
 			defer wg.Done()
-			for i := 0; i < each; i++ {
+			for range each {
 				_, _ = app.AddNote("concurrent")
 			}
 		}()

@@ -276,13 +276,15 @@ fi
 
 # registration integrity (single registration point, D-2026-08-08-02): the
 # root settings.json must keep declaring the UI skills and the dead nested
-# file must never be resurrected.
+# .pi machinery must never be resurrected (neither the settings.json file
+# nor an empty .pi shell left by a pre-exclusion sync — the rsync excludes
+# .pi, so any presence is residue that must be removed by hand).
 if ! grep -q '"../ui-kit/skills"' "$ROOT/KitV2/.pi/settings.json" 2>/dev/null; then
 	echo "sync-ui-kit: FAIL — root .pi/settings.json no longer declares ../ui-kit/skills (registration lost, D-2026-08-08-02)." >&2
 	postfail=1
 fi
-if [ -e "$UI_KIT/.pi/settings.json" ]; then
-	echo "sync-ui-kit: FAIL — nested ui-kit/.pi/settings.json present (dead file must stay excluded, D-2026-08-08-02)." >&2
+if [ -e "$UI_KIT/.pi" ]; then
+	echo "sync-ui-kit: FAIL — a nested ui-kit/.pi directory is present (dead machinery, D-2026-08-08-02); remove it before syncing (the re-sync excludes .pi and never recreates it)." >&2
 	postfail=1
 fi
 

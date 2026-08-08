@@ -93,6 +93,11 @@ PROCESS_SURFACES = (
     *((ROOT / ".pi" / "prompts").glob("*.md")),
     *((ROOT / ".pi" / "skills").glob("*/SKILL.md")),
     *((ROOT / ".pi" / "extensions").glob("*.ts")),
+    # recipes: KVA-005 (2026-08-08) — the KVA-106 scope names recipe process
+    # instructions, so recipe SKILL.md files enter the forward scan; recipe
+    # functional/API-contract lexemes are recorded in the registry under the
+    # same rule-content boundary as rule bodies.
+    *((ROOT / "recipes").rglob("SKILL.md")),
 )
 
 
@@ -102,10 +107,11 @@ def check_absolute_instructions_registry() -> list[str]:
     (.agent/instructions.md), and every recorded carrier must exist.
 
     Forward direction: a process surface (AGENTS.md, prompts, workflow
-    SKILL.md, extension promptGuidelines) carrying a MANDATORY lexeme must
-    have a registry row naming its path (rules/ rule bodies are excluded by
-    the KVA-106 interpretation: rule-content boundaries are not process
-    absolutes).
+    SKILL.md, extension promptGuidelines, recipe SKILL.md) carrying a
+    MANDATORY lexeme must have a registry row naming its path (rules/ rule
+    bodies are excluded by the KVA-106 interpretation: rule-content
+    boundaries are not process absolutes; recipe functional/API contracts
+    are recorded under the same boundary).
     Reverse direction: every non-wildcard registry carrier path must exist
     (a cited validator/carrier that does not exist is itself a defect).
     """

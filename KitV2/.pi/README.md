@@ -7,9 +7,11 @@ This directory contains the native Pi runtime surface of the installed Kit.
   runnable procedures). Library fiches (`../knowledge/catalogs`) are routed
   on demand via `search_kit_resources` instead of being listed in every
   prompt — this keeps the always-visible surface small so rules stay
-  salient. The UI SDK (`../ui-kit/skills`) is deliberately NOT listed here:
-  it is a separate routing corpus (see `search_ui_kit_resources`) and stays
-  inert for non-Wails projects.
+  salient. The UI SDK (`../ui-kit/skills`) IS declared here too — the single
+  registration point — but it is inert by description:
+  its frontmatter scopes the skills to Wails/UI work, it routes through a
+  separate corpus (`search_ui_kit_resources`), and nothing activates for a
+  plain Go project.
 - `prompts/` contains manually invoked workflow and checklist orchestrators
   (`/checklist-api`, `/checklist-release`, `/workflow-memory`) and the
   `/goak-help` entry point, which orders the agent to read the shipped user guide
