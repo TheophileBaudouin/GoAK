@@ -55,7 +55,9 @@ function bannerAlreadyShown(ctx: {
 }): boolean {
 	return ctx.sessionManager
 		.getBranch()
-		.some((entry) => entry.type === "custom" && entry.customType === ENTRY_TYPE);
+		.some(
+			(entry) => entry.type === "custom" && entry.customType === ENTRY_TYPE,
+		);
 }
 
 export default function (pi: ExtensionAPI) {
