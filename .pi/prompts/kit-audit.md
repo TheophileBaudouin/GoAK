@@ -367,6 +367,35 @@ touches the zone.
    `KitV2/probes/ui-kit-sync/` (Wails-only materialization + ownership
    contract). Absence of a green result for any of these is a finding.
 
+#### C17. workspace-init zone integrity (contract Z14) — read-only, never initializes
+
+The workspace-init zone governs the day-0 foundation protocol (`workspace/`
+capture + AGENTS.md sections). The audit is non-destructive — it DETECTS
+drift and routes to the skill; it never initializes a project, never rewrites
+`KitV2/AGENTS.md`, never touches a consumer project.
+
+1. **Kit pointer section**: `KitV2/AGENTS.md` carries the "Project
+   Foundation" pointer section, delimited by its markers
+   (`<!-- workspace-init section: begin -->` … `<!-- workspace-init
+   section: end -->`) with the `## Project Foundation` title between them.
+   The validator `check_workspace_init_placeholder` enforces this — cite
+   it, do not rebuild it. A missing or altered section is `NON CONFORM`:
+   two manual merge mechanisms live in this file (UI work and Project
+   Foundation) and neither may silently swallow the other.
+2. **Zone contract listed**: `.agent/kit-governance/README.md` lists the
+   `24-zone-workspace-init.md` contract (Z14) in its index.
+3. **Router indexing**: the router index contains the `workspace-init`
+   skill entry (`.pi/skills/workspace-init/SKILL.md`, kind `skill`), and
+   the routing-quality scenario "set up project foundation kernel modules
+   before feature work" passes under the real scoring
+   (`.agent/router/run_scenarios.mjs`).
+4. **Automated checks to cite, not rebuild**: `validate-kitv2.py`
+   `check_workspace_init_placeholder` (kit pointer section markers +
+   title), `check_no_metaproject_paths` (the product never references the
+   build repository — Z9 §3.2), plus the skill's frontmatter / size / prose
+   gates (validate-instructions, validate-cognitive). Absence of a green
+   result for any of these is a finding.
+
 ### Phase D — Decide "metaproject or Kit?"
 
 This dimension is mandatory for **every file**, including supporting files.
@@ -435,6 +464,11 @@ validators:
 - state precisely what `validate-cognitive.py` already covers (metadata and
   relations of supported YAML artifacts, statuses/targets, source units,
   metaproject path leakage, and offline bundle);
+- state precisely what `validate-kitv2.py` already covers (product
+  structure, router index + scenarios, ui-kit pin/copy-rules/corpus
+  disjointness, the Z14 `check_workspace_init_placeholder` for the kit
+  AGENTS.md Project Foundation section, and the product-autonomy
+  `check_no_metaproject_paths` — Z9 §3.2);
 - do not rebuild these checks in the report as if they were absent;
 - report the real gaps: all uncovered file types, complete §5, semantic
   duplication, language, effective source freshness, composition,
@@ -565,6 +599,14 @@ The table contains at minimum, at each audit:
   check: extend validate-kitv2.py with a settings.json assertion, reason:
   the single-registration-point rule (D-2026-08-08-02) is a stable
   structural property a validator can assert.
+- the "workspace-init integrity (C17)" row: the kit pointer section is
+  covered by `validate-kitv2.py` `check_workspace_init_placeholder`
+  (markers + title); the gap is the CONSUMER-side capture (the per-project
+  AGENTS.md section + sha256 marker written by the init session into a
+  consumer project) — inherently a runtime artifact outside the kit, a
+  review control only; the skill itself self-checks idempotence and
+  no-content-loss by procedure (workspace-init SKILL.md §Before you begin /
+  §AGENTS.md mechanics).
 
 ### F. Verdict and next steps
 

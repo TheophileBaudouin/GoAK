@@ -91,6 +91,32 @@ Rule: the product never points to the metaproject; the metaproject may point
 to the product. A consumer installing only `KitV2/` must be able to use it
 without the root.
 
+### 5.1 — Merged `AGENTS.md` sections (general convention)
+
+Any zone that merges content into the product `KitV2/AGENTS.md` (Z13 today
+with "UI work", Z14 with "Project Foundation", others tomorrow) MUST, by
+convention — it is not a UI-kit special case:
+
+1. **Delimited section**: wrap the merged section in explicit markers
+   unique to the zone. Two accepted shapes:
+   - static pointer content → begin/end markers
+     (`<!-- <zone> section: begin -->` … `<!-- <zone> section: end -->`),
+     checked by the validator for presence, order, and the expected title
+     between them (Z14 model);
+   - dynamic content mirrored from a source file → a content hash marker
+     (`<!-- <source-path> sha256: <hash> -->`), checked against the source
+     (Z13 model).
+2. **Dedicated mechanical check**: the zone's contract lists a named
+   `check_<zone>_placeholder` / pin check in `validate-kitv2.py`, wired
+   into `main()`, with unit tests in `test_validate_kitv2.py`. A section
+   without its check is a C9/C15 finding, not a documentation gap.
+3. **Section isolation**: one zone's manual re-merge must never touch
+   another zone's section; each section is edited through its own workflow
+   (update-ui-kit Phase 2 guards the "Project Foundation" section too).
+4. **Contract traceability**: the format of the markers and the check name
+   are recorded in the zone's governance contract, in this section, and in
+   the zone's validation criteria.
+
 ## 6. Placeholders and roadmaps
 
 - **No empty `.gitkeep` directory**: planned zones live in the zone README

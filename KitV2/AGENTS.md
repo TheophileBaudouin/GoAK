@@ -50,6 +50,7 @@ ownership, zero-value design); treat those as pre-loaded even when the user
 does not name them. Catalog fiches are routed on demand and are deliberately
 absent from the always-visible skill surface.
 
+<!-- workspace-init section: begin -->
 ## Project Foundation — new consumer projects
 
 Before the first feature of a new project (and before any `spec-driven-dev`
@@ -69,6 +70,7 @@ the project's own `AGENTS.md`.
 - The workspace docs are project-owned: written by the init session, never
   synced from the kit. Projects that are not initialized carry no
   project-specific section here — only this generic pointer.
+<!-- workspace-init section: end -->
 
 ## UI work — Wails projects (merged ui-agent-kit SDK instructions)
 

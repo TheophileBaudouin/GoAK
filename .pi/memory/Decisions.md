@@ -921,3 +921,22 @@ questions utilisateur.
   `unittest.main()` sat mid-file — 7 tests (KVA-102 check, probe inventory,
   ui-kit registration) never ran; all pass now (19 tests). Z9 §3.2
   generalized from AGENTS.md to the whole product. Full gate PASS.
+- **D-2026-08-08-12 (AGENTS.md merged-section hardening)**: two manual
+  merge mechanisms coexisted in `KitV2/AGENTS.md` (UI work with a sha256
+  marker, Project Foundation without one) — a silent-swallow collision
+  risk. Closed with: (1) the "Project Foundation" pointer section is now
+  delimited by its own markers `<!-- workspace-init section: begin -->` …
+  `<!-- workspace-init section: end -->` (owner arbitration 2026-08-08 —
+  begin/end over a hash: the section is static); (2) a dedicated mechanical
+  check `check_workspace_init_placeholder` in `validate-kitv2.py` (markers
+  present, in order, title between them — the product always shows the
+  not-yet-initialized state, so a missing/altered section is the only
+  failure), wired into `main()` with 3 unit tests; (3) `update-ui-kit.md`
+  Phase 2 gains a "Project Foundation guard" step (verify the other section
+  survived, abort + `git restore` otherwise) without rewriting the existing
+  UI step; (4) kit-audit gains dimension C17 "workspace-init zone
+  integrity" (same non-destructive mold as C16) + Z14 rows in §4 and the
+  gaps list; (5) general convention N1 §5.1: any future zone merging
+  content into AGENTS.md MUST use a delimited marker + a dedicated
+  mechanical check — no generic framework (two cases do not justify one,
+  owner arbitration). Full gate PASS.

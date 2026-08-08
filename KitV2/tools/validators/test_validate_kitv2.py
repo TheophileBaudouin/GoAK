@@ -204,8 +204,6 @@ class ValidatorTests(unittest.TestCase):
             )
             self.assertEqual(module.check_snippet_chain(root=root), [])
 
-
-
     def test_no_metaproject_paths_catches_leakage(self) -> None:
         """KVA-102 — a shipped file referencing the metaproject marker fails."""
         with tempfile.TemporaryDirectory() as directory:
@@ -243,6 +241,44 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("a.md" in error for error in errors), errors)
         self.assertTrue(any("g.md" in error for error in errors), errors)
         self.assertFalse(any("ok.md" in error for error in errors), errors)
+
+    def test_workspace_init_placeholder_passes_with_section(self) -> None:
+        """Z14 — the pointer section with both markers and the title is the
+        valid (not-yet-initialized) state of the kit AGENTS.md."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "<!-- workspace-init section: begin -->\n"
+                "## Project Foundation — new consumer projects\n"
+                "pointer content\n"
+                "<!-- workspace-init section: end -->\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                self.assertEqual(module.check_workspace_init_placeholder(), [])
+
+    def test_workspace_init_placeholder_fails_when_section_lost(self) -> None:
+        """Z14 — a removed Project Foundation section fails the gate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", "only other content\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_workspace_init_placeholder()
+        self.assertTrue(any("AGENTS.md" in error for error in errors), errors)
+
+    def test_workspace_init_placeholder_fails_when_marker_altered(self) -> None:
+        """Z14 — a swallowed marker (e.g. a manual merge dropped the end
+        marker) fails the gate, never silently passing."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "<!-- workspace-init section: begin -->\n"
+                "## Project Foundation — new consumer projects\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_workspace_init_placeholder()
+        self.assertTrue(any("markers missing" in error for error in errors), errors)
 
     def test_probe_inventory_out_of_sync_fails(self) -> None:
         """KVA-102 — the probes README table must match the real probe tree."""
@@ -322,6 +358,7 @@ class ValidatorTests(unittest.TestCase):
             )
             errors = module.check_ui_kit_registration(root)
         self.assertTrue(any("../rules" in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -870,10 +870,10 @@ def check_router_scenarios() -> list[str]:
 
     This checks the contract file's integrity only. The actual ranking
     verification (expected ids within top-K under the real runtime scoring)
-    is the metaproject gate (.agent/router/run_scenarios.mjs, node) — see
-    router/scenarios.json header. The ranking gate is not duplicated here
-    because the product validator must stay node-free; the scenario file is
-    shipped so consumers and CI can run the node gate themselves."""
+    is the ranking gate (node) — see router/scenarios.json header. The
+    ranking gate is not duplicated here because the product validator must
+    stay node-free; the scenario file is shipped so consumers and CI can
+    run the node gate themselves."""
     errors: list[str] = []
     router = ROOT / "router"
     scenarios_path = router / "scenarios.json"
@@ -945,6 +945,42 @@ def check_ui_kit_pin() -> list[str]:
         errors.append(f"{pin}: missing a well-formed 40-hex pinned SHA")
     if not re.search(r"\| Sync date \| \d{4}-\d{2}-\d{2} \|", text):
         errors.append(f"{pin}: missing a YYYY-MM-DD sync date")
+    return errors
+
+
+def check_workspace_init_placeholder() -> list[str]:
+    """Z14 — the kit AGENTS.md must carry the "Project Foundation" pointer
+    section, delimited by its begin/end markers.
+
+    The product always shows the not-yet-initialized state: the init
+    session writes the per-project section into the CONSUMER project's
+    AGENTS.md, never into the kit's. So the only valid state here is both
+    markers present, begin before end, and the expected section title
+    between them. A missing or altered section is a regression guard
+    failure (two manual merge mechanisms live in this file — UI work and
+    Project Foundation — and neither may silently swallow the other)."""
+    errors: list[str] = []
+    path = ROOT / "AGENTS.md"
+    if not path.exists():
+        return [f"{path}: missing"]
+    text = path.read_text(encoding="utf-8", errors="replace")
+    begin = "<!-- workspace-init section: begin -->"
+    end = "<!-- workspace-init section: end -->"
+    ib = text.find(begin)
+    ie = text.find(end)
+    if ib == -1 or ie == -1:
+        return [
+            f"{path}: Project Foundation section markers missing "
+            "(workspace-init section begin/end)"
+        ]
+    if ib > ie:
+        return [f"{path}: Project Foundation markers out of order"]
+    between = text[ib + len(begin) : ie]
+    if "## Project Foundation" not in between:
+        return [
+            f"{path}: Project Foundation section title missing between "
+            "the markers"
+        ]
     return errors
 
 
@@ -1214,6 +1250,7 @@ def main() -> int:
     errors.extend(check_ui_kit_pin())
     errors.extend(check_ui_kit_registration())
     errors.extend(check_ui_corpus_disjointness())
+    errors.extend(check_workspace_init_placeholder())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())

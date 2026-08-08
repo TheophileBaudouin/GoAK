@@ -78,11 +78,21 @@ gosec/govulncheck, probes).
    updated — adapt the prose to mirror the new SDK instructions (never lose
    an instruction from either file) and refresh the sha256 marker. Review
    the section even on a trivial jump.
-3. Inspect the diff for anomalies (unexpected deletions, binaries, secrets).
-4. Commit with a message naming the new SHA and summarizing the change, e.g.:
+3. **Project Foundation guard (Z14)**: `KitV2/AGENTS.md` also carries the
+   "Project Foundation" pointer section, delimited by its own markers
+   (`<!-- workspace-init section: begin -->` … `<!-- workspace-init
+   section: end -->`). Before committing, verify — via
+   `validate-kitv2.py` `check_workspace_init_placeholder` (or a quick read
+   of the two markers and the `## Project Foundation` title between them) —
+   that the section survived this sync intact. If the section or a marker
+   is missing or altered, ABORT: `git restore -- KitV2/AGENTS.md`, report
+   the failure, and do NOT commit — exactly like any other failed guard in
+   this workflow.
+4. Inspect the diff for anomalies (unexpected deletions, binaries, secrets).
+5. Commit with a message naming the new SHA and summarizing the change, e.g.:
    `feat(ui-kit): re-pin zone to ui-agent-kit <short-sha> — <what changed>`.
    Include `KitV2/AGENTS.md` when its merged section changed.
-5. Do NOT amend silently; keep the commit separate and reviewable.
+6. Do NOT amend silently; keep the commit separate and reviewable.
 
 ## Phase 3 — Record (durable state)
 

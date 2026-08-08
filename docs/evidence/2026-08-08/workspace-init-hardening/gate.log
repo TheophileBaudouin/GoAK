@@ -1,0 +1,24 @@
+# Gate evidence — workspace-init hardening (AGENTS.md merged-section isolation) — 2026-08-08
+
+## Validators
+instruction-artifacts: PASS
+cognitive: PASS (35 catalog objects)
+kitv2: PASS (73 product skills, 3 snippets, standalone, offline bundle, router index 281 resources)
+  - check_workspace_init_placeholder active (markers + title verified on the real AGENTS.md)
+
+## Validator unit tests (22 — incl. 3 new workspace-init placeholder tests)
+Ran 22 tests ... OK
+
+## Router scenarios (real scoring)
+router scenarios: 23/23 PASS (index v2.6.0, 281 resources)
+
+## Go gate
+gofmt: clean
+go vet: clean
+golangci-lint: 0 issues
+go test -race: pass
+gosec: 0 issues
+govulncheck: no vulnerabilities
+
+## Probes
+16/16 PASS

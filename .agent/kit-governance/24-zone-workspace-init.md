@@ -118,15 +118,22 @@ workspace/
 8. **Restitution before write**: the agent proposes the synthesis, the user
    explicitly validates it, then the session writes `workspace/` and the
    consumer `AGENTS.md` section. Never write before explicit validation.
-9. **`AGENTS.md` mechanics** (reverse of the Z13 merge flow): the product
-   `KitV2/AGENTS.md` carries a generic **"Project Foundation"** pointer
-   section ("not initialized — run `workspace-init`"); the init session
-   writes the per-project section into the consumer's `AGENTS.md` under an
-   identifiable marker (`<!-- workspace-init sha256: <hash of
-   workspace/CONSTITUTION.md + ARCHITECTURE.md> -->`). Content is
-   project-owned, written from the local session, **never synced from the
-   kit**; existing content is never lost; projects that are not initialized
-   get no noise.
+9. **`AGENTS.md` mechanics** — two distinct markers, one per surface:
+   - **Product pointer** (`KitV2/AGENTS.md`): the generic **"Project
+     Foundation"** pointer section is delimited by explicit markers
+     `<!-- workspace-init section: begin -->` … `<!-- workspace-init
+     section: end -->` (N1 convention: every zone merging content into
+     AGENTS.md delimits its section). The section is static kit content;
+     `validate-kitv2.py` `check_workspace_init_placeholder()` verifies
+     presence of both markers and the section title — a missing or altered
+     section fails the gate.
+   - **Consumer capture** (written by the init session into the consumer
+     project's `AGENTS.md`): the per-project section under an identifiable
+     marker (`<!-- workspace-init sha256: <hash of
+     workspace/CONSTITUTION.md + ARCHITECTURE.md> -->`, recomputed when
+     the workspace docs change). Content is project-owned, written from
+     the local session, **never synced from the kit**; existing content is
+     never lost; projects that are not initialized get no noise.
 10. **`spec-driven-dev` articulation**: the skill's "Before You Begin"
     continuity check inventories `workspace/` alongside `AGENTS.md` and
     `.pi/memory/`; when `workspace/CONSTITUTION.md` + `ARCHITECTURE.md`
@@ -192,7 +199,9 @@ workspace/
 - [ ] `spec-driven-dev` "Before You Begin" inventories `workspace/` (one
       bullet, no duplicated logic) and `last-verified` is bumped.
 - [ ] `KitV2/AGENTS.md` carries the generic "Project Foundation" pointer
-      section.
+      section, delimited by the `workspace-init section: begin/end`
+      markers; `check_workspace_init_placeholder` is present in the
+      validator and green (a missing or altered section fails the gate).
 - [ ] The consumer-side marker mechanics are documented in the skill
       (marker format, no-content-loss rule, no-noise rule) and verified by
       review (no validator can check a runtime artifact).
