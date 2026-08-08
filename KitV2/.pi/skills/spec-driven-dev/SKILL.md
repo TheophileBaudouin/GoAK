@@ -2,7 +2,7 @@
 name: spec-driven-dev
 category: workflow
 tags: [spec-driven, workflow, planning, analysis, s-u-p-e-r, adaptive-control, large-scale, migration, refactor]
-last-verified: 2026-08-05
+last-verified: 2026-08-08
 description: "Spec-driven development workflow for large-scale Go transformations (rewrite, migration, overhaul, whole-project refactor). Use when the user requests a large-scale project transformation that needs deep analysis, phased task decomposition, progress continuity across sessions, and execution within one session — not for ordinary single-task work. Runs the seven-phase pipeline: intent capture, deep analysis with S.U.P.E.R health scoring, grounded intent refinement, task decomposition with delivery batches, progress tracking (MASTER.md), confirmed execution with adaptive control, and archive. Local-only: no GitHub dependency. Composes the kit's existing prompts and skills (memory, planning, review, testing) instead of duplicating them."
 ---
 
@@ -38,7 +38,7 @@ You are executing the **Spec-Driven Development** workflow — a seven-phase pip
 
 ## Before You Begin: Cross-Conversation Continuity Check
 
-**CRITICAL**: Before starting any phase, inventory and read any existing project-level instruction and memory surfaces (`AGENTS.md`, the native memory `.pi/memory/` — **verify which memory files actually exist, `Decisions.md` may be missing from the bootstrap** — any existing platform rule files).
+**CRITICAL**: Before starting any phase, inventory and read any existing project-level instruction and memory surfaces (`AGENTS.md`, the native memory `.pi/memory/` — **verify which memory files actually exist, `Decisions.md` may be missing from the bootstrap** — any existing platform rule files, and the project foundation `workspace/` when present: if `workspace/CONSTITUTION.md` and `workspace/ARCHITECTURE.md` exist — initialized by the `workspace-init` skill at day 0 — read them now and keep every phase consistent with them; the foundation is captured once, never re-derived per feature).
 
 Then check if `docs/progress/MASTER.md` already exists:
 
@@ -56,7 +56,7 @@ After loading your current state, populate the platform's native task tracking t
 **Actions**:
 
 1. Extract from the user's message: the transformation type, the rough target state, and any explicitly stated constraints.
-2. Summarize the direction back in 1-2 sentences. Do NOT ask deep clarifying questions here — Phase 1 analysis will reveal what to ask. Confirm: "I understand you want to [direction]. Let me first analyze the current project so I can ask you the right questions."
+2. Summarize the direction back in 1-2 sentences. Do NOT ask deep clarifying questions here — Phase 1 analysis will reveal what to ask. Confirm: "I understand you want to [direction]. Let me first analyze the current project so I can ask you the right questions." If a project foundation (`workspace/`) exists, the direction must be consistent with its CONSTITUTION.md and ARCHITECTURE.md (read in the continuity check).
 3. If intent is completely unclear, ask ONE high-level question to determine the transformation type.
 
 **Output**: A preliminary direction statement guiding Phase 1. NOT the final task definition — that comes in Phase 2.

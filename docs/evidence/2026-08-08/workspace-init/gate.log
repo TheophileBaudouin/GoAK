@@ -1,0 +1,38 @@
+# Gate evidence — workspace-init (Z14) — 2026-08-08
+
+## Validators
+```
+instruction-artifacts: PASS
+cognitive: PASS (35 catalog objects)
+kitv2: PASS (73 product skills, 3 snippets, standalone, offline bundle, router index 281 resources)
+```
+## Router scenarios (real scoring, node)
+```
+PASS  "set up project foundation kernel modules before feature work" -> workspace-init, catalog-freshness, pattern:go:value-vs-pointer-receivers, bounded-worker-cancellation, source:go:modules
+
+router scenarios: 23/23 PASS (index v2.6.0, 281 resources)
+```
+## Router + validator unit tests
+```
+
+OK
+
+OK
+```
+## Probes
+```
+probes/run.sh: 16/16 PASS (raw output in the Go gate section below)
+```
+# Go gate + probes (raw)
+all modules verified
+gofmt: clean
+vet: clean
+0 issues.
+lint: clean
+go test -race: pass
+  Issues : [1;32m0[0m
+No vulnerabilities found.
+probes:
+ui-kit-sync: PASS (materialize, idempotence, Wails-only, structure evolution, ownership contract)
+--- probes/worker-pool ---
+worker-pool: PASS

@@ -6,12 +6,12 @@
   "prompt": 3,
   "recipe": 15,
   "rule": 14,
-  "skill": 8,
+  "skill": 9,
   "snippet": 3,
   "source": 55,
   "template": 3
  },
- "index_sha256": "56ab438b3eef8d9c7c15014e0a0dc855764b47062353213eefae49899b2b7c5c",
+ "index_sha256": "3ede15d0d920b4a86fcdb0f9a4cc51b381d50e3e12d5f8239d505fc994c1ef0a",
  "schema": 1,
  "stopwords": [
   "a",

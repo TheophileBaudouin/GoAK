@@ -50,6 +50,26 @@ ownership, zero-value design); treat those as pre-loaded even when the user
 does not name them. Catalog fiches are routed on demand and are deliberately
 absent from the always-visible skill surface.
 
+## Project Foundation — new consumer projects
+
+Before the first feature of a new project (and before any `spec-driven-dev`
+run), the kit recommends initializing the project foundation with the
+`workspace-init` skill: one day-0 session that decides the
+kernel/modules boundary, pins the stack, non-negotiables, and testing
+policy, and writes `workspace/` (CONSTITUTION.md, ARCHITECTURE.md, optional
+DOMAIN.md, decisions/, research/) plus a "Project Foundation" section in
+the project's own `AGENTS.md`.
+
+- **Initialized project**: `workspace/CONSTITUTION.md` and
+  `workspace/ARCHITECTURE.md` are the foundation reference — read them
+  before any feature work; `spec-driven-dev` reads them in its continuity
+  check and makes Phase 0 consistent with them.
+- **Not initialized**: run `workspace-init` (strongly recommended, never a
+  hard gate). Do not invent a foundation on the fly per feature.
+- The workspace docs are project-owned: written by the init session, never
+  synced from the kit. Projects that are not initialized carry no
+  project-specific section here — only this generic pointer.
+
 ## UI work — Wails projects (merged ui-agent-kit SDK instructions)
 
 <!-- ui-kit/AGENTS.md sha256: ae432ca832839f98ba80eea058f626880facd77ab6392152bf7d191a8f36f1ad — this section mirrors the pinned SDK AGENTS.md; the re-sync helper (metaproject) fails when the checksum drifts. Update the prose at every ui-kit update, never lose an instruction from either file. -->

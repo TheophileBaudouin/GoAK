@@ -23,8 +23,7 @@ adding unsupported volume or ambiguity.
 
 ## Architecture
 
-KitV2 is the standalone consumable product. Root `.agent/`, root `.pi/memory/`, docs/plans/research/evidence, and evaluation governance belong exclusively to the metaproject. Since 2026-08-04, `.agent/kit-governance/` holds the 15 construction contracts (C0, C1, C2, Z1–Z10, A1, N1) that govern each KitV2 zone: mission, format, actionable rules, patterns, anti-patterns, validation criteria. Every rule a contract states must be verifiable by the product validator or an explicit review control. Templates policy (owner directive 2026-08-04): templates are NEVER agent-authored — each is a minimally-adapted fork of a real, reliable, functional, single-responsibility open-source project under MIT license; existing agent scaffolds are marked `legacy` and candidates for replacement.
-
+Since 2026-08-04, `.agent/kit-governance/` holds the construction contracts that govern each KitV2 zone: C0, C1, C2, Z1–Z13 (Z14 added 2026-08-08: `workspace-init` — kernel-first project foundation protocol, `.pi/skills/workspace-init/`, consumer-side `workspace/` capture + AGENTS.md "Project Foundation" section), A1, N1. Every rule a contract states must be verifiable by the product validator or an explicit review control. Templates policy (owner directive 2026-08-04): templates are NEVER agent-authored — each is a minimally-adapted fork of a real, reliable, functional, single-responsibility open-source project under MIT license; existing agent scaffolds are marked `legacy` and candidates for replacement. The `workspace-init` document gabarits (CONSTITUTION.md/ARCHITECTURE.md/DOMAIN.md) are document templates (same status as spec-driven-dev/references/templates/), not Z5 code templates.
 ## Artifact graph and module format
 
 KitV2 uses typed artifacts: Rule, Recipe, Pattern, Snippet, Template,

@@ -30,6 +30,7 @@ self-contained (Z9, N1).
 | [21-zone-router.md](21-zone-router.md) | `router/` — semantic routing index (Z11) | active |
 | [22-zone-spec-driven-dev.md](22-zone-spec-driven-dev.md) | spec-driven-dev + deep-discuss workflow (Z12) | active |
 | [23-zone-ui-kit.md](23-zone-ui-kit.md) | `ui-kit/` — pinned ui-agent-kit SDK zone, UI routing corpus, Wails-only sync (Z13) | active |
+| [24-zone-workspace-init.md](24-zone-workspace-init.md) | `.pi/skills/workspace-init/` — kernel-first project foundation protocol, `workspace/` capture + AGENTS.md section (Z14) | active |
 | [30-conventions.md](30-conventions.md) | Naming, formats, boundaries (N1) | active |
 
 ## Origin

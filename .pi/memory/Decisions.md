@@ -859,3 +859,49 @@ questions utilisateur.
   Version bumped 2.5.0 → 2.6.0 across manifest.yaml, capabilities.yaml,
   install.sh, README.md; router meta regenerated. Full gate PASS; installer
   verified end-to-end.
+- **D-2026-08-08-06 (workspace-init — form factor and name)**: the day-0
+  project foundation protocol ships as the workflow skill
+  `.pi/skills/workspace-init/SKILL.md` (category `workflow`), not a prompt:
+  Z8 role boundary (procedures = skills, checklists = prompts), the
+  `setup-matt-pocock-skills` precedent (one-shot init), and the need for
+  `references/` + document templates. Name `workspace-init` (owner
+  arbitration 2026-08-08): names what it produces (`workspace/`).
+  Governance zone Z14 = `.agent/kit-governance/24-zone-workspace-init.md`
+  (modeled on Z12).
+- **D-2026-08-08-07 (workspace-init — strongly recommended, not
+  blocking)**: the protocol is suggested by the skill and the kit
+  AGENTS.md "Project Foundation" section for a new consumer project, never
+  a hard gate; a skipped init is recorded in project memory. No MANDATORY
+  lexeme on this subject (charter §16.1.4 / Z8 rule 6); the skill's
+  process absolutes ("never write before validation", "never re-run over
+  an existing workspace/", "never lose AGENTS.md content") are recorded in
+  the enforcement registry `.agent/instructions.md` as guidance-only
+  (2026-08-08, Z14).
+- **D-2026-08-08-08 (workspace/ layout)**: consumer-side capture =
+  `workspace/CONSTITUTION.md` (adapted from the spec-kit constitution
+  template: mission, core principles, kernel-first mandate, stack
+  decisions, governance with semver), `ARCHITECTURE.md` (kernel/modules
+  boundary, one-line module contracts, SDK plan), optional `DOMAIN.md`
+  (glossary, grill-with-docs pattern), `decisions/` (D-YYYY-MM-DD-NN,
+  same format as this file), `research/` (dated, sourced notes). The
+  documents are produced at runtime in the consumer project — never
+  shipped by the kit (like `structure.md`, Layer 5.1); the shipped
+  `references/templates/*.md` are **document gabarits**, not Z5 code
+  templates.
+- **D-2026-08-08-09 (AGENTS.md placeholder mechanics, reverse of Z13)**:
+  `KitV2/AGENTS.md` carries a generic "Project Foundation" pointer
+  section; the init session writes the per-project section into the
+  consumer's AGENTS.md under an identifiable marker
+  (`<!-- workspace-init sha256: <hash of CONSTITUTION.md + ARCHITECTURE.md> -->`).
+  Content is project-owned (written from the local session, never synced
+  from the kit), existing content is never lost, uninitialized projects
+  get no noise. The ui-kit merge precedent (Z13 §4) provides the marker
+  mechanics; the flow direction is inverted.
+- **D-2026-08-08-10 (spec-driven-dev articulation)**: the skill's "Before
+  You Begin" continuity check now inventories `workspace/` (reads
+  CONSTITUTION.md + ARCHITECTURE.md when present) and Phase 0 must be
+  consistent with them — one bullet + one line, composition without
+  duplicating spec-driven-dev logic (owner arbitration 2026-08-08). The
+  interview is adapted from the `grilling` primitive (mattpocock/skills),
+  the kernel/modules definition cites Mark Richards, the SDK rationale
+  cites Ousterhout (deep modules) — never home-made definitions.

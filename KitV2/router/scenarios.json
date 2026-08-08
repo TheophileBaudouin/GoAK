@@ -133,6 +133,12 @@
 			"query": "quantum computing compiler",
 			"expect": [],
 			"offDomain": true
+		},
+		{
+			"query": "set up project foundation kernel modules before feature work",
+			"expect": [
+				"workspace-init"
+			]
 		}
 	]
 }
