@@ -281,8 +281,17 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("markers missing" in error for error in errors), errors)
 
     def test_agents_md_contract_passes_with_canonical_structure(self) -> None:
-        """Z9 §9 (D-2026-08-08-19) — the canonical section set, small size,
-        and no history markers is the valid execution-contract state."""
+        """Z9 §9 (D-2026-08-08-19/21) — the canonical section set including
+        the two owner-mandated top blocks, small size, and no history
+        markers is the valid execution-contract state."""
+        blocks = (
+            "## Before doing anything\n"
+            "Always use subagents. You are the orchestrator.\n"
+            "Except for implementations, you are not required.\n",
+            "## Absolute rules\n"
+            "You must always check which step of the to-do list you are at\n"
+            "and strictly follow this to-do list.\n",
+        )
         sections = [
             "## Normative levels",
             "## Non-Negotiable Rules",
@@ -293,7 +302,7 @@ class ValidatorTests(unittest.TestCase):
             "## Limits",
         ]
         body = "# Go Agent Development Kit\n\n" + "\n\n".join(
-            s + "\ncontent" for s in sections
+            s + "\ncontent" for s in (*blocks, *sections)
         )
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -303,6 +312,88 @@ class ValidatorTests(unittest.TestCase):
                 errors = module.check_agents_md_contract(warnings)
         self.assertEqual(errors, [], errors)
         self.assertEqual(warnings, [], warnings)
+
+    def test_agents_md_contract_fails_when_mandatory_block_lost(self) -> None:
+        """Z9 §9.1a (D-2026-08-08-21) — a rewrite that drops an
+        owner-mandated top block fails the gate."""
+        body = (
+            "# Go Agent Development Kit\n\n"
+            "## Absolute rules\n"
+            "You must always check which step of the to-do list you are at\n"
+            "and strictly follow this to-do list.\n\n"
+            "## Normative levels\ncontent\n"
+            "## Non-Negotiable Rules\ncontent\n"
+            "## Repository map\ncontent\n"
+            "## Task Routing\ncontent\n"
+            "## Memory\ncontent\n"
+            "## Validation\ncontent\n"
+            "## Limits\ncontent\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body)
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(
+            any("Before doing anything" in error for error in errors), errors
+        )
+
+    def test_agents_md_contract_fails_when_mandatory_block_sentinel_lost(
+        self,
+    ) -> None:
+        """Z9 §9.1a — a heading that survives without its sentinel sentence
+        (the block was gutted) fails the gate."""
+        body = (
+            "# Go Agent Development Kit\n\n"
+            "## Before doing anything\n"
+            "some other text\n\n"
+            "## Absolute rules\n"
+            "You must always check which step of the to-do list you are at\n"
+            "and strictly follow this to-do list.\n\n"
+            "## Normative levels\ncontent\n"
+            "## Non-Negotiable Rules\ncontent\n"
+            "## Repository map\ncontent\n"
+            "## Task Routing\ncontent\n"
+            "## Memory\ncontent\n"
+            "## Validation\ncontent\n"
+            "## Limits\ncontent\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body)
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(
+            any("sentinel" in error or "orchestrator" in error for error in errors),
+            errors,
+        )
+
+    def test_agents_md_contract_fails_when_mandatory_blocks_reordered(self) -> None:
+        """Z9 §9.1a — the two mandatory blocks must sit at the top, in
+        order, before the canonical sections."""
+        body = (
+            "# Go Agent Development Kit\n\n"
+            "## Normative levels\ncontent\n"
+            "## Before doing anything\n"
+            "Always use subagents. You are the orchestrator.\n\n"
+            "## Absolute rules\n"
+            "You must always check which step of the to-do list you are at\n"
+            "and strictly follow this to-do list.\n\n"
+            "## Non-Negotiable Rules\ncontent\n"
+            "## Repository map\ncontent\n"
+            "## Task Routing\ncontent\n"
+            "## Memory\ncontent\n"
+            "## Validation\ncontent\n"
+            "## Limits\ncontent\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", body)
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_agents_md_contract([])
+        self.assertTrue(
+            any("precede '## Normative levels'" in error for error in errors), errors
+        )
 
     def test_agents_md_contract_fails_when_section_lost(self) -> None:
         """Z9 §9 — a rewrite that drops a canonical section (e.g. the
@@ -362,6 +453,12 @@ class ValidatorTests(unittest.TestCase):
 
     def test_agents_md_contract_warns_near_budget(self) -> None:
         """Z9 §9.4 — near-budget files warn instead of silently growing."""
+        blocks = (
+            "## Before doing anything\n"
+            "Always use subagents. You are the orchestrator.\n",
+            "## Absolute rules\n"
+            "You must always check which step of the to-do list you are at\n",
+        )
         sections = "\n\n".join(
             f"## {title}\ncontent"
             for title in (
@@ -374,7 +471,14 @@ class ValidatorTests(unittest.TestCase):
                 "Limits",
             )
         )
-        body = "# Go Agent Development Kit\n\n" + sections + "\n\n" + "y" * 13000
+        body = (
+            "# Go Agent Development Kit\n\n"
+            + "\n\n".join(blocks)
+            + "\n\n"
+            + sections
+            + "\n\n"
+            + "y" * 13000
+        )
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             write(root / "AGENTS.md", body + "\n")

@@ -126,6 +126,12 @@ that is a defect.
   three marker sections (User guide, Project Foundation, UI work + sha256);
   end with the full gate and a fresh-context review. Enforced by
   `check_agents_md_contract` (validate-kitv2.py).
+- The two owner-mandated top blocks (`## Before doing anything` and
+  `## Absolute rules`, Z9 §9.1a, D-2026-08-08-21) are immutable content:
+  they always sit at the top of the file, in order, before `## Normative
+  levels`, and survive EVERY rewrite — dropping, renaming, gutting, or
+  relocating them fails `check_agents_md_contract` (presence + order +
+  sentinel sentences).
 - Its "UI work" section is a CONDENSED delegation: activation guard, routing
   obligation, cross-cutting invariants only — every other UI instruction
   lives in `ui-kit/AGENTS.md` (single canonical source). The checksum marker

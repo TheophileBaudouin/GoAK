@@ -1032,11 +1032,11 @@ def check_workspace_init_placeholder() -> list[str]:
 
 
 def check_agents_md_contract(warnings: list[str]) -> list[str]:
-    """Z9 §9 (D-2026-08-08-19) — the consumer AGENTS.md is an execution
-    contract with a frozen canonical structure, a size budget, and no
-    historical content. A rewrite must restructure, never append; these
-    anchors make the structure checkable so the file cannot silently drift
-    back into a manual."""
+    """Z9 §9 (D-2026-08-08-19/21) — the consumer AGENTS.md is an execution
+    contract with a frozen canonical structure, a size budget, no
+    historical content, and two owner-mandated top blocks. A rewrite must
+    restructure, never append; these anchors make the structure checkable
+    so the file cannot silently drift back into a manual."""
     errors: list[str] = []
     path = ROOT / "AGENTS.md"
     if not path.exists():
@@ -1052,6 +1052,42 @@ def check_agents_md_contract(warnings: list[str]) -> list[str]:
         warnings.append(
             f"{path}: {size} bytes — near the 16 KiB budget (Z9 §9.4), "
             "prefer delegation over addition"
+        )
+    # Owner-mandated top blocks (Z9 §9.1a, D-2026-08-08-21): present, in
+    # order, before "## Normative levels", with their sentinel sentences.
+    # They are immutable across rewrites — dropping or renaming them fails.
+    mandatory_blocks = (
+        (
+            "## Before doing anything",
+            "Always use subagents. You are the orchestrator.",
+        ),
+        ("## Absolute rules", "You must always check which step of the to-do list"),
+    )
+    prev = -1
+    for heading, sentinel in mandatory_blocks:
+        index = text.find("\n" + heading)
+        if index == -1:
+            errors.append(
+                f"{path}: mandatory block {heading!r} missing (Z9 §9.1a — "
+                "owner-mandated top blocks must survive every rewrite)"
+            )
+            continue
+        if sentinel not in text:
+            errors.append(
+                f"{path}: mandatory block {heading!r} missing sentinel "
+                f"{sentinel!r} (Z9 §9.1a)"
+            )
+        if index <= prev:
+            errors.append(
+                f"{path}: mandatory blocks out of order (Z9 §9.1a — "
+                "Before doing anything → Absolute rules, at the top)"
+            )
+        prev = index
+    normative = text.find("\n## Normative levels")
+    if prev != -1 and normative != -1 and prev > normative:
+        errors.append(
+            f"{path}: mandatory top blocks must precede '## Normative levels' "
+            "(Z9 §9.1a)"
         )
     for heading in (
         "## Normative levels",
@@ -1082,7 +1118,8 @@ def check_agents_md_contract(warnings: list[str]) -> list[str]:
     if all(index != -1 for index in positions) and positions != sorted(positions):
         errors.append(
             f"{path}: required sections out of canonical order (Z9 §9.1 — "
-            "Identity → Normative levels → … → Validation → Limits)"
+            "Identity → Before doing anything → Absolute rules → Normative "
+            "levels → … → Validation → Limits)"
         )
     for pattern, label in (
         (r"\(removed \d{4}", "removed-system history"),

@@ -10,6 +10,22 @@ This file is the agent's execution contract, not the kit's documentation
 same question, keep one canonical answer and replace the other with a
 pointer — never both.
 
+## Before doing anything
+
+Always check the list of pi-subagents available to you.
+To search for files or information in the project, use Scoot.
+Pi-subagents are designed to be used together and run in parallel,
+allowing you to work faster and maintain a cleaner context.
+Always use subagents. You are the orchestrator.
+Except for implementations, you are not required.
+
+## Absolute rules
+
+You must always check which step of the to-do list you are at and strictly
+follow this to-do list.
+Every task you do, you do by strictly following this to-do list that you
+created.
+
 ## Normative levels
 
 Every instruction uses exactly one level below; the level is the meaning.

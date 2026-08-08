@@ -64,7 +64,9 @@ The product's **single entry point** for a consumer agent: what this Kit is, whe
 - [ ] C2: AGENTS.md exists (already verified) and referenced zones exist.
 - [ ] C2 (extended): no `../` or `.agent/` reference in AGENTS.md.
 - [ ] §9 contract: canonical sections present, size ≤ 16 KiB, no history
-  markers — `check_agents_md_contract` (D-2026-08-08-19).
+  markers, mandatory top blocks present (`## Before doing anything` +
+  `## Absolute rules` + sentinels) — `check_agents_md_contract`
+  (D-2026-08-08-19/21).
 
 ## 8. Open questions
 
@@ -78,11 +80,13 @@ edit — especially every rewrite — MUST follow this protocol. A rewrite is a
 
 ### 9.1 Canonical structure (order is mandatory)
 
-`# Identity/Scope` → `## Normative levels` (MUST/SHOULD/MAY legend +
-vocabulary) → `## User guide` (marker) → `## Non-Negotiable Rules` →
-`## Repository map` → `## Task Routing` → `## Project Foundation` (marker)
-→ `## UI work — Wails projects` (marker + sha256) → `## Memory` →
-`## Validation` → `## Limits` → closing invariants echo.
+`# Identity/Scope` → `## Before doing anything` (mandatory block, see 9.1a)
+→ `## Absolute rules` (mandatory block, see 9.1a) → `## Normative levels`
+(MUST/SHOULD/MAY legend + vocabulary) → `## User guide` (marker) →
+`## Non-Negotiable Rules` → `## Repository map` → `## Task Routing` →
+`## Project Foundation` (marker) → `## UI work — Wails projects` (marker +
+sha256) → `## Memory` → `## Validation` → `## Limits` → closing invariants
+echo.
 
 Rationale (critique §25/§26): the agent first needs the absolute rules, then
 the entry procedure (routing), then the conditional rules, then the
@@ -90,6 +94,43 @@ references, then the validation. Section titles are canonical: presence and
 order of the required headings are mechanically checked by
 `check_agents_md_contract`; the three marker sections carry their own checks
 (titles + checksums).
+
+### 9.1a Mandatory blocks (owner rule 2026-08-08, D-2026-08-08-21)
+
+The two blocks below are **owner-mandated, immutable content**: they MUST be
+present verbatim at the top of `KitV2/AGENTS.md` (after the identity/scope
+paragraph, before `## Normative levels`), in this order, on every version of
+the file — including every rewrite. They are the agent's day-0 operating
+rules (sub-agent delegation, to-do list discipline). Their presence, order,
+and sentinel lines are mechanically enforced by `check_agents_md_contract`
+(validate-kitv2.py) — a rewrite that drops, renames, or relocates them
+fails the gate.
+
+Block 1 — `## Before doing anything`:
+
+```text
+Always check the list of pi-subagents available to you.
+To search for files or information in the project, use Scoot.
+Pi-subagents are designed to be used together and run in parallel,
+allowing you to work faster and maintain a cleaner context.
+Always use subagents. You are the orchestrator.
+Except for implementations, you are not required.
+```
+
+Block 2 — `## Absolute rules`:
+
+```text
+You must always check which step of the to-do list you are at and strictly
+follow this to-do list.
+Every task you do, you do by strictly following this to-do list that you
+created.
+```
+
+The validator asserts presence of both headings (in order, before
+`## Normative levels`) plus the sentinel lines "Always use subagents. You
+are the orchestrator." and "You must always check which step of the to-do
+list". Editorial reflow of the prose (line wrapping) is allowed; the
+sentences and their order are not.
 
 ### 9.2 Writing rules
 
@@ -154,6 +195,11 @@ order of the required headings are mechanically checked by
 - No history markers, no "best practices" wording, no metaproject markers.
 - Marker sections and the UI checksum intact.
 - Gate PASS: validators (instructions, cognitive, kitv2 + unit tests),
+  router + UI scenario gates, Go gate, probes.
+- Fresh-context review done; GOAK.md / `/goak-help` / banner consistent
+  (no command or workflow drift).
+- Enforcement: `check_agents_md_contract` (product validator).
+nit tests),
   router + UI scenario gates, Go gate, probes.
 - Fresh-context review done; GOAK.md / `/goak-help` / banner consistent
   (no command or workflow drift).
