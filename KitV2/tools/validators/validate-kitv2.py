@@ -977,10 +977,7 @@ def check_workspace_init_placeholder() -> list[str]:
         return [f"{path}: Project Foundation markers out of order"]
     between = text[ib + len(begin) : ie]
     if "## Project Foundation" not in between:
-        return [
-            f"{path}: Project Foundation section title missing between "
-            "the markers"
-        ]
+        return [f"{path}: Project Foundation section title missing between the markers"]
     return errors
 
 
