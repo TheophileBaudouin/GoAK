@@ -125,6 +125,7 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed maintenance
 
+- [x] [2026-08-08] Release v2.7.4 pushed (D-2026-08-08-22): committed the memory-v2 migration + version bump (manifest/capabilities/router meta 2.7.4, install.sh default ref + raw URL, README, GOAK example), annotated tag v2.7.4 pushed, one-command install verified in a temp copy (validator PASS, no metaproject pollution, v2 Memory section present).
 - [x] [2026-08-08] Project-memory v2 migration (D-2026-08-08-22): all memory mentions updated across kit + metaproject (AGENTS.md, workflow-memory, GOAK, spec-driven-dev/workspace-init, Z12, instructions registry), kit-audit C19 added, `check_memory_contract` in validate-kitv2.py (+5 tests), gate PASS.
 - [x] [2026-08-08] Onboarding fixes (D-2026-08-08-18, user-reported): (1)
       `/goak` renamed to `/goak-help` everywhere (prompt file, guide, banner,
