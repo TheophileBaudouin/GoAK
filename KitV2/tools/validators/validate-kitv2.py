@@ -1226,6 +1226,113 @@ def check_consumer_onboarding() -> list[str]:
     return errors
 
 
+# Removed v1 memory API tokens (D-2026-08-08-22): any occurrence in a
+# shipped file teaches the agent to call tools that no longer exist or a
+# bootstrap premise that is false under the v2 extension. Static literals,
+# compiled once — never user input.
+_MEMORY_V1_TOKENS = (
+    (re.compile(r"memory_update\b", re.IGNORECASE), "removed v1 memory-write tool"),
+    (re.compile(r"memory_bootstrap\b", re.IGNORECASE), "removed v1 bootstrap tool"),
+    (
+        re.compile(r"memory_refactor\b", re.IGNORECASE),
+        "removed v1 refactor tool (use the memory-refactor skill)",
+    ),
+    (re.compile(r"PI_MEMORY_WIDGET\b", re.IGNORECASE), "removed v1 widget flag"),
+    (
+        re.compile(r"memory_read all\b", re.IGNORECASE),
+        "v1 read-all phrasing (omit file instead)",
+    ),
+    (
+        re.compile(r"Decisions\.md[^\n]{0,80}not created by default", re.IGNORECASE),
+        "stale v1 bootstrap premise",
+    ),
+    (
+        re.compile(r"not created by the bootstrap", re.IGNORECASE),
+        "stale v1 bootstrap premise",
+    ),
+    (
+        re.compile(r"missing from the [Pp]i bootstrap", re.IGNORECASE),
+        "stale v1 bootstrap premise",
+    ),
+    (
+        re.compile(r"bootstrap may (?:not|only) create", re.IGNORECASE),
+        "stale v1 bootstrap premise",
+    ),
+    (
+        re.compile(r"without [`']?Decisions\.md[`']?", re.IGNORECASE),
+        "stale v1 bootstrap premise",
+    ),
+)
+
+
+def check_memory_contract() -> list[str]:
+    """The consumer memory surface is the project-memory extension v2
+    (D-2026-08-08-22): five files (Brief, Progress, Gotchas, Decisions,
+    Agent) auto-bootstrapped when missing, full content injected once per
+    session, memory_read (omit file = all) as the only tool, direct edits
+    under the memory-writing skill, refactoring only via the memory-refactor
+    skill (archive, never delete).
+
+    Two obligations: (1) no shipped file may teach the removed v1 API — the
+    memory_update / memory_bootstrap / memory_refactor tools, the
+    "memory_read all" phrasing, the PI_MEMORY_WIDGET flag, or the stale
+    "Decisions.md is NOT created by the bootstrap" premise (the extension
+    auto-bootstraps it); (2) the two consumer memory instruction surfaces
+    (AGENTS.md ## Memory, workflow-memory.md) must state the v2 facts: the
+    five files, memory_read, and the two skills."""
+    errors: list[str] = []
+    extensions = {
+        ".md",
+        ".yaml",
+        ".yml",
+        ".ts",
+        ".json",
+        ".go",
+        ".sh",
+        ".txt",
+        ".py",
+    }
+    skip = {"validate-kitv2.py", "test_validate_kitv2.py"}
+    local_owned = {"PIN.md", "scenarios.json"}
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or path.suffix not in extensions:
+            continue
+        if path.name in skip:
+            continue  # the checker and its test legitimately name the tokens
+        if path.is_relative_to(ROOT / "ui-kit") and path.name not in local_owned:
+            continue  # the ui-kit mirror is a verbatim upstream pin
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for pattern, label in _MEMORY_V1_TOKENS:
+            if pattern.search(text):
+                errors.append(f"{path}: {label} must not ship")
+                break
+    # Required v2 facts in the two consumer memory instruction surfaces.
+    five = ("Brief", "Progress", "Gotchas", "Decisions", "Agent")
+    required = {
+        ROOT / "AGENTS.md": ("memory_read", "memory-writing", "memory-refactor"),
+        ROOT / ".pi" / "prompts" / "workflow-memory.md": (
+            "memory_read",
+            "memory-writing",
+            "memory-refactor",
+        ),
+    }
+    for path, terms in required.items():
+        if not path.is_file():
+            errors.append(f"{path}: missing — required memory instruction surface")
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        missing_files = [name for name in five if name not in text]
+        if missing_files:
+            errors.append(
+                f"{path}: memory file set incomplete — missing "
+                f"{missing_files} (the five-file v2 contract)"
+            )
+        for term in terms:
+            if term not in text:
+                errors.append(f"{path}: must name {term!r} (v2 memory workflow)")
+    return errors
+
+
 def check_ui_kit_registration(
     root: Path | None = None,
 ) -> list[str]:
@@ -1496,6 +1603,7 @@ def main() -> int:
     errors.extend(check_workspace_init_placeholder())
     errors.extend(check_agents_md_contract(warnings))
     errors.extend(check_consumer_onboarding())
+    errors.extend(check_memory_contract())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())

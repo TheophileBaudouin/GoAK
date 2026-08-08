@@ -38,7 +38,7 @@ You are executing the **Spec-Driven Development** workflow — a seven-phase pip
 
 ## Before You Begin: Cross-Conversation Continuity Check
 
-**CRITICAL**: Before starting any phase, inventory and read any existing project-level instruction and memory surfaces (`AGENTS.md`, the native memory `.pi/memory/` — **verify which memory files actually exist, `Decisions.md` may be missing from the bootstrap** — any existing platform rule files, and the project foundation `workspace/` when present: if `workspace/CONSTITUTION.md` and `workspace/ARCHITECTURE.md` exist — initialized by the `workspace-init` skill at day 0 — read them now and keep every phase consistent with them; the foundation is captured once, never re-derived per feature).
+**CRITICAL**: Before starting any phase, inventory and read any existing project-level instruction and memory surfaces (`AGENTS.md`, the native memory `.pi/memory/` — **verify which memory files actually exist; the native memory extension auto-bootstraps the five files (Brief, Progress, Gotchas, Decisions, Agent) when missing** — any existing platform rule files, and the project foundation `workspace/` when present: if `workspace/CONSTITUTION.md` and `workspace/ARCHITECTURE.md` exist — initialized by the `workspace-init` skill at day 0 — read them now and keep every phase consistent with them; the foundation is captured once, never re-derived per feature).
 
 Then check if `docs/progress/MASTER.md` already exists:
 
@@ -135,7 +135,7 @@ Use `references/templates/progress.md` for progress documents and `references/te
 
 ### Project Governance Surface
 
-1. **Inventory existing surfaces**: shared instruction files (`AGENTS.md` or equivalent), existing platform rule files, and the agent's native memory `.pi/memory/` — **verify which memory files actually exist** (the Pi bootstrap may create only Brief/Progress/Gotchas/Agent, without `Decisions.md`); never assume the standard set.
+1. **Inventory existing surfaces**: shared instruction files (`AGENTS.md` or equivalent), existing platform rule files, and the agent's native memory `.pi/memory/` — **verify which memory files actually exist** (the native memory extension auto-bootstraps the five files — Brief, Progress, Gotchas, Decisions, Agent — when missing); never assume the standard set is complete.
 2. **Update instruction surfaces without overwriting**: shared rules → `AGENTS.md`; platform rule files only when they already exist or are requested. Preserve user-written sections, local commands, and security constraints. If an existing rule conflicts with the plan, do not silently replace it — record the conflict in MASTER.md and ask the user at the next checkpoint.
 3. **Resolve the memory surface**: prefer native memory `.pi/memory/`; never silently create a Markdown memory file; use a repo-local fallback only on user confirmation or existing project declaration. Record the resolution in MASTER.md "Governance Status".
 

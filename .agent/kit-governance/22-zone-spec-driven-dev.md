@@ -53,9 +53,12 @@ KitV2/.pi/skills/spec-driven-dev/
 4. **Archive mandatory**: Phase 6 always executed; all artifacts under
    `docs/archives/<project>/` with an index.
 5. **Memory rule** (kit, NOT metaproject): every agent using the kit verifies
-   which `.pi/memory/` files actually exist — the Pi bootstrap does not create
-   `Decisions.md` by default. Never assume the standard set; create the
-   missing files without copying external history. Encoded in
+   which `.pi/memory/` files actually exist — the native memory extension
+   auto-bootstraps the five files (`Brief`, `Progress`, `Gotchas`,
+   `Decisions`, `Agent`) when missing; `Decisions.md` is part of the
+   bootstrapped set, never assumed absent (memory v2, D-2026-08-08-22).
+   Never assume the standard set is complete; create any missing file
+   without copying external history. Encoded in
    `KitV2/AGENTS.md` and `workflow-memory.md`.
 6. **Composition, not duplication**: the skill composes the existing
    prompts/skills (`workflow-memory`, `go-implementation-plan`,

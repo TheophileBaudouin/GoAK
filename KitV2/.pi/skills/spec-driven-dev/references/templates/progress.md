@@ -34,7 +34,7 @@ Templates for the tracking documents generated in Phase 4 (Progress Tracking Doc
 | Surface | Status | Notes |
 |:--------|:-------|:------|
 | `AGENTS.md` | existing / created / unused | shared agent rules |
-| `.pi/memory/` | verified — files present: | **verify which files actually exist (Decisions.md may be missing from the Pi bootstrap)** |
+| `.pi/memory/` | verified — files present: | **verify which files actually exist (the five files — Brief, Progress, Gotchas, Decisions, Agent — auto-bootstrap when missing)** |
 | Memory fallback | approved / not | never created silently |
 
 ## Current Status

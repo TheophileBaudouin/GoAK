@@ -275,8 +275,11 @@ against contract Z12:
 - S.U.P.E.R present as a health lens with the "sourced kit rules win"
   boundary (D-2026-08-05-16, Z12 §3.2);
 - adaptive control (telemetry, drift, thresholds) and Phase 6 archive present;
-- the memory rule "verify which .pi/memory files exist, Decisions.md may be
-  missing" encoded (KitV2/AGENTS.md + workflow-memory.md);
+- the memory rule encoded (KitV2/AGENTS.md + workflow-memory.md): verify
+  which `.pi/memory/` files exist — the native memory extension
+  auto-bootstraps the five files (Brief, Progress, Gotchas, Decisions,
+  Agent) when missing; create missing ones via /memory-init; never copy
+  external history (memory v2, D-2026-08-08-22);
 - **no residual `workflow-{clarify,plan,tasks,implement,verify}` prompt**: a
   residual prompt from the former chain is a named finding category of its
   own (D-2026-08-05-16), not a generic case;
@@ -410,8 +413,12 @@ product validator — the audit verifies consistency, not existence alone.
    Kit structure, Troubleshooting). Every command, tool, and path it names
    exists in the shipped tree (cross-check `.pi/prompts/`, `.pi/skills/`,
    `rules/`, `recipes/`, `router/`); anything named but absent is a stale
-   claim (`NON CONFORM`). The guide must stay usable with no external
-   documentation and no build-repository references
+   claim (`NON CONFORM`). Platform-provided memory commands and skills
+   (`/memory-init`, `/memory`, `memory_read`, the `memory-writing` and
+   `memory-refactor` skills — shipped by the user-level project-memory
+   extension, not by the kit) are out of scope for this cross-check; they
+   are covered by dimension C19. The guide must stay usable with no
+   external documentation and no build-repository references
    (`check_no_metaproject_paths` covers the latter).
 2. **`/goak-help` correctness**: `.pi/prompts/goak-help.md` exists, has a
    `description`, and orders the agent to READ the local guide (mentions
@@ -446,6 +453,42 @@ product validator — the audit verifies consistency, not existence alone.
    green result for any of these is a finding. The CONTENT-consistency
    part (banner ↔ real workflows, guide claims ↔ tree) is a review
    control; report it in Phase E.
+
+#### C19. Memory-system contract (project-memory v2) — no v1 residue
+
+The consumer memory surface is the Pi project-memory extension v2
+(D-2026-08-08-22): five files (`Brief`, `Progress`, `Gotchas`,
+`Decisions`, `Agent`) auto-bootstrapped when missing (budgets 8/10/12/8/8
+KiB), full content injected once per session, `memory_read` (omit `file` =
+all) as the only tool, direct edits under the `memory-writing` skill,
+refactoring only through the `memory-refactor` skill (archive, never
+delete). The audit verifies that every memory mention in the Kit matches
+this contract and that no v1 residue remains.
+
+1. **No removed-tool residue in shipped files**: scan `KitV2/` for the
+   removed v1 API — the `memory_update`, `memory_bootstrap`,
+   `memory_refactor` tools (underscore), the `memory_read all` phrasing,
+   the `PI_MEMORY_WIDGET` flag, and the stale bootstrap premise
+   ("Decisions.md is NOT created by default / may be missing from the Pi
+   bootstrap" / "the bootstrap may create only Brief/Progress/Gotchas/
+   Agent, without Decisions.md"). Any occurrence in a shipped file is
+   `NON CONFORM`. The validator `check_memory_contract` enforces this —
+   cite it, do not rebuild it.
+2. **No stale bootstrap premise**: the v1 claim that `Decisions.md` is
+   missing from the bootstrap is false under v2 (the extension
+   auto-bootstraps the five files when missing, nothing overwritten). A
+   file still teaching it is `NON CONFORM`; the doctrine is "verify which
+   files actually exist, create missing ones via /memory-init, never copy
+   external history".
+3. **Memory instruction surfaces teach the v2 workflow**: the `## Memory`
+   section of `KitV2/AGENTS.md` and `.pi/prompts/workflow-memory.md` list
+   the five files, name `memory_read` (omit `file`), and name the
+   `memory-writing` and `memory-refactor` skills. A surface stuck on the
+   v1 file set or tool vocabulary is `NON CONFORM`.
+4. **Automated checks to cite, not rebuild**: `validate-kitv2.py`
+   `check_memory_contract` (forbidden tokens + required v2 facts in the
+   two instruction surfaces). The content-vs-reality match with the
+   installed extension version is a review control; report it in Phase E.
 
 ### Phase D — Decide "metaproject or Kit?"
 
@@ -518,8 +561,10 @@ validators:
 - state precisely what `validate-kitv2.py` already covers (product
   structure, router index + scenarios, ui-kit pin/copy-rules/corpus
   disjointness, the Z14 `check_workspace_init_placeholder` for the kit
-  AGENTS.md Project Foundation section, and the product-autonomy
-  `check_no_metaproject_paths` — Z9 §3.2);
+  AGENTS.md Project Foundation section, the consumer-onboarding
+  `check_consumer_onboarding`, the memory-contract `check_memory_contract`
+  (C19 — no v1 memory-tool residue, v2 facts in the memory surfaces), and
+  the product-autonomy `check_no_metaproject_paths` — Z9 §3.2);
 - do not rebuild these checks in the report as if they were absent;
 - report the real gaps: all uncovered file types, complete §5, semantic
   duplication, language, effective source freshness, composition,
@@ -669,6 +714,16 @@ The table contains at minimum, at each audit:
   guide describes reality), reason: the mechanical gate guarantees shape,
   the review guarantees truth; the routing-quality scenarios act as a
   narrow tripwire for guide-related vocabulary.
+- the "memory-system contract (C19)" row: v1 residue is covered by
+  `validate-kitv2.py` `check_memory_contract` (forbidden tokens:
+  memory_update, memory_bootstrap, memory_refactor-as-tool, "memory_read
+  all", PI_MEMORY_WIDGET, stale bootstrap premises; required v2 facts in
+  the AGENTS.md Memory section and workflow-memory.md); the gap is the
+  semantic match between the kit's doctrine and the installed extension
+  version (the extension is user-level, never shipped) — a review control
+  at each kit-audit run; recommended check: none beyond the token gate,
+  reason: the kit can only document the contract, the installed extension
+  is outside the repository (D-2026-08-08-22).
 
 ### F. Verdict and next steps
 

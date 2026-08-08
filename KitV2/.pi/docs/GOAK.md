@@ -34,7 +34,7 @@ software and keeps those decisions verifiable.
 
 Precondition: the kit is installed in your project root (installer:
 `curl -fsSL https://raw.githubusercontent.com/TheophileBaudouin/GoAK/<ref>/install.sh | sh -s -- <dir>`,
-where `<ref>` is a release tag such as `v2.7.3` and `<dir>` your project).
+where `<ref>` is a release tag such as `v2.7.4` and `<dir>` your project).
 
 1. **Enter the project** — `cd <dir>`.
 2. **Open Pi** — run `pi`. Approve project trust when asked (headless:
@@ -147,11 +147,13 @@ error wrapping (pattern `error-wrapping-chain`), channel ownership (pattern
 - **Routing is mandatory, not optional.** Call `search_kit_resources` before
   planning or implementing technical work. If it returns no match, say so
   and proceed with general Go knowledge.
-- **Memory is local and verified.** Pi initializes `.pi/memory/` with a
-  minimal default set — `Decisions.md` is NOT created by default. Always
-  inventory which memory files actually exist before relying on them
-  (`Brief`, `Progress`, `Gotchas`, `Agent`, `Decisions`); create the missing
-  ones with `/workflow-memory`; never copy external history into them.
+- **Memory is local and verified.** The native memory extension
+  auto-bootstraps `.pi/memory/` with the five files (`Brief`, `Progress`,
+  `Gotchas`, `Decisions`, `Agent`) when missing and injects them once per
+  session. Always inventory which memory files actually exist before
+  relying on them; create the missing ones with `/memory-init` — a
+  platform-provided command, the kit ships the `/workflow-memory`
+  procedure; never copy external history into them.
 - **English only.** All kit content, docs, and project artifacts are written
   in English; ids stay ASCII kebab-case.
 - **Validation gate.** From the kit root, with

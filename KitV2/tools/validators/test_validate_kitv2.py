@@ -649,6 +649,157 @@ class ValidatorTests(unittest.TestCase):
                 errors = module.check_consumer_onboarding()
         self.assertTrue(any("markers missing" in error for error in errors), errors)
 
+    def test_memory_contract_passes_with_v2_surface(self) -> None:
+        """D-2026-08-08-22 — the five-file set, memory_read, and the two
+        skills in the memory instruction surfaces, with no v1 residue
+        anywhere, is the valid state."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "## Memory\n\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "Re-read with `memory_read` (omit `file` for all memory).\n"
+                "Load the `memory-writing` skill before editing; run the\n"
+                "`memory-refactor` skill when over budget.\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "workflow-memory.md",
+                "---\ndescription: init consumer memory\n---\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read` omits `file` for all memory; `memory-writing`\n"
+                "governs edits; `memory-refactor` archives over-budget files.\n",
+            )
+            write(root / "rules" / "SKILL.md", "# rule content\n")
+            with mock.patch.object(module, "ROOT", root):
+                self.assertEqual(module.check_memory_contract(), [])
+
+    def test_memory_contract_fails_on_old_tool_residue(self) -> None:
+        """A shipped file teaching a removed v1 memory tool fails the
+        gate — the tool no longer exists, the agent would fail calling it."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "## Memory\n\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read` omits `file`; `memory-writing`; `memory-refactor`.\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "workflow-memory.md",
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            write(
+                root / "recipes" / "SKILL.md",
+                "update the memory with memory_update (action: gotcha_add)\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_memory_contract()
+        self.assertTrue(any("memory-write tool" in error for error in errors), errors)
+
+    def test_memory_contract_fails_on_stale_bootstrap_premise(self) -> None:
+        """The v1 premise that Decisions.md is missing from the bootstrap is
+        false under the v2 extension (it auto-bootstraps the five files)."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "## Memory\n\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "workflow-memory.md",
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            write(
+                root / "rules" / "SKILL.md",
+                "Pi initializes a minimal default set — Decisions.md is "
+                "NOT created by the bootstrap.\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_memory_contract()
+        self.assertTrue(
+            any("stale v1 bootstrap premise" in error for error in errors), errors
+        )
+
+    def test_memory_contract_fails_on_every_stale_premise_variant(self) -> None:
+        """Every stale v1 bootstrap-premise variant is trip-wired, so a
+        regression in one variant cannot slip the suite."""
+        variants = (
+            "Decisions.md is NOT created by default.",
+            "Decisions.md may be missing from the Pi bootstrap.",
+            "the Pi bootstrap may create only Brief/Progress/Gotchas/Agent, "
+            "without `Decisions.md`.",
+            "the bootstrap may not create Decisions.md.",
+        )
+        for variant in variants:
+            with self.subTest(variant=variant):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    write(
+                        root / "AGENTS.md",
+                        "## Memory\n\n"
+                        "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, "
+                        "`Agent`.\n"
+                        "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+                    )
+                    write(
+                        root / ".pi" / "prompts" / "workflow-memory.md",
+                        "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, "
+                        "`Agent`.\n"
+                        "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+                    )
+                    write(root / "rules" / "SKILL.md", variant + "\n")
+                    with mock.patch.object(module, "ROOT", root):
+                        errors = module.check_memory_contract()
+                self.assertTrue(
+                    any("stale v1 bootstrap premise" in error for error in errors),
+                    f"{variant!r}: {errors}",
+                )
+
+    def test_memory_contract_fails_when_file_set_incomplete(self) -> None:
+        """A memory instruction surface stuck on the v1 four-file set
+        (no Decisions) fails the gate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "## Memory\n\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "workflow-memory.md",
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_memory_contract()
+        self.assertTrue(any("file set incomplete" in error for error in errors), errors)
+
+    def test_memory_contract_fails_when_v2_terms_missing(self) -> None:
+        """A memory section that never names the writing/refactor skills
+        teaches none of the v2 workflow — it fails the gate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / "AGENTS.md",
+                "## Memory\n\n"
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "Use memory_read to read.\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "workflow-memory.md",
+                "Files: `Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`.\n"
+                "`memory_read`; `memory-writing`; `memory-refactor`.\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_memory_contract()
+        self.assertTrue(any("must name" in error for error in errors), errors)
+
     def test_declared_skill_dirs_passes_with_descriptions(self) -> None:
         """Root .md files in declared skill dirs with a frontmatter
         description load cleanly (recipes/README.md fix)."""

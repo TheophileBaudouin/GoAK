@@ -27,10 +27,11 @@ These instructions apply to the whole repository.
   validation and record the limitation.
 - Record durable project facts, commands, invariants, and recurring gotchas
   in the resolved native memory surface (` .pi/memory/` ) when available.
-- **Verify which memory files actually exist**: the Pi bootstrap may create
-  only Brief/Progress/Gotchas/Agent, without `Decisions.md`. Never assume the
-  standard set; create the missing files in the expected format, without
-  copying any external history.
+- **Verify which memory files actually exist**: the native memory extension
+  auto-bootstraps the five files (Brief, Progress, Gotchas, Decisions,
+  Agent) when missing. Never assume the standard set is complete; create
+  the missing files in the expected format, without copying any external
+  history.
 - Do not create a repo-local memory file unless the workflow explicitly
   records that fallback decision.
 ```

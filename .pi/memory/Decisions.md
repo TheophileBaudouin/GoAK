@@ -1090,3 +1090,31 @@ in the guide, not repeated in the banner). GOAK.md §3.3
 decision table updated (spec-driven-dev "do not run a separate discussion
 workflow before it" + new "Problem analysis / design decision" row for
 deep-discuss). Validators PASS (kitv2, cognitive).
+
+## Project-memory v2 migration (2026-08-08, D-2026-08-08-22)
+
+- **D-2026-08-08-22 (memory system = project-memory extension v2)** : the
+  user-level project-memory extension was rewritten (v2): `memory_update`,
+  `memory_bootstrap`, and the `memory_refactor` tool no longer exist. Read
+  is the only tool (`memory_read`, omit `file` = all memory); writing is a
+  direct `edit`/`write` of `.pi/memory/*.md` guided by the `memory-writing`
+  skill; refactoring is the `memory-refactor` skill only (archive, never
+  delete); bootstrap is automatic (five files — Brief, Progress, Gotchas,
+  Decisions, Agent — plus AGENTS.md, created when missing, nothing
+  overwritten), with explicit `/memory` (status) and `/memory-init`. This
+  **supersedes** the D-2026-08-05-20 premise ("the Pi bootstrap does not
+  create `Decisions.md` by default"): Decisions.md is part of the
+  auto-bootstrapped set; the doctrine is now "verify which files actually
+  exist, create missing ones via /memory-init, never copy external
+  history". All consumer-kit memory surfaces (KitV2/AGENTS.md Memory
+  section, workflow-memory.md, GOAK.md, spec-driven-dev and workspace-init
+  skills + templates) and metaproject instruction surfaces (instructions.md
+  enforcement registry, Z12 contract, kit-audit dimensions C10/C19) were
+  updated to the v2 doctrine in the same change; `validate-kitv2.py` gained
+  `check_memory_contract` (no v1 tool tokens or stale bootstrap premise in
+  shipped files, v2 facts required in the two memory instruction surfaces).
+  Historical dated records documenting v1 behavior (Gotchas/Progress/
+  Decisions entries) stay as records, per the memory-refactor contract
+  (never rewrite dated history). Gate PASS: validators ×3, router scenarios
+  23/23 + UI 11/11, unit tests, gofmt/vet/lint/test-race/gosec/govulncheck,
+  probes. Plan: `docs/plans/2026-08-08-project-memory-v2-migration.md`.

@@ -196,18 +196,25 @@ skills — live in `ui-kit/AGENTS.md`; read it, not this section.
 
 ## Memory
 
-Pi initializes `.pi/memory/` with a minimal default set — `Decisions.md` is
-NOT created by the bootstrap.
+The native memory extension auto-bootstraps `.pi/memory/` with five files
+when missing (`Brief`, `Progress`, `Gotchas`, `Decisions`, `Agent`) and
+injects their full content once per session, on the first message.
 
-- **Rule**: never assume a memory file exists; never write to a file that
-  does not exist as if it did.
-- **Procedure**: before relying on memory, inventory the real files under
-  `.pi/memory/` (`Brief`, `Progress`, `Gotchas`, `Agent`, `Decisions`);
-  create missing files in the host's expected format, without copying
-  external history.
-- **Reference**: follow the `workflow-memory` skill for initialization and
-  updates. Durable rules, gotchas, and decisions discovered during a
-  spec-driven run go into the resolved memory surface.
+- **Rule**: never assume a memory file exists; verify which files are
+  present before relying on memory; never write to a file as if it
+  existed without checking.
+- **Read**: re-read on demand with the `memory_read` tool — omit `file`
+  to read all memory.
+- **Write**: edit the affected memory file directly. Before editing any
+  memory file, load the `memory-writing` skill (per-file budgets, one
+  idea per line, no cross-file duplication).
+- **Refactor**: when a file exceeds its size budget (alert injected at
+  session start), run the `memory-refactor` skill — archive, never
+  delete to fit.
+- **Reference**: follow the `workflow-memory` prompt for initialization
+  (`/memory-init`) and updates. Durable rules, gotchas, and decisions
+  discovered during a spec-driven run go into the resolved memory
+  surface.
 
 ## Validation
 
