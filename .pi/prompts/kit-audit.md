@@ -396,6 +396,57 @@ drift and routes to the skill; it never initializes a project, never rewrites
    gates (validate-instructions, validate-cognitive). Absence of a green
    result for any of these is a finding.
 
+#### C18. Consumer onboarding system (docs + /goak + banner) — the embedded knowledge surface
+
+The kit ships an onboarding/knowledge system for consumers: the user guide
+`.pi/docs/GOAK.md`, the `/goak` entry point (`.pi/prompts/goak.md`), the
+onboarding banner extension (`.pi/extensions/kit-onboarding.ts` +
+`.pi/onboarding/banner.md`), and the "User guide" pointer section of
+`KitV2/AGENTS.md`. It is shipped, self-contained, and enforced by the
+product validator — the audit verifies consistency, not existence alone.
+
+1. **Guide present and structured**: `.pi/docs/GOAK.md` exists and carries
+   the Get Started level plus the deep-usage levels (Commands, Workflows,
+   Kit structure, Troubleshooting). Every command, tool, and path it names
+   exists in the shipped tree (cross-check `.pi/prompts/`, `.pi/skills/`,
+   `rules/`, `recipes/`, `router/`); anything named but absent is a stale
+   claim (`NON CONFORM`). The guide must stay usable with no external
+   documentation and no build-repository references
+   (`check_no_metaproject_paths` covers the latter).
+2. **`/goak` correctness**: `.pi/prompts/goak.md` exists, has a
+   `description`, and orders the agent to READ the local guide (mentions
+   `.pi/docs/GOAK.md`) rather than answer from memory; it must not point at
+   a renamed/stale path; it must end by inviting follow-up questions. It is
+   router-indexed (C13) and passes validate-instructions (description
+   gate).
+3. **Banner extension**: `.pi/extensions/kit-onboarding.ts` exists, is
+   project-local, subscribes to `session_start`, renders only for
+   `reason: startup | reload`, guards on UI availability, and degrades
+   silently when the banner file is missing (no network, no background
+   process, no state). Its displayed content comes from
+   `.pi/onboarding/banner.md` — content must stay out of code.
+4. **Banner content**: `.pi/onboarding/banner.md` carries the three
+   expected entries — Get Started, new large feature, new small feature —
+   and their pointers are consistent with the real workflows (large →
+   `spec-driven-dev` skill; small → direct routing + `.pi/` prompts/skills;
+   orientation → `/goak`). A banner describing an obsolete workflow or a
+   command that no longer exists is a finding.
+5. **AGENTS.md pointer**: the "User guide" section, delimited by its
+   markers (`<!-- user guide section: begin -->` … `<!-- user guide
+   section: end -->`) with the `## User guide` title between them (N1
+   §5.1, D-2026-08-08-17). The validator `check_consumer_onboarding`
+   enforces this — cite it, do not rebuild it. Three manual merge
+   mechanisms now live in this file (UI work, Project Foundation, User
+   guide) and none may silently swallow another.
+6. **Automated checks to cite, not rebuild**: `validate-kitv2.py`
+   `check_consumer_onboarding` (guide sections, /goak local-path,
+   banner three entries + /goak pointer, extension markers, AGENTS.md
+   markers), `check_no_metaproject_paths`, `check_router` (goak.md
+   indexed), validate-instructions (prompt description). Absence of a
+   green result for any of these is a finding. The CONTENT-consistency
+   part (banner ↔ real workflows, guide claims ↔ tree) is a review
+   control; report it in Phase E.
+
 ### Phase D — Decide "metaproject or Kit?"
 
 This dimension is mandatory for **every file**, including supporting files.
@@ -607,6 +658,17 @@ The table contains at minimum, at each audit:
   review control only; the skill itself self-checks idempotence and
   no-content-loss by procedure (workspace-init SKILL.md §Before you begin /
   §AGENTS.md mechanics).
+- the "consumer onboarding (C18)" row: structure is covered by
+  `validate-kitv2.py` `check_consumer_onboarding` (guide sections, /goak
+  local-path, banner three entries + /goak pointer, extension markers,
+  AGENTS.md markers); the gap is CONTENT consistency — the banner's
+  workflow pointers and the guide's named commands/paths must match the
+  real tree (a renamed command, a removed workflow, a rewritten guide
+  section) — inherently semantic, a review control at each kit-audit run;
+  recommended check: none (no deterministic assertion can verify that the
+  guide describes reality), reason: the mechanical gate guarantees shape,
+  the review guarantees truth; the routing-quality scenarios act as a
+  narrow tripwire for guide-related vocabulary.
 
 ### F. Verdict and next steps
 

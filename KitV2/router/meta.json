@@ -3,7 +3,7 @@
   "anti-pattern": 58,
   "catalog": 80,
   "pattern": 46,
-  "prompt": 3,
+  "prompt": 4,
   "recipe": 15,
   "rule": 14,
   "skill": 9,
@@ -11,7 +11,7 @@
   "source": 55,
   "template": 3
  },
- "index_sha256": "28df1f1248178beca4139af5eaef129954479ea874e0d08e33dc7ef92eab65f3",
+ "index_sha256": "721d6ed13c0070e16883fcab42303f7aa93f4f6fc177a0db063271f6b218b2c9",
  "schema": 1,
  "stopwords": [
   "a",

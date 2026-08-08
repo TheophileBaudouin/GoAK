@@ -20,6 +20,23 @@ declare module "@earendil-works/pi-coding-agent" {
 		content: ToolResultContent[];
 		details: Record<string, unknown>;
 	}
+	export interface SessionStartEvent {
+		reason: "startup" | "reload" | "new" | "resume" | "fork";
+		previousSessionFile?: string;
+	}
+	export interface ExtensionUi {
+		setWidget(
+			key: string,
+			lines: string[] | undefined,
+			options?: { placement?: string },
+		): void;
+	}
+	export interface ExtensionContext {
+		hasUI: boolean;
+		mode: "tui" | "rpc" | "json" | "print";
+		cwd: string;
+		ui: ExtensionUi;
+	}
 	export interface ExtensionAPI {
 		registerTool(definition: {
 			name: string;
@@ -37,6 +54,13 @@ declare module "@earendil-works/pi-coding-agent" {
 				ctx?: unknown,
 			) => Promise<ToolResult> | ToolResult;
 		}): void;
+		on(
+			event: "session_start",
+			handler: (
+				event: SessionStartEvent,
+				ctx: ExtensionContext,
+			) => void | Promise<void>,
+		): void;
 	}
 }
 
@@ -52,9 +76,10 @@ declare module "typebox" {
 declare module "node:fs" {
 	export function readFileSync(path: string | URL, encoding: "utf-8"): string;
 	export function existsSync(path: string | URL): boolean;
-	export function statSync(
-		path: string | URL,
-	): { isDirectory(): boolean; isFile(): boolean };
+	export function statSync(path: string | URL): {
+		isDirectory(): boolean;
+		isFile(): boolean;
+	};
 	export function readdirSync(
 		path: string | URL,
 		options?: { withFileTypes?: boolean },

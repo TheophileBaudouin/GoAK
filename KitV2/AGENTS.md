@@ -4,6 +4,17 @@ This kit is the standalone consumable Go agent kit: rules, recipes, knowledge,
 snippets, templates, probes, and a pinned UI SDK zone — everything an agent
 needs to build idiomatic Go software, Go-generalist first.
 
+<!-- user guide section: begin -->
+## User guide — new to this kit?
+
+The kit ships its own user guide at `.pi/docs/GOAK.md` — the source of
+truth for how to use the kit, readable with no other documentation. A fresh
+user (or an agent asked "how do I use this kit?") should start there, or run
+the `/goak` prompt, which orders the agent to read the guide and explain it.
+The onboarding banner shown at session start (Get Started / new large
+feature / new small feature) points to the same three starting paths.
+<!-- user guide section: end -->
+
 ## Source of truth
 
 | Zone | Mission (one line) | Pointer |
@@ -29,7 +40,10 @@ subject to evidence and validation gates.
 ## Workflow
 
 For ordinary non-trivial work, use the native skills and prompts of `.pi/`
-(checklist-* for reviews, `workflow-memory` for memory). For large-scale
+(checklist-* for reviews, `workflow-memory` for memory). `/goak` explains
+the kit from its shipped user guide (`.pi/docs/GOAK.md`) — use it whenever
+the user asks how to use the kit, instead of answering from general
+knowledge. For large-scale
 transformations (rewrite, migration, overhaul, whole-project refactor), use
 the `spec-driven-dev` skill: it runs the seven-phase pipeline (intent,
 deep analysis with S.U.P.E.R health, grounded refinement, decomposition with

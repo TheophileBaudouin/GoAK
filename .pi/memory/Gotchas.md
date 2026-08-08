@@ -1,5 +1,20 @@
 # Gotchas — Go Engineering Kit
 
+- **2026-08-08** — *Massive working-tree corruption mid-session*: ~909 git-tracked
+  files (including `.pi/memory/*`, `.agent/instructions.md`, `KitV2/go.mod`,
+  `.gitignore`) were truncated to 0 bytes with mode `000` at 14:18:46 by an
+  external git-driven process (untracked files written minutes earlier
+  survived untouched). Detected when `git status` reported 928 modified
+  files and `git diff` failed with "Permission denied". Full recovery:
+  `git restore --source=HEAD --worktree .` (the tree was clean at session
+  start; every 0-byte file was tracked). → **Before declaring work done,
+  verify tree integrity: `find . -type f -perm 000 | wc -l` and
+  `git status --short | wc -l` (expect a small, known set). If tracked
+  files suddenly go 0-byte/mode-000, restore from HEAD immediately —
+  untracked deliverables are not affected by a git-driven sweep, and
+  re-apply your tracked edits afterwards. Do not re-run validators on a
+  corrupted tree and trust the PASS.**
+
 ## Recipes prioritaires 2.3.0 (2026-08-05)
 
 - Une recipe Testcontainers ne peut pas être déclarée couverte par un mock :

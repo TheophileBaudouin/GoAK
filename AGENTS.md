@@ -9,11 +9,11 @@ verifiable by observable application behavior as well as code checks.
 
 ## Before doing anything
 
-Always check the list of pi-subagents available to you. 
+Always check the list of pi-subagents available to you.
 To search for files or information in the project, use Scoot.
-Pi-subagents are designed to be used together and run in parallel, 
-allowing you to work faster and maintain a cleaner context. 
-Always use subagents. You are the orchestrator. 
+Pi-subagents are designed to be used together and run in parallel,
+allowing you to work faster and maintain a cleaner context.
+Always use subagents. You are the orchestrator.
 Except for implementations, you are not required.
 
 ## Decision order
@@ -65,6 +65,11 @@ before changing `KitV2/rules/core/`, adding a dependency or category, changing a
 frontmatter contract, adding a reference project, or changing adapter output.
 Never bypass this approval boundary by silently expanding scope.
 
+## Absolute rules
+
+You must always check which step of the to-do list you are at and strictly follow this to-do list. 
+Every task you do, you do by strictly following this to-do list that you created.
+
 ## Validation
 
 The Python validators require PyYAML (pinned in
@@ -89,3 +94,26 @@ Root `.pi/memory/` is metaproject memory. `KitV2/.pi/` ships reusable
 settings, prompts, and skills only; no consumer memory is shipped. Consumer
 projects initialize their own `.pi/memory/`. Never mix metaproject memory with
 consumer memory.
+
+## Consumer documentation & onboarding (shipped, never optional)
+
+The consumer kit carries an embedded onboarding/knowledge system — the user
+guide `KitV2/.pi/docs/GOAK.md`, the `/goak` entry point
+(`KitV2/.pi/prompts/goak.md`), the onboarding banner
+(`KitV2/.pi/extensions/kit-onboarding.ts` + `.pi/onboarding/banner.md`), and
+the "User guide" section of `KitV2/AGENTS.md`. These are part of the product:
+they ship with every install, must stay usable with no metaproject
+documentation, and are verified by `validate-kitv2.py`
+`check_consumer_onboarding` plus the `kit audit` dimension C18.
+
+Every change to the consumer kit MUST include the documentation review:
+before modifying, identify whether the change affects the guide, `/goak`, the
+banner, or the audit; during the change, update the affected surface in the
+same commit; after the change, verify consistency (code ↔ guide ↔ banner ↔
+`/goak` ↔ `kit audit`) and run the validator. Never ship a kit change that
+documents a command that does not exist, omits a command that exists, or
+describes a workflow that no longer matches the tree — the guide is the
+shipped source of truth, not an editorial afterthought. A future agent that
+modifies the kit must be naturally led to update documentation, banner, and
+audits; if a change touches these surfaces and the guide is left untouched,
+that is a defect.

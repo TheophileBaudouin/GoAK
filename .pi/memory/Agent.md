@@ -164,6 +164,33 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   it is dead and must be deleted + excluded from syncs so it is never
   resurrected or mistaken for the source of truth.
 
+## Consumer documentation & onboarding maintenance (D-2026-08-08-14..17)
+
+- The consumer kit ships an embedded onboarding/knowledge system: the user
+  guide `KitV2/.pi/docs/GOAK.md`, the `/goak` entry point
+  (`KitV2/.pi/prompts/goak.md`), the onboarding banner
+  (`KitV2/.pi/extensions/kit-onboarding.ts` + `.pi/onboarding/banner.md`),
+  and the marker-delimited "User guide" section of `KitV2/AGENTS.md`.
+  These are PART OF THE PRODUCT, shipped with every install, and verified by
+  `validate-kitv2.py check_consumer_onboarding` + `kit audit` C18. The guide
+  is the shipped source of truth: it must stay usable with no metaproject
+  documentation and never reference the build repository.
+- **Documentation review is a mandatory step of every consumer-kit change.**
+  Before modifying: identify whether the change affects the guide, `/goak`,
+  the banner, or the audit. During: update the affected surface in the same
+  change. After: verify consistency (code ↔ guide ↔ banner ↔ `/goak` ↔
+  `kit audit`) and run the validator. Never ship a kit change that documents
+  a nonexistent command, omits an existing command, or describes a workflow
+  that no longer matches the tree.
+- The banner stays orientation-only (Get Started / large feature / small
+  feature) and is never a second documentation; `/goak` stays a small
+  pointer that forces reading the guide; the guide is the detailed source.
+  Information lives once: code = behavior, guide = explanation, `/goak` =
+  access point, banner = immediate orientation, audit = consistency check.
+- Any new surface that merges content into `KitV2/AGENTS.md` MUST use
+  begin/end markers + a dedicated mechanical check (N1 §5.1, D-2026-08-08-12)
+  — today: UI work (sha256), Project Foundation, User guide.
+
 ## Sub-agent delegation (pi-subagents only, owner rule 2026-08-08)
 
 - I delegate every task to a sub-agent EXCLUSIVELY through the pi-subagents

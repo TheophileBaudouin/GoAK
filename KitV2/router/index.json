@@ -1655,6 +1655,29 @@
    ]
   },
   {
+   "description": "Explain the Go Agent Kit (GOAK) from its shipped local user guide, then answer follow-up questions.",
+   "id": "goak",
+   "kind": "prompt",
+   "path": ".pi/prompts/goak.md",
+   "tags": [],
+   "terms": [
+    "goak",
+    "explain",
+    "go",
+    "agent",
+    "kit",
+    "goak",
+    "shipped",
+    "local",
+    "user",
+    "guide",
+    "answer",
+    "follow",
+    "up",
+    "questions"
+   ]
+  },
+  {
    "description": "github.com/golang-jwt/jwt/v5 v5.3.1 — JWT signing and verification for Go. Use when an interoperable signed token is required for APIs or service-to-service auth; not for cookie sessions, key management, or unvalidated token trust.",
    "id": "golang-jwt",
    "kind": "catalog",

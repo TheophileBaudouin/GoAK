@@ -981,6 +981,98 @@ def check_workspace_init_placeholder() -> list[str]:
     return errors
 
 
+def check_consumer_onboarding() -> list[str]:
+    """The consumer onboarding system (D-2026-08-08-14..17) — shipped user
+    guide, /goak entry point, onboarding banner, AGENTS.md pointer.
+
+    The kit must always ship a self-contained onboarding surface: the user
+    guide (.pi/docs/GOAK.md) with Get Started + deep-usage sections, the
+    /goak prompt that points the agent at the local guide, the banner data
+    file with the three entries (Get Started / large feature / small
+    feature), the onboarding extension that renders it, and the
+    marker-delimited "User guide" section in AGENTS.md. Any of these
+    missing or drifted is a regression-guard failure: a consumer must be
+    able to learn the kit from the kit itself, with no external
+    documentation."""
+    errors: list[str] = []
+
+    guide = ROOT / ".pi" / "docs" / "GOAK.md"
+    if not guide.is_file():
+        errors.append(f"{guide}: missing — the consumer user guide is required")
+    else:
+        text = guide.read_text(encoding="utf-8", errors="replace")
+        for heading in (
+            "Get Started",
+            "Commands",
+            "Workflows",
+            "Kit structure",
+            "Troubleshooting",
+        ):
+            if heading not in text:
+                errors.append(f"{guide}: required guide section {heading!r} missing")
+
+    prompt = ROOT / ".pi" / "prompts" / "goak.md"
+    if not prompt.is_file():
+        errors.append(f"{prompt}: missing — the /goak command is required")
+    else:
+        text = prompt.read_text(encoding="utf-8", errors="replace")
+        if ".pi/docs/GOAK.md" not in text:
+            errors.append(
+                f"{prompt}: must point the agent at the local guide "
+                "(.pi/docs/GOAK.md) — a stale or external path is drift"
+            )
+
+    banner = ROOT / ".pi" / "onboarding" / "banner.md"
+    if not banner.is_file():
+        errors.append(f"{banner}: missing — the onboarding banner content is required")
+    else:
+        text = banner.read_text(encoding="utf-8", errors="replace")
+        upper = text.upper()
+        if "GET STARTED" not in upper:
+            errors.append(f"{banner}: Get Started entry missing")
+        if (
+            upper.count("NEW FEATURE") < 2
+            or "LARGE" not in upper
+            or "SMALL" not in upper
+        ):
+            errors.append(
+                f"{banner}: large and small feature entries missing "
+                "(two NEW FEATURE entries expected)"
+            )
+        if "/goak" not in text:
+            errors.append(f"{banner}: must point to the /goak entry point")
+
+    extension = ROOT / ".pi" / "extensions" / "kit-onboarding.ts"
+    if not extension.is_file():
+        errors.append(f"{extension}: missing — the onboarding extension is required")
+    else:
+        text = extension.read_text(encoding="utf-8", errors="replace")
+        for marker in ("session_start", "setWidget", "onboarding"):
+            if marker not in text:
+                errors.append(
+                    f"{extension}: onboarding behavior marker {marker!r} missing"
+                )
+
+    agents = ROOT / "AGENTS.md"
+    if not agents.exists():
+        errors.append(f"{agents}: missing")
+    else:
+        text = agents.read_text(encoding="utf-8", errors="replace")
+        begin = "<!-- user guide section: begin -->"
+        end = "<!-- user guide section: end -->"
+        ib = text.find(begin)
+        ie = text.find(end)
+        if ib == -1 or ie == -1:
+            errors.append(f"{agents}: User guide section markers missing")
+        elif ib > ie:
+            errors.append(f"{agents}: User guide section markers out of order")
+        elif "## User guide" not in text[ib + len(begin) : ie]:
+            errors.append(
+                f"{agents}: User guide section title missing between the markers"
+            )
+    return errors
+
+
 def check_ui_kit_registration(
     root: Path | None = None,
 ) -> list[str]:
@@ -1248,6 +1340,7 @@ def main() -> int:
     errors.extend(check_ui_kit_registration())
     errors.extend(check_ui_corpus_disjointness())
     errors.extend(check_workspace_init_placeholder())
+    errors.extend(check_consumer_onboarding())
     errors.extend(check_ui_router_scenarios())
     errors.extend(check_probe_runner())
     errors.extend(check_template_status())

@@ -359,6 +359,87 @@ class ValidatorTests(unittest.TestCase):
             errors = module.check_ui_kit_registration(root)
         self.assertTrue(any("../rules" in error for error in errors), errors)
 
+    def test_consumer_onboarding_passes_with_full_surface(self) -> None:
+        """The complete onboarding surface (guide, /goak, banner, extension,
+        AGENTS.md section) is the valid shipped state."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "docs" / "GOAK.md",
+                "# Guide\n\n## Get Started\nsteps\n\n## Commands\n\n"
+                "## Workflows\n\n## Kit structure\n\n## Troubleshooting\n",
+            )
+            write(
+                root / ".pi" / "prompts" / "goak.md",
+                "---\ndescription: Explain GOAK from the local guide.\n---\n"
+                "Read `.pi/docs/GOAK.md` first.\n",
+            )
+            write(
+                root / ".pi" / "onboarding" / "banner.md",
+                "1. GET STARTED — /goak\n"
+                "2. NEW FEATURE — LARGE change\n"
+                "3. NEW FEATURE — SMALL change\n",
+            )
+            write(
+                root / ".pi" / "extensions" / "kit-onboarding.ts",
+                '// onboarding extension\npi.on("session_start", () => {}\n'
+                'ctx.ui.setWidget("k", lines)\n',
+            )
+            write(
+                root / "AGENTS.md",
+                "<!-- user guide section: begin -->\n"
+                "## User guide\npointer\n"
+                "<!-- user guide section: end -->\n",
+            )
+            errors = module.check_consumer_onboarding()
+        self.assertEqual(errors, [])
+
+    def test_consumer_onboarding_fails_when_guide_missing(self) -> None:
+        """A shipped kit without the user guide fails the gate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", "content\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_consumer_onboarding()
+        self.assertTrue(any("GOAK.md" in error for error in errors), errors)
+
+    def test_consumer_onboarding_fails_when_goak_points_to_stale_path(self) -> None:
+        """/goak must point at the local guide; a stale or external path is
+        drift (the agent would answer from memory or old docs)."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "prompts" / "goak.md",
+                "---\ndescription: Explain GOAK.\n---\n"
+                "Explain the kit from your general knowledge.\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_consumer_onboarding()
+        self.assertTrue(any("local guide" in error for error in errors), errors)
+
+    def test_consumer_onboarding_fails_when_banner_entry_missing(self) -> None:
+        """The banner must carry the three entries (Get Started, large,
+        small); a partial banner fails the gate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "onboarding" / "banner.md",
+                "1. GET STARTED — /goak\n2. NEW FEATURE — LARGE change\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_consumer_onboarding()
+        self.assertTrue(any("small feature" in error for error in errors), errors)
+
+    def test_consumer_onboarding_fails_when_agents_section_lost(self) -> None:
+        """A removed AGENTS.md User guide pointer section fails the gate
+        (same marker discipline as the Project Foundation section)."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(root / "AGENTS.md", "only other content\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_consumer_onboarding()
+        self.assertTrue(any("markers missing" in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()

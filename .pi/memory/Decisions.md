@@ -964,3 +964,46 @@ questions utilisateur.
   contract pointer count 5→10; router regenerated 281→286 resources. Gate
   PASS: validators ×3, router scenarios 23/23, UI 11/11, probes 16/16,
   unit tests 66/66. Plan: `docs/plans/2026-08-08-llm-reference-pointers.md`.
+- **D-2026-08-08-14 (consumer onboarding system — docs location)**: the
+  consumer user guide lives at `KitV2/.pi/docs/GOAK.md` (single file). NOT a
+  root `docs/` folder: consumer workflows (spec-driven-dev, workspace-init)
+  create the CONSUMER's own `docs/` at the project root, and the installer
+  merges kit files into that same root — a shipped `docs/` would collide
+  with consumer-owned docs. `.pi/` is the shipped Pi surface whose README
+  documents path contracts, and both consumers of the guide (`/goak`,
+  banner) live there. Z8 amended: `.pi/` roles now include `docs/`
+  (user guide) and `onboarding/` (banner content) besides
+  settings/prompts/skills/extensions.
+- **D-2026-08-08-15 (/goak is a prompt template, not an extension command)**:
+  `KitV2/.pi/prompts/goak.md` — Pi-native, zero code, filename = command
+  name; it does not inline the docs, it orders the agent to READ the local
+  guide (`.pi/docs/GOAK.md`) first, explain from it, point to sections,
+  then invite follow-up questions. Z8 §3.2 naming rule amended: workflow/
+  checklist orchestrators keep the `workflow-*`/`checklist-*` convention;
+  the kit entry-point command `/goak` is the single deliberate exception
+  (filename = stable command contract). The prompt is router-indexed
+  (prompt 3→4, index 287).
+- **D-2026-08-08-16 (banner = tiny project-local extension + data file)**:
+  `KitV2/.pi/extensions/kit-onboarding.ts` renders
+  `KitV2/.pi/onboarding/banner.md` as a TUI widget on `session_start` with
+  `reason: startup | reload` only, guarded by `ctx.hasUI`, silent no-op when
+  the file is missing. Content stays out of code (single source for the
+  displayed text; mechanically auditable). Constraints honored: no network,
+  no background process, no state, idempotent (widget key overwrite),
+  minuscule. The banner is orientation only — never a second documentation.
+- **D-2026-08-08-17 (AGENTS.md "User guide" pointer + mechanical check)**:
+  `KitV2/AGENTS.md` gains a marker-delimited section
+  (`<!-- user guide section: begin/end -->` + `## User guide` title) and a
+  new validator check `check_consumer_onboarding` in `validate-kitv2.py`
+  (guide sections, /goak local-path, banner three entries + /goak pointer,
+  extension markers, AGENTS.md markers) — same pattern as
+  `check_workspace_init_placeholder` (N1 §5.1). Three manual merge
+  mechanisms now live in this file (UI work, Project Foundation, User
+  guide); none may silently swallow another. `kit audit` gains dimension
+  C18 (consumer onboarding system) + a Phase E row. `.agent/instructions.md`
+  records the guide's absolutes (guidance-only). No version bump / no
+  release in this change (not requested); router meta stays at manifest
+  2.6.0. Full gate PASS (validators ×3, unit tests 27, scenarios 23/23 +
+  UI 11/11, go gate, consumer Pi smoke: `/goak` expansion reads the guide
+  end-to-end). Plan:
+  `docs/plans/2026-08-08-consumer-onboarding-system.md`.

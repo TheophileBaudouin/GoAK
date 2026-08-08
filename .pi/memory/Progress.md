@@ -125,6 +125,26 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed maintenance
 
+- [x] [2026-08-08] Consumer onboarding & knowledge system (D-2026-08-08-14..17):
+      shipped user guide `KitV2/.pi/docs/GOAK.md` (Get Started + deep usage,
+      LLM-native, decision tables, verified commands) + `/goak` prompt
+      (`.pi/prompts/goak.md`, orders the agent to read the local guide) +
+      onboarding banner (`.pi/extensions/kit-onboarding.ts` renders
+      `.pi/onboarding/banner.md` as a session-start widget on
+      startup/reload) + marker-delimited "User guide" section in
+      KitV2/AGENTS.md; validator `check_consumer_onboarding` (+5 unit
+      tests), kit-audit dimension C18 + Phase E row, Z8 roles table
+      (docs/onboarding/extensions) + /goak naming exception, Z9 §3.5
+      markers rule, .agent/instructions.md row, root AGENTS.md +
+      Agent.md maintenance rules, router regenerated (prompt 3→4, index
+      287, version 2.6.0). Gate PASS (validators ×3, unit tests 27,
+      scenarios 23/23 + UI 11/11, go gate, lint/gosec). Consumer Pi smoke
+      verified end-to-end: `/goak` expands → agent reads
+      .pi/docs/GOAK.md → faithful explanation. Incident: an external
+      git-driven process truncated ~909 tracked files to 0 bytes (mode 000)
+      at 14:18:46 — recovered via `git restore --source=HEAD`; untracked
+      deliverables survived. Plan:
+      docs/plans/2026-08-08-consumer-onboarding-system.md.
 - [x] [2026-08-08] Merged root AGENTS.md + release v2.6.0 (owner mission): KitV2/AGENTS.md rewritten as the single agent file — merges the pinned ui-kit/AGENTS.md instructions into a 'UI work — Wails projects' section (agent-instructions skill discipline; EVERY instruction from both files preserved, adapted not deformed) with a sha256 checksum marker; the re-sync helper now refuses to finish when the marker drifts (merged prose + marker must be updated at every SDK update — Z13 §4, update-ui-kit prompt, idempotent re-sync + stale-marker tripwire tested); pi-lens autofix normalized bullets, Stack line fixed. Release v2.6.0: version bumped across manifest/capabilities/install.sh/README (router meta regenerated), full gate PASS (validators, Go 22/22, UI 11/11, 44 router tests, lint/gosec/govulncheck 0, probes), installer simulated (extraction + validator + probes + ui-kit + settings fused + no .agent leak) and verified end-to-end after push. Decisions D-2026-08-08-04/05.
 
 - [x] [2026-08-07] ui-agent-kit native integration (D-2026-08-07-04..06, owner decision): first-class `KitV2/ui-kit/` zone (pinned `sdk/` mirror @ f9bdd9b = npm 0.1.0 tarball, AGENTS.md verbatim, PIN.md), Z13 contract + governance index, manifest/capabilities (capability `ui-kit`, coverage.ui_kit_skills=7, probes 16), validator (Pi-compat frontmatter, disjointness, node-free UI scenarios) + 8 tests, `search_ui_kit_resources` tool (separate corpus, shared scoring, on-the-fly index from `shared/kit-ui-router-core.ts`), `ui-kit/scenarios.json` 9/9 under the real scoring (gate `run_ui_scenarios.mjs` + negative tripwire), shared modules relocated to `.pi/extensions/shared/` (pre-existing Pi loader fix, headless smoke OK), `tools/sync-ui-kit.sh` Wails-only + probe 16/16, manual gated metaproject re-sync; full gate PASS (validators, Go 22/22, UI 9/9, 38 tests, gofmt/vet/lint/gosec 0, govulncheck 0, probes 16/16), consumer Pi smoke: 2 tools registered, UI query → UI corpus, Go queries → Go corpus with no ui-kit/ paths; plan docs/plans/2026-08-07-ui-agent-kit-integration.md, evidence docs/evidence/2026-08-07/ui-agent-kit-integration/.

@@ -33,6 +33,13 @@ The product's **single entry point** for a consumer agent: what this Kit is, whe
    gate.
 3. Any zone or contract creation updates the map in the same commit.
 4. The listed gate is exact: all commands, or explicitly "PARTIAL if a tool is missing".
+5. **Marker-delimited injected sections** (N1 §5.1, D-2026-08-08-12/17): every
+   section merged into this file carries its own begin/end markers plus a
+   dedicated mechanical check. Today: UI work (sha256 marker,
+   `check_ui_kit_pin`), Project Foundation (`<!-- workspace-init section:
+   begin/end -->`, `check_workspace_init_placeholder`), User guide
+   (`<!-- user guide section: begin/end -->`, `check_consumer_onboarding`).
+   A new merge mechanism without markers + check is non-conformant.
 
 ## 4. Maintenance
 
