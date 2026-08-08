@@ -1656,12 +1656,13 @@
   },
   {
    "description": "Explain the Go Agent Kit (GOAK) from its shipped local user guide, then answer follow-up questions.",
-   "id": "goak",
+   "id": "goak-help",
    "kind": "prompt",
-   "path": ".pi/prompts/goak.md",
+   "path": ".pi/prompts/goak-help.md",
    "tags": [],
    "terms": [
     "goak",
+    "help",
     "explain",
     "go",
     "agent",

@@ -10,7 +10,7 @@ needs to build idiomatic Go software, Go-generalist first.
 The kit ships its own user guide at `.pi/docs/GOAK.md` — the source of
 truth for how to use the kit, readable with no other documentation. A fresh
 user (or an agent asked "how do I use this kit?") should start there, or run
-the `/goak` prompt, which orders the agent to read the guide and explain it.
+the `/goak-help` prompt, which orders the agent to read the guide and explain it.
 The onboarding banner shown at session start (Get Started / new large
 feature / new small feature) points to the same three starting paths.
 <!-- user guide section: end -->
@@ -40,7 +40,7 @@ subject to evidence and validation gates.
 ## Workflow
 
 For ordinary non-trivial work, use the native skills and prompts of `.pi/`
-(checklist-* for reviews, `workflow-memory` for memory). `/goak` explains
+(checklist-* for reviews, `workflow-memory` for memory). `/goak-help` explains
 the kit from its shipped user guide (`.pi/docs/GOAK.md`) — use it whenever
 the user asks how to use the kit, instead of answering from general
 knowledge. For large-scale

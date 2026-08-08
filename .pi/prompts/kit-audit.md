@@ -396,10 +396,10 @@ drift and routes to the skill; it never initializes a project, never rewrites
    gates (validate-instructions, validate-cognitive). Absence of a green
    result for any of these is a finding.
 
-#### C18. Consumer onboarding system (docs + /goak + banner) — the embedded knowledge surface
+#### C18. Consumer onboarding system (docs + /goak-help + banner) — the embedded knowledge surface
 
 The kit ships an onboarding/knowledge system for consumers: the user guide
-`.pi/docs/GOAK.md`, the `/goak` entry point (`.pi/prompts/goak.md`), the
+`.pi/docs/GOAK.md`, the `/goak-help` entry point (`.pi/prompts/goak-help.md`), the
 onboarding banner extension (`.pi/extensions/kit-onboarding.ts` +
 `.pi/onboarding/banner.md`), and the "User guide" pointer section of
 `KitV2/AGENTS.md`. It is shipped, self-contained, and enforced by the
@@ -413,7 +413,7 @@ product validator — the audit verifies consistency, not existence alone.
    claim (`NON CONFORM`). The guide must stay usable with no external
    documentation and no build-repository references
    (`check_no_metaproject_paths` covers the latter).
-2. **`/goak` correctness**: `.pi/prompts/goak.md` exists, has a
+2. **`/goak-help` correctness**: `.pi/prompts/goak-help.md` exists, has a
    `description`, and orders the agent to READ the local guide (mentions
    `.pi/docs/GOAK.md`) rather than answer from memory; it must not point at
    a renamed/stale path; it must end by inviting follow-up questions. It is
@@ -429,7 +429,7 @@ product validator — the audit verifies consistency, not existence alone.
    expected entries — Get Started, new large feature, new small feature —
    and their pointers are consistent with the real workflows (large →
    `spec-driven-dev` skill; small → direct routing + `.pi/` prompts/skills;
-   orientation → `/goak`). A banner describing an obsolete workflow or a
+   orientation → `/goak-help`). A banner describing an obsolete workflow or a
    command that no longer exists is a finding.
 5. **AGENTS.md pointer**: the "User guide" section, delimited by its
    markers (`<!-- user guide section: begin -->` … `<!-- user guide
@@ -439,9 +439,9 @@ product validator — the audit verifies consistency, not existence alone.
    mechanisms now live in this file (UI work, Project Foundation, User
    guide) and none may silently swallow another.
 6. **Automated checks to cite, not rebuild**: `validate-kitv2.py`
-   `check_consumer_onboarding` (guide sections, /goak local-path,
-   banner three entries + /goak pointer, extension markers, AGENTS.md
-   markers), `check_no_metaproject_paths`, `check_router` (goak.md
+   `check_consumer_onboarding` (guide sections, /goak-help local-path,
+   banner three entries + /goak-help pointer, extension markers, AGENTS.md
+   markers), `check_no_metaproject_paths`, `check_router` (goak-help.md
    indexed), validate-instructions (prompt description). Absence of a
    green result for any of these is a finding. The CONTENT-consistency
    part (banner ↔ real workflows, guide claims ↔ tree) is a review
@@ -659,8 +659,8 @@ The table contains at minimum, at each audit:
   no-content-loss by procedure (workspace-init SKILL.md §Before you begin /
   §AGENTS.md mechanics).
 - the "consumer onboarding (C18)" row: structure is covered by
-  `validate-kitv2.py` `check_consumer_onboarding` (guide sections, /goak
-  local-path, banner three entries + /goak pointer, extension markers,
+  `validate-kitv2.py` `check_consumer_onboarding` (guide sections, /goak-help
+  local-path, banner three entries + /goak-help pointer, extension markers,
   AGENTS.md markers); the gap is CONTENT consistency — the banner's
   workflow pointers and the guide's named commands/paths must match the
   real tree (a renamed command, a removed workflow, a rewritten guide

@@ -720,6 +720,56 @@ def check_empty_markdown() -> list[str]:
     return errors
 
 
+def check_declared_skill_dirs() -> list[str]:
+    """Every root-level .md file in a declared skill directory must carry a
+    frontmatter `description` (Pi semantics: a directory listed in
+    .pi/settings.json "skills" loads its root .md files as individual
+    skills when it has no SKILL.md at its root, and skills with a missing
+    description are NOT loaded — recipes/README.md regression, where Pi
+    reported "[Skill conflicts] … description is required").
+
+    A `description` (and a valid `name`) makes the file load cleanly;
+    `disable-model-invocation: true` keeps a pure index out of the system
+    prompt while staying loadable by path."""
+    errors: list[str] = []
+    settings = ROOT / ".pi" / "settings.json"
+    if not settings.exists():
+        return []  # the UI-registration check reports the missing settings
+    try:
+        data = json.loads(settings.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []  # malformed settings is reported elsewhere
+    skills = data.get("skills") if isinstance(data, dict) else None
+    if not isinstance(skills, list):
+        return []
+    for entry in skills:
+        if not isinstance(entry, str) or not entry.startswith("../"):
+            continue
+        declared = (ROOT / entry.removeprefix("../")).resolve()
+        if not declared.is_dir():
+            continue
+        if (declared / "SKILL.md").exists():
+            continue  # a skill root: only SKILL.md loads, root .md files are inert
+        for path in sorted(declared.glob("*.md")):
+            if not path.is_file():
+                continue
+            try:
+                values = parse_frontmatter(path)
+            except ValueError as error:
+                errors.append(str(error))
+                continue
+            if not values.get("description"):
+                errors.append(
+                    f"{path}: root .md in a declared skill directory needs a "
+                    "frontmatter description (Pi loads it as a skill; missing "
+                    "description = skill not loaded + conflict warning)"
+                )
+            name = values.get("name")
+            if name and not re.fullmatch(r"[a-z0-9-]+", str(name)):
+                errors.append(f"{path}: skill name {name!r} must be lowercase a-z0-9-")
+    return errors
+
+
 def check_no_metaproject_paths() -> list[str]:
     """A shipped file must never reference build-repository-only material.
 
@@ -982,17 +1032,17 @@ def check_workspace_init_placeholder() -> list[str]:
 
 
 def check_consumer_onboarding() -> list[str]:
-    """The consumer onboarding system (D-2026-08-08-14..17) — shipped user
-    guide, /goak entry point, onboarding banner, AGENTS.md pointer.
+    """The consumer onboarding system (D-2026-08-08-14..18) — shipped user
+    guide, /goak-help entry point, onboarding banner, AGENTS.md pointer.
 
     The kit must always ship a self-contained onboarding surface: the user
     guide (.pi/docs/GOAK.md) with Get Started + deep-usage sections, the
-    /goak prompt that points the agent at the local guide, the banner data
-    file with the three entries (Get Started / large feature / small
-    feature), the onboarding extension that renders it, and the
-    marker-delimited "User guide" section in AGENTS.md. Any of these
-    missing or drifted is a regression-guard failure: a consumer must be
-    able to learn the kit from the kit itself, with no external
+    /goak-help prompt that points the agent at the local guide, the banner
+    data file with the three entries (Get Started / large feature / small
+    feature), the onboarding extension that appends it once at session
+    start, and the marker-delimited "User guide" section in AGENTS.md. Any
+    of these missing or drifted is a regression-guard failure: a consumer
+    must be able to learn the kit from the kit itself, with no external
     documentation."""
     errors: list[str] = []
 
@@ -1011,9 +1061,9 @@ def check_consumer_onboarding() -> list[str]:
             if heading not in text:
                 errors.append(f"{guide}: required guide section {heading!r} missing")
 
-    prompt = ROOT / ".pi" / "prompts" / "goak.md"
+    prompt = ROOT / ".pi" / "prompts" / "goak-help.md"
     if not prompt.is_file():
-        errors.append(f"{prompt}: missing — the /goak command is required")
+        errors.append(f"{prompt}: missing — the /goak-help command is required")
     else:
         text = prompt.read_text(encoding="utf-8", errors="replace")
         if ".pi/docs/GOAK.md" not in text:
@@ -1039,15 +1089,15 @@ def check_consumer_onboarding() -> list[str]:
                 f"{banner}: large and small feature entries missing "
                 "(two NEW FEATURE entries expected)"
             )
-        if "/goak" not in text:
-            errors.append(f"{banner}: must point to the /goak entry point")
+        if "/goak-help" not in text:
+            errors.append(f"{banner}: must point to the /goak-help entry point")
 
     extension = ROOT / ".pi" / "extensions" / "kit-onboarding.ts"
     if not extension.is_file():
         errors.append(f"{extension}: missing — the onboarding extension is required")
     else:
         text = extension.read_text(encoding="utf-8", errors="replace")
-        for marker in ("session_start", "setWidget", "onboarding"):
+        for marker in ("session_start", "appendEntry", "registerEntryRenderer"):
             if marker not in text:
                 errors.append(
                     f"{extension}: onboarding behavior marker {marker!r} missing"
@@ -1332,6 +1382,7 @@ def main() -> int:
     for path in sorted((ROOT / "knowledge").rglob("*.yaml")):
         errors.extend(check_freshness(path, warnings))
     errors.extend(check_empty_markdown())
+    errors.extend(check_declared_skill_dirs())
     errors.extend(check_router())
     errors.extend(check_router_scenarios())
     errors.extend(check_ui_kit_copy_rules())

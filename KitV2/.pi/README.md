@@ -12,7 +12,7 @@ This directory contains the native Pi runtime surface of the installed Kit.
   inert for non-Wails projects.
 - `prompts/` contains manually invoked workflow and checklist orchestrators
   (`/checklist-api`, `/checklist-release`, `/workflow-memory`) and the
-  `/goak` entry point, which orders the agent to read the shipped user guide
+  `/goak-help` entry point, which orders the agent to read the shipped user guide
   (`docs/GOAK.md`) instead of answering from memory.
 - `skills/` contains durable workflow procedures loaded by context.
 - `extensions/` contains the read-only semantic resource routers (`search_kit_resources`

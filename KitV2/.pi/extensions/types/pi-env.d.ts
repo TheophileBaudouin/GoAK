@@ -36,6 +36,23 @@ declare module "@earendil-works/pi-coding-agent" {
 		mode: "tui" | "rpc" | "json" | "print";
 		cwd: string;
 		ui: ExtensionUi;
+		sessionManager: {
+			getEntries(): Array<{
+				type: string;
+				customType?: string;
+				data?: unknown;
+			}>;
+			getBranch(): Array<{
+				type: string;
+				customType?: string;
+				data?: unknown;
+			}>;
+		};
+	}
+	export interface SessionEntry {
+		type: string;
+		customType?: string;
+		data?: unknown;
 	}
 	export interface ExtensionAPI {
 		registerTool(definition: {
@@ -61,6 +78,41 @@ declare module "@earendil-works/pi-coding-agent" {
 				ctx: ExtensionContext,
 			) => void | Promise<void>,
 		): void;
+		appendEntry(customType: string, data?: Record<string, unknown>): void;
+		registerEntryRenderer(
+			customType: string,
+			renderer: (
+				entry: SessionEntry,
+				options: { expanded: boolean },
+				theme: PiTheme,
+			) => unknown,
+		): void;
+	}
+	export interface PiTheme {
+		bg(color: string, text: string): string;
+		fg(color: string, text: string): string;
+		bold(text: string): string;
+	}
+}
+
+declare module "@earendil-works/pi-tui" {
+	export class Text {
+		constructor(
+			content: string,
+			paddingX?: number,
+			paddingY?: number,
+			background?: unknown,
+		);
+		setText(content: string): void;
+	}
+	export class Box {
+		constructor(
+			paddingX?: number,
+			paddingY?: number,
+			background?: (text: string) => string | undefined,
+		);
+		addChild(child: unknown): void;
+		setBgFn(fn: (text: string) => string | undefined): void;
 	}
 }
 

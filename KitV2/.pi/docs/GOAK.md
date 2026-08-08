@@ -24,7 +24,7 @@ This guide has two levels:
 | Probes | `probes/` | Executable scenarios that verify the kit's observable behavior |
 | Resource router | `router/` + `search_kit_resources` | Find the kit resource that answers a task |
 | UI SDK (Wails only) | `ui-kit/` + `search_ui_kit_resources` | UI rules/patterns for Wails desktop projects |
-| Pi surface | `.pi/` | Prompts (`/goak`, `/checklist-*`), skills (`spec-driven-dev`, `workspace-init`, …), onboarding banner |
+| Pi surface | `.pi/` | Prompts (`/goak-help`, `/checklist-*`), skills (`spec-driven-dev`, `workspace-init`, …), onboarding banner |
 
 What it is **not**: a framework, a starter repo, or a replacement for Go's
 standard library. It reduces the decisions an agent makes when building Go
@@ -41,7 +41,7 @@ where `<ref>` is a release tag such as `v2.6.0` and `<dir>` your project).
    `pi -a`). In interactive mode you will see the GOAK banner with three
    entries: Get Started, new large feature, new small feature (headless
    runs render no UI).
-3. **Type `/goak`** — the agent reads this guide and explains the kit.
+3. **Type `/goak-help`** — the agent reads this guide and explains the kit.
    Ask it anything ("what do I do now?", "how do I start a feature?").
 4. **Verify the install** — run:
 
@@ -69,7 +69,7 @@ sections you need, when you need them.
 
 | Command | What it does | When |
 | --- | --- | --- |
-| `/goak` | Agent reads this guide (`.pi/docs/GOAK.md`) and explains the kit | First use, orientation, any "how do I…" question |
+| `/goak-help` | Agent reads this guide (`.pi/docs/GOAK.md`) and explains the kit | First use, orientation, any "how do I…" question |
 | `/checklist-api` | REST API review checklist with evidence verdicts | Before/while reviewing an API surface |
 | `/checklist-release` | Release checklist separating mechanics and behavior | Before tagging/releasing |
 | `/workflow-memory` | Initialize and maintain your project's `.pi/memory/` | Project start, after durable decisions/blockers |
@@ -133,7 +133,7 @@ the other to it — this is a kit-wide rule.
    files stay the source of truth.
 2. **Browse**: `knowledge/INDEX.md` lists every knowledge domain;
    `router/index.json` is the full generated index.
-3. **Ask**: `/goak` for kit orientation; `/checklist-api` and
+3. **Ask**: `/goak-help` for kit orientation; `/checklist-api` and
    `/checklist-release` for review procedures.
 
 The router applies by default on every Go task: naming (rule `naming`),
@@ -186,9 +186,9 @@ a kit resource for a technology.
 | Symptom | Cause / fix |
 | --- | --- |
 | No GOAK banner at startup | The banner shows on session start/reload in interactive mode only. Run `/reload`; if it still does not show, the banner file `.pi/onboarding/banner.md` is missing (broken install) — reinstall the kit. |
-| `/goak` or `/checklist-*` not found | Prompts load after project trust. Run `/reload` or restart Pi and approve trust (`pi -a` headless). |
+| `/goak-help` or `/checklist-*` not found | Prompts load after project trust. Run `/reload` or restart Pi and approve trust (`pi -a` headless). |
 | Verification reports `PARTIAL` | A tool is missing (python3/PyYAML for the validator, Go toolchain for probes). Install it, or run the commands that can run; never treat PARTIAL as PASS. |
 | `probes/run.sh` fails on module download | Offline bundle pins may have drifted from `go.mod` — the validator's bundle check reports it; reinstall a release where manifest and `go.mod` agree. |
 | `search_kit_resources` returns no match | The query is outside the kit's domain or badly phrased. Reformulate with Go-specific technical terms, or conclude that no kit resource applies. |
 | UI tools return "no ui-kit SDK zone" | The project has no Wails layout (no `wails.json` + `frontend/`); the UI corpus is deliberately inert there. |
-| A doc/command in this guide differs from the kit | This guide is the shipped contract; the kit's validator (`check_consumer_onboarding` inside `validate-kitv2.py`) fails when the guide, `/goak`, or the banner drift from the required structure — report the mismatch rather than working around it. |
+| A doc/command in this guide differs from the kit | This guide is the shipped contract; the kit's validator (`check_consumer_onboarding` inside `validate-kitv2.py`) fails when the guide, `/goak-help`, or the banner drift from the required structure — report the mismatch rather than working around it. |

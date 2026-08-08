@@ -167,8 +167,8 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
 ## Consumer documentation & onboarding maintenance (D-2026-08-08-14..17)
 
 - The consumer kit ships an embedded onboarding/knowledge system: the user
-  guide `KitV2/.pi/docs/GOAK.md`, the `/goak` entry point
-  (`KitV2/.pi/prompts/goak.md`), the onboarding banner
+  guide `KitV2/.pi/docs/GOAK.md`, the `/goak-help` entry point
+  (`KitV2/.pi/prompts/goak-help.md`), the onboarding banner
   (`KitV2/.pi/extensions/kit-onboarding.ts` + `.pi/onboarding/banner.md`),
   and the marker-delimited "User guide" section of `KitV2/AGENTS.md`.
   These are PART OF THE PRODUCT, shipped with every install, and verified by
@@ -176,16 +176,16 @@ unrun scenario, incomplete metadata, or missing relationship is `PARTIAL` or
   is the shipped source of truth: it must stay usable with no metaproject
   documentation and never reference the build repository.
 - **Documentation review is a mandatory step of every consumer-kit change.**
-  Before modifying: identify whether the change affects the guide, `/goak`,
+  Before modifying: identify whether the change affects the guide, `/goak-help`,
   the banner, or the audit. During: update the affected surface in the same
-  change. After: verify consistency (code ↔ guide ↔ banner ↔ `/goak` ↔
+  change. After: verify consistency (code ↔ guide ↔ banner ↔ `/goak-help` ↔
   `kit audit`) and run the validator. Never ship a kit change that documents
   a nonexistent command, omits an existing command, or describes a workflow
   that no longer matches the tree.
 - The banner stays orientation-only (Get Started / large feature / small
-  feature) and is never a second documentation; `/goak` stays a small
+  feature) and is never a second documentation; `/goak-help` stays a small
   pointer that forces reading the guide; the guide is the detailed source.
-  Information lives once: code = behavior, guide = explanation, `/goak` =
+  Information lives once: code = behavior, guide = explanation, `/goak-help` =
   access point, banner = immediate orientation, audit = consistency check.
 - Any new surface that merges content into `KitV2/AGENTS.md` MUST use
   begin/end markers + a dedicated mechanical check (N1 §5.1, D-2026-08-08-12)

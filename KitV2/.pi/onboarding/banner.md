@@ -1,6 +1,7 @@
-GOAK — Go Agent Kit
+Go Agent Kit — welcome
 
-1. GET STARTED — new here? Type /goak (agent reads .pi/docs/GOAK.md) · verify: bash probes/run.sh
-2. NEW FEATURE — large change? Use the spec-driven-dev skill (7 phases; foundation first: workspace-init)
-3. NEW FEATURE — small change? Call search_kit_resources, follow the kit-resource-routing skill, use /checklist-* prompts
-Full guide: /goak — ask anything about this kit
+1. GET STARTED — new here? Type /goak-help to get started.
+2. NEW FEATURE — large change? Start with the spec-driven-dev workflow.
+3. NEW FEATURE — small change? Just describe it — the agent will guide you.
+
+Full guide: /goak-help

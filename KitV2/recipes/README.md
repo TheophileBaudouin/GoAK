@@ -1,3 +1,9 @@
+---
+name: recipes
+description: Index of the runnable Go recipes shipped with this kit (procedures, tests, observable scenarios, limits, roadmap). Read it to browse recipes; each recipe loads on demand from its own SKILL.md.
+disable-model-invocation: true
+---
+
 # Recipes
 
 Recipes are ordered, runnable procedures for a repeatable Go task. Each recipe

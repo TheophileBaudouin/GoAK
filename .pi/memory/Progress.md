@@ -125,21 +125,42 @@ Legend: `[x]` done (validation green) · `[ ]` planned · `[~]` in progress · `
 
 ## Completed maintenance
 
+- [x] [2026-08-08] Onboarding fixes (D-2026-08-08-18, user-reported): (1)
+      `/goak` renamed to `/goak-help` everywhere (prompt file, guide, banner,
+      AGENTS.md, validator, tests, Z8 naming exception, kit-audit C18,
+      instructions.md, Agent.md, router entry `goak-help`); (2) banner is
+      NO LONGER a persistent widget — `kit-onboarding.ts` now appends one
+      chat-transcript entry per session (`pi.appendEntry` +
+      `registerEntryRenderer`, content from `.pi/onboarding/banner.md`),
+      startup|reload only, idempotent (same session never duplicated),
+      silent headless/missing-file — verified by a behavioral mock test
+      (startup append / reload no-dup / headless no-op / renderer / missing
+      file); banner content simplified to user-facing one-liners;
+      (3) skill-conflict fix: `pi` from the kit root reported
+      "[Skill conflicts] recipes/README.md — description is required" (Pi
+      loads root-level .md of declared skill dirs without a root SKILL.md as
+      skills) — fixed with frontmatter (name + description +
+      disable-model-invocation: true) + new validator gate
+      `check_declared_skill_dirs` (+2 tests); verified with Pi's own skills
+      loader: diagnostics NONE, `recipes` skill loads, 15 recipe skills
+      intact. Gate PASS (validators ×3, 29 unit tests, scenarios 23/23 +
+      UI 11/11), consumer smoke: `/goak-help` expands → agent reads the
+      guide.
 - [x] [2026-08-08] Consumer onboarding & knowledge system (D-2026-08-08-14..17):
       shipped user guide `KitV2/.pi/docs/GOAK.md` (Get Started + deep usage,
-      LLM-native, decision tables, verified commands) + `/goak` prompt
-      (`.pi/prompts/goak.md`, orders the agent to read the local guide) +
+      LLM-native, decision tables, verified commands) + `/goak-help` prompt
+      (`.pi/prompts/goak-help.md`, orders the agent to read the local guide) +
       onboarding banner (`.pi/extensions/kit-onboarding.ts` renders
       `.pi/onboarding/banner.md` as a session-start widget on
       startup/reload) + marker-delimited "User guide" section in
       KitV2/AGENTS.md; validator `check_consumer_onboarding` (+5 unit
       tests), kit-audit dimension C18 + Phase E row, Z8 roles table
-      (docs/onboarding/extensions) + /goak naming exception, Z9 §3.5
+      (docs/onboarding/extensions) + /goak-help naming exception, Z9 §3.5
       markers rule, .agent/instructions.md row, root AGENTS.md +
       Agent.md maintenance rules, router regenerated (prompt 3→4, index
       287, version 2.6.0). Gate PASS (validators ×3, unit tests 27,
       scenarios 23/23 + UI 11/11, go gate, lint/gosec). Consumer Pi smoke
-      verified end-to-end: `/goak` expands → agent reads
+      verified end-to-end: `/goak-help` expands → agent reads
       .pi/docs/GOAK.md → faithful explanation. Incident: an external
       git-driven process truncated ~909 tracked files to 0 bytes (mode 000)
       at 14:18:46 — recovered via `git restore --source=HEAD`; untracked

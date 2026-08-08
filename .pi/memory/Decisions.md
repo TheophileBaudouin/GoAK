@@ -1007,3 +1007,25 @@ questions utilisateur.
   UI 11/11, go gate, consumer Pi smoke: `/goak` expansion reads the guide
   end-to-end). Plan:
   `docs/plans/2026-08-08-consumer-onboarding-system.md`.
+- **D-2026-08-08-18 (onboarding fixes — /goak-help rename, transcript banner,
+  skill-conflict fix)**: three user-reported fixes folded into the onboarding
+  system. (1) **Rename**: the entry-point command is now `/goak-help`
+  (`KitV2/.pi/prompts/goak-help.md`); `/goak` is retired everywhere (guide,
+  banner, AGENTS.md, validator, tests, Z8 naming exception, kit-audit C18,
+  instructions.md, Agent.md). (2) **Banner is NOT a persistent widget**: the
+  extension now appends ONE chat-transcript entry per session
+  (`pi.appendEntry("goak-onboarding")` + `registerEntryRenderer`, content
+  from `.pi/onboarding/banner.md`) on `session_start` startup|reload only —
+  it is the first message of the conversation and scrolls up as the user
+  talks; idempotent (session already contains the entry → skip), out of LLM
+  context (custom entries never are), silent when the file is missing.
+  (3) **Skill conflict**: `pi` from the kit root reported "[Skill
+  conflicts] recipes/README.md — description is required" — Pi loads every
+  root-level .md of a declared skill dir (recipes/ has no SKILL.md at root)
+  as a skill; fixed with frontmatter (name + description +
+  disable-model-invocation: true) and a new validator gate
+  `check_declared_skill_dirs` (every root .md in declared dirs must carry a
+  description, mirroring Pi's discovery; +2 tests). Banner content
+  simplified to user-facing one-liners (Get Started / large change / small
+  change + /goak-help pointer). Router regenerated (goak-help entry); full
+  gate PASS; consumer smoke verified.

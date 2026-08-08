@@ -360,8 +360,8 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("../rules" in error for error in errors), errors)
 
     def test_consumer_onboarding_passes_with_full_surface(self) -> None:
-        """The complete onboarding surface (guide, /goak, banner, extension,
-        AGENTS.md section) is the valid shipped state."""
+        """The complete onboarding surface (guide, /goak-help, banner,
+        extension, AGENTS.md section) is the valid shipped state."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             write(
@@ -370,20 +370,21 @@ class ValidatorTests(unittest.TestCase):
                 "## Workflows\n\n## Kit structure\n\n## Troubleshooting\n",
             )
             write(
-                root / ".pi" / "prompts" / "goak.md",
+                root / ".pi" / "prompts" / "goak-help.md",
                 "---\ndescription: Explain GOAK from the local guide.\n---\n"
                 "Read `.pi/docs/GOAK.md` first.\n",
             )
             write(
                 root / ".pi" / "onboarding" / "banner.md",
-                "1. GET STARTED — /goak\n"
+                "1. GET STARTED — /goak-help\n"
                 "2. NEW FEATURE — LARGE change\n"
                 "3. NEW FEATURE — SMALL change\n",
             )
             write(
                 root / ".pi" / "extensions" / "kit-onboarding.ts",
                 '// onboarding extension\npi.on("session_start", () => {}\n'
-                'ctx.ui.setWidget("k", lines)\n',
+                'pi.appendEntry("goak-onboarding", { lines })\n'
+                'pi.registerEntryRenderer("goak-onboarding", () => {})\n',
             )
             write(
                 root / "AGENTS.md",
@@ -404,12 +405,12 @@ class ValidatorTests(unittest.TestCase):
         self.assertTrue(any("GOAK.md" in error for error in errors), errors)
 
     def test_consumer_onboarding_fails_when_goak_points_to_stale_path(self) -> None:
-        """/goak must point at the local guide; a stale or external path is
-        drift (the agent would answer from memory or old docs)."""
+        """/goak-help must point at the local guide; a stale or external path
+        is drift (the agent would answer from memory or old docs)."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             write(
-                root / ".pi" / "prompts" / "goak.md",
+                root / ".pi" / "prompts" / "goak-help.md",
                 "---\ndescription: Explain GOAK.\n---\n"
                 "Explain the kit from your general knowledge.\n",
             )
@@ -424,7 +425,7 @@ class ValidatorTests(unittest.TestCase):
             root = Path(directory)
             write(
                 root / ".pi" / "onboarding" / "banner.md",
-                "1. GET STARTED — /goak\n2. NEW FEATURE — LARGE change\n",
+                "1. GET STARTED — /goak-help\n2. NEW FEATURE — LARGE change\n",
             )
             with mock.patch.object(module, "ROOT", root):
                 errors = module.check_consumer_onboarding()
@@ -439,6 +440,39 @@ class ValidatorTests(unittest.TestCase):
             with mock.patch.object(module, "ROOT", root):
                 errors = module.check_consumer_onboarding()
         self.assertTrue(any("markers missing" in error for error in errors), errors)
+
+    def test_declared_skill_dirs_passes_with_descriptions(self) -> None:
+        """Root .md files in declared skill dirs with a frontmatter
+        description load cleanly (recipes/README.md fix)."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../rules", "../recipes"]\n}\n',
+            )
+            write(
+                root / "recipes" / "README.md",
+                "---\nname: recipes\ndescription: Index of the shipped recipes.\n"
+                "disable-model-invocation: true\n---\n# Recipes\ncontent\n",
+            )
+            with mock.patch.object(module, "ROOT", root):
+                self.assertEqual(module.check_declared_skill_dirs(), [])
+
+    def test_declared_skill_dirs_fails_without_description(self) -> None:
+        """Pi loads root .md files of a declared skill dir as skills; a
+        missing description breaks loading and shows a conflict warning."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write(
+                root / ".pi" / "settings.json",
+                '{\n  "skills": ["../recipes"]\n}\n',
+            )
+            write(root / "recipes" / "README.md", "# Recipes\ncontent\n")
+            with mock.patch.object(module, "ROOT", root):
+                errors = module.check_declared_skill_dirs()
+        self.assertTrue(
+            any("description" in e or "frontmatter" in e for e in errors), errors
+        )
 
 
 if __name__ == "__main__":
