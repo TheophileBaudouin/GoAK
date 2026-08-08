@@ -19,7 +19,7 @@
 set -eu
 
 repo="TheophileBaudouin/GoAK"
-ref="${GAK_REF:-v2.6.0}"
+ref="${GAK_REF:-v2.7.0}"
 target="${1:-./go-agent-kit}"
 
 # --- output helpers: minimal, portable (POSIX sh), auto-disabled ---
